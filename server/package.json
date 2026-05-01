@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "",
+  "author": "KANCHAN NATH",
   "license": "ISC",
-  "type": "commonjs"
+  "type": "module"
 }
