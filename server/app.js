@@ -1,14 +1,11 @@
 import express from "express"
 import dotenv from "dotenv"
+import { prisma } from "./prisma/index.js";
 
 const app = express();
-import { PrismaClient } from '@prisma/client'
-const prisma = new PrismaClient()
 
-const user = await prisma.user.create({
-    data: { name: "Kanchan", email: "k@test.com" }
-})
-const PORT = 4000
+const PORT = process.env.PORT
+
 app.listen(PORT, () => {
     console.log("Hello World");
 
