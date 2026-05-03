@@ -9,6 +9,13 @@ const register = asyncHandler(async(req, res)=>{
         throw new ApiError(400, "all fields are required")
     }
 
+    const user = await prisma.user.create({
+        name:"Kanchan Nath",
+        email:"kanchan.nath.act@gmail.comn",
+        password:"Kan_chan",
+        grade:"UG - 1st Year"
+    })
+    console.log(user);
     
 })
 

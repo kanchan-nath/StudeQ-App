@@ -7,8 +7,6 @@ class ApiResponse {
     }
 }
 
-export { ApiResponse }
-
 
 class ApiError extends Error {
     constructor(
@@ -32,8 +30,6 @@ class ApiError extends Error {
 
     }
 }
-
-export { ApiError }
 
 export {
     ApiResponse,
