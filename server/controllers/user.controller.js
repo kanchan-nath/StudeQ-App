@@ -1,6 +1,7 @@
 import {asyncHandler} from "../utils/asyncHandler.js"
-import { ApiError } from "../utils/Async.js"
-import {prisma } from "../prisma/index.js"
+import { ApiError, ApiResponse } from "../utils/Async.js"
+import prisma from "../lib/prisma.js"
+
 
 const register = asyncHandler(async(req, res)=>{
     const {name, email,password,grade} = req.body
@@ -9,13 +10,25 @@ const register = asyncHandler(async(req, res)=>{
         throw new ApiError(400, "all fields are required")
     }
 
-    const user = await prisma.user.create({
-        name:"Kanchan Nath",
-        email:"kanchan.nath.act@gmail.comn",
-        password:"Kan_chan",
-        grade:"UG - 1st Year"
+    const newUser = await prisma.user.create({
+        data: {
+            name,
+            email,
+            password,
+            grade
+        },
+        omit:{
+            password: true
+        }
     })
-    console.log(user);
+    
+    if(!newUser){
+        throw new ApiError(400, "user not created")
+    }
+    
+    return res
+    .status(200)
+    .json(new ApiResponse(200, newUser))
     
 })
 

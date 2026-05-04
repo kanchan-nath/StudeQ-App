@@ -1,24 +1,18 @@
+import "dotenv/config";
 import express from "express"
-import dotenv from "dotenv"
-import { prisma } from "./prisma/index.js";
+import prisma from "./lib/prisma.js"
 
 const app = express();
+app.use(express.json({ limit: "16kb" }))
+app.use(express.urlencoded({ extended: true, limit: "16kb" }))
+
+
 const PORT = process.env.PORT
 
 
 import registerRoute from "../server/routes/auth.route.js"
 
 app.use("/api/auth", registerRoute)
-
-const user = await prisma.user.create({
-    data: {
-        name: "Kanchan Nath",
-        email: "kanchan.nath.act@gmail.comn",
-        password: "Kan_chan",
-        grade: "UG - 1st Year"
-    }
-})
-console.log(user);
 
 app.listen(PORT, () => {
     console.log("Hello World");
