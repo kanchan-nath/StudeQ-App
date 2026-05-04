@@ -5,23 +5,25 @@ import prisma from "../lib/prisma.js"
 
 const verifyJWT = asyncHandler(async (req, res, next) => {
     try {
-        const token = req.cookies?.accessToken
+        console.log(req);
         
-        if(!token){
+        const token = req.cookies?.accessToken
+
+        if (!token) {
             throw new ApiError(401, "Unathorized request")
         }
 
         const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET)
 
-        console.log("This is decoded token",decodedToken);
+        console.log("This is decoded token", decodedToken);
 
         const user = await prisma.user.findUnique({
-            where:{
-                id:decodedToken.userId,
+            where: {
+                id: decodedToken.userId,
             }
         })
         console.log(user);
-        
+
         if (!user) {
 
             throw new ApiError(401, "Invalid Access Token")
@@ -33,4 +35,4 @@ const verifyJWT = asyncHandler(async (req, res, next) => {
     }
 })
 
-export {verifyJWT}
+export { verifyJWT }
