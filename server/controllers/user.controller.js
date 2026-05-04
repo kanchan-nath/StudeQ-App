@@ -2,7 +2,21 @@ import { asyncHandler } from "../utils/asyncHandler.js"
 import { ApiError, ApiResponse } from "../utils/Async.js"
 import prisma from "../lib/prisma.js"
 import { generateAccessToken, generateRefreshToken } from "../helpers/generateToken.js"
-import bcrypt, { hashSync } from "bcrypt"
+import bcrypt from "bcrypt"
+
+const isPasswordCorrect = async (email, password) => {
+    try {
+        const user = await prisma.user.findUnique({
+            where: {
+                email
+            }
+        })
+
+       return await bcrypt.compare(password, user.password)
+    } catch (error) {
+        throw new ApiError(400, "Incorrect password")
+    }
+}
 
 const hashPassword = async (password) => {
     try {
@@ -18,7 +32,6 @@ const hashPassword = async (password) => {
 const generateAccessAndRefreshToken = async (user) => {
     const accessToken = generateAccessToken(user)
     const refreshToken = generateRefreshToken(user)
-    console.log("the user Id is ", user);
 
     const tokenUser = await prisma.user.update({
         where: { id: user.id },
@@ -27,6 +40,8 @@ const generateAccessAndRefreshToken = async (user) => {
         }
 
     })
+    console.log(tokenUser);
+    
 
     return { accessToken, refreshToken }
 
@@ -88,20 +103,29 @@ const login = asyncHandler(async (req, res) => {
         throw new ApiError(400, "User not exist")
     }
 
-    const { accessToken, refreshToken } = await generateAccessAndRefreshToken(existedUser)
+    const isPasswordValid = await isPasswordCorrect(email,password)
 
-    console.log(accessToken, refreshToken);
+    if (!isPasswordValid){
+        throw new ApiError(400, "Password not matched")
+    }
+
+    const { accessToken, refreshToken } = await generateAccessAndRefreshToken(existedUser)
 
     const options = {
         httpOnly: true,
         secure: true
     }
 
+    const loggedInUser = await prisma.user.findUnique({
+        where:{
+            id:existedUser.id
+        }
+    })
     return res
         .status(200)
         .cookie("accessToken", accessToken, options)
         .cookie("refreshToken", refreshToken, options)
-        .json(new ApiResponse(200, { existedUser, accessToken, refreshToken }, " login successfully"))
+        .json(new ApiResponse(200, { loggedInUser, accessToken, refreshToken }, " login successfully"))
 
 })
 

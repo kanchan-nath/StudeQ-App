@@ -17,7 +17,7 @@ import registerRoute from "../server/routes/auth.route.js"
 app.use("/api/auth", registerRoute)
 
 app.listen(PORT, () => {
-    console.log("Hello World");
+    console.log(`Server is running at ${PORT}`);
 
 })
 export { app }
