@@ -2,8 +2,11 @@ import React from 'react'
 import { useState } from 'react'
 import { useNavigate } from "react-router-dom"
 import BASE_URL from "../lib/api.js"
+import {Link} from "react-router-dom"
 
 const Register = () => {
+
+const navigate = useNavigate()
 
   const [formData, setFormData] = useState({
     name:"",
@@ -32,11 +35,13 @@ const Register = () => {
         body: JSON.stringify(formData)
       })
 
-      const data = await res.json()
-      
       if(!res.ok){
-        setError(data.message)
+        const data = await res.json()
+        return setError(data.message || "Registration failed")
       }
+      const data = await res.json()
+
+      navigate("/login")
       
     } catch (error) {
       console.error("Form submission error", error)
@@ -57,6 +62,7 @@ const Register = () => {
         name='name' 
         type="text" 
         placeholder='Enter your name'
+        required
         value={formData.name}
         onChange={handleChange}
         />
@@ -66,6 +72,7 @@ const Register = () => {
           name='email'
           type="email"
           placeholder='Enter your email'
+          required
           value={formData.email}
           onChange={handleChange}
         />
@@ -75,6 +82,7 @@ const Register = () => {
           name='password'
           type="password"
           placeholder='Create a password'
+          required
           value={formData.password}
           onChange={handleChange}
         />
@@ -84,6 +92,7 @@ const Register = () => {
           name='grade'
           type="grade"
           placeholder='What is your grade'
+          required
           value={formData.grade}
           onChange={handleChange}
         />
@@ -95,6 +104,7 @@ const Register = () => {
         >
           {loading ? "Registering": "Register"}
         </button>
+        <p>Already have account <Link to = "/login">Login</Link></p>
       </form>
     </>
   )
