@@ -32,7 +32,11 @@ const Register = () => {
         body: JSON.stringify(formData)
       })
 
-      console.log(res);
+      const data = await res.json()
+      
+      if(!res.ok){
+        setError(data.message)
+      }
       
     } catch (error) {
       console.error("Form submission error", error)
