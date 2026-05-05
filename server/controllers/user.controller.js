@@ -119,13 +119,16 @@ const login = asyncHandler(async (req, res) => {
     const loggedInUser = await prisma.user.findUnique({
         where:{
             id:existedUser.id
+        },
+        omit:{
+            refreshToken:true
         }
     })
     return res
         .status(200)
         .cookie("accessToken", accessToken, options)
         .cookie("refreshToken", refreshToken, options)
-        .json(new ApiResponse(200, { loggedInUser, accessToken, refreshToken }, " login successfully"))
+        .json(new ApiResponse(200, { loggedInUser, accessToken }, " login successfully"))
 
 })
 
