@@ -44,11 +44,12 @@ const Login = () => {
       navigate("/dashboard")
       
     } catch (error) {
-      console.error("Login faliure", error)
+      setError(setError(error)||"Something went wrong. Try again.") 
     }finally{
       setLoading(false)
     }
   }
+
   return (
     <>
       <form onSubmit={handleSubmit}>
