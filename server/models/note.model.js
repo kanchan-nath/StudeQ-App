@@ -22,3 +22,5 @@ const noteSchema = new mongoose.Schema({
         type:Date
     }
 }, {timestamps: true})
+
+export const Note = mongoose.model("Note", noteSchema)
