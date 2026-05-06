@@ -13,8 +13,10 @@ const PORT = process.env.PORT
 
 
 import registerRoute from "../server/routes/auth.route.js"
+import userRoute from "../server/routes/auth.route.js"
 
 app.use("/api/auth", registerRoute)
+app.use("/api/user", userRoute)
 
 app.listen(PORT, () => {
     console.log(`Server is running at ${PORT}`);
