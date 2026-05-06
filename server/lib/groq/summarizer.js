@@ -14,7 +14,8 @@ IMPORTANT: Return ONLY a raw JSON object in this exact format, no extra text, no
   "title": "...",
   "summary": "...",
   "keyPoints": ["...", "...", "...", "...", "..."]
-}`
+}`,
+                // stream:true,
             }
         ]
     })
