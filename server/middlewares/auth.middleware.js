@@ -7,7 +7,7 @@ import prisma from "../lib/prisma.js"
 const verifyJWT = asyncHandler(async (req, res, next) => {
     try {
 
-        const token = req.cookies?.accessToken
+        const token = req.cookies?.accessToken || req.header("Authorization")?.replace("Bearer ", "")
 
         if (!token) {
             throw new ApiError(401, "Unathorized request")
@@ -18,6 +18,10 @@ const verifyJWT = asyncHandler(async (req, res, next) => {
         const user = await prisma.user.findUnique({
             where: {
                 id: decodedToken.userId,
+            },
+            omit:{
+                refreshToken:true,
+                password:true
             }
         })
 
