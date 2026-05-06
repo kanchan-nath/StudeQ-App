@@ -29,7 +29,7 @@ const Dashboard = () => {
 
       const data = await res.json();
       setUserData({ ...userData, name: data.data.name, email: data.data.email, grade: data.data.grade })
-      console.log(userData.name);
+
 
     };
 

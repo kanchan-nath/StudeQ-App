@@ -39,9 +39,7 @@ const generateAccessAndRefreshToken = async (user) => {
             refreshToken: refreshToken
         }
 
-    })
-    console.log(tokenUser);
-    
+    })    
 
     return { accessToken, refreshToken }
 

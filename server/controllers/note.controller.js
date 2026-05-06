@@ -31,8 +31,17 @@ const createNote = asyncHandler(async (req, res) => {
 
 })
 
-const getNote = asyncHandler(async () => {
+const getNote = asyncHandler(async (req, res) => {
+    const userId = req.user.id
 
+    const allNotes = await Note.find({
+        userId:userId
+    })
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, allNotes, "All notes fetched successfully"))
+    
 })
 
 export {
