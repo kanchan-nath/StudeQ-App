@@ -6,12 +6,23 @@ const summarizeText = async (text) => {
         messages: [
             {
                 role: "user",
-                content: `Think yourself as a teacher and now Summarize this ${text} for a student and list 5 key points and also give a title for it.`
+                content: `You are a teacher. Summarize this text for a student: "${text}"
+List 5 key points and give a title.
+
+IMPORTANT: Return ONLY a raw JSON object in this exact format, no extra text, no markdown:
+{
+  "title": "...",
+  "summary": "...",
+  "keyPoints": ["...", "...", "...", "...", "..."]
+}`
             }
         ]
     })
 
-    console.log(response.choices[0].message.content)
+    const raw = response.choices[0].message.content
+    const data = JSON.parse(raw)
+
+    return data
 }
 
 export { summarizeText }

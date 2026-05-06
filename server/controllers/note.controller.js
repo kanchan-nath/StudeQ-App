@@ -1,6 +1,6 @@
 import { asyncHandler } from "../utils/asyncHandler.js"
 import { ApiError, ApiResponse } from "../utils/Async.js"
-import { summarizeText } from "../lib/gemini/summarizer.js"
+import { summarizeText } from "../lib/groq/summarizer.js"
 import { Note } from "../models/note.model.js"
 
 const createNote = asyncHandler(async (req, res) => {
@@ -12,11 +12,22 @@ const createNote = asyncHandler(async (req, res) => {
     }
 
     const result = await summarizeText(content)
-    console.log(result);
+    
+    if(!result){
+        throw new ApiError(400, "Something went wrong, Try again !")
+    }
+    
+    const {title, summary, keyPoints} = result
 
+    await Note.create({
+        userId,
+        title,
+        summary,
+        keyPoints
+    })
     return res
         .status(200)
-        .json(new ApiResponse(200, usr, "Content created successfuly"))
+        .json(new ApiResponse(200, result, "Content created successfuly"))
 
 })
 
