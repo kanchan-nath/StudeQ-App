@@ -81,6 +81,25 @@ const Notes = () => {
     }
   }
 
+  const handleSubmitDelete = async(id)=>{
+
+    try {
+      const res = await fetch(`${BASE_URL}/api/notes/${id}`,{
+        method:"DELETE",
+        headers:{
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        }
+      })
+
+      const data = await res.json()
+      fetchNotes()
+      
+    } catch (error) {
+      throw new Error(error)
+    }
+  }
+
   useEffect(()=>{
     fetchNotes()
   }, [])
@@ -111,6 +130,7 @@ const Notes = () => {
             <div key={note._id}>
               <h3>{note.title}</h3>
               <p>{note.summary}</p>
+              <button onClick={()=> handleSubmitDelete(note._id)}>Delete</button>
             </div>
           ))}
         </div>
