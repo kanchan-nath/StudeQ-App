@@ -12,9 +12,10 @@ app.use(cors())
 import registerRoute from "../server/routes/auth.route.js"
 import userRoute from "../server/routes/auth.route.js"
 import noteRoute from "./routes/note.route.js"
+import tutorRouter from "../server/routes/tutor.route.js"
 
 app.use("/api/auth", registerRoute)
 app.use("/api/user", userRoute)
 app.use("/api", noteRoute)
-
+app.use("/api/tutor", tutorRouter)
 export { app }
