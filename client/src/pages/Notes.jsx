@@ -1,6 +1,7 @@
 import React from 'react'
 import { useState } from 'react'
 import BASE_URL from "../lib/api.js"
+import { useEffect } from 'react'
 
 const Notes = () => {
   const [error, setError] = useState("")
@@ -11,6 +12,11 @@ const Notes = () => {
     summary:"",
     keyPoints:"",
   })
+
+  const [notes,setNotes] = useState([])
+  const [fetchError, setFetchError] = useState("")
+  const [fetching, setFetching] = useState(false)
+
   const token = localStorage.getItem("token")
 
   const handleChange = async (e) => {
@@ -39,8 +45,8 @@ const Notes = () => {
       const{title, summary, keyPoints} = data.data
 
       setSummaryData({ title, summary, keyPoints })
-      console.log(data)
 
+      fetchNotes()
 
     } catch (error) {
       setError(error || "Content generation failed")
@@ -49,6 +55,35 @@ const Notes = () => {
     }
 
   }
+  const fetchNotes = async()=>{
+    setFetching(true)
+
+    try {
+      const res = await fetch(`${BASE_URL}/api/notes`,{
+        method:"GET",
+        headers:{
+          "Content-Type":"application/json",
+          "Authorization": `Bearer ${token}`
+        }
+      })
+
+      if(!res.ok){
+        throw new Error("fetching problem")
+      }
+
+      const data = await res.json()
+      setNotes(data.data)      
+      
+    } catch (error) {
+      setFetchError(error)
+    }finally{
+      setFetching(false)
+    }
+  }
+
+  useEffect(()=>{
+    fetchNotes()
+  }, [])
   return (
     <>
       <form onSubmit={handleSubmit}>
@@ -67,6 +102,19 @@ const Notes = () => {
         <p>{`Key Points: ${summaryData.keyPoints}`}</p>
       </div>
       }
+
+      <div>
+        <h1>All Chats</h1>
+        
+        <div>
+          {notes.map((note)=>(
+            <div key={note._id}>
+              <h3>{note.title}</h3>
+              <p>{note.summary}</p>
+            </div>
+          ))}
+        </div>
+      </div>
     </>
   )
 }
