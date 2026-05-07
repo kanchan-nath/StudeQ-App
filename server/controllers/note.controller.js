@@ -12,12 +12,12 @@ const createNote = asyncHandler(async (req, res) => {
     }
 
     const result = await summarizeText(content)
-    
-    if(!result){
+
+    if (!result) {
         throw new ApiError(400, "Something went wrong, Try again !")
     }
-    
-    const {title, summary, keyPoints} = result
+
+    const { title, summary, keyPoints } = result
 
     await Note.create({
         userId,
@@ -35,16 +35,34 @@ const getNote = asyncHandler(async (req, res) => {
     const userId = req.user.id
 
     const allNotes = await Note.find({
-        userId:userId
+        userId: userId
     })
 
     return res
-    .status(200)
-    .json(new ApiResponse(200, allNotes, "All notes fetched successfully"))
-    
+        .status(200)
+        .json(new ApiResponse(200, allNotes, "All notes fetched successfully"))
+
 })
 
+const deleteNote = asyncHandler(async(req, res)=>{
+    const {id} = req.params
+    const userId = req.user.id
+    if(!id){
+        throw new ApiError(400, "Not found")
+    }
+
+    const response = await Note.findByIdAndDelete({
+        _id:id,
+        userId:userId
+    })
+    console.log(response);
+    
+    return res
+    .status(200)
+        .json(new ApiResponse(200, response, "Notes deleted succesfully"))
+})
 export {
     createNote,
-    getNote
+    getNote,
+    deleteNote
 }
