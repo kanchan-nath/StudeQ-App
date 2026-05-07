@@ -31,26 +31,42 @@ const ask = asyncHandler(async (req, res) => {
                 }
             ]
         })
-    }
-
-    await Tutorchat.updateOne(
-        { sessionId },
-        {
-            $push: {
-                messages: {
-                    $each: [
-                        { role: "user", content: question },
-                        { role: "tutor", content: data }
-                    ]
+    }else{
+        await Tutorchat.updateOne(
+            { sessionId },
+            {
+                $push: {
+                    messages: {
+                        $each: [
+                            { role: "user", content: question },
+                            { role: "tutor", content: data }
+                        ]
+                    }
                 }
             }
-        }
-    )
+        )
+    }
+
+    
     return res
         .status(200)
         .json(new ApiResponse(200, data, "Answer is provided of that question"))
 })
 
+const getChatHistory = asyncHandler(async(req, res)=>{
+    const userId = req.user.id
+
+    const chatHistory = await Tutorchat.find({
+        userId:userId
+    })
+
+    console.log(chatHistory);
+    
+    return res
+    .status(200)
+    .json(new ApiResponse(200, chatHistory, "All chat history fetched successfully"))
+})
 export {
-    ask
+    ask,
+    getChatHistory
 }
