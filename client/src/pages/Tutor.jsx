@@ -9,7 +9,7 @@ const Tutor = () => {
   const [error, setError] = useState("")
   const [sending, setSending] = useState(false)
   const [questionAnswerData, setQuestionAnswerData] = useState("")
-  const [chatHistory, setChatHistory] = useState("")
+  const [chatHistory, setChatHistory] = useState([])
   const [sessionId, setSessionId] = useState("")
 
   const token = localStorage.getItem("token")
@@ -53,7 +53,7 @@ const Tutor = () => {
 
     const data = await res.json()
 
-    console.log(data);
+    setChatHistory(data.data)
 
   }
   useEffect(() => {
@@ -65,8 +65,8 @@ const Tutor = () => {
       <form onSubmit={handleSubmitQuestion}>
 
         <input type="text" required onChange={handleChangeQuestion} value={question} name='question' />
-        <button>
-          Ask
+        <button disabled = {sending}>
+          {sending ? "Genereting" : "Ask"}
         </button>
       </form>
 
@@ -77,7 +77,26 @@ const Tutor = () => {
         </div>
       }
 
+      <div>
+        <h1>Chat Conversation</h1>
+        {
+          chatHistory.map((chat)=>(
+            <div key={chat._id}>
+              {
+                chat.messages.map((item, index)=>(
+                  <div key={index}>
 
+                    <p>
+                      <strong>{item.role}:</strong> {item.content}
+                    </p>
+
+                  </div>
+                ))
+              }
+            </div>
+          ))
+        }
+      </div>
     </>
   )
 }
