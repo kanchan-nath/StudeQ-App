@@ -1,12 +1,28 @@
 import groq from "./groq.js"
+import { webSearch } from "../websearch.js"
 
-const questionAnswer = async (text) => {
+const questionAnswer = async (query) => {
+    const searchResult = await webSearch(query)
+    
+    const prompt = `
+    You are an AI assistant.
+
+    Use the following search results to answer accurately.
+
+    Search Results:
+    ${searchResult}
+
+    Question:
+    ${query}
+
+    Answer properly using the search results.`
+
     const response = await groq.chat.completions.create({
         model: "llama-3.3-70b-versatile",
         messages: [
             {
                 role: "user",
-                content: `You are a helpful study tutor for Indian students. Answer this clearly: ${text}`,
+                content: prompt,
                 // stream:true,
             }
         ]
