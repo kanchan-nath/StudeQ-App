@@ -1,13 +1,15 @@
 import groq from "./groq.js"
 import { webSearch } from "../websearch.js"
 
-const questionAnswer = async (query) => {
+const questionAnswer = async (query, subject) => {
     const searchResult = await webSearch(query)
-    
-    const prompt = `
-    You are an AI assistant.
 
-    Use the following search results to answer accurately.
+    const prompt = `
+    Think yourself as a ${subject} Teacher.
+    Format all responses using markdown.
+    Use ## for section headers, **bold** for key terms,
+    bullet lists for multiple items, and keep paragraphs short.
+    Now Use the following search results to answer accurately.
 
     Search Results:
     ${searchResult}
