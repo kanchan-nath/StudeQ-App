@@ -1,49 +1,49 @@
 import groq from "./groq.js";
 
-const quiz = async(topic, subject)=>{
+const quiz = async (topic, subject) => {
 
     const prompt = `
-        
-Generate at least 5 multiple choice questions(you may generate more if the topic warrants it).
+You are a quiz generator for the subject: ${subject}.
+Generate at least 5 multiple choice questions on the topic: ${topic}.
+The questions must be strictly relevant to "${topic}" within "${subject}".
 
 Return ONLY valid JSON.
 Do not add explanations, headings, notes, markdown fences, or extra text outside the JSON.
 
 Response format:
 
-    [
-        {
-            "question": "Markdown formatted question",
-            "options": [
-                { "optionId": "A", "text": "Markdown formatted option" },
-                { "optionId": "B", "text": "Markdown formatted option" },
-                { "optionId": "C", "text": "Markdown formatted option" },
-                { "optionId": "D", "text": "Markdown formatted option" }
-            ],
-            "answer": "A"
-        }
-    ]
+[
+    {
+        "question": "Markdown formatted question",
+        "options": [
+            { "optionId": "A", "text": "Markdown formatted option" },
+            { "optionId": "B", "text": "Markdown formatted option" },
+            { "optionId": "C", "text": "Markdown formatted option" },
+            { "optionId": "D", "text": "Markdown formatted option" }
+        ],
+        "answer": "A"
+    }
+]
 
-    Rules:
-    - The entire response must be valid JSON array.
+Rules:
+- The entire response must be valid JSON array.
 - The array must contain a minimum of 5 question objects.
 - Every string value may contain Markdown formatting.
 - Each question must contain exactly 4 options.
 - Option IDs must always be exactly: A, B, C, D — in that order.
-- "answer" must contain only the single correct option ID(one of: A, B, C, or D).
+- "answer" must contain only the single correct option ID (one of: A, B, C, or D).
 - Do not duplicate answer text inside "answer".
 - Distribute correct answers across A, B, C, D — do not cluster them on the same option.
 - Do not use trailing commas.
 - Escape quotes properly inside strings.
 - Do not return anything except the JSON array.
-
-    `
+`
 
     const response = await groq.chat.completions.create({
         model: "llama-3.3-70b-versatile",
-        messages:[
+        messages: [
             {
-                role:"user",
+                role: "user",
                 content: prompt
             }
         ]
@@ -54,9 +54,11 @@ Response format:
     return data
 }
 
-const flashcards = async(topic,subject)=>{
+const flashcards = async (topic, subject) => {
     const prompt = `
-        Generate 10 educational flashcards about the topic: ${topic} and subject is ${subject}.
+       You are a flashcard generator for the subject: ${subject}.
+
+Generate at least 5 flashcards on the topic: ${topic}.
 
 Return the response ONLY in valid JSON format as an array like this:
 
@@ -76,11 +78,11 @@ Rules:
     `
 
     const response = await groq.chat.completions.create({
-        model:"llama-3.3-70b-versatile",
-        messages:[
+        model: "llama-3.3-70b-versatile",
+        messages: [
             {
-                role:"user",
-                content:prompt
+                role: "user",
+                content: prompt
             }
         ]
     })
