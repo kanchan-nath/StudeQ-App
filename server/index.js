@@ -11,13 +11,13 @@ const io = new Server(server,{
     }
 })
 
-io.on("connection",(socket)=>{
-    console.log(`${socket.id} is connected`);
-})
+// io.on("connection",(socket)=>{
+//     console.log(`${socket.id} is connected`);
+// })
 
-io.on("disconnect", (socket) => {
-    console.log(`${socket.id} is disconnected`);
-})
+// io.on("disconnect", (socket) => {
+//     console.log(`${socket.id} is disconnected`);
+// })
 const PORT = process.env.PORT
 
 connectDB()
