@@ -1,7 +1,8 @@
 import { asyncHandler } from "../utils/asyncHandler.js"
 import { ApiError, ApiResponse } from "../utils/Async.js"
-import {quiz} from "../lib/groq/quiz.js"
+import {quiz, flashcards} from "../lib/groq/quiz.js"
 import {Quiz} from "../models/quiz.model.js"
+import {Flascards} from "../models/flashcard.model.js"
 
 const generateQuiz = asyncHandler(async(req, res)=>{
     const {topic, subject, quizId} = req.body
@@ -43,7 +44,46 @@ const generateQuiz = asyncHandler(async(req, res)=>{
     .json(new ApiResponse(200, data, "Quiz generate successfully"))
 })
 
+const generateFlashcards = asyncHandler(async(req, res)=>{
+    const { topic, subject, flashcardId } = req.body
+    const userId = req.user.id
 
+    if (!topic || !subject || !flashcardId) {
+        throw new ApiError(400, "All fields are required")
+    }
+
+    const data = await flashcards(topic, subject)
+
+    let flashcard = await Flascards.findOne({
+        flashcardId
+    })
+
+    if(!flashcard){
+        await Flascards.create({
+            userId,
+            flashcardId,
+            flashcards:data
+        })
+    }else{
+        await Flascards.updateOne(
+            {
+                flashcardId
+            },
+            {
+                $push:{
+                    flashcards:{
+                        $each: data
+                    }
+                }
+            }
+        )
+    }
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, data, "FLashcards generate successfully"))
+})
 export {
-    generateQuiz
+    generateQuiz,
+    generateFlashcards
 }

@@ -53,4 +53,43 @@ Response format:
     const data = JSON.parse(result)
     return data
 }
-export {quiz}
+
+const flashcards = async(topic,subject)=>{
+    const prompt = `
+        Generate 10 educational flashcards about the topic: ${topic} and subject is ${subject}.
+
+Return the response ONLY in valid JSON format as an array like this:
+
+[
+  {
+    "front": "Question or term",
+    "back": "Answer or definition"
+  }
+]
+
+Rules:
+- Exactly 10 flashcards
+- "front" should contain a short question, keyword, or concept
+- "back" should contain a clear and concise explanation or answer
+- Keep the language simple and student-friendly
+- Do not include markdown, extra text, or explanations outside the JSON
+    `
+
+    const response = await groq.chat.completions.create({
+        model:"llama-3.3-70b-versatile",
+        messages:[
+            {
+                role:"user",
+                content:prompt
+            }
+        ]
+    })
+
+    const raw = response.choices[0].message.content
+    const data = JSON.parse(raw)
+    return data
+}
+export {
+    quiz,
+    flashcards
+}
