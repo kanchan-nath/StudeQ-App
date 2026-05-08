@@ -4,13 +4,13 @@ import { questionAnswer } from "../lib/groq/question-answer.js"
 import { Tutorchat } from "../models/tutorchat.model.js"
 
 const ask = asyncHandler(async (req, res) => {
-    const { question, sessionId } = req.body
+    const { question, sessionId, subject } = req.body
     const userId = req.user.id
     if (!question || !sessionId) {
         throw new ApiError(400, "Question not found OR session end")
     }
 
-    const data = await questionAnswer(question)
+    const data = await questionAnswer(question, subject)
 
     let chat = await Tutorchat.findOne({
         sessionId

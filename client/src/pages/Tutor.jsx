@@ -3,15 +3,19 @@ import { useState } from 'react'
 import BASE_URL from "../lib/api.js"
 import { useEffect } from 'react'
 import { v4 as uuidv4 } from "uuid";
-
+import Markdown from "react-markdown"
 const Tutor = () => {
   const [question, setQuestion] = useState("")
   const [error, setError] = useState("")
   const [sending, setSending] = useState(false)
   const [questionAnswerData, setQuestionAnswerData] = useState("")
-  const [chatHistory, setChatHistory] = useState("")
+  const [chatHistory, setChatHistory] = useState([])
   const [sessionId, setSessionId] = useState("")
-
+  const [subject, setSubject] = useState("")
+  const SUBJECTS = [
+    "Mathematics", "Physics", "Chemistry", "Biology",
+    "History", "Geography", "English", "Computer Science"
+  ]
   const token = localStorage.getItem("token")
 
   const handleChangeQuestion = async (e) => {
@@ -29,7 +33,7 @@ const Tutor = () => {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${token}`
         },
-        body: JSON.stringify({ question, sessionId })
+        body: JSON.stringify({ question, sessionId, subject })
       })
 
       const data = await res.json()
@@ -53,7 +57,7 @@ const Tutor = () => {
 
     const data = await res.json()
 
-    console.log(data);
+    setChatHistory(data.data)
 
   }
   useEffect(() => {
@@ -63,21 +67,48 @@ const Tutor = () => {
   return (
     <>
       <form onSubmit={handleSubmitQuestion}>
-
+        <h1>Ask your doubt:</h1>
         <input type="text" required onChange={handleChangeQuestion} value={question} name='question' />
-        <button>
-          Ask
+        <button disabled={sending}>
+          {sending ? "Genereting" : "Ask"}
         </button>
+
+        {
+          SUBJECTS.map((sub)=>(
+            <button key={sub} onClick={()=> setSubject(sub)}>
+              {sub}
+            </button>
+          ))
+        }
       </form>
 
       {question &&
         <div>
           <p>{question}</p>
-          <p>{questionAnswerData}</p>
+          <Markdown>{questionAnswerData}</Markdown>
         </div>
       }
 
+      <div>
+        <h1>Chat Conversation</h1>
+        {
+          chatHistory.map((chat) => (
+            <div key={chat._id}>
+              {
+                chat.messages.map((item, index) => (
+                  <div key={index}>
 
+                    <p>
+                      <strong>{item.role}:</strong> {item.content}
+                    </p>
+
+                  </div>
+                ))
+              }
+            </div>
+          ))
+        }
+      </div>
     </>
   )
 }
