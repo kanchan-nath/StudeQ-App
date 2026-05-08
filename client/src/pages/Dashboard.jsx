@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { jwtDecode } from "jwt-decode"
 import BASE_URL from "../lib/api.js"
 import { useNavigate, Link } from "react-router-dom"
+import { socket } from '../lib/socket.js'
 
 const Dashboard = () => {
   const navigate = useNavigate()
@@ -14,6 +15,10 @@ const Dashboard = () => {
   const token = localStorage.getItem("token")
 
   useEffect(() => {
+    socket.on("connect", () => {
+      console.log("Connected to server:", socket.id);
+    });
+    
     const fetchData = async () => {
       const res = await fetch(`${BASE_URL}/api/user/userinfo`, {
         method: "GET",
