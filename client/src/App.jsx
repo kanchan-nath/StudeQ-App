@@ -9,6 +9,7 @@ import Notes from "./pages/Notes.jsx"
 import Quiz from "./pages/Quiz.jsx"
 import Tutor from "./pages/Tutor.jsx"
 import StudyRoom from "./pages/StudyRoom.jsx"
+import RoomChat from './pages/RoomChat.jsx'
 
 const App = () => {
   return (
@@ -20,8 +21,10 @@ const App = () => {
         <Route path='/dashboard' element={<ProtectedRoute component={<Dashboard/>}/>} />
         <Route path='/notes' element={<ProtectedRoute component={<Notes />} />} />
         <Route path='/quiz' element={<ProtectedRoute component={<Quiz />} />} />
-        <Route path='/studyroom' element={<ProtectedRoute component={<StudyRoom />} />} />
         <Route path='/tutor' element={<ProtectedRoute component={<Tutor />} />} />
+        <Route path='/study-room' element={<ProtectedRoute component={<StudyRoom />} />} />
+        <Route path='/study-room/:roomId' element={<ProtectedRoute component={<RoomChat roomId="123" username="Kanchan"/>} />} />
+
 
       </Routes>
     </>
