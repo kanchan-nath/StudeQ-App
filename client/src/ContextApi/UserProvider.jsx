@@ -8,29 +8,34 @@ const UserProvider = ({children}) => {
 
     const token = localStorage.getItem("token")
 
-    useEffect(async()=>{
+   
+    useEffect(()=>{
+      const fetchUser = async () => {
         try {
-            const res = await fetch(`${BASE_URL}/api/auth/userinfo`,{
-              method:"GET",
-              headers:{
-                "Content-Type":" application/json",
-                "Authorization": `Bearer ${token}`
-              }
-              
-            })
-
-            if(!res.ok){
-              throw new Error("user details not fetched")
+          const res = await fetch(`${BASE_URL}/api/auth/userinfo`, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${token}`
             }
 
-            const data = await res.json()
+          })
 
-            setUser(data.data)
-            setLoading(false)
+          if (!res.ok) {
+            throw new Error("user details not fetched")
+          }
+
+          const data = await res.json()
+
+          setUser(data.data)
+          setLoading(false)
 
         } catch (error) {
-            setLoading(false)
+          setLoading(false)
         }
+
+      }
+        fetchUser()
     }, [])
   return (
     <UserContext.Provider value={{user, setUser, loading}}>

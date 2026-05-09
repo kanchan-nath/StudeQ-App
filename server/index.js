@@ -11,29 +11,23 @@ const io = new Server(server, {
     }
 })
 
-io.on("connection", (socket) => {
-    console.log(`${socket.id} is connected`);
+io.on("connection",(socket)=>{
+    console.log(`User is connected - ${socket.id}`);
 
-    socket.on("join_room", ({ roomId, username }) => {
-        socket.join(roomId)
-
-        socket.data.username = username
-        socket.data.roomId = roomId
-
-        socket.to(roomId).emit("user_joined", {
-            username
-        })
+    socket.on("join_room",async(data)=>{
+        await socket.join(data.roomId)
+        socket.data.roomId = data.roomId
+        socket.to(data.roomId).emit("join_room_notice", data)
+        
     })
-    socket.on("send_message", ({ roomId, message, username, time }) => {
-        socket.to(roomId).emit('receive-message', { username, message, time })
-     })
-    socket.on("typing", () => { })
-    socket.on("disconnect", () => {
-        socket.to(socket.data.roomId).emit("user_left", { username: socket.data.username });
-     })
 
+    socket.on("send_message",(data)=>{
+        console.log(data.roomId);
+        
+        io.to(data.roomId).emit("send_message", data)
+    })
+    
 })
-
 
 const PORT = process.env.PORT
 
