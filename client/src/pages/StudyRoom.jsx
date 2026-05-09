@@ -75,12 +75,14 @@ const StudyRoom = () => {
         }
         
       </div>
+
       <div>
         {
           getRooms.map((item,index)=>(
             <div key={index}>
               <h2>Room Name: {item.name}</h2>
               <p>Room Id: {item.id}</p>
+              <button>Join </button>
             </div>
           ))
         }
@@ -88,5 +90,6 @@ const StudyRoom = () => {
     </>
   )
 }
+
 
 export default StudyRoom
