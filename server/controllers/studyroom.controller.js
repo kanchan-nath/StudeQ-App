@@ -35,7 +35,17 @@ const createRoom = asyncHandler(async (req, res) => {
 })
 
 const getAllRoom = asyncHandler(async (req, res) => {
+    const userId = req.user.id
 
+    const data = await prisma.studyRoom.findMany({
+        where:{
+            createdById:userId
+        }
+    })
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, data, `All rooms fetched successfully`))
 })
 export {
     createRoom,
