@@ -4,6 +4,9 @@ import BASE_URL from "../lib/api.js"
 const StudyRoom = () => {
   const [getRooms, setGetRooms] = useState([])
   const token = localStorage.getItem("token")
+  const [showButton, setShowButton] = useState(true)
+  const [name, setName] = useState("")
+
 
   const fetchAllRooms = async()=>{
     try {
@@ -25,18 +28,52 @@ const StudyRoom = () => {
     
 
   }
+
+  const handleClick = async()=>{
+    setShowButton(false)
+  }
+
+  const handleChange = (e)=>{
+    setName(e.target.value)
+  }
+
+  const handleSubmit = async()=>{
+    try {
+      const res = await fetch(`${BASE_URL}/api/rooms`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify({ name })
+      })
+
+      if(!res.ok){
+        throw new Error("something went wrong")
+      }
+    } catch (error) {
+      throw new Error("Room creation failed", error)
+    }
+
+  }
   useEffect(()=>{
 
     fetchAllRooms()
-    console.log(getRooms);
     
   }, [])
   return (
     <>
       <div>
-        <button>
-          Create Room
-        </button>
+        {
+          showButton ? <button onClick={handleClick}>
+            Create Room
+          </button> :
+          <form onSubmit={handleSubmit} >
+            <label htmlFor="name">Room Name: </label>
+            <input type="text " value={name} required onChange={handleChange} />
+          </form>
+        }
+        
       </div>
       <div>
         {
