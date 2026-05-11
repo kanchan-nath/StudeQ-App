@@ -1,24 +1,33 @@
 import { asyncHandler } from "../utils/asyncHandler.js"
 import { ApiError, ApiResponse } from "../utils/Async.js"
 import fs from "fs"
-import {PDFParse} from "pdf-parse"
+import { PDFParse } from "pdf-parse"
 import { analyzePDF } from "../lib/groq/pdfAnalyze.js"
 
-const pdfAnalyze = asyncHandler(async(req, res)=>{
-    const pdfLocalFilePath = req.files?.pdf[0]?.path
+const pdfAnalyze = asyncHandler(async (req, res) => {
+    try {
+        const pdfLocalFilePath = req.files?.pdf?.[0]?.path
+        if (!pdfLocalFilePath) throw new ApiError(400, "No PDF uploaded")
 
-    const dataBuffer = fs.readFileSync(pdfLocalFilePath)
-    const uint8Array = new Uint8Array(dataBuffer)
-    const parser = new PDFParse(uint8Array)
-    const result = await parser.getText();
+        const dataBuffer = fs.readFileSync(pdfLocalFilePath)
+        const uint8Array = new Uint8Array(dataBuffer)
+        const parser = new PDFParse(uint8Array)
+        const result = await parser.getText();
 
-    const data  = await analyzePDF(result.text)
-    console.log(result.text);
-    
-    return res
-    .status(200)
-    .json(new ApiResponse(200, {data}, "file extracted suucesfully"))
-    
+        const data = await analyzePDF(result.text)
+
+        fs.unlinkSync(pdfLocalFilePath)
+
+        return res
+            .status(200)
+            .json(new ApiResponse(200, data, "file extracted suucesfully"))
+    } finally {
+        if (imageLocalFilePath && fs.existsSync(imageLocalFilePath)) {
+            fs.unlinkSync(imageLocalFilePath)
+        }
+    }
+
+
 })
 
 export {
