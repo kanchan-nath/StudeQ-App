@@ -11,6 +11,7 @@ import Tutor from "./pages/Tutor.jsx"
 import StudyRoom from "./pages/StudyRoom.jsx"
 import RoomChat from './pages/RoomChat.jsx'
 import ImageAnalysis from './pages/ImageAnalysis.jsx'
+import PDFSummary from './pages/PDFSummary.jsx'
 
 const App = () => {
   return (
@@ -26,6 +27,7 @@ const App = () => {
         <Route path='/study-room' element={<ProtectedRoute component={<StudyRoom />} />} />
         <Route path='/study-room/:roomId' element={<ProtectedRoute component={<RoomChat/>} />} />
         <Route path='/image-analysis' element={<ProtectedRoute component={<ImageAnalysis />} />} />
+        <Route path='/pdf-analysis' element={<ProtectedRoute component={<PDFSummary />} />} />
 
       </Routes>
     </>

@@ -37,8 +37,8 @@ ${EXTRACTED_TEXT}`
             }
         ]
     })
-
-    const data = response.choices[0].message.content
+    
+    const data = response.choices[0].message    
 
     return data
 
