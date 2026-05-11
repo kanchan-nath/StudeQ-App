@@ -23,7 +23,7 @@ const App = () => {
         <Route path='/quiz' element={<ProtectedRoute component={<Quiz />} />} />
         <Route path='/tutor' element={<ProtectedRoute component={<Tutor />} />} />
         <Route path='/study-room' element={<ProtectedRoute component={<StudyRoom />} />} />
-        <Route path='/study-room/:roomId' element={<ProtectedRoute component={<RoomChat roomId="123" username="Kanchan"/>} />} />
+        <Route path='/study-room/:roomId' element={<ProtectedRoute component={<RoomChat/>} />} />
 
 
       </Routes>

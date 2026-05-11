@@ -8,7 +8,7 @@ const RoomChat = () => {
   const { user } = useUser()
   const [joinUser, setJoinUser] = useState("")
   const name = user?.name?.toUpperCase()
-  const roomId = "vxbds-fdfdfnf-dfldshf"
+  const roomId = "1"
 
   const handleChange = (e) => {
     setText(e.target.value)
@@ -64,7 +64,7 @@ const RoomChat = () => {
 
       <div>
         {message.map((msg) => (
-          <h1 key={msg.id}>{msg.text}</h1>
+          <h1 key={msg.id}>{msg.sender}:{msg.text}</h1>
         ))}
       </div>
     </>
