@@ -60,10 +60,12 @@ const Dashboard = () => {
       >Logout</button>
 
       <nav>
-        <Link to="/notes">Notes</Link>
-        <Link to="/quiz">Quiz</Link>
-        <Link to="/studyroom">Study Room</Link>
+        <Link to="/notes">Notes </Link>
+        <Link to="/quiz">Quiz </Link>
+        <Link to="/studyroom">Study Room </Link>
         <Link to="/tutor">Tutor</Link>
+        <Link to="/image-analysis">Image Analysis</Link>
+
 
       </nav>
     </>
