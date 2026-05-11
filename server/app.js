@@ -17,6 +17,7 @@ import quizRouter from "../server/routes/quiz.route.js"
 import studyRoomRouter from "../server/routes/studyroom.route.js"
 import imageAnalysisRouter from "../server/routes/imageAnalysis.route.js"
 import pdfAnalysisRouter from "./routes/pdfAnalysis.route.js"
+import schedulerRouter from "./routes/scheduler.route.js"
 
 app.use("/api/auth", registerRoute)
 app.use("/api/user", userRoute)
@@ -26,4 +27,6 @@ app.use("/api/quiz", quizRouter)
 app.use("/api", studyRoomRouter)
 app.use("/api/image", imageAnalysisRouter)
 app.use("/api/pdf", pdfAnalysisRouter)
+app.use("/api", schedulerRouter)
+
 export { app }
