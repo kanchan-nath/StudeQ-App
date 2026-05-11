@@ -3,17 +3,17 @@ import { ApiError, ApiResponse } from "../utils/Async.js"
 import prisma from "../lib/prisma.js"
 
 const createRoom = asyncHandler(async (req, res) => {
-    const { name } = req.body
+    const { name, roomId } = req.body
     const userId = req.user.id
 
-    if (!name) {
+    if (!name || !roomId) {
         throw new ApiError(400, "Name is required to create study room")
     }
 
     const room = await prisma.studyRoom.findFirst({
         where: {
             createdById: userId,
-            name
+            name,
         }
     })
 
@@ -25,6 +25,7 @@ const createRoom = asyncHandler(async (req, res) => {
     const data = await prisma.studyRoom.create({
         data: {
             name,
+            roomId,
             createdById: userId
         }
     })
@@ -37,11 +38,7 @@ const createRoom = asyncHandler(async (req, res) => {
 const getAllRoom = asyncHandler(async (req, res) => {
     const userId = req.user.id
 
-    const data = await prisma.studyRoom.findMany({
-        where:{
-            createdById:userId
-        }
-    })
+    const data = await prisma.studyRoom.findMany()
 
     return res
     .status(200)

@@ -6,3 +6,6 @@ node_modules
 
 /generated/prisma
 .DS_Store
+
+server/uploads/*
+!server/uploads/.gitkeep

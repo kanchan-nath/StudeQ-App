@@ -49,6 +49,7 @@ model QuizQuestion {
 model StudyRoom {
   id          Int    @id @default(autoincrement())
   name        String
+  roomId      String
   createdById Int
   createdBy   User   @relation(fields: [createdById], references: [id])
 }
