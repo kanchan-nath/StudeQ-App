@@ -125,7 +125,7 @@ const Scheduler = () => {
                         <div key={index}>
                             <p>Subject: {item.subject}</p>
                             <p>Topic: {item.topic}</p>
-                            <p>Date: {item.date}</p>
+                            <p>Date:  {new Date(item.schedulerDate).toLocaleDateString()}</p>
                             <p>Duration: {item.duration}</p>
                             <p>Completed: {item.completed}</p>
                         </div>
