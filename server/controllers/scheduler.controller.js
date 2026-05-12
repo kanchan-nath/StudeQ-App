@@ -1,6 +1,7 @@
 import { asyncHandler } from "../utils/asyncHandler.js"
 import { ApiError, ApiResponse } from "../utils/Async.js"
 import {scheduleEntry} from "../models/scheduleEntry.model.js"
+import { generateStudyPlan } from "../lib/groq/generateStudyPlan.js"
 
 const createScheduler = asyncHandler(async(req, res)=>{
     const {  subject ,topic, schedulerDate,duration} = req.body
@@ -39,22 +40,23 @@ const getScheduler = asyncHandler(async(req,res)=>{
 const updateScheduler = asyncHandler(async(req, res)=>{
     const {schedulerId} = req.params
 
-    const { subject, topic, schedulerDate, duration } = req.body
+    const { subject, topic, schedulerDate, duration, completed } = req.body
 
     const userId = req.user.id
 
     const data = await scheduleEntry.findOneAndUpdate(
         {
-            schedulerId,
+            _id:schedulerId,
             userId
         },
         {
             subject,
             topic,
             schedulerDate,
-            duration
+            duration,
+            completed
         },{
-            const : true
+            new : true
         }
     )
 
@@ -64,8 +66,25 @@ const updateScheduler = asyncHandler(async(req, res)=>{
 
 
 })
+
+const generatePlan = asyncHandler(async(req, res)=>{
+    const { subjects, hoursPerDay, goalDate } = req.body
+
+    if(!subjects || !hoursPerDay | !goalDate){
+        throw new ApiError(400, "All fields are required")
+    }
+
+     
+    const data = await generateStudyPlan(subjects, hoursPerDay, goalDate)
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, data, "Study plan created"))
+
+})
 export {
     createScheduler,
     getScheduler,
-    updateScheduler
+    updateScheduler,
+    generatePlan
 }
