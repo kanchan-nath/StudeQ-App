@@ -11,6 +11,14 @@ const Scheduler = () => {
     const [loading, setLoading] = useState(false)
     const [formResult, setFormResult] = useState([])
     const [formDataResult, setFormDataResult] = useState({})
+    const [isGenerate_AI_Study_Plan, setIsGenerate_AI_Study_Plan] = useState(false)
+
+    const [studyPlanData, setStudyPlanData] = useState({
+        subjects: "",
+        hoursPerDay: "",
+        goalDate: ""
+    })
+
     const token = localStorage.getItem("token")
 
     const handleChange = (e) => {
@@ -90,6 +98,26 @@ const Scheduler = () => {
 
     }
 
+    const handlebuttonGenerativeAI = async (e) => {
+        e.preventDefault()
+        setIsGenerate_AI_Study_Plan(true)
+
+        try {
+            const res = await fetch(`${BASE_URL}/api/scheduler/generate-plan`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
+                body: JSON.stringify(studyPlanData)
+            })
+        } catch (error) {
+            console.error(error)
+        } finally {
+            setIsGenerate_AI_Study_Plan(false)
+        }
+    }
+
     useEffect(() => {
         fetchData()
 
@@ -152,6 +180,38 @@ const Scheduler = () => {
                             <p>Completed: <button name='completed' onClick={(e) => handleClickCompletedButton(e, item._id)}>Done</button></p>
                         </div>
                     ))
+                }
+            </div>
+
+            <div>
+
+                {!isGenerate_AI_Study_Plan
+                    ? <button onClick={() => setIsGenerate_AI_Study_Plan(true)}>Generate AI Study Plan</button>
+                    : <form onSubmit={handlebuttonGenerativeAI}>
+                        <label htmlFor="subjects">Subjects: </label>
+                        <input
+                            type="text"
+                            name='subjects'
+                            required
+                            onChange={handleChangeStudyPlan}
+                        />
+
+                        <label htmlFor="hoursPerDay">Hours Per Day: </label>
+                        <input
+                            type="number"
+                            name='hoursPerDay'
+                            required
+                            onChange={handleChangeStudyPlan}
+                        />
+
+                        <label htmlFor="goalDate">Goal Date : </label>
+                        <input
+                            type="text"
+                            name='goalDate'
+                            required
+                            onChange={handleChangeStudyPlan}
+                        />
+                    </form>
                 }
             </div>
         </>
