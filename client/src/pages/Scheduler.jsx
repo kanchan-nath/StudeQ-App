@@ -5,13 +5,12 @@ const Scheduler = () => {
         subject: "",
         topic: "",
         schedulerDate: "",
-        duration: ""
-
+        duration: "",
+        completed: false
     })
     const [loading, setLoading] = useState(false)
     const [formResult, setFormResult] = useState([])
     const [formDataResult, setFormDataResult] = useState({})
-
     const token = localStorage.getItem("token")
 
     const handleChange = (e) => {
@@ -66,6 +65,29 @@ const Scheduler = () => {
         } catch (error) {
             console.error(error)
         }
+    }
+
+    const handleClickCompletedButton = async (e, schedulerId) => {
+        try {
+            setFormData({ ...formData, [e.target.name]: true })
+            console.log(schedulerId);
+
+            const res = await fetch(`${BASE_URL}/api/scheduler/${schedulerId}`, {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
+                body: JSON.stringify({ completed: true })
+            })
+
+            const data = await res.json()
+            console.log(data);
+        } catch (error) {
+            console.error(error)
+        }
+
+
     }
 
     useEffect(() => {
@@ -123,11 +145,11 @@ const Scheduler = () => {
                 {
                     formResult.map((item, index) => (
                         <div key={index}>
-                            <p>Subject: {item.subject}</p>
+                            <p>Subject: {item.subject} </p>
                             <p>Topic: {item.topic}</p>
                             <p>Date:  {new Date(item.schedulerDate).toLocaleDateString()}</p>
                             <p>Duration: {item.duration}</p>
-                            <p>Completed: {item.completed}</p>
+                            <p>Completed: <button name='completed' onClick={(e) => handleClickCompletedButton(e, item._id)}>Done</button></p>
                         </div>
                     ))
                 }
