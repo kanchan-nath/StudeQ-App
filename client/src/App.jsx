@@ -13,6 +13,7 @@ import RoomChat from './pages/RoomChat.jsx'
 import ImageAnalysis from './pages/ImageAnalysis.jsx'
 import PDFSummary from './pages/PDFSummary.jsx'
 import Scheduler from './pages/Scheduler.jsx'
+import GeneratePlanView from './pages/GeneratePlanView.jsx'
 
 const App = () => {
   return (
@@ -30,6 +31,7 @@ const App = () => {
         <Route path='/image-analysis' element={<ProtectedRoute component={<ImageAnalysis />} />} />
         <Route path='/pdf-analysis' element={<ProtectedRoute component={<PDFSummary />} />} />
         <Route path='/scheduler' element={<ProtectedRoute component={<Scheduler />} />} />
+        <Route path='/scheduler/generate-plan' element={<ProtectedRoute component={<GeneratePlanView />} />} />
 
       </Routes>
     </>
