@@ -2,6 +2,7 @@ import { asyncHandler } from "../utils/asyncHandler.js"
 import { ApiError, ApiResponse } from "../utils/Async.js"
 import {scheduleEntry} from "../models/scheduleEntry.model.js"
 import { generateStudyPlan } from "../lib/groq/generateStudyPlan.js"
+import { StudyPlan } from "../models/studyPlan.js"
 
 const createScheduler = asyncHandler(async(req, res)=>{
     const {  subject ,topic, schedulerDate,duration} = req.body
@@ -82,9 +83,34 @@ const generatePlan = asyncHandler(async(req, res)=>{
     .json(new ApiResponse(200, data, "Study plan created"))
 
 })
+
+const saveGeneratePlan = asyncHandler(async(req, res)=>{
+    const { subjects, hoursPerDay, goalDate, generatedPlan } = req.body
+
+    const userId = req.user.id
+
+    if (!subjects || !hoursPerDay | !goalDate || !generatedPlan) {
+        throw new ApiError(400, "All fields are required")
+    }
+
+
+    const data = await StudyPlan.create({
+        userId,
+        subjects,
+        hoursPerDay,
+        goalDate,
+        generatedPlan
+    })
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, data, "Study plan saved in mognoDB"))
+
+})
 export {
     createScheduler,
     getScheduler,
     updateScheduler,
-    generatePlan
+    generatePlan,
+    saveGeneratePlan
 }
