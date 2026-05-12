@@ -65,6 +65,9 @@ const Dashboard = () => {
         <Link to="/studyroom">Study Room </Link>
         <Link to="/tutor">Tutor</Link>
         <Link to="/image-analysis">Image Analysis</Link>
+        <Link to="/pdf-analysis">PDF Analysis</Link>
+        <Link to="/scheduler">Scheduler</Link>
+
 
 
       </nav>
