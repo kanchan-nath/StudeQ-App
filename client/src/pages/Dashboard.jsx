@@ -203,56 +203,7 @@ const Dashboard = () => {
         </section>
 
       </main>
-
-      {/* ── RIGHT PANEL (no scroll) ────────────────────────── */}
-      <aside className="right-panel" role="complementary" aria-label="Sidebar widgets">
-
-        {/* Upgrade card */}
-        <div className="upgrade-card">
-          <div className="upgrade-card__header">
-            <div className="upgrade-card__badge" aria-hidden="true">⭐</div>
-            <h3 className="upgrade-card__title">Go Premium</h3>
-          </div>
-          <p className="upgrade-card__desc">
-            Unlock unlimited AI sessions, advanced PDF analysis, priority tutor access,
-            and your full study history.
-          </p>
-          <button className="upgrade-card__btn">Upgrade now</button>
-        </div>
-
-        {/* Upcoming exams */}
-        <div className="panel-widget" aria-labelledby="upcoming-heading">
-          <h3 className="panel-widget__title" id="upcoming-heading">
-            📅 Upcoming
-          </h3>
-          <p className="panel-widget__body">
-            No exams scheduled yet. Add a deadline to get a personalized study plan.
-          </p>
-          <Link to="/scheduler" className="panel-widget__link">Add exam date →</Link>
-        </div>
-
-        {/* Streak */}
-        <div className="panel-widget streak-widget" role="status" aria-label="Current study streak">
-          <div className="streak-widget__left">
-            <span aria-hidden="true">🔥</span>
-            1-day streak!
-          </div>
-          <Link to="/" className="streak-widget__link">Leaderboard →</Link>
-        </div>
-
-        {/* Announcements */}
-        <div className="panel-widget" aria-labelledby="announce-heading">
-          <h3 className="panel-widget__title" id="announce-heading">
-            🎉 What's New
-          </h3>
-          <p className="panel-widget__body">
-            <strong className="text-primary">Image Analysis is live!</strong><br />
-            Drop any diagram or photo and get an instant AI breakdown. Try it now.
-          </p>
-          <Link to="/image-analysis" className="panel-widget__link">Try it →</Link>
-        </div>
-
-      </aside>
+      
     </div>
   )
 }

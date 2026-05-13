@@ -725,18 +725,7 @@ ol {
     gap: 8px;
 }
 
-/* ── 13. RIGHT PANEL ────────────────────────────────────────── */
-.right-panel {
-    grid-area: rightpanel;
-    background: var(--clr-bg);
-    border-left: 1px solid var(--clr-border);
-    overflow: hidden;
-    /* NO SCROLL - fixed height */
-    display: flex;
-    flex-direction: column;
-    gap: var(--sp-4);
-    padding: var(--sp-6) var(--sp-5);
-}
+
 
 /* Premium upgrade card */
 .upgrade-card {
