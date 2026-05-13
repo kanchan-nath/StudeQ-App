@@ -24,7 +24,7 @@ const App = () => {
   const showNavbar = token && !hideNavOn.includes(location.pathname);
   return (
     <>
-      {showNavbar && <Navbar/>}
+      {/* {showNavbar && <Navbar/>} */}
       <Routes>
         <Route path='/' element={<Home/>} />
         <Route path='/register' element={<Register/>} />
