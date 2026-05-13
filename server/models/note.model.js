@@ -18,6 +18,10 @@ const noteSchema = new mongoose.Schema({
     keyPoints:{
         type: [String]
     },
+    isPinned:{
+        type :Boolean,
+        default:false
+    },
     createdAt:{
         type:Date
     }

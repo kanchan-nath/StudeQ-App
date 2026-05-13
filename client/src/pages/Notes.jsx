@@ -6,6 +6,7 @@ import { jsPDF } from "jspdf";
 
 
 const Notes = () => {
+  const [pinned, setPinned] = useState(false)
   const [isCopied, setIsCopied] = useState(false)
   const [editId, setEditId] = useState("")
   const inputRef = useRef(null)
@@ -13,11 +14,13 @@ const Notes = () => {
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
   const [content, setContent] = useState("")
-  const [summaryData, setSummaryData] = useState({
+  const [summaryData, setSummaryData] = useState([{
     title: "",
     summary: "",
-    keyPoints: "",
-  })
+    keyPoints: [],
+    _id:"",
+    isPinned: false
+  }])
   const [notes, setNotes] = useState([])
   const [fetchError, setFetchError] = useState("")
   const [fetching, setFetching] = useState(false)
@@ -65,10 +68,10 @@ const Notes = () => {
         }
 
         const data = await res.json()
-        const { title, summary, keyPoints } = data.data
+        const { title, summary, keyPoints, _id, isPinned } = data.data
 
-        setSummaryData({ title, summary, keyPoints })
-
+        setSummaryData({ title, summary, keyPoints, _id, isPinned })
+        
         fetchNotes()
       } catch (error) {
         setError(error || "Content generation failed")
@@ -96,7 +99,7 @@ const Notes = () => {
       }
 
       const data = await res.json()
-      setNotes(data.data)
+      setNotes(data.data);
 
     } catch (error) {
       setFetchError(error)
@@ -153,6 +156,34 @@ const Notes = () => {
     doc.text(text, 10, 10, { maxWidth: 180 })
     doc.save(`${summaryText.title}`)
   }
+
+  const tooglePin = async (data) => {
+    const newPinned = !pinned
+    setPinned(newPinned)
+
+    try {
+      const res = await fetch(`${BASE_URL}/api/notes/${data._id}/pin`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify({newPinned})
+      })
+
+      if (!res.ok) {
+        throw new Error(res.statusText)
+      }
+
+      const result = await res.json()
+      
+      setNotes(result.data)
+    } catch (error) {
+      setPinned(!newPinned) // rollback on fail
+      console.error(error)
+    }
+  }
+
   useEffect(() => {
     fetchNotes()
   }, [])
@@ -173,7 +204,8 @@ const Notes = () => {
           <p>{`Summary Data: ${summaryData.summary}`}</p>
           <p>{`Key Points: ${summaryData.keyPoints}`}</p>
           <button onClick={handleCopy}>{isCopied ? "Copied": "Copy to clipboard"}</button>
-          <button onClick={()=>handleDownload(summaryData)}>Download PDF</button>
+          <button onClick={()=>handleDownload(summaryData)}>Download PDF </button>
+          <button onClick={() => tooglePin(summaryData)}>Pin</button>
         </div>
       }
 

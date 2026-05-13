@@ -19,7 +19,7 @@ const createNote = asyncHandler(async (req, res) => {
 
     const { title, summary, keyPoints } = result
 
-    await Note.create({
+    const data = await Note.create({
         userId,
         title,
         summary,
@@ -27,7 +27,7 @@ const createNote = asyncHandler(async (req, res) => {
     })
     return res
         .status(200)
-        .json(new ApiResponse(200, result, "Content created successfuly"))
+        .json(new ApiResponse(200, data, "Content created successfuly"))
 
 })
 
@@ -100,9 +100,39 @@ const updateNote = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, {}, "Note is updated"))
 
 })
+
+const tooglePin = asyncHandler(async(req, res)=>{
+    const {isPinned} =  req.body
+
+    const {id} = req.params
+
+    const userId= req.user.id
+
+    await Note.findOneAndUpdate(
+        {
+            userId,
+            _id:id
+        },
+        {
+            isPinned
+        }
+    )
+    const sortQuery = isPinned ? { isPinned: -1, createdAt: -1 } : { createdAt: -1 };
+
+    const data = await Note.find(
+        {
+            userId
+        }
+    ).sort(sortQuery)
+    
+    return res
+    .status(200)
+    .json(new ApiResponse(200, data, "pin successful"))
+})
 export {
     createNote,
     getNote,
     deleteNote,
-    updateNote
+    updateNote,
+    tooglePin
 }
