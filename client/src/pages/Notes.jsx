@@ -4,6 +4,7 @@ import BASE_URL from "../lib/api.js"
 import { useEffect } from 'react'
 
 const Notes = () => {
+  const [isCopied, setIsCopied] = useState(false)
   const [editId, setEditId] = useState("")
   const inputRef = useRef(null)
   const [editValue, setEditValue] = useState("")
@@ -128,6 +129,22 @@ const Notes = () => {
 
   }
 
+  const handleCopy = async()=>{
+
+    try {
+      await navigator.clipboard.writeText(JSON.stringify(notes.map(note => ({
+        summary: note.summary,
+        title: note.title,
+        keyPoints: note.keyPoints
+      })), ))
+      setIsCopied(true);
+
+      setTimeout(() => setIsCopied(false), 2000);
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
   useEffect(() => {
     fetchNotes()
   }, [])
@@ -147,6 +164,7 @@ const Notes = () => {
           <h1>{`Title: ${summaryData.title}`}</h1>
           <p>{`Summary Data: ${summaryData.summary}`}</p>
           <p>{`Key Points: ${summaryData.keyPoints}`}</p>
+          <button onClick={handleCopy}>{isCopied ? "Copied": "Copy to clipboard"}</button>
         </div>
       }
 
