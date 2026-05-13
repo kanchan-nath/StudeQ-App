@@ -1,7 +1,9 @@
 import React, { useState } from 'react'
 import BASE_URL from "../lib/api.js"
+import Loader from "../components/Loader";
 
 const GeneratePlanView = () => {
+    const [loader, setLoader] = useState(false)
     const [isGenerate_AI_Study_Plan, setIsGenerate_AI_Study_Plan] = useState(false)
     const [loadingSavePlanButton, setLoadingSavePlanButton] = useState(false)
     const [studyPlanData, setStudyPlanData] = useState({
@@ -18,6 +20,7 @@ const GeneratePlanView = () => {
         e.preventDefault()
         setIsGenerate_AI_Study_Plan(true)
         setLoadingSavePlanButton(true)
+        setLoader(true)
 
         try {
             const res = await fetch(`${BASE_URL}/api/scheduler/generate-plan`, {
@@ -34,12 +37,17 @@ const GeneratePlanView = () => {
             }
 
             const data = await res.json()
+            setLoader(false)
             setStudyPlanDataResult(data.data)
 
         } catch (error) {
             console.error(error)
+            setLoader(false)
+
         } finally {
             setIsGenerate_AI_Study_Plan(false)
+            setLoader(false)
+
         }
     }
 
@@ -48,6 +56,8 @@ const GeneratePlanView = () => {
     }
 
     const handleClickSavePlan = async () => {
+        setLoader(true)
+
         try {
             const res = await fetch(`${BASE_URL}/api/scheduler/generate-plan/save`, {
                 method: "POST",
@@ -64,16 +74,19 @@ const GeneratePlanView = () => {
             })
 
             const data = await res.json()
+            setLoader(false)
+
             console.log(data);
 
         } catch (error) {
             throw new Error(error)
         }
     }
-
+    if (loader) return <Loader />;  
     return (
 
         <>
+            
             <div>
 
                 {!isGenerate_AI_Study_Plan
