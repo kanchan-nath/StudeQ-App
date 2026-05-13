@@ -2,6 +2,8 @@ import React, { useRef } from 'react'
 import { useState } from 'react'
 import BASE_URL from "../lib/api.js"
 import { useEffect } from 'react'
+import { jsPDF } from "jspdf";
+
 
 const Notes = () => {
   const [isCopied, setIsCopied] = useState(false)
@@ -16,7 +18,6 @@ const Notes = () => {
     summary: "",
     keyPoints: "",
   })
-
   const [notes, setNotes] = useState([])
   const [fetchError, setFetchError] = useState("")
   const [fetching, setFetching] = useState(false)
@@ -145,6 +146,13 @@ const Notes = () => {
     }
   }
 
+  const handleDownload = (summaryText)=>{
+   const text = [ `Title: ${summaryText.title}`, `Summary Data: ${summaryText.summary}`, `Key Points: ${summaryText.keyPoints}`]
+
+    const doc = new jsPDF()
+    doc.text(text, 10, 10, { maxWidth: 180 })
+    doc.save(`${summaryText.title}`)
+  }
   useEffect(() => {
     fetchNotes()
   }, [])
@@ -165,6 +173,7 @@ const Notes = () => {
           <p>{`Summary Data: ${summaryData.summary}`}</p>
           <p>{`Key Points: ${summaryData.keyPoints}`}</p>
           <button onClick={handleCopy}>{isCopied ? "Copied": "Copy to clipboard"}</button>
+          <button onClick={()=>handleDownload(summaryData)}>Download PDF</button>
         </div>
       }
 
