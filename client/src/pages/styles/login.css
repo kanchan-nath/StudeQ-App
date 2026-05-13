@@ -765,3 +765,115 @@ body {
         transition-duration: 0.01ms !important;
     }
 }
+
+/* ============================================================
+   login.css ADDITIONS — login-specific components
+   Social buttons, divider, eye toggle, terms footer
+   ============================================================ */
+
+/* ── SOCIAL ROW ───────────────────────────────────────────── */
+.auth-social-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-3);
+    margin-bottom: var(--space-5);
+    animation: slideUp var(--dur-slow) var(--ease-out) 100ms both;
+}
+
+.auth-social-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-4);
+    background: var(--color-bg-left);
+    border: 1.5px solid var(--color-border);
+    border-radius: var(--radius-md);
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--color-text-heading);
+    cursor: pointer;
+    box-shadow: var(--shadow-input);
+    transition:
+        border-color var(--dur-fast),
+        background var(--dur-fast),
+        box-shadow var(--dur-fast),
+        transform var(--dur-fast);
+}
+
+.auth-social-btn:hover {
+    border-color: #cbd5e1;
+    background: #f8fafc;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transform: translateY(-1px);
+}
+
+.auth-social-btn:active {
+    transform: translateY(0);
+}
+
+/* ── DIVIDER ──────────────────────────────────────────────── */
+.auth-divider {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-bottom: var(--space-5);
+    animation: slideUp var(--dur-slow) var(--ease-out) 110ms both;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--color-border);
+}
+
+.auth-divider-text {
+    font-size: 0.8125rem;
+    color: var(--color-text-muted);
+    white-space: nowrap;
+}
+
+/* ── PASSWORD EYE TOGGLE ──────────────────────────────────── */
+.auth-input--password {
+    padding-right: calc(var(--space-4) + 1.5rem + var(--space-2));
+}
+
+.auth-eye-btn {
+    position: absolute;
+    right: var(--space-4);
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--color-text-muted);
+    padding: var(--space-1);
+    border-radius: var(--radius-sm);
+    transition: color var(--dur-fast);
+}
+
+.auth-eye-btn:hover {
+    color: var(--color-text-heading);
+}
+
+.auth-eye-btn:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+}
+
+/* ── TERMS + MULTI-LINK FOOTER ────────────────────────────── */
+.auth-footer-terms {
+    margin-bottom: var(--space-2);
+}
+
+.auth-form-footer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-1);
+}
