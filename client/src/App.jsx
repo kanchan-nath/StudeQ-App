@@ -14,10 +14,17 @@ import ImageAnalysis from './pages/ImageAnalysis.jsx'
 import PDFSummary from './pages/PDFSummary.jsx'
 import Scheduler from './pages/Scheduler.jsx'
 import GeneratePlanView from './pages/GeneratePlanView.jsx'
+import Navbar from '../src/components/Navbar.jsx'
 
 const App = () => {
+
+  const token = localStorage.getItem("token")
+
+  const hideNavOn = ["/login", "/register"];
+  const showNavbar = token && !hideNavOn.includes(location.pathname);
   return (
     <>
+      {showNavbar && <Navbar/>}
       <Routes>
         <Route path='/' element={<Home/>} />
         <Route path='/register' element={<Register/>} />
