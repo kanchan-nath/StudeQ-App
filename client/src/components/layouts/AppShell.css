@@ -308,3 +308,15 @@ ul, ol { list-style: none; }
   }
   .sidebar__link.active::before { display: none; }
 }
+
+/* ── 13. RIGHT PANEL ────────────────────────────────────────── */
+.right-panel {
+  grid-area: rightpanel;
+  background: var(--clr-bg);
+  border-left: 1px solid var(--clr-border);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+  padding: var(--sp-6) var(--sp-5);
+}
