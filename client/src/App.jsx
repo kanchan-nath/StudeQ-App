@@ -15,6 +15,7 @@ import PDFSummary from './pages/PDFSummary.jsx'
 import Scheduler from './pages/Scheduler.jsx'
 import GeneratePlanView from './pages/GeneratePlanView.jsx'
 import Navbar from '../src/components/Navbar.jsx'
+import AppShell from './components/layouts/AppShell.jsx'
 
 const App = () => {
 
@@ -29,17 +30,22 @@ const App = () => {
         <Route path='/' element={<Home/>} />
         <Route path='/register' element={<Register/>} />
         <Route path='/login' element={<Login/>} />
-        <Route path='/dashboard' element={<ProtectedRoute component={<Dashboard/>}/>} />
-        <Route path='/notes' element={<ProtectedRoute component={<Notes />} />} />
-        <Route path='/quiz' element={<ProtectedRoute component={<Quiz />} />} />
-        <Route path='/tutor' element={<ProtectedRoute component={<Tutor />} />} />
-        <Route path='/study-room' element={<ProtectedRoute component={<StudyRoom />} />} />
-        <Route path='/study-room/:roomId' element={<ProtectedRoute component={<RoomChat/>} />} />
-        <Route path='/image-analysis' element={<ProtectedRoute component={<ImageAnalysis />} />} />
-        <Route path='/pdf-analysis' element={<ProtectedRoute component={<PDFSummary />} />} />
-        <Route path='/scheduler' element={<ProtectedRoute component={<Scheduler />} />} />
-        <Route path='/scheduler/generate-plan' element={<ProtectedRoute component={<GeneratePlanView />} />} />
 
+        <Route element={<AppShell />}>
+
+        <Route path='/dashboard' element={<ProtectedRoute component={<Dashboard/>}/>} />
+          <Route path='/notes' element={<ProtectedRoute component={<Notes />} />} />
+          <Route path='/quiz' element={<ProtectedRoute component={<Quiz />} />} />
+          <Route path='/tutor' element={<ProtectedRoute component={<Tutor />} />} />
+          <Route path='/study-room' element={<ProtectedRoute component={<StudyRoom />} />} />
+          <Route path='/study-room/:roomId' element={<ProtectedRoute component={<RoomChat />} />} />
+          <Route path='/image-analysis' element={<ProtectedRoute component={<ImageAnalysis />} />} />
+          <Route path='/pdf-analysis' element={<ProtectedRoute component={<PDFSummary />} />} />
+          <Route path='/scheduler' element={<ProtectedRoute component={<Scheduler />} />} />
+          <Route path='/scheduler/generate-plan' element={<ProtectedRoute component={<GeneratePlanView />} />} />
+
+        </Route>
+        
       </Routes>
     </>
   )
