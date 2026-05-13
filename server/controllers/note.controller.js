@@ -44,39 +44,41 @@ const getNote = asyncHandler(async (req, res) => {
 
 })
 
-const deleteNote = asyncHandler(async(req, res)=>{
-    const {id} = req.params
+const deleteNote = asyncHandler(async (req, res) => {
+    const { id } = req.params
     const userId = req.user.id
-    if(!id){
+    if (!id) {
         throw new ApiError(400, "Not found")
     }
 
     const response = await Note.findByIdAndDelete({
-        _id:id,
-        userId:userId
+        _id: id,
+        userId: userId
     })
     console.log(response);
-    
+
     return res
-    .status(200)
+        .status(200)
         .json(new ApiResponse(200, response, "Notes deleted succesfully"))
 })
 
-const updateNote  = asyncHandler(async(req, res)=>{
-    const {content} = req.body
-    const {id} = req.params
+const updateNote = asyncHandler(async (req, res) => {
+    const { content } = req.body
+    const { id } = req.params
     const userId = req.user.id
 
-    if(!content || !id){
+    if (!content || !id) {
         throw new ApiError(400, "Content is not changed anything")
     }
 
     const result = await summarizeText(content)
     const { title, summary, keyPoints } = result
+    console.log(title);
+
 
     const existedNote = await Note.findOneAndUpdate(
         {
-            _id:id,
+            _id: id,
             userId
         },
         {
@@ -85,17 +87,17 @@ const updateNote  = asyncHandler(async(req, res)=>{
             keyPoints
         },
         {
-            new: true
+            returnDocument: 'after'
         }
     )
 
-    if(!existedNote){
+    if (!existedNote) {
         throw new ApiError(404, "Summarizing content not exit")
     }
 
     return res
-    .status(200)
-    .json(new ApiResponse(200, {}, "Note is updated"))
+        .status(200)
+        .json(new ApiResponse(200, {}, "Note is updated"))
 
 })
 export {
