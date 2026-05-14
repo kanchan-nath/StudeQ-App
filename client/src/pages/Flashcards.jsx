@@ -5,6 +5,7 @@ import { v4 as uuidv4 } from "uuid"
 import { useEffect } from 'react'
 
 const Flashcards = () => {
+    const [pdfFilePath, setPdfFilePath] = useState("")
     const [moreFlashId, setMoreFlashId] = useState("")
     const [input, setInput] = useState({
         topic: "",
@@ -73,7 +74,7 @@ const Flashcards = () => {
                 }
                 const data = await res.json()
                 console.log(data);
-                
+
                 setInputResult(data.data)
 
                 setInput({ topic: "", subject: "" })
@@ -147,6 +148,24 @@ const Flashcards = () => {
 
     }
 
+    const handleClickPdfFlash = async()=>{
+        try {
+            const res = await fetch(`${BASE_URL}/api/quiz/flashcards`,{
+                method:"POST",
+                headers:{
+                    "Authorization":`Bearer ${token}`
+                },
+                body: JSON.stringify({pdfFilePath})
+            })
+        } catch (error) {
+            console.error(error)
+        }
+    }
+
+    const handleChangePdfFlash = (e)=>{
+        setPdfFilePath(e.target.files[0])
+    }
+
     useEffect(() => {
         fetchFlashcards()
 
@@ -177,7 +196,7 @@ const Flashcards = () => {
 
             <div>
                 {
-                    inputResult?.flashcards?.map((item, index)=>(
+                    inputResult?.flashcards?.map((item, index) => (
                         <div key={index}>
                             <p><strong>Front</strong>: {item.front}</p>
 
@@ -212,7 +231,13 @@ const Flashcards = () => {
                 </div>
             </div>
 
-
+            <div>
+                <input
+                    type="file"
+                    onChange={handleChangePdfFlash}
+                />
+                <button onClick={handleClickPdfFlash}>Generate</button>
+            </div>
         </>
     )
 }
