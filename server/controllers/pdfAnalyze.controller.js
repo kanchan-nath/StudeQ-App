@@ -22,8 +22,8 @@ const pdfAnalyze = asyncHandler(async (req, res) => {
             .status(200)
             .json(new ApiResponse(200, data, "file extracted suucesfully"))
     } finally {
-        if (imageLocalFilePath && fs.existsSync(imageLocalFilePath)) {
-            fs.unlinkSync(imageLocalFilePath)
+        if (pdfLocalFilePath && fs.existsSync(pdfLocalFilePath)) {
+            fs.unlinkSync(pdfLocalFilePath)
         }
     }
 
