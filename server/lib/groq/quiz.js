@@ -59,15 +59,20 @@ const flashcards = async (topic, subject) => {
        You are a flashcard generator for the subject: ${subject}.
 
 Generate at least 5 flashcards on the topic: ${topic}.
+Also give the difficulety level - easy/medium/hard.
 
 Return the response ONLY in valid JSON format as an array like this:
 
-[
-  {
-    "front": "Question or term",
-    "back": "Answer or definition"
-  }
-]
+
+{
+    "difficultyLevel": "easy/medium/hard",
+    "card":[
+        {
+            "front": "Question or term",
+            "back": "Answer or definition"
+        }
+    ]
+}
 
 Rules:
 - Exactly 10 flashcards
