@@ -1,85 +1,111 @@
 import React from 'react'
 import { useState } from 'react'
 import BASE_URL from "../lib/api.js"
-import {v4 as uuidv4} from "uuid"
+import { v4 as uuidv4 } from "uuid"
 import { useEffect } from 'react'
 
 const Flashcards = () => {
     const [input, setInput] = useState({
-        topic:"",
-        subject:""
+        topic: "",
+        subject: ""
     })
     const [flashcardId, setFlashcardId] = useState("")
     const [loading, setLoading] = useState(false)
-    const [inputResult, setInputResult]= useState([])
+    const [inputResult, setInputResult] = useState([])
     const [allFlashcards, setAllFlashcards] = useState([])
 
     const token = localStorage.getItem("token")
 
-    const handleChange = (e)=>{
-        setInput({...input, [e.target.name]:e.target.value})
+    const handleChange = (e) => {
+        setInput({ ...input, [e.target.name]: e.target.value })
     }
 
-    const handleSubmit = async(e)=>{
+    const handleSubmit = async (e) => {
         e.preventDefault()
         setLoading(true)
-        const {topic, subject} = input
+        const { topic, subject } = input
         const id = uuidv4()
         setFlashcardId(id)
-        
+
         try {
-            const res = await fetch(`${BASE_URL}/api/quiz/flashcards`,{
-                method:"POST",
-                headers:{
-                    "Content-Type":"application/json",
-                    "Authorization":`Bearer ${token}`
+            const res = await fetch(`${BASE_URL}/api/quiz/flashcards`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
                 },
-                body: JSON.stringify({ topic, subject, flashcardId:id })
+                body: JSON.stringify({ topic, subject, flashcardId: id })
             })
 
-            if(!res.ok){
+            if (!res.ok) {
                 console.error("Something went wrong, Try Again!")
             }
             const data = await res.json()
-            
+
             setInputResult(data.data)
 
-            setInput("")
+            setInput({ topic: "", subject: "" })
             fetchFlashcards()
         } catch (error) {
             console.error(error)
             setLoading(false)
-        }finally{
+        } finally {
             setLoading(false)
         }
 
     }
 
-    const fetchFlashcards = async()=>{
+    const fetchFlashcards = async () => {
         try {
-            const res = await fetch(`${BASE_URL}/api/quiz/flashcards`,{
-                method:"GET",
-                headers:{
-                    "Content-Type":"application/json",
+            const res = await fetch(`${BASE_URL}/api/quiz/flashcards`, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                }
+            })
+
+            if (!res.ok) {
+                console.error(`Something went wrong, Try Again`)
+            }
+
+            const data = await res.json()
+
+            setAllFlashcards(data.data)
+
+        } catch (error) {
+            console.error(error)
+        }
+    }
+
+    const handleClickDelete = async (id) => {
+        console.log(id);
+
+        try {
+            const res = await fetch(`${BASE_URL}/api/quiz/flashcards/${id}`, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
                     "Authorization": `Bearer ${token}`
                 }
             })
 
             if(!res.ok){
-                console.error(`Something went wrong, Try Again`)
+                console.error("Something went wrnog, Try Again!")
             }
+            fetchFlashcards()
+            const data = await res.json()   
 
-            const data = await res.json()
-            
-            setAllFlashcards(data.data)
         } catch (error) {
             console.error(error)
         }
+
+
     }
 
-    useEffect(()=>{
+    useEffect(() => {
         fetchFlashcards()
-        
+
     }, [])
     return (
         <>
@@ -99,17 +125,17 @@ const Flashcards = () => {
                         onChange={handleChange}
                         name='subject'
                     />
-                    <button disabled = {loading} >{loading ? "Generating":"Generate"}</button>
+                    <button disabled={loading} >{loading ? "Generating" : "Generate"}</button>
                 </form>
             </div>
 
             <div>
                 {
-                    inputResult.map((item, index)=>(
+                    inputResult.map((item, index) => (
                         <div key={index}>
                             <p><strong>Front</strong>: {item.front}</p>
 
-                            <p><strong>Back</strong>: {item.back}</p>    
+                            <p><strong>Back</strong>: {item.back}</p>
                         </div>
                     ))
                 }
@@ -119,22 +145,26 @@ const Flashcards = () => {
                 <h1>All Flashcards</h1>
                 <div>
                     {
-                        allFlashcards.map((item, index)=>(
+                        allFlashcards.map((item, index) => (
                             <div key={index}>
+                                <h3>Topic: {item.topic}, Subjects:{item.subject}</h3>
                                 {
-                                    item.flashcards.map((flashcard, id)=>(
+                                    item.flashcards.map((flashcard, id) => (
                                         <div key={id}>
                                             <p><strong>Front</strong>: {flashcard.front}</p>
 
-                                            <p><strong>Back</strong>: {flashcard.back}</p>   
+                                            <p><strong>Back</strong>: {flashcard.back}</p>
                                         </div>
                                     ))
                                 }
+                                <button onClick={() => handleClickDelete(item._id)}>Delete</button>
                             </div>
                         ))
                     }
                 </div>
             </div>
+
+            
         </>
     )
 }

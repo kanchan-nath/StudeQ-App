@@ -81,7 +81,9 @@ const generateFlashcards = asyncHandler(async(req, res)=>{
         await Flascards.create({
             userId,
             flashcardId,
-            flashcards:data
+            flashcards:data,
+            subject,
+            topic,
         })
     }else{
         await Flascards.updateOne(
