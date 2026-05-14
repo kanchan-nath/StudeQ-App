@@ -71,22 +71,28 @@ const generateFlashcards = asyncHandler(async (req, res) => {
         throw new ApiError(400, "All fields are required")
     }
 
-    const data = await flashcards(topic, subject)
+    const { difficultyLevel, card } = await flashcards(topic, subject)
+    
 
     let flashcard = await Flascards.findOne({
         flashcardId
     })
 
     if (!flashcard) {
-        await Flascards.create({
+        const data = await Flascards.create({
             userId,
             flashcardId,
-            flashcards: data,
+            flashcards: card,
             subject,
             topic,
+            difficultyLevel
         })
+
+        return res
+            .status(200)
+            .json(new ApiResponse(200, data, "FLashcards generate successfully"))
     } else {
-        await Flascards.updateOne(
+       const updatedData = await Flascards.updateOne(
             {
                 flashcardId
             },
@@ -98,11 +104,12 @@ const generateFlashcards = asyncHandler(async (req, res) => {
                 }
             }
         )
+        return res
+            .status(200)
+            .json(new ApiResponse(200, updatedData, "FLashcards generate successfully"))
     }
 
-    return res
-        .status(200)
-        .json(new ApiResponse(200, data, "FLashcards generate successfully"))
+    
 })
 
 const getFlashcards = asyncHandler(async (req, res) => {

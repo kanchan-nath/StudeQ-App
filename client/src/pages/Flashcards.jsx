@@ -12,7 +12,7 @@ const Flashcards = () => {
     })
     const [flashcardId, setFlashcardId] = useState("")
     const [loading, setLoading] = useState(false)
-    const [inputResult, setInputResult] = useState([])
+    const [inputResult, setInputResult] = useState({})
     const [allFlashcards, setAllFlashcards] = useState([])
 
     const inputRef = useRef(null)
@@ -38,7 +38,7 @@ const Flashcards = () => {
                         "Content-Type": "application/json",
                         "Authorization": `Bearer ${token}`
                     },
-                    body: JSON.stringify({ topic, subject, flashcardId })
+                    body: JSON.stringify({ topic, subject, flashcardId: id })
                 })
 
                 if (!res.ok) {
@@ -72,7 +72,8 @@ const Flashcards = () => {
                     console.error("Something went wrong, Try Again!")
                 }
                 const data = await res.json()
-
+                console.log(data);
+                
                 setInputResult(data.data)
 
                 setInput({ topic: "", subject: "" })
@@ -176,7 +177,7 @@ const Flashcards = () => {
 
             <div>
                 {
-                    inputResult.map((item, index) => (
+                    inputResult?.flashcards?.map((item, index)=>(
                         <div key={index}>
                             <p><strong>Front</strong>: {item.front}</p>
 
@@ -193,6 +194,7 @@ const Flashcards = () => {
                         allFlashcards.map((item, index) => (
                             <div key={index}>
                                 <h3>Topic: {item.topic}, Subjects:{item.subject}</h3>
+                                <h4>Difficulty Level: {item.difficultyLevel}</h4>
                                 {
                                     item.flashcards.map((flashcard, id) => (
                                         <div key={id}>

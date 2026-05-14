@@ -23,6 +23,9 @@ const flashcardsSchema = new mongoose.Schema({
     },
     topic:{
         type: String
+    },
+    difficultyLevel:{
+        type: String
     }
 },{timestamps:true})
 
