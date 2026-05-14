@@ -44,6 +44,22 @@ const generateQuiz = asyncHandler(async(req, res)=>{
     .json(new ApiResponse(200, data, "Quiz generate successfully"))
 })
 
+const getQuizzes = asyncHandler(async(req, res)=>{
+    const userId = req.user.id
+
+    const existedQuiz = await Quiz.find({userId})
+
+    if(!existedQuiz){
+        throw new ApiError(400, "No quizzes found")
+    }
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, existedQuiz, "All quizzes fetched"))
+})
+
+
+
 const generateFlashcards = asyncHandler(async(req, res)=>{
     const { topic, subject, flashcardId } = req.body
     const userId = req.user.id
@@ -83,7 +99,49 @@ const generateFlashcards = asyncHandler(async(req, res)=>{
     .status(200)
     .json(new ApiResponse(200, data, "FLashcards generate successfully"))
 })
+
+const getFlashcards = asyncHandler(async(req, res)=>{
+    const userId = req.user.id
+
+    const existedFlashcards = await Flascards.find({userId})
+
+    if(!existedFlashcards){
+        throw new ApiError(400, "No flashcard found")
+    }
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, existedFlashcards, "All flashcards fetched"))
+})
+
+const deleteFlashcards =asyncHandler(async(req, res)=>{
+    const {id} = req.params
+
+    const userId = req.user.id
+
+    const data = await Flascards.findOneAndDelete(
+        {
+            userId,
+            _id:id
+        },
+        
+    )
+    
+    return res
+    .status(200)
+    .json(new ApiResponse(200, {}, "Flashcard deleted successfully"))
+})
+
+
+
 export {
     generateQuiz,
-    generateFlashcards
+    getQuizzes,
+    getQuizAnswer,
+    getQuizzes,
+
+    generateFlashcards,
+    getFlashcards,
+    deleteFlashcards,
+    updateFlashcards
 }

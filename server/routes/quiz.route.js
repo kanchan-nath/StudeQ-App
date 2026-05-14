@@ -1,15 +1,29 @@
 import { Router } from "express"
 import {
     generateQuiz,
-    generateFlashcards
+    getQuizzes,
+    getQuizAnswer,
+    getQuizzes,
+
+    generateFlashcards,
+    getFlashcards,
+    deleteFlashcards,
+    updateFlashcards
+
 } from "../controllers/quiz.controller.js"
 import { verifyJWT } from "../middlewares/auth.middleware.js"
 
 const router = Router()
 
 router.route("/generate").post(verifyJWT, generateQuiz)
-router.route("/flashcards").post(verifyJWT, generateFlashcards)
+router.route("/quiz/:id").get(verifyJWT, getQuizzes)
+router.route("/quiz/:id/answer").patch(verifyJWT, getQuizAnswer)
+router.route("/quiz/:id").delete(verifyJWT, getQuizzes)
 
+router.route("/flashcards").post(verifyJWT, generateFlashcards)
+router.route("/flashcards").get(verifyJWT, getFlashcards)
+router.route("/flashcards/:id").delete(verifyJWT, deleteFlashcards)
+router.route("/flashcards/:id").patch(verifyJWT, updateFlashcards)
 
 
 export default router
