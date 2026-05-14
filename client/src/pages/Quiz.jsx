@@ -68,9 +68,6 @@ const Quiz = () => {
     setQuizId(uuidv4())
   }, [])
 
-  useEffect(() => {
-    console.log(score)
-  }, [score])
   return (
     <>
       <div>

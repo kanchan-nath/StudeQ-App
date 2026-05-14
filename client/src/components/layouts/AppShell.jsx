@@ -6,6 +6,7 @@ const NAV_MAIN = [
     { to: '/dashboard', label: 'Home', icon: '🏠', color: 'blue' },
     { to: '/notes', label: 'Notes', icon: '📝', color: 'teal' },
     { to: '/quiz', label: 'Quiz', icon: '⚡', color: 'purple' },
+    { to: '/flashcards', label: 'Flashcards', icon: '⚡', color: 'purple' },
     { to: '/study-room', label: 'Study Room', icon: '📚', color: 'green' },
     { to: '/scheduler', label: 'Scheduler', icon: '📅', color: 'orange' },
 ]
