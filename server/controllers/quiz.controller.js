@@ -1,37 +1,37 @@
 import { asyncHandler } from "../utils/asyncHandler.js"
 import { ApiError, ApiResponse } from "../utils/Async.js"
-import {quiz, flashcards} from "../lib/groq/quiz.js"
-import {Quiz} from "../models/quiz.model.js"
-import {Flascards} from "../models/flashcard.model.js"
+import { quiz, flashcards } from "../lib/groq/quiz.js"
+import { Quiz } from "../models/quiz.model.js"
+import { Flascards } from "../models/flashcard.model.js"
 
-const generateQuiz = asyncHandler(async(req, res)=>{
-    const {topic, subject, quizId} = req.body
+const generateQuiz = asyncHandler(async (req, res) => {
+    const { topic, subject, quizId } = req.body
     const userId = req.user.id
 
-    if(!topic || !subject || !quizId){
+    if (!topic || !subject || !quizId) {
         throw new ApiError(400, "All fields are required")
     }
 
-    const data =await quiz(topic, subject)
+    const data = await quiz(topic, subject)
     console.log(data);
-    
-    
-    let quizStore = await Quiz.findOne({quizId})
 
-    if (!quizStore){
+
+    let quizStore = await Quiz.findOne({ quizId })
+
+    if (!quizStore) {
         await Quiz.create({
             userId,
             quizId,
-            quiz:data
+            quiz: data
         })
-    }else{
+    } else {
         await Quiz.findOneAndUpdate(
             {
                 quizId,
             },
             {
-                $push:{
-                    quiz:{
+                $push: {
+                    quiz: {
                         $each: data
                     }
                 }
@@ -40,30 +40,30 @@ const generateQuiz = asyncHandler(async(req, res)=>{
     }
 
     return res
-    .status(200)
-    .json(new ApiResponse(200, data, "Quiz generate successfully"))
+        .status(200)
+        .json(new ApiResponse(200, data, "Quiz generate successfully"))
 })
 
-const getQuizzes = asyncHandler(async(req, res)=>{
+const getQuizzes = asyncHandler(async (req, res) => {
     const userId = req.user.id
 
-    const existedQuiz = await Quiz.find({userId})
+    const existedQuiz = await Quiz.find({ userId })
 
-    if(!existedQuiz){
+    if (!existedQuiz) {
         throw new ApiError(400, "No quizzes found")
     }
 
     return res
-    .status(200)
-    .json(new ApiResponse(200, existedQuiz, "All quizzes fetched"))
+        .status(200)
+        .json(new ApiResponse(200, existedQuiz, "All quizzes fetched"))
 })
 
-const getQuizAnswer = asyncHandler(async(req, rs)=>{
+const getQuizAnswer = asyncHandler(async (req, rs) => {
 
 })
 
 
-const generateFlashcards = asyncHandler(async(req, res)=>{
+const generateFlashcards = asyncHandler(async (req, res) => {
     const { topic, subject, flashcardId } = req.body
     const userId = req.user.id
 
@@ -77,20 +77,22 @@ const generateFlashcards = asyncHandler(async(req, res)=>{
         flashcardId
     })
 
-    if(!flashcard){
+    if (!flashcard) {
         await Flascards.create({
             userId,
             flashcardId,
-            flashcards:data
+            flashcards: data,
+            subject,
+            topic,
         })
-    }else{
+    } else {
         await Flascards.updateOne(
             {
                 flashcardId
             },
             {
-                $push:{
-                    flashcards:{
+                $push: {
+                    flashcards: {
                         $each: data
                     }
                 }
@@ -99,62 +101,59 @@ const generateFlashcards = asyncHandler(async(req, res)=>{
     }
 
     return res
-    .status(200)
-    .json(new ApiResponse(200, data, "FLashcards generate successfully"))
+        .status(200)
+        .json(new ApiResponse(200, data, "FLashcards generate successfully"))
 })
 
-const getFlashcards = asyncHandler(async(req, res)=>{
+const getFlashcards = asyncHandler(async (req, res) => {
     const userId = req.user.id
 
-    const existedFlashcards = await Flascards.find({userId})
+    const existedFlashcards = await Flascards.find({ userId })
 
-    if(!existedFlashcards){
+    if (!existedFlashcards) {
         throw new ApiError(400, "No flashcard found")
     }
 
     return res
-    .status(200)
-    .json(new ApiResponse(200, existedFlashcards, "All flashcards fetched"))
+        .status(200)
+        .json(new ApiResponse(200, existedFlashcards, "All flashcards fetched"))
 })
 
-const deleteFlashcards =asyncHandler(async(req, res)=>{
-    const {id} = req.params
+const deleteFlashcards = asyncHandler(async (req, res) => {
+    const { id } = req.params
 
     const userId = req.user.id
 
     const data = await Flascards.findOneAndDelete(
         {
             userId,
-            _id:id
+            _id: id
         },
-        
+
     )
-    
+
     return res
-    .status(200)
-    .json(new ApiResponse(200, {}, "Flashcard deleted successfully"))
+        .status(200)
+        .json(new ApiResponse(200, {}, "Flashcard deleted successfully"))
 })
 
 
-const addMoreFlashcards = asyncHandler(async(req, res)=>{
+const addMoreFlashcards = asyncHandler(async (req, res) => {
     const { topic, subject, flashcardId } = req.body
-    const {id} = req.params
+    const { id } = req.params
     const userId = req.user.id
 
-    if (!topic || !subject || !flashcardId) {
-        throw new ApiError(400, "All fields are required")
-    }
-
-    const result = await flashcards(topic, subject)    
+    const result = await flashcards(topic, subject)
 
     const data = await Flascards.findOneAndUpdate(
-        {   _id:id,
+        {
+            _id: id,
             // userId,
             // flashcardId
         },
         {
-            $push:{
-                flashcards:{
+            $push: {
+                flashcards: {
                     $each: result
                 }
             }
@@ -163,8 +162,8 @@ const addMoreFlashcards = asyncHandler(async(req, res)=>{
     )
 
     return res
-    .status(200)
-    .json(new ApiResponse(200, data, "Flashcard updated successfully"))
+        .status(200)
+        .json(new ApiResponse(200, data, "Flashcard updated successfully"))
 
 })
 
