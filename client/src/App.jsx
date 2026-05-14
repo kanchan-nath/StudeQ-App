@@ -16,6 +16,7 @@ import Scheduler from './pages/Scheduler.jsx'
 import GeneratePlanView from './pages/GeneratePlanView.jsx'
 import Navbar from '../src/components/Navbar.jsx'
 import AppShell from './components/layouts/AppShell.jsx'
+import Flashcards from './pages/Flashcards.jsx'
 
 const App = () => {
 
@@ -36,6 +37,7 @@ const App = () => {
         <Route path='/dashboard' element={<ProtectedRoute component={<Dashboard/>}/>} />
           <Route path='/notes' element={<ProtectedRoute component={<Notes />} />} />
           <Route path='/quiz' element={<ProtectedRoute component={<Quiz />} />} />
+          <Route path='/flashcards' element={<ProtectedRoute component={<Flashcards />} />} />
           <Route path='/tutor' element={<ProtectedRoute component={<Tutor />} />} />
           <Route path='/study-room' element={<ProtectedRoute component={<StudyRoom />} />} />
           <Route path='/study-room/:roomId' element={<ProtectedRoute component={<RoomChat />} />} />
