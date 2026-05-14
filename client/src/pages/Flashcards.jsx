@@ -167,6 +167,7 @@ const Flashcards = () => {
             }
 
             const data = await res.json()
+            console.log("pdf raw response:", data) 
             setInputResult(data.data)
             fetchFlashcards()
         } catch (error) {

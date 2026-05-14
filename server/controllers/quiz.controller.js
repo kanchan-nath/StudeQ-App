@@ -82,13 +82,12 @@ const generateFlashcards = asyncHandler(async (req, res) => {
 
             const extractedText = await parser.getText()
             
-            const {difficultyLevel, card} = await pdfToFlashcard(extractedText.text)
-
+            const {difficultyLevel , card} = await pdfToFlashcard(extractedText.text)            
             
             const data = await Flascards.create({
                 userId,
                 difficultyLevel,
-                card
+                flashcards: card
             })
             return res
             .status(200)
@@ -106,7 +105,7 @@ const generateFlashcards = asyncHandler(async (req, res) => {
         }
 
         const { difficultyLevel, card } = await flashcards(topic, subject)
-
+        
 
         let flashcard = await Flascards.findOne({
             flashcardId

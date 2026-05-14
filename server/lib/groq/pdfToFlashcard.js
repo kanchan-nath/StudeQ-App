@@ -36,7 +36,7 @@ Rules:
     })
 
     const raw = response.choices[0].message.content
-    // const data = JSON.parse(raw)
-    return raw
+    const data = JSON.parse(raw)
+    return data
 }
 export {pdfToFlashcard}
