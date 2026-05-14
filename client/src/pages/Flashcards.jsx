@@ -149,14 +149,26 @@ const Flashcards = () => {
     }
 
     const handleClickPdfFlash = async()=>{
+
+        const formData = new FormData()
+
+        formData.append("pdfFilePath", pdfFilePath)
         try {
             const res = await fetch(`${BASE_URL}/api/quiz/flashcards`,{
                 method:"POST",
                 headers:{
                     "Authorization":`Bearer ${token}`
                 },
-                body: JSON.stringify({pdfFilePath})
+                body: formData
             })
+
+            if(!res.ok){
+                console.error("somehting went wrong")
+            }
+
+            const data = await res.json()
+            setInputResult(data.data)
+            fetchFlashcards()
         } catch (error) {
             console.error(error)
         }

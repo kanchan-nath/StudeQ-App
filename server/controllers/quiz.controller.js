@@ -3,6 +3,9 @@ import { ApiError, ApiResponse } from "../utils/Async.js"
 import { quiz, flashcards } from "../lib/groq/quiz.js"
 import { Quiz } from "../models/quiz.model.js"
 import { Flascards } from "../models/flashcard.model.js"
+import { PDFParse } from "pdf-parse"
+import fs from "fs"
+import {pdfToFlashcard} from "../lib/groq/pdfToFlashcard.js"
 
 const generateQuiz = asyncHandler(async (req, res) => {
     const { topic, subject, quizId } = req.body
@@ -65,51 +68,82 @@ const getQuizAnswer = asyncHandler(async (req, rs) => {
 
 const generateFlashcards = asyncHandler(async (req, res) => {
     const { topic, subject, flashcardId } = req.body
+    const pdfFile = req.files?.pdfFilePath?.[0].path
     const userId = req.user.id
+    console.log(pdfFile);
+    
+    if (pdfFile) {
+        console.log(pdfFile);
+        
+        try {
+            const dataBuffer = fs.readFileSync(pdfFile)
+            const unit8Array = new Uint8Array(dataBuffer)
+            const parser = new PDFParse(unit8Array)
 
-    if (!topic || !subject || !flashcardId) {
-        throw new ApiError(400, "All fields are required")
+            const extractedText = await parser.getText()
+            
+            const {difficultyLevel, card} = await pdfToFlashcard(extractedText.text)
+
+            
+            const data = await Flascards.create({
+                userId,
+                difficultyLevel,
+                card
+            })
+            return res
+            .status(200)
+            .json(new ApiResponse(200, data, "Flashcard generated"))
+            fs.unlinkSync(pdfFile)
+        }finally {
+            if (pdfFile && fs.existsSync(pdfFile)) {
+                fs.unlinkSync(pdfFile)
+        }
     }
 
-    const { difficultyLevel, card } = await flashcards(topic, subject)
-    
+    } else {
+        if (!topic || !subject || !flashcardId) {
+            throw new ApiError(400, "All fields are required")
+        }
 
-    let flashcard = await Flascards.findOne({
-        flashcardId
-    })
+        const { difficultyLevel, card } = await flashcards(topic, subject)
 
-    if (!flashcard) {
-        const data = await Flascards.create({
-            userId,
-            flashcardId,
-            flashcards: card,
-            subject,
-            topic,
-            difficultyLevel
+
+        let flashcard = await Flascards.findOne({
+            flashcardId
         })
 
-        return res
-            .status(200)
-            .json(new ApiResponse(200, data, "FLashcards generate successfully"))
-    } else {
-       const updatedData = await Flascards.updateOne(
-            {
-                flashcardId
-            },
-            {
-                $push: {
-                    flashcards: {
-                        $each: data
+        if (!flashcard) {
+            const data = await Flascards.create({
+                userId,
+                flashcardId,
+                flashcards: card,
+                subject,
+                topic,
+                difficultyLevel
+            })
+
+            return res
+                .status(200)
+                .json(new ApiResponse(200, data, "FLashcards generate successfully"))
+        } else {
+            const updatedData = await Flascards.updateOne(
+                {
+                    flashcardId
+                },
+                {
+                    $push: {
+                        flashcards: {
+                            $each: data
+                        }
                     }
                 }
-            }
-        )
-        return res
-            .status(200)
-            .json(new ApiResponse(200, updatedData, "FLashcards generate successfully"))
+            )
+            return res
+                .status(200)
+                .json(new ApiResponse(200, updatedData, "FLashcards generate successfully"))
+        }
     }
 
-    
 })
 
 const getFlashcards = asyncHandler(async (req, res) => {
