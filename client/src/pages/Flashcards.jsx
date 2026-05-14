@@ -2,6 +2,7 @@ import React from 'react'
 import { useState } from 'react'
 import BASE_URL from "../lib/api.js"
 import {v4 as uuidv4} from "uuid"
+import { useEffect } from 'react'
 
 const Flashcards = () => {
     const [input, setInput] = useState({
@@ -10,7 +11,8 @@ const Flashcards = () => {
     })
     const [flashcardId, setFlashcardId] = useState("")
     const [loading, setLoading] = useState(false)
-    const [inputResult, setInputResult]= useState({})
+    const [inputResult, setInputResult]= useState([])
+    const [allFlashcards, setAllFlashcards] = useState([])
 
     const token = localStorage.getItem("token")
 
@@ -39,9 +41,11 @@ const Flashcards = () => {
                 console.error("Something went wrong, Try Again!")
             }
             const data = await res.json()
-            console.log(data);
             
-            setInputResult(data)
+            setInputResult(data.data)
+
+            setInput("")
+            fetchFlashcards()
         } catch (error) {
             console.error(error)
             setLoading(false)
@@ -50,6 +54,33 @@ const Flashcards = () => {
         }
 
     }
+
+    const fetchFlashcards = async()=>{
+        try {
+            const res = await fetch(`${BASE_URL}/api/quiz/flashcards`,{
+                method:"GET",
+                headers:{
+                    "Content-Type":"application/json",
+                    "Authorization": `Bearer ${token}`
+                }
+            })
+
+            if(!res.ok){
+                console.error(`Something went wrong, Try Again`)
+            }
+
+            const data = await res.json()
+            
+            setAllFlashcards(data.data)
+        } catch (error) {
+            console.error(error)
+        }
+    }
+
+    useEffect(()=>{
+        fetchFlashcards()
+        
+    }, [])
     return (
         <>
             <div>
@@ -73,7 +104,36 @@ const Flashcards = () => {
             </div>
 
             <div>
-                
+                {
+                    inputResult.map((item, index)=>(
+                        <div key={index}>
+                            <p><strong>Front</strong>: {item.front}</p>
+
+                            <p><strong>Back</strong>: {item.back}</p>    
+                        </div>
+                    ))
+                }
+            </div>
+
+            <div>
+                <h1>All Flashcards</h1>
+                <div>
+                    {
+                        allFlashcards.map((item, index)=>(
+                            <div key={index}>
+                                {
+                                    item.flashcards.map((flashcard, id)=>(
+                                        <div key={id}>
+                                            <p><strong>Front</strong>: {flashcard.front}</p>
+
+                                            <p><strong>Back</strong>: {flashcard.back}</p>   
+                                        </div>
+                                    ))
+                                }
+                            </div>
+                        ))
+                    }
+                </div>
             </div>
         </>
     )
