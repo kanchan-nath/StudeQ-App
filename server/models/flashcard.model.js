@@ -14,7 +14,10 @@ const flashcardsSchema = new mongoose.Schema({
                 type:String
             }
         }
-    ]
+    ],
+    flashcardId:{
+        type:String
+    }
 },{timestamps:true})
 
 export const Flascards = mongoose.model("Flashcards", flashcardsSchema)

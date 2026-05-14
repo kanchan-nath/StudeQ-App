@@ -58,6 +58,9 @@ const getQuizzes = asyncHandler(async(req, res)=>{
     .json(new ApiResponse(200, existedQuiz, "All quizzes fetched"))
 })
 
+const getQuizAnswer = asyncHandler(async(req, rs)=>{
+
+})
 
 
 const generateFlashcards = asyncHandler(async(req, res)=>{
@@ -133,15 +136,45 @@ const deleteFlashcards =asyncHandler(async(req, res)=>{
 })
 
 
+const addMoreFlashcards = asyncHandler(async(req, res)=>{
+    const { topic, subject, flashcardId } = req.body
+    const {id} = req.params
+    const userId = req.user.id
+
+    if (!topic || !subject || !flashcardId) {
+        throw new ApiError(400, "All fields are required")
+    }
+
+    const result = await flashcards(topic, subject)    
+
+    const data = await Flascards.findOneAndUpdate(
+        {   _id:id,
+            // userId,
+            // flashcardId
+        },
+        {
+            $push:{
+                flashcards:{
+                    $each: result
+                }
+            }
+        },
+        { new: true }
+    )
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, data, "Flashcard updated successfully"))
+
+})
 
 export {
     generateQuiz,
     getQuizzes,
     getQuizAnswer,
-    getQuizzes,
 
     generateFlashcards,
     getFlashcards,
     deleteFlashcards,
-    updateFlashcards
+    addMoreFlashcards
 }
