@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect, useCallback } from 'react'
 import BASE_URL from "../lib/api.js"
 import { v4 as uuidv4 } from "uuid"
-import styles from "./styles/Flashcards.module.css"
+import styles from './styles/Flashcards.module.css'
 
 // ─── Icons (inline SVG components) ───────────────────────────────────────────
 const IconHome = () => (
@@ -123,54 +123,67 @@ const VIEW = {
     CREATE_STEP2_PDF: 'create_step2_pdf',
 }
 
-// ─── Left Sidebar ─────────────────────────────────────────────────────────────
+// ─── Right Sidebar (was LeftSidebar) ──────────────────────────────────────────
 const LeftSidebar = ({ activeView, onNavigate }) => {
+    const [sidebarOpen, setSidebarOpen] = useState(true)
+
     const navItems = [
         { label: 'Home', icon: <IconHome />, view: null },
         { label: 'My Sets', icon: <IconSets />, view: VIEW.VIEWER },
         { label: 'Flashcards', icon: <IconFlash />, view: VIEW.VIEWER },
         { label: 'Favourites', icon: <IconStar />, view: null },
     ]
+
     return (
-        <aside className={styles.leftSidebar}>
-            <div className={styles.sidebarLogo}>
-                <div className={styles.logoMark}>
-                    <IconFlash />
-                </div>
-                <span className={styles.logoText}>CardForge</span>
-            </div>
+        <aside className={`${styles.leftSidebar} ${sidebarOpen ? styles.sidebarExpanded : styles.sidebarCollapsed}`}>
+            {/* Toggle arrow — always visible on the left edge of sidebar */}
+            <button
+                className={styles.sidebarToggle}
+                onClick={() => setSidebarOpen(o => !o)}
+                aria-label={sidebarOpen ? 'Collapse sidebar' : 'Expand sidebar'}
+            >
+                {sidebarOpen ? <IconChevronRight /> : <IconChevronLeft />}
+            </button>
 
-            <nav className={styles.sidebarNav}>
-                {navItems.map(item => (
-                    <button
-                        key={item.label}
-                        className={`${styles.navItem} ${activeView === item.view ? styles.navItemActive : ''}`}
-                        onClick={() => item.view && onNavigate(item.view)}
-                    >
-                        <span className={styles.navIcon}>{item.icon}</span>
-                        <span className={styles.navLabel}>{item.label}</span>
+            {/* Content hidden when collapsed */}
+            <div className={styles.sidebarInner}>
+                <div className={styles.sidebarLogo}>
+                    <div className={styles.logoMark}><IconFlash /></div>
+                    <span className={styles.logoText}>CardForge</span>
+                </div>
+
+                <nav className={styles.sidebarNav}>
+                    {navItems.map(item => (
+                        <button
+                            key={item.label}
+                            className={`${styles.navItem} ${activeView === item.view ? styles.navItemActive : ''}`}
+                            onClick={() => item.view && onNavigate(item.view)}
+                        >
+                            <span className={styles.navIcon}>{item.icon}</span>
+                            <span className={styles.navLabel}>{item.label}</span>
+                        </button>
+                    ))}
+                </nav>
+
+                <div className={styles.sidebarUpload}>
+                    <button className={styles.uploadBtn} onClick={() => onNavigate(VIEW.CREATE_STEP1)}>
+                        <IconUpload />
+                        <span>New Set</span>
                     </button>
-                ))}
-            </nav>
-
-            <div className={styles.sidebarUpload}>
-                <button className={styles.uploadBtn} onClick={() => onNavigate(VIEW.CREATE_STEP1)}>
-                    <IconUpload />
-                    <span>New Set</span>
-                </button>
-            </div>
-
-            <div className={styles.recentNotes}>
-                <div className={styles.recentHeader}>
-                    <span>Recent Sets</span>
-                    <button className={styles.viewAllBtn}>View All</button>
                 </div>
-                {['Physics Fundamentals', 'Calc Derivatives', 'World History'].map(note => (
-                    <div key={note} className={styles.noteItem}>
-                        <IconNote />
-                        <span>{note}</span>
+
+                <div className={styles.recentNotes}>
+                    <div className={styles.recentHeader}>
+                        <span>Recent Sets</span>
+                        <button className={styles.viewAllBtn}>View All</button>
                     </div>
-                ))}
+                    {['Physics Fundamentals', 'Calc Derivatives', 'World History'].map(note => (
+                        <div key={note} className={styles.noteItem}>
+                            <IconNote />
+                            <span>{note}</span>
+                        </div>
+                    ))}
+                </div>
             </div>
         </aside>
     )
@@ -751,10 +764,8 @@ const Flashcards = () => {
                     />
                 )}
             </main>
-            
         </div>
     )
 }
-
 
 export default Flashcards

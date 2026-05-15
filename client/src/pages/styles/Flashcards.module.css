@@ -79,41 +79,95 @@
 
 .mainContent {
     flex: 1;
-    margin-left: var(--sidebar-width);
+    margin-right: var(--sidebar-width);
     min-height: 100vh;
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    transition: margin-right var(--transition-mid);
 }
 
-/* ── Left Sidebar ────────────────────────────────────────────────────────── */
+/* ── Sidebar (Right Side, Collapsible) ───────────────────────────────────── */
 .leftSidebar {
     position: fixed;
     top: 0;
-    left: 0;
+    right: 0;
     width: var(--sidebar-width);
     height: 100vh;
     background: var(--bg-sidebar);
-    border-right: 1px solid var(--border);
+    border-left: 1px solid var(--border);
     display: flex;
-    flex-direction: column;
-    padding: 20px 0;
+    flex-direction: row;
     z-index: 100;
     box-shadow: var(--shadow-sm);
+    transition: width var(--transition-mid);
+    overflow: hidden;
+}
+
+.sidebarExpanded {
+    width: var(--sidebar-width);
+}
+
+.sidebarCollapsed {
+    width: 40px;
+}
+
+/* Toggle arrow — always visible on the left edge */
+.sidebarToggle {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-sidebar);
+    border: none;
+    border-right: 1px solid var(--border);
+    color: var(--text-secondary);
+    cursor: pointer;
+    flex-shrink: 0;
+    z-index: 2;
+    transition: color var(--transition-fast), background var(--transition-fast);
+}
+
+.sidebarToggle:hover {
+    color: var(--accent);
+    background: var(--accent-light);
+}
+
+/* Inner content — sits right of the toggle strip */
+.sidebarInner {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    padding: 20px 0;
+    margin-left: 40px;
+    overflow: hidden;
+    min-width: calc(var(--sidebar-width) - 40px);
+    opacity: 1;
+    transition: opacity var(--transition-mid);
+}
+
+.sidebarCollapsed .sidebarInner {
+    opacity: 0;
+    pointer-events: none;
 }
 
 .sidebarLogo {
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 0 20px 24px;
+    padding: 0 16px 20px;
     border-bottom: 1px solid var(--border);
     margin-bottom: 16px;
 }
 
 .logoMark {
-    width: 36px;
-    height: 36px;
+    width: 32px;
+    height: 32px;
     background: var(--accent);
     border-radius: var(--radius-sm);
     display: flex;
@@ -124,17 +178,18 @@
 }
 
 .logoText {
-    font-size: 1.1rem;
+    font-size: 1rem;
     font-weight: 700;
     color: var(--text-primary);
     letter-spacing: -0.02em;
+    white-space: nowrap;
 }
 
 .sidebarNav {
     display: flex;
     flex-direction: column;
     gap: 2px;
-    padding: 0 10px;
+    padding: 0 8px;
 }
 
 .navItem {
@@ -152,6 +207,7 @@
     transition: background var(--transition-fast), color var(--transition-fast);
     text-align: left;
     width: 100%;
+    white-space: nowrap;
 }
 
 .navItem:hover {
@@ -178,7 +234,7 @@
 }
 
 .sidebarUpload {
-    padding: 16px 10px;
+    padding: 12px 8px;
     border-top: 1px solid var(--border);
     margin-top: 8px;
 }
@@ -198,6 +254,7 @@
     font-weight: 600;
     cursor: pointer;
     transition: background var(--transition-fast), transform var(--transition-fast);
+    white-space: nowrap;
 }
 
 .uploadBtn:hover {
@@ -206,7 +263,7 @@
 }
 
 .recentNotes {
-    padding: 16px 10px;
+    padding: 14px 8px;
     flex: 1;
     overflow: hidden;
 }
@@ -216,7 +273,7 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 10px;
-    font-size: 0.75rem;
+    font-size: 0.72rem;
     font-weight: 600;
     color: var(--text-muted);
     text-transform: uppercase;
@@ -228,9 +285,10 @@
     background: none;
     border: none;
     color: var(--accent);
-    font-size: 0.75rem;
+    font-size: 0.72rem;
     cursor: pointer;
     padding: 0;
+    white-space: nowrap;
 }
 
 .noteItem {
