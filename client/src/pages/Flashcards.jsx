@@ -3,7 +3,7 @@ import BASE_URL from "../lib/api.js"
 import { v4 as uuidv4 } from "uuid"
 import styles from './styles/Flashcards.module.css'
 
-// ─── Icons (inline SVG components) ───────────────────────────────────────────
+// ─── Icons ────────────────────────────────────────────────────────────────────
 const IconHome = () => (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><polyline points="9 22 9 12 15 12 15 22" />
@@ -106,15 +106,6 @@ const IconNote = () => (
     </svg>
 )
 
-// ─── Mock data for preview ────────────────────────────────────────────────────
-const MOCK_FLASHCARDS = [
-    { front: "Electromagnetic Waves", back: "Oscillating electric and magnetic fields that propagate through space or matter." },
-    { front: "Frequency", back: "The number of wave cycles that pass a fixed point per unit time, measured in Hz." },
-    { front: "Wavelength", back: "The distance between successive crests of a wave, denoted by lambda (λ)." },
-    { front: "Amplitude", back: "The maximum displacement of a wave from its equilibrium position." },
-]
-
-// ─── VIEW MODES ───────────────────────────────────────────────────────────────
 const VIEW = {
     VIEWER: 'viewer',
     CREATE_STEP1: 'create_step1',
@@ -123,20 +114,13 @@ const VIEW = {
     CREATE_STEP2_PDF: 'create_step2_pdf',
 }
 
-// ─── Right Sidebar (was LeftSidebar) ──────────────────────────────────────────
-const LeftSidebar = ({ activeView, onNavigate }) => {
+// ─── RIGHT Sidebar ────────────────────────────────────────────────────────────
+const RightSidebar = ({ activeView, onNavigate, allFlashcards, onSelectSet }) => {
     const [sidebarOpen, setSidebarOpen] = useState(true)
 
-    const navItems = [
-        { label: 'Home', icon: <IconHome />, view: null },
-        { label: 'My Sets', icon: <IconSets />, view: VIEW.VIEWER },
-        { label: 'Flashcards', icon: <IconFlash />, view: VIEW.VIEWER },
-        { label: 'Favourites', icon: <IconStar />, view: null },
-    ]
-
     return (
-        <aside className={`${styles.leftSidebar} ${sidebarOpen ? styles.sidebarExpanded : styles.sidebarCollapsed}`}>
-            {/* Toggle arrow — always visible on the left edge of sidebar */}
+        <aside className={`${styles.rightSidebar} ${sidebarOpen ? styles.sidebarExpanded : styles.sidebarCollapsed}`}>
+            {/* Toggle on LEFT edge of sidebar */}
             <button
                 className={styles.sidebarToggle}
                 onClick={() => setSidebarOpen(o => !o)}
@@ -145,25 +129,7 @@ const LeftSidebar = ({ activeView, onNavigate }) => {
                 {sidebarOpen ? <IconChevronRight /> : <IconChevronLeft />}
             </button>
 
-            {/* Content hidden when collapsed */}
             <div className={styles.sidebarInner}>
-                <div className={styles.sidebarLogo}>
-                    <div className={styles.logoMark}><IconFlash /></div>
-                    <span className={styles.logoText}>CardForge</span>
-                </div>
-
-                <nav className={styles.sidebarNav}>
-                    {navItems.map(item => (
-                        <button
-                            key={item.label}
-                            className={`${styles.navItem} ${activeView === item.view ? styles.navItemActive : ''}`}
-                            onClick={() => item.view && onNavigate(item.view)}
-                        >
-                            <span className={styles.navIcon}>{item.icon}</span>
-                            <span className={styles.navLabel}>{item.label}</span>
-                        </button>
-                    ))}
-                </nav>
 
                 <div className={styles.sidebarUpload}>
                     <button className={styles.uploadBtn} onClick={() => onNavigate(VIEW.CREATE_STEP1)}>
@@ -177,10 +143,21 @@ const LeftSidebar = ({ activeView, onNavigate }) => {
                         <span>Recent Sets</span>
                         <button className={styles.viewAllBtn}>View All</button>
                     </div>
-                    {['Physics Fundamentals', 'Calc Derivatives', 'World History'].map(note => (
-                        <div key={note} className={styles.noteItem}>
+                    {allFlashcards.length === 0 && (
+                        <p className={styles.emptyRecent}>No sets yet</p>
+                    )}
+                    {allFlashcards.map(set => (
+                        <div
+                            key={set._id}
+                            className={styles.noteItem}
+                            onClick={() => onSelectSet(set)}
+                            title={set.subject || ''}
+                        >
                             <IconNote />
-                            <span>{note}</span>
+                            <div className={styles.noteItemText}>
+                                <span className={styles.noteTopic}>{set.topic || 'No Title Found'}</span>
+                                {set.subject && <span className={styles.noteSubject}>{set.subject}</span>}
+                            </div>
                         </div>
                     ))}
                 </div>
@@ -189,11 +166,9 @@ const LeftSidebar = ({ activeView, onNavigate }) => {
     )
 }
 
-// ─── Flashcard Viewer Page ────────────────────────────────────────────────────
+// ─── Flashcard Viewer ─────────────────────────────────────────────────────────
 const FlashcardViewer = ({ allFlashcards, onNavigate }) => {
-    const cards = allFlashcards.length > 0
-        ? allFlashcards.flatMap(set => set.flashcards || [])
-        : MOCK_FLASHCARDS
+    const cards = allFlashcards.flatMap(set => set.flashcards || [])
 
     const [currentIndex, setCurrentIndex] = useState(0)
     const [isFlipped, setIsFlipped] = useState(false)
@@ -202,11 +177,9 @@ const FlashcardViewer = ({ allFlashcards, onNavigate }) => {
     const [thumbUp, setThumbUp] = useState(false)
     const [thumbDown, setThumbDown] = useState(false)
     const [bookmarked, setBookmarked] = useState(false)
-    const [rightOpen, setRightOpen] = useState(false)
 
     const modes = ['Standard', 'Spaced Repetition', 'Bookmarked Flashcards']
 
-    // Spacebar flip
     useEffect(() => {
         const handleKey = (e) => {
             if (e.code === 'Space' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
@@ -221,21 +194,12 @@ const FlashcardViewer = ({ allFlashcards, onNavigate }) => {
     }, [currentIndex, cards.length])
 
     const goNext = () => {
-        if (currentIndex < cards.length - 1) {
-            setCurrentIndex(i => i + 1)
-            setIsFlipped(false)
-        }
+        if (currentIndex < cards.length - 1) { setCurrentIndex(i => i + 1); setIsFlipped(false) }
     }
     const goPrev = () => {
-        if (currentIndex > 0) {
-            setCurrentIndex(i => i - 1)
-            setIsFlipped(false)
-        }
+        if (currentIndex > 0) { setCurrentIndex(i => i - 1); setIsFlipped(false) }
     }
-    const goTo = (i) => {
-        setCurrentIndex(i)
-        setIsFlipped(false)
-    }
+    const goTo = (i) => { setCurrentIndex(i); setIsFlipped(false) }
 
     const currentCard = cards[currentIndex] || { front: 'No cards yet', back: 'Add cards to your set' }
 
@@ -244,12 +208,8 @@ const FlashcardViewer = ({ allFlashcards, onNavigate }) => {
             {/* Headbar */}
             <div className={styles.headbar}>
                 <div className={styles.headbarLeft}>
-                    {/* Mode dropdown */}
                     <div className={styles.modeDropdownWrapper}>
-                        <button
-                            className={styles.modeBtn}
-                            onClick={() => setModeOpen(o => !o)}
-                        >
+                        <button className={styles.modeBtn} onClick={() => setModeOpen(o => !o)}>
                             <IconSets />
                             <span>{mode}</span>
                             <IconChevronDown />
@@ -273,7 +233,6 @@ const FlashcardViewer = ({ allFlashcards, onNavigate }) => {
                     </div>
                 </div>
 
-                {/* Progress dots */}
                 <div className={styles.progressDots}>
                     {cards.slice(0, Math.min(cards.length, 12)).map((_, i) => (
                         <button
@@ -287,9 +246,7 @@ const FlashcardViewer = ({ allFlashcards, onNavigate }) => {
                 </div>
 
                 <div className={styles.headbarRight}>
-                    <button className={styles.shuffleBtn} title="Shuffle cards">
-                        <IconShuffle />
-                    </button>
+                    <button className={styles.shuffleBtn} title="Shuffle cards"><IconShuffle /></button>
                     <div className={styles.cardCounter}>{currentIndex + 1} / {cards.length}</div>
                     <button className={styles.navArrow} onClick={goPrev} disabled={currentIndex === 0}><IconChevronLeft /></button>
                     <button className={styles.navArrow} onClick={goNext} disabled={currentIndex === cards.length - 1}><IconChevronRight /></button>
@@ -298,7 +255,6 @@ const FlashcardViewer = ({ allFlashcards, onNavigate }) => {
 
             {/* Card area */}
             <div className={styles.cardArea}>
-                {/* Card label + rating row */}
                 <div className={styles.cardMeta}>
                     <span className={styles.cardSideLabel}>{isFlipped ? 'Definition' : 'Term'}</span>
                     <div className={styles.ratingBtns}>
@@ -317,11 +273,7 @@ const FlashcardViewer = ({ allFlashcards, onNavigate }) => {
                     </div>
                 </div>
 
-                {/* The flashcard */}
-                <div
-                    className={`${styles.cardScene}`}
-                    onClick={() => setIsFlipped(f => !f)}
-                >
+                <div className={styles.cardScene} onClick={() => setIsFlipped(f => !f)}>
                     <div className={`${styles.card3d} ${isFlipped ? styles.cardFlipped : ''}`}>
                         <div className={styles.cardFront}>
                             <p className={styles.cardText}>{currentCard.front}</p>
@@ -332,7 +284,6 @@ const FlashcardViewer = ({ allFlashcards, onNavigate }) => {
                     </div>
                 </div>
 
-                {/* Bottom action bar */}
                 <div className={styles.bottomBar}>
                     <button className={styles.bottomNavBtn} onClick={goPrev} disabled={currentIndex === 0}>
                         <IconChevronLeft /> Previous
@@ -345,59 +296,35 @@ const FlashcardViewer = ({ allFlashcards, onNavigate }) => {
                     </button>
                 </div>
             </div>
-
-            {/* Right sidebar toggle */}
-            <div className={`${styles.rightSidebar} ${rightOpen ? styles.rightSidebarOpen : ''}`}>
-                <button
-                    className={styles.rightToggle}
-                    onClick={() => setRightOpen(o => !o)}
-                    aria-label="Toggle panel"
-                >
-                    {rightOpen ? <IconChevronRight /> : <IconChevronLeft />}
-                </button>
-                <div className={styles.rightContent}>
-                    <h3 className={styles.rightTitle}>AI Study Hints</h3>
-                    <p className={styles.rightPlaceholder}>Smart hints and related notes will appear here as you study.</p>
-                    <div className={styles.rightPlaceholderCard} />
-                    <div className={styles.rightPlaceholderCard} />
-                </div>
-            </div>
         </div>
     )
 }
 
-// ─── Create Page Step 1 ───────────────────────────────────────────────────────
+// ─── Create Step 1 ────────────────────────────────────────────────────────────
 const CreateStep1 = ({ onSelect, onExit }) => {
     const tiles = [
-        { label: 'Create from Scratch', icon: <IconScratch />, color: 'indigo', view: VIEW.CREATE_STEP2_SCRATCH, active: true },
-        { label: 'Create from Materials', icon: <IconMaterials />, color: 'amber', view: null, active: false },
-        { label: 'Create from Topic', icon: <IconTopic />, color: 'violet', view: VIEW.CREATE_STEP2_TOPIC, active: true },
-        { label: 'Import Quizlet', icon: <IconQuizlet />, color: 'sky', view: null, active: false },
-        { label: 'Upload PDF', icon: <IconPDF />, color: 'teal', view: VIEW.CREATE_STEP2_PDF, active: true },
+        { label: 'Create from Scratch', icon: <IconScratch />, color: 'Indigo', view: VIEW.CREATE_STEP2_SCRATCH, active: true },
+        { label: 'Create from Materials', icon: <IconMaterials />, color: 'Amber', view: null, active: false },
+        { label: 'Create from Topic', icon: <IconTopic />, color: 'Violet', view: VIEW.CREATE_STEP2_TOPIC, active: true },
+        { label: 'Import Quizlet', icon: <IconQuizlet />, color: 'Sky', view: null, active: false },
+        { label: 'Upload PDF', icon: <IconPDF />, color: 'Teal', view: VIEW.CREATE_STEP2_PDF, active: true },
     ]
 
     return (
         <div className={styles.createLayout}>
             <div className={styles.createHeader}>
-                <div className={styles.createTitle}>
-                    <IconFlash />
-                    <span>Build a Study Set</span>
-                </div>
-                <button className={styles.exitBtn} onClick={onExit}>
-                    <IconX /> Exit
-                </button>
+                <div className={styles.createTitle}><IconFlash /><span>Build a Study Set</span></div>
+                <button className={styles.exitBtn} onClick={onExit}><IconX /> Exit</button>
             </div>
-
             <div className={styles.createBody}>
                 <div className={styles.createLeft}>
                     <p className={styles.stepIndicator}>1 of 4</p>
                     <h2 className={styles.createHeading}>How would you like to build your flashcards?</h2>
-
                     <div className={styles.tilesGrid}>
                         {tiles.map((tile, i) => (
                             <button
                                 key={tile.label}
-                                className={`${styles.tile} ${styles[`tileColor${tile.color.charAt(0).toUpperCase() + tile.color.slice(1)}`]} ${!tile.active ? styles.tileDisabled : ''}`}
+                                className={`${styles.tile} ${styles[`tileColor${tile.color}`]} ${!tile.active ? styles.tileDisabled : ''}`}
                                 style={{ '--tile-rotate': i % 2 === 0 ? '3deg' : '-3deg' }}
                                 onClick={() => tile.active && tile.view && onSelect(tile.view)}
                                 disabled={!tile.active}
@@ -409,12 +336,9 @@ const CreateStep1 = ({ onSelect, onExit }) => {
                         ))}
                     </div>
                 </div>
-
                 <div className={styles.createRight}>
                     <div className={styles.previewPanel}>
-                        <h2 className={styles.previewTitle}>
-                            Build <span className={styles.accent}>Smarter</span> Flashcards
-                        </h2>
+                        <h2 className={styles.previewTitle}>Build <span className={styles.accent}>Smarter</span> Flashcards</h2>
                         <p className={styles.previewSub}>Turn any material into a personalised study set</p>
                         <div className={styles.cardFanWrapper}>
                             <div className={`${styles.fanCard} ${styles.fanCard1}`}>
@@ -448,7 +372,7 @@ const CreateStep1 = ({ onSelect, onExit }) => {
     )
 }
 
-// ─── Create Page Step 2 — Topic ───────────────────────────────────────────────
+// ─── Create Step 2 — Topic ────────────────────────────────────────────────────
 const CreateStep2Topic = ({ onBack, onExit, onSubmit, loading }) => {
     const [topic, setTopic] = useState('')
     const [subject, setSubject] = useState('')
@@ -456,77 +380,35 @@ const CreateStep2Topic = ({ onBack, onExit, onSubmit, loading }) => {
     return (
         <div className={styles.createLayout}>
             <div className={styles.createHeader}>
-                <div className={styles.createTitle}>
-                    <IconFlash />
-                    <span>Build a Study Set</span>
-                </div>
-                <button className={styles.exitBtn} onClick={onExit}>
-                    <IconX /> Exit
-                </button>
+                <div className={styles.createTitle}><IconFlash /><span>Build a Study Set</span></div>
+                <button className={styles.exitBtn} onClick={onExit}><IconX /> Exit</button>
             </div>
-
             <div className={styles.createBody}>
                 <div className={styles.createLeft}>
                     <p className={styles.stepIndicator}>Step 2 of 4</p>
                     <h2 className={styles.createHeading}>Enter a Topic</h2>
                     <p className={styles.createSubheading}>Type the topic you want to create flashcards about</p>
-
                     <div className={styles.fieldGroup}>
                         <label className={styles.fieldLabel}>Topic</label>
-                        <input
-                            className={styles.fieldInput}
-                            type="text"
-                            placeholder="e.g. Photosynthesis, World War II, Calculus Derivatives..."
-                            value={topic}
-                            onChange={e => setTopic(e.target.value)}
-                        />
-                        <p className={styles.fieldHint}>Be specific for better flashcards. Instead of "History," try "Causes of the French Revolution."</p>
+                        <input className={styles.fieldInput} type="text" placeholder="e.g. Photosynthesis, World War II..." value={topic} onChange={e => setTopic(e.target.value)} />
+                        <p className={styles.fieldHint}>Be specific for better flashcards.</p>
                     </div>
-
                     <div className={styles.fieldGroup}>
                         <label className={styles.fieldLabel}>Subject</label>
-                        <input
-                            className={styles.fieldInput}
-                            type="text"
-                            placeholder="e.g. Biology, History, Mathematics..."
-                            value={subject}
-                            onChange={e => setSubject(e.target.value)}
-                        />
+                        <input className={styles.fieldInput} type="text" placeholder="e.g. Biology, History..." value={subject} onChange={e => setSubject(e.target.value)} />
                     </div>
-
                     <div className={styles.stepNav}>
                         <button className={styles.backBtn} onClick={onBack}>Back</button>
-                        <button
-                            className={styles.nextBtn}
-                            disabled={!topic.trim() || loading}
-                            onClick={() => onSubmit({ topic, subject })}
-                        >
+                        <button className={styles.nextBtn} disabled={!topic.trim() || loading} onClick={() => onSubmit({ topic, subject })}>
                             {loading ? 'Generating...' : 'Next →'}
                         </button>
                     </div>
                 </div>
-
                 <div className={styles.createRight}>
                     <div className={styles.previewPanel}>
                         <div className={styles.topicPreview}>
-                            <div className={styles.topicPreviewIcon}>
-                                <IconLightbulb />
-                            </div>
-                            <p className={styles.topicPreviewText}>
-                                {topic ? `Generating flashcards for: "${topic}"` : 'Enter your topic to begin'}
-                            </p>
-                        </div>
-                        <div className={styles.cardFanWrapper} style={{ opacity: 0.5 }}>
-                            <div className={`${styles.fanCard} ${styles.fanCard2}`}>
-                                <div className={styles.fanCardIcon} style={{ background: '#fef3c7', color: '#f59e0b' }}>U</div>
-                                <div className={styles.fanLine} /><div className={styles.fanLine} />
-                            </div>
-                            <div className={`${styles.fanCard} ${styles.fanCard3}`}>
-                                <div className={styles.fanCardIcon} style={{ background: '#ede9fe', color: '#6366f1' }}>⊞</div>
-                                <strong>Term &amp; Definition</strong>
-                                <div className={styles.fanCardSection}>TERM</div>
-                                <div className={styles.fanLine} /><div className={styles.fanLine} />
-                            </div>
+                            <div className={styles.topicPreviewIcon}><IconLightbulb /></div>
+                            <p className={styles.topicPreviewText}>{topic ? `Generating flashcards for: "${topic}"` : 'Enter your topic to begin'}</p>
                         </div>
                     </div>
                 </div>
@@ -535,7 +417,7 @@ const CreateStep2Topic = ({ onBack, onExit, onSubmit, loading }) => {
     )
 }
 
-// ─── Create Page Step 2 — Scratch ────────────────────────────────────────────
+// ─── Create Step 2 — Scratch ──────────────────────────────────────────────────
 const CreateStep2Scratch = ({ onBack, onExit, onSubmit, loading }) => {
     const [topic, setTopic] = useState('')
     const [subject, setSubject] = useState('')
@@ -543,13 +425,8 @@ const CreateStep2Scratch = ({ onBack, onExit, onSubmit, loading }) => {
     return (
         <div className={styles.createLayout}>
             <div className={styles.createHeader}>
-                <div className={styles.createTitle}>
-                    <IconFlash />
-                    <span>Build a Study Set</span>
-                </div>
-                <button className={styles.exitBtn} onClick={onExit}>
-                    <IconX /> Exit
-                </button>
+                <div className={styles.createTitle}><IconFlash /><span>Build a Study Set</span></div>
+                <button className={styles.exitBtn} onClick={onExit}><IconX /> Exit</button>
             </div>
             <div className={styles.createBody}>
                 <div className={styles.createLeft}>
@@ -586,7 +463,7 @@ const CreateStep2Scratch = ({ onBack, onExit, onSubmit, loading }) => {
     )
 }
 
-// ─── Create Page Step 2 — PDF ─────────────────────────────────────────────────
+// ─── Create Step 2 — PDF ──────────────────────────────────────────────────────
 const CreateStep2PDF = ({ onBack, onExit, onPdfSubmit }) => {
     const [file, setFile] = useState(null)
     return (
@@ -622,7 +499,7 @@ const CreateStep2PDF = ({ onBack, onExit, onPdfSubmit }) => {
     )
 }
 
-// ─── Main Flashcards Component ────────────────────────────────────────────────
+// ─── Main Component ───────────────────────────────────────────────────────────
 const Flashcards = () => {
     const [pdfFilePath, setPdfFilePath] = useState("")
     const [moreFlashId, setMoreFlashId] = useState("")
@@ -632,11 +509,10 @@ const Flashcards = () => {
     const [inputResult, setInputResult] = useState({})
     const [allFlashcards, setAllFlashcards] = useState([])
     const [currentView, setCurrentView] = useState(VIEW.VIEWER)
+    const [selectedSet, setSelectedSet] = useState(null)
 
     const inputRef = useRef(null)
     const token = localStorage.getItem("token")
-
-    const handleChange = (e) => setInput({ ...input, [e.target.name]: e.target.value })
 
     const handleSubmit = async ({ topic, subject }) => {
         setLoading(true)
@@ -652,6 +528,7 @@ const Flashcards = () => {
                 if (!res.ok) console.error("something went wrong")
                 await res.json()
                 fetchFlashcards()
+                setSelectedSet(null)
             } catch (error) { console.error(error) }
             finally { setLoading(false) }
         } else {
@@ -666,6 +543,7 @@ const Flashcards = () => {
                 setInputResult(data.data)
                 setInput({ topic: "", subject: "" })
                 fetchFlashcards()
+                setSelectedSet(null)
                 setCurrentView(VIEW.VIEWER)
             } catch (error) { console.error(error) }
             finally { setLoading(false) }
@@ -680,25 +558,9 @@ const Flashcards = () => {
             })
             if (!res.ok) console.error(`Something went wrong, Try Again`)
             const data = await res.json()
+            console.log("Flashcards response:", data.data)
             setAllFlashcards(data.data)
         } catch (error) { console.error(error) }
-    }
-
-    const handleClickDelete = async (id) => {
-        try {
-            await fetch(`${BASE_URL}/api/quiz/flashcards/${id}`, {
-                method: "DELETE",
-                headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` }
-            })
-            fetchFlashcards()
-        } catch (error) { console.error(error) }
-    }
-
-    const handleClickAddMoreFlash = (item) => {
-        setMoreFlashId(item._id)
-        setInput({ topic: item.topic, subject: item.subject })
-        setCurrentView(VIEW.CREATE_STEP2_TOPIC)
-        setTimeout(() => inputRef.current?.focus(), 0)
     }
 
     const handleClickPdfFlash = async (file) => {
@@ -714,6 +576,7 @@ const Flashcards = () => {
             const data = await res.json()
             setInputResult(data.data)
             fetchFlashcards()
+            setSelectedSet(null)
             setCurrentView(VIEW.VIEWER)
         } catch (error) { console.error(error) }
     }
@@ -725,45 +588,35 @@ const Flashcards = () => {
 
     return (
         <div className={styles.appShell}>
-            <LeftSidebar activeView={currentView} onNavigate={navigateTo} />
-
+            {/* Main scrollable content */}
             <main className={styles.mainContent}>
                 {currentView === VIEW.VIEWER && (
                     <FlashcardViewer
-                        allFlashcards={allFlashcards}
+                        allFlashcards={selectedSet ? [selectedSet] : allFlashcards}
                         onNavigate={navigateTo}
                     />
                 )}
                 {currentView === VIEW.CREATE_STEP1 && (
-                    <CreateStep1
-                        onSelect={navigateTo}
-                        onExit={exitToViewer}
-                    />
+                    <CreateStep1 onSelect={navigateTo} onExit={exitToViewer} />
                 )}
                 {currentView === VIEW.CREATE_STEP2_TOPIC && (
-                    <CreateStep2Topic
-                        onBack={() => navigateTo(VIEW.CREATE_STEP1)}
-                        onExit={exitToViewer}
-                        onSubmit={handleSubmit}
-                        loading={loading}
-                    />
+                    <CreateStep2Topic onBack={() => navigateTo(VIEW.CREATE_STEP1)} onExit={exitToViewer} onSubmit={handleSubmit} loading={loading} />
                 )}
                 {currentView === VIEW.CREATE_STEP2_SCRATCH && (
-                    <CreateStep2Scratch
-                        onBack={() => navigateTo(VIEW.CREATE_STEP1)}
-                        onExit={exitToViewer}
-                        onSubmit={handleSubmit}
-                        loading={loading}
-                    />
+                    <CreateStep2Scratch onBack={() => navigateTo(VIEW.CREATE_STEP1)} onExit={exitToViewer} onSubmit={handleSubmit} loading={loading} />
                 )}
                 {currentView === VIEW.CREATE_STEP2_PDF && (
-                    <CreateStep2PDF
-                        onBack={() => navigateTo(VIEW.CREATE_STEP1)}
-                        onExit={exitToViewer}
-                        onPdfSubmit={handleClickPdfFlash}
-                    />
+                    <CreateStep2PDF onBack={() => navigateTo(VIEW.CREATE_STEP1)} onExit={exitToViewer} onPdfSubmit={handleClickPdfFlash} />
                 )}
             </main>
+
+            {/* Single right sidebar — static, inner scrollable */}
+            <RightSidebar
+                activeView={currentView}
+                onNavigate={navigateTo}
+                allFlashcards={allFlashcards}
+                onSelectSet={(set) => { setSelectedSet(set); navigateTo(VIEW.VIEWER) }}
+            />
         </div>
     )
 }

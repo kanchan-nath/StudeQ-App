@@ -1,6 +1,5 @@
 /* ─── Flashcards.module.css ─────────────────────────────────────────────── */
 
-/* ── CSS Variables ───────────────────────────────────────────────────────── */
 :root {
     --bg-page: #f0f2f8;
     --bg-card: #ffffff;
@@ -18,7 +17,6 @@
     --accent: #6366f1;
     --accent-light: #ede9fe;
     --accent-hover: #4f46e5;
-    --accent-text: #ffffff;
 
     --border: #e2e8f0;
     --border-card: #e8eaf0;
@@ -50,16 +48,13 @@
     --bg-tile: #1e293b;
     --bg-input: #0f172a;
     --bg-dropdown: #1e293b;
-
     --text-primary: #f1f5f9;
     --text-secondary: #94a3b8;
     --text-muted: #64748b;
     --text-label: #cbd5e1;
-
     --accent: #818cf8;
     --accent-light: #1e1b4b;
     --accent-hover: #6366f1;
-
     --border: #334155;
     --border-card: #334155;
     --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
@@ -69,36 +64,39 @@
 }
 
 /* ── App Shell ───────────────────────────────────────────────────────────── */
+/* height:100% fills AppShell main-content slot exactly; overflow:hidden kills page scroll */
 .appShell {
     display: flex;
-    min-height: 100vh;
+    flex-direction: row;
+    height: 100%;
+    overflow: hidden;
     background: var(--bg-page);
     font-family: var(--font-body);
     color: var(--text-primary);
 }
 
+/* Only this region scrolls for page content */
 .mainContent {
     flex: 1;
-    margin-right: var(--sidebar-width);
-    min-height: 100vh;
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
     display: flex;
     flex-direction: column;
-    overflow: hidden;
-    transition: margin-right var(--transition-mid);
 }
 
-/* ── Sidebar (Right Side, Collapsible) ───────────────────────────────────── */
-.leftSidebar {
-    position: fixed;
-    top: 0;
-    right: 0;
+/* ── RIGHT Sidebar ───────────────────────────────────────────────────────── */
+/* Static: full height, never scrolls itself */
+.rightSidebar {
+    flex-shrink: 0;
     width: var(--sidebar-width);
-    height: 100vh;
+    height: 100%;
     background: var(--bg-sidebar);
     border-left: 1px solid var(--border);
     display: flex;
     flex-direction: row;
-    z-index: 100;
+    position: relative;
+    z-index: 20;
     box-shadow: var(--shadow-sm);
     transition: width var(--transition-mid);
     overflow: hidden;
@@ -112,7 +110,7 @@
     width: 40px;
 }
 
-/* Toggle arrow — always visible on the left edge */
+/* Toggle — left edge of sidebar */
 .sidebarToggle {
     position: absolute;
     top: 50%;
@@ -138,14 +136,15 @@
     background: var(--accent-light);
 }
 
-/* Inner content — sits right of the toggle strip */
+/* Inner content — the ONLY part that scrolls in the sidebar */
 .sidebarInner {
     display: flex;
     flex-direction: column;
     flex: 1;
     padding: 20px 0;
     margin-left: 40px;
-    overflow: hidden;
+    overflow-y: auto;
+    overflow-x: hidden;
     min-width: calc(var(--sidebar-width) - 40px);
     opacity: 1;
     transition: opacity var(--transition-mid);
@@ -163,6 +162,7 @@
     padding: 0 16px 20px;
     border-bottom: 1px solid var(--border);
     margin-bottom: 16px;
+    flex-shrink: 0;
 }
 
 .logoMark {
@@ -190,6 +190,7 @@
     flex-direction: column;
     gap: 2px;
     padding: 0 8px;
+    flex-shrink: 0;
 }
 
 .navItem {
@@ -237,6 +238,7 @@
     padding: 12px 8px;
     border-top: 1px solid var(--border);
     margin-top: 8px;
+    flex-shrink: 0;
 }
 
 .uploadBtn {
@@ -265,7 +267,6 @@
 .recentNotes {
     padding: 14px 8px;
     flex: 1;
-    overflow: hidden;
 }
 
 .recentHeader {
@@ -288,7 +289,6 @@
     font-size: 0.72rem;
     cursor: pointer;
     padding: 0;
-    white-space: nowrap;
 }
 
 .noteItem {
@@ -311,13 +311,11 @@
     color: var(--accent);
 }
 
-/* ── Flashcard Viewer Layout ─────────────────────────────────────────────── */
+/* ── Viewer Layout ───────────────────────────────────────────────────────── */
 .viewerLayout {
     display: flex;
     flex-direction: column;
-    height: 100vh;
-    position: relative;
-    overflow: hidden;
+    min-height: 100%;
 }
 
 /* ── Headbar ─────────────────────────────────────────────────────────────── */
@@ -331,7 +329,8 @@
     background: var(--bg-headbar);
     border-bottom: 1px solid var(--border);
     flex-shrink: 0;
-    position: relative;
+    position: sticky;
+    top: 0;
     z-index: 10;
     box-shadow: var(--shadow-sm);
 }
@@ -350,7 +349,6 @@
     flex-shrink: 0;
 }
 
-/* Mode Dropdown */
 .modeDropdownWrapper {
     position: relative;
 }
@@ -427,7 +425,6 @@
     font-weight: 600;
 }
 
-/* Progress Dots */
 .progressDots {
     display: flex;
     align-items: center;
@@ -527,7 +524,6 @@
     justify-content: center;
     padding: 24px 32px;
     gap: 20px;
-    overflow: hidden;
 }
 
 .cardMeta {
@@ -646,6 +642,7 @@
     align-items: center;
     gap: 12px;
     justify-content: center;
+    padding-bottom: 24px;
 }
 
 .bottomNavBtn {
@@ -705,103 +702,13 @@
     font-size: 0.7rem;
     font-family: monospace;
     color: var(--text-muted);
-    font-style: normal;
-}
-
-/* ── Right Sidebar ───────────────────────────────────────────────────────── */
-.rightSidebar {
-    position: fixed;
-    top: var(--headbar-height);
-    right: 0;
-    height: calc(100vh - var(--headbar-height));
-    width: 44px;
-    background: var(--bg-card);
-    border-left: 1px solid var(--border);
-    transition: width var(--transition-mid);
-    overflow: hidden;
-    display: flex;
-    z-index: 20;
-    box-shadow: var(--shadow-sm);
-}
-
-.rightSidebarOpen {
-    width: 280px;
-}
-
-.rightToggle {
-    position: absolute;
-    top: 50%;
-    left: 0;
-    transform: translateY(-50%);
-    width: 44px;
-    height: 44px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: var(--bg-card);
-    border: none;
-    border-right: 1px solid var(--border);
-    color: var(--text-secondary);
-    cursor: pointer;
-    transition: color var(--transition-fast);
-    flex-shrink: 0;
-}
-
-.rightToggle:hover {
-    color: var(--accent);
-}
-
-.rightContent {
-    padding: 24px 20px 24px 56px;
-    flex: 1;
-    opacity: 0;
-    transition: opacity var(--transition-mid);
-    min-width: 280px;
-}
-
-.rightSidebarOpen .rightContent {
-    opacity: 1;
-}
-
-.rightTitle {
-    font-size: 0.95rem;
-    font-weight: 700;
-    color: var(--text-primary);
-    margin: 0 0 8px;
-}
-
-.rightPlaceholder {
-    font-size: 0.8rem;
-    color: var(--text-muted);
-    line-height: 1.5;
-    margin: 0 0 16px;
-}
-
-.rightPlaceholderCard {
-    height: 64px;
-    background: var(--bg-page);
-    border-radius: var(--radius-sm);
-    margin-bottom: 10px;
-    animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-
-    0%,
-    100% {
-        opacity: 0.5;
-    }
-
-    50% {
-        opacity: 1;
-    }
 }
 
 /* ── Create Layout ───────────────────────────────────────────────────────── */
 .createLayout {
     display: flex;
     flex-direction: column;
-    min-height: 100vh;
+    min-height: 100%;
     background: var(--bg-page);
 }
 
@@ -814,6 +721,9 @@
     background: var(--bg-headbar);
     border-bottom: 1px solid var(--border);
     flex-shrink: 0;
+    position: sticky;
+    top: 0;
+    z-index: 10;
     box-shadow: var(--shadow-sm);
 }
 
@@ -883,7 +793,7 @@
     margin: 0 0 28px;
 }
 
-/* ── Tiles Grid ──────────────────────────────────────────────────────────── */
+/* ── Tiles ───────────────────────────────────────────────────────────────── */
 .tilesGrid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -1134,7 +1044,7 @@
     max-width: 480px;
 }
 
-/* ── Step Navigation ─────────────────────────────────────────────────────── */
+/* ── Step Nav ────────────────────────────────────────────────────────────── */
 .stepNav {
     display: flex;
     gap: 12px;
@@ -1270,6 +1180,46 @@
     box-shadow: var(--shadow-sm);
 }
 
+.noteItem {
+    cursor: pointer;
+    /* keep existing styles */
+    transition: background 0.15s;
+}
+
+.noteItem:hover {
+    background: rgba(99, 102, 241, 0.08);
+    border-radius: 8px;
+}
+
+.noteItemText {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    overflow: hidden;
+}
+
+.noteTopic {
+    font-size: 13px;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.noteSubject {
+    font-size: 11px;
+    opacity: 0.55;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.emptyRecent {
+    font-size: 12px;
+    opacity: 0.4;
+    padding: 8px 4px;
+}
+
 /* ── Responsive ──────────────────────────────────────────────────────────── */
 @media (max-width: 1024px) {
     .createRight {
@@ -1282,17 +1232,8 @@
 }
 
 @media (max-width: 768px) {
-    :root {
-        --sidebar-width: 0px;
-    }
-
-    .leftSidebar {
-        transform: translateX(-100%);
-        transition: transform var(--transition-mid);
-    }
-
-    .mainContent {
-        margin-left: 0;
+    .rightSidebar {
+        display: none;
     }
 
     .createBody {
@@ -1328,10 +1269,6 @@
 
     .cardArea {
         padding: 16px;
-    }
-
-    .rightSidebar {
-        display: none;
     }
 }
 
