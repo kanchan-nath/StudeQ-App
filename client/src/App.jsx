@@ -1,4 +1,5 @@
 import React from 'react'
+import "./pages/styles/global.css"
 import { Routes, Route } from "react-router-dom"
 import  Home  from "../src/pages/Home.jsx"
 import Login from "./pages/Login.jsx"
