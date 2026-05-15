@@ -39,7 +39,7 @@ const AppShell = ({ userName = '' }) => {
     }
 
     return (
-        <div className={styles['app-shell']}>
+        <div className={`${styles['app-shell']}${panelOpen ? ` ${styles['app-shell--panel-open']}` : ''}`}>
 
             {/* ── TOP BAR ── */}
             <header className={styles.topbar} role="banner">
