@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react'
 import { jwtDecode } from "jwt-decode"
 import BASE_URL from "../lib/api.js"
 import { useNavigate, Link } from "react-router-dom"
-// import { socket } from '../lib/socket.js'
-import "../pages/styles/dashboard.css"
+import styles from "../pages/styles/dashboard.module.css"
+
 const Dashboard = () => {
   const [activeNav, setActiveNav] = useState('home');
   const navigate = useNavigate()
@@ -16,10 +16,6 @@ const Dashboard = () => {
   const token = localStorage.getItem("token")
 
   useEffect(() => {
-    // socket.on("connect", () => {
-    //   console.log("Connected to server:", socket.id);
-    // });
-    
     const fetchData = async () => {
       const res = await fetch(`${BASE_URL}/api/user/userinfo`, {
         method: "GET",
@@ -35,8 +31,6 @@ const Dashboard = () => {
 
       const data = await res.json();
       setUserData({ ...userData, name: data.data.name, email: data.data.email, grade: data.data.grade })
-
-
     };
 
     fetchData();
@@ -45,12 +39,9 @@ const Dashboard = () => {
   const handleSubmitLogout = (e) => {
     e.preventDefault()
     localStorage.removeItem("token")
-
     navigate("/login")
-
   }
 
-  // ── Quick actions ─────────────────────────────────────────────
   const QUICK_ACTIONS = [
     { label: 'Upload Material', icon: '⬆️', to: '/notes' },
     { label: 'Create Quiz', icon: '⚡', to: '/quiz' },
@@ -60,7 +51,6 @@ const Dashboard = () => {
     { label: 'PDF Analysis', icon: '📄', to: '/pdf-analysis' },
   ];
 
-  // ── Feature / activity cards ──────────────────────────────────
   const FEATURE_CARDS = [
     {
       icon: '🧠', colorClass: 'blue',
@@ -105,15 +95,14 @@ const Dashboard = () => {
     : 'U';
 
   return (
-    <div className="app-shell">
+    <div className={styles['app-shell']}>
 
-      {/* ── MAIN CONTENT (scrollable) ──────────────────────── */}
-      <main className="main-content" role="main" aria-label="Dashboard content">
+      <main className={styles['main-content']} role="main" aria-label="Dashboard content">
 
         {/* Greeting banner */}
-        <section className="greeting-banner" aria-label="Welcome banner">
-          <div className="greeting-banner__avatar" aria-hidden="true">👋</div>
-          <div className="greeting-banner__text">
+        <section className={styles['greeting-banner']} aria-label="Welcome banner">
+          <div className={styles['greeting-banner__avatar']} aria-hidden="true">👋</div>
+          <div className={styles['greeting-banner__text']}>
             <h1>Welcome back, {userData?.name}!</h1>
             <p>
               Ready to pick up where you left off?{' '}
@@ -124,23 +113,23 @@ const Dashboard = () => {
         </section>
 
         {/* Quick actions */}
-        <section className="quick-actions" aria-labelledby="quick-actions-heading">
-          <div className="section-header">
+        <section className={styles['quick-actions']} aria-labelledby="quick-actions-heading">
+          <div className={styles['section-header']}>
             <div>
               <h2 id="quick-actions-heading">Quick Actions</h2>
               <p>Jump straight into any tool</p>
             </div>
           </div>
 
-          <div className="quick-actions__grid" role="list">
+          <div className={styles['quick-actions__grid']} role="list">
             {QUICK_ACTIONS.map(({ label, icon, to }) => (
               <Link
                 key={to}
                 to={to}
-                className="quick-action-card"
+                className={styles['quick-action-card']}
                 role="listitem"
               >
-                <div className="quick-action-card__icon" aria-hidden="true">
+                <div className={styles['quick-action-card__icon']} aria-hidden="true">
                   {icon}
                 </div>
                 {label}
@@ -150,29 +139,29 @@ const Dashboard = () => {
         </section>
 
         {/* Profile details */}
-        <section className="profile-section" aria-labelledby="profile-heading">
-          <div className="section-header">
+        <section className={styles['profile-section']} aria-labelledby="profile-heading">
+          <div className={styles['section-header']}>
             <div>
               <h2 id="profile-heading">Your Profile</h2>
               <p>Your account details at a glance</p>
             </div>
           </div>
 
-          <div className="profile-card">
-            <div className="profile-card__info">
-              <p className="profile-card__label">Account Info</p>
-              <div className="profile-card__rows">
-                <div className="profile-card__row">
-                  <span className="profile-card__row-key">Name</span>
-                  <span className="profile-card__row-val">{userData?.name}</span>
+          <div className={styles['profile-card']}>
+            <div className={styles['profile-card__info']}>
+              <p className={styles['profile-card__label']}>Account Info</p>
+              <div className={styles['profile-card__rows']}>
+                <div className={styles['profile-card__row']}>
+                  <span className={styles['profile-card__row-key']}>Name</span>
+                  <span className={styles['profile-card__row-val']}>{userData?.name}</span>
                 </div>
-                <div className="profile-card__row">
-                  <span className="profile-card__row-key">Grade</span>
-                  <span className="profile-card__row-val">{userData?.grade}</span>
+                <div className={styles['profile-card__row']}>
+                  <span className={styles['profile-card__row-key']}>Grade</span>
+                  <span className={styles['profile-card__row-val']}>{userData?.grade}</span>
                 </div>
-                <div className="profile-card__row">
-                  <span className="profile-card__row-key">Email</span>
-                  <span className="profile-card__row-val">{userData?.email}</span>
+                <div className={styles['profile-card__row']}>
+                  <span className={styles['profile-card__row-key']}>Email</span>
+                  <span className={styles['profile-card__row-val']}>{userData?.email}</span>
                 </div>
               </div>
             </div>
@@ -180,30 +169,30 @@ const Dashboard = () => {
         </section>
 
         {/* Feature / activity cards */}
-        <section className="feature-section" aria-labelledby="explore-heading">
-          <div className="section-header">
+        <section className={styles['feature-section']} aria-labelledby="explore-heading">
+          <div className={styles['section-header']}>
             <div>
               <h2 id="explore-heading">Explore Your Tools</h2>
               <p>Everything you need to learn smarter, not harder</p>
             </div>
           </div>
 
-          <div className="feature-cards-grid" role="list">
+          <div className={styles['feature-cards-grid']} role="list">
             {FEATURE_CARDS.map(({ icon, colorClass, title, desc, cta, to }) => (
-              <article key={to} className="feature-card" role="listitem">
-                <div className={`feature-card__icon feature-card__icon--${colorClass}`} aria-hidden="true">
+              <article key={to} className={styles['feature-card']} role="listitem">
+                <div className={`${styles['feature-card__icon']} ${styles[`feature-card__icon--${colorClass}`]}`} aria-hidden="true">
                   {icon}
                 </div>
-                <h3 className="feature-card__title">{title}</h3>
-                <p className="feature-card__desc">{desc}</p>
-                <Link to={to} className="feature-card__cta">{cta}</Link>
+                <h3 className={styles['feature-card__title']}>{title}</h3>
+                <p className={styles['feature-card__desc']}>{desc}</p>
+                <Link to={to} className={styles['feature-card__cta']}>{cta}</Link>
               </article>
             ))}
           </div>
         </section>
 
       </main>
-      
+
     </div>
   )
 }

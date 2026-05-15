@@ -1,11 +1,6 @@
-/* ============================================================
-   Notes.css  —  Notes page styles
-   Companion to Notes.jsx
-   Light + Dark mode via CSS variables
-   Responsive: mobile / tablet / desktop
-   ============================================================ */
+/* notes.module.css — Notes page (scoped) */
 
-/* ── DESIGN TOKENS (light, default) ─────────────────────────── */
+/* ── NOTES-SPECIFIC CSS VARS (keep here, --n- prefix = no conflict) ── */
 [data-theme="light"],
 :root {
     --n-bg: #F0F2F8;
@@ -13,12 +8,10 @@
     --n-surface-raised: #F8FAFF;
     --n-border: #E2E8F0;
     --n-border-subtle: #EEF2F8;
-
     --n-primary: #3B5BDB;
     --n-primary-dark: #2F4AC4;
     --n-primary-light: #EEF2FF;
     --n-primary-glow: rgba(59, 91, 219, 0.15);
-
     --n-accent: #22C55E;
     --n-accent-light: #DCFCE7;
     --n-purple: #7C3AED;
@@ -27,45 +20,34 @@
     --n-danger-light: #FEF2F2;
     --n-warning: #F97316;
     --n-pin: #F59E0B;
-
     --n-text-primary: #0F172A;
     --n-text-secondary: #475569;
     --n-text-muted: #94A3B8;
     --n-text-inverse: #FFFFFF;
-
     --n-sidebar-w: 260px;
-
     --n-r-sm: 6px;
     --n-r-md: 12px;
     --n-r-lg: 16px;
     --n-r-xl: 24px;
     --n-r-full: 9999px;
-
     --n-shadow-sm: 0 1px 3px rgba(0, 0, 0, .06), 0 1px 2px rgba(0, 0, 0, .04);
     --n-shadow-card: 0 4px 20px rgba(59, 91, 219, .08), 0 1px 4px rgba(0, 0, 0, .05);
     --n-shadow-lift: 0 8px 32px rgba(59, 91, 219, .14), 0 2px 8px rgba(0, 0, 0, .06);
-
     --n-t-fast: 150ms ease;
     --n-t-base: 220ms ease;
     --n-t-slow: 380ms cubic-bezier(.4, 0, .2, 1);
-
-    --font-display: 'Sora', sans-serif;
-    --font-body: 'DM Sans', sans-serif;
 }
 
-/* ── DESIGN TOKENS (dark) ────────────────────────────────────── */
 [data-theme="dark"] {
     --n-bg: #0D1117;
     --n-surface: #161B27;
     --n-surface-raised: #1E2535;
     --n-border: #2A3347;
     --n-border-subtle: #1E2535;
-
     --n-primary: #6B8EFF;
     --n-primary-dark: #4F6FE0;
     --n-primary-light: rgba(107, 142, 255, .12);
     --n-primary-glow: rgba(107, 142, 255, .20);
-
     --n-accent: #34D399;
     --n-accent-light: rgba(52, 211, 153, .12);
     --n-purple: #A78BFA;
@@ -74,12 +56,10 @@
     --n-danger-light: rgba(248, 113, 113, .12);
     --n-warning: #FB923C;
     --n-pin: #FBBF24;
-
     --n-text-primary: #E8EDF5;
     --n-text-secondary: #94A3B8;
     --n-text-muted: #4A5568;
     --n-text-inverse: #0D1117;
-
     --n-shadow-sm: 0 1px 3px rgba(0, 0, 0, .30);
     --n-shadow-card: 0 4px 24px rgba(0, 0, 0, .35);
     --n-shadow-lift: 0 8px 40px rgba(0, 0, 0, .50);
@@ -88,7 +68,6 @@
 /* ── PAGE LAYOUT ─────────────────────────────────────────────── */
 .notes-page {
     display: grid;
-    /* ✦ CHANGED: main first (left), sidebar second (right) */
     grid-template-columns: 1fr var(--n-sidebar-w);
     grid-template-rows: 1fr;
     height: 100%;
@@ -109,17 +88,12 @@
     }
 }
 
-/* ════════════════════════════════════════════════════════════════
-   NOTES SIDEBAR  (now on the RIGHT)
-════════════════════════════════════════════════════════════════ */
+/* ── NOTES SIDEBAR (RIGHT) ───────────────────────────────────── */
 .notes-sidebar {
-    /* ✦ CHANGED: place sidebar in column 2 (right) */
     grid-column: 2;
     grid-row: 1;
     background: var(--n-surface);
-    /* ✦ CHANGED: border on left side now */
     border-left: 1px solid var(--n-border);
-    border-right: none;
     display: flex;
     flex-direction: column;
     overflow-y: auto;
@@ -127,7 +101,6 @@
     gap: 0;
 }
 
-/* scrollbar */
 .notes-sidebar::-webkit-scrollbar {
     width: 4px;
 }
@@ -259,13 +232,13 @@
     padding-left: 14px;
 }
 
-.notes-sidebar__item.active {
-    background: var(--n-primary-light);
-    color: var(--n-primary);
+.active {
+    background: var(--n-primary-light) !important;
+    color: var(--n-primary) !important;
     font-weight: 600;
 }
 
-.notes-sidebar__item.active::before {
+.active::before {
     content: '';
     position: absolute;
     left: 0;
@@ -284,7 +257,7 @@
 }
 
 .notes-sidebar__item:hover .notes-sidebar__item-icon,
-.notes-sidebar__item.active .notes-sidebar__item-icon {
+.active .notes-sidebar__item-icon {
     opacity: 1;
 }
 
@@ -296,11 +269,8 @@
     max-width: 180px;
 }
 
-/* ════════════════════════════════════════════════════════════════
-   MAIN PANEL  (now on the LEFT, full remaining width)
-════════════════════════════════════════════════════════════════ */
+/* ── MAIN PANEL (LEFT) ───────────────────────────────────────── */
 .notes-main {
-    /* ✦ CHANGED: place main in column 1 (left) */
     grid-column: 1;
     grid-row: 1;
     overflow-y: auto;
@@ -322,7 +292,6 @@
     border-radius: var(--n-r-full);
 }
 
-/* ── error banner ── */
 .notes-error {
     position: fixed;
     bottom: 24px;
@@ -355,9 +324,7 @@
     opacity: 1;
 }
 
-/* ════════════════════════════════════════════════════════════════
-   WELCOME PANEL
-════════════════════════════════════════════════════════════════ */
+/* ── WELCOME PANEL ───────────────────────────────────────────── */
 .welcome-panel {
     display: flex;
     align-items: center;
@@ -496,9 +463,7 @@
     transform: translateY(0);
 }
 
-/* ════════════════════════════════════════════════════════════════
-   INPUT FORM CARD
-════════════════════════════════════════════════════════════════ */
+/* ── INPUT FORM CARD ─────────────────────────────────────────── */
 .note-input-wrap {
     display: flex;
     align-items: flex-start;
@@ -624,9 +589,7 @@
     background: var(--n-primary-dark);
 }
 
-/* ════════════════════════════════════════════════════════════════
-   NOTE DOCUMENT VIEW
-════════════════════════════════════════════════════════════════ */
+/* ── NOTE DOCUMENT ───────────────────────────────────────────── */
 .note-doc {
     max-width: 760px;
     margin: 0 auto;
@@ -827,9 +790,7 @@
     line-height: 1.65;
 }
 
-/* ════════════════════════════════════════════════════════════════
-   TOAST NOTIFICATION
-════════════════════════════════════════════════════════════════ */
+/* ── TOAST ───────────────────────────────────────────────────── */
 .toast {
     position: fixed;
     top: 24px;
@@ -847,45 +808,21 @@
     max-width: 340px;
 }
 
-@keyframes slideDown {
-    from {
-        opacity: 0;
-        transform: translateY(-16px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@keyframes slideUp {
-    from {
-        opacity: 0;
-        transform: translateX(-50%) translateY(16px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateX(-50%) translateY(0);
-    }
-}
-
 .toast--success {
     background: var(--n-accent-light);
     color: #166534;
     border: 1px solid rgba(34, 197, 94, .25);
 }
 
-[data-theme="dark"] .toast--success {
-    color: var(--n-accent);
-    border-color: rgba(52, 211, 153, .25);
-}
-
 .toast--error {
     background: var(--n-danger-light);
     color: var(--n-danger);
     border: 1px solid rgba(239, 68, 68, .25);
+}
+
+[data-theme="dark"] .toast--success {
+    color: var(--n-accent);
+    border-color: rgba(52, 211, 153, .25);
 }
 
 .toast__icon {
@@ -911,9 +848,7 @@
     opacity: 1;
 }
 
-/* ════════════════════════════════════════════════════════════════
-   SPINNER
-════════════════════════════════════════════════════════════════ */
+/* ── SPINNER ─────────────────────────────────────────────────── */
 .spinner {
     display: inline-block;
     width: 14px;
@@ -932,17 +867,38 @@
     border-top-color: var(--n-text-muted);
 }
 
+/* ── ANIMATIONS ──────────────────────────────────────────────── */
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-16px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(16px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
 @keyframes spin {
     to {
         transform: rotate(360deg);
     }
 }
 
-/* ════════════════════════════════════════════════════════════════
-   RESPONSIVE
-════════════════════════════════════════════════════════════════ */
-
-/* Tablet */
+/* ── RESPONSIVE ──────────────────────────────────────────────── */
 @media (max-width: 900px) {
     :root {
         --n-sidebar-w: 220px;
@@ -961,11 +917,9 @@
     }
 }
 
-/* Mobile */
 @media (max-width: 640px) {
     .notes-page {
         grid-template-columns: 1fr;
-        /* ✦ CHANGED: sidebar below main on mobile */
         grid-template-rows: 1fr auto;
         height: auto;
         min-height: 100%;
@@ -1031,11 +985,4 @@
         left: 12px;
         max-width: none;
     }
-}
-
-/* ════════════════════════════════════════════════════════════════
-   UTILITY: hide/show transitions
-════════════════════════════════════════════════════════════════ */
-.u-fade-in {
-    animation: fadeIn var(--n-t-slow) both;
 }
