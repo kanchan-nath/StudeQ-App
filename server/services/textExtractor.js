@@ -3,7 +3,8 @@ import {PDFParse} from "pdf-parse"
 import fs from "fs"
 import XLSX from "xlsx"
 import Tesseract from "tesseract.js"
-import embeddings from "./embeddings.js"
+import chunking from "./chunking.js"
+import embedText from "./embedText.js"
 
 const textExtractor = async (file) => {
     const mimeType = file.mimetype
@@ -15,9 +16,8 @@ const textExtractor = async (file) => {
             const uint8Array = new Uint8Array(dataBuffer)
             const parser = new PDFParse(uint8Array)
             const extractedText = (await parser.getText()).text
-            console.log(extractedText);
             
-            embeddings(extractedText)
+            embedText(extractedText)
             fs.unlinkSync(filePath)
             return extractedText
 

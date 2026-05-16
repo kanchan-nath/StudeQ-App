@@ -1,0 +1,54 @@
+import dotenv from "dotenv"
+dotenv.config()
+import { Pinecone } from "@pinecone-database/pinecone";
+import embedText from "./embedText.js";
+import chunking from "./chunking.js";
+import textExtractor from "./textExtractor.js";
+
+const vectorDB = async (question, file) => {
+    const extractedText = await textExtractor(file)
+
+    const chunks = await chunking(extractedText)
+
+    const pc = new Pinecone(
+        {
+            apiKey: process.env.PINECONE_API_KEY
+        }
+    )
+
+    const index = await pc.index("vectordb")
+
+    const namespace = process.env.PINECONE_NAME_SPACE ? process.env.PINECONE_NAME_SPACE.replace(/['"]/g, '') : "Kanchan_12345"
+
+    const ns = index.namespace(namespace);
+
+    const embeddings = await Promise.all(
+        chunks.map(chunk => embedText(chunk))
+    );
+
+    const records = chunks.map((chunk, i) => (
+        {
+            id: `doc_${i}`,
+            values: embeddings[i],
+            metadata: {
+                text: chunk,
+            }
+        }
+    ))
+
+    await ns.upsert({ records })
+
+    const questionVector = await embedText(question)
+
+
+    const results = await ns.query({
+        vector: questionVector,
+        topK: 5,
+        includeMetadata: true
+    })
+
+    const topChunks = results.matches.map(m => m.metadata.text);
+    return topChunks
+}
+
+export default vectorDB
