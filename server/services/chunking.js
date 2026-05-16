@@ -1,17 +1,16 @@
 import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
+import embedText from "./embedText.js";
 
-const embeddings = async (text) => {
+const chunking = async (text) => {
 
     const splitter = new RecursiveCharacterTextSplitter({
         chunkSize:1000,
         chunkOverlap:200,
     })
 
-    const chunks = await splitter.createDocuments([text])
-    console.log("Log:");
-    console.log(chunks);
-    
-    
+    const chunks = await splitter.splitText(text)
+    // embedText(chunks)
+    return chunks
 }
 
-export default embeddings
+export default chunking
