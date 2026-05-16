@@ -28,7 +28,9 @@
     "pg": "^8.20.0",
     "prettier": "^3.8.3",
     "serpapi": "^2.2.1",
-    "socket.io": "^4.8.3"
+    "socket.io": "^4.8.3",
+    "tesseract.js": "^7.0.0",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "prisma": "^7.8.0"
