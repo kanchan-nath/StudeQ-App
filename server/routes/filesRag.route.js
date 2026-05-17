@@ -14,6 +14,6 @@ router.route("/upload").post(verifyJWT,
     uploadFile
 )
 
-router.route("/:id/chat").post(verifyJWT, askQuery)
+router.route("/:id/chat/:chatRoomKey").post(verifyJWT, askQuery)
 
 export default router

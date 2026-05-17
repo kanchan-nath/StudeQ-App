@@ -17,12 +17,24 @@ const AIResponseSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    tokenUsed:{
+    promptTokens:{
+        type: String,
+        required: true
+    },
+    completionTokens: {
+        type: String,
+        required: true
+    },
+    totalTokens: {
+        type: String,
+        required: true
+    },
+    totalTime: {
         type: String,
         required: true
     },
     createdAt:{
-        type: Date.now()
+        type: Date
     }
 
 },{timestamps:true})

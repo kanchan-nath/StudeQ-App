@@ -61,7 +61,6 @@ const queryDB = async(query)=>{
         topK: 5,
         includeMetadata: true
     })
-    console.log(results.matches);
     
     const topChunks = results.matches.map((m)=>(m.metadata.text))
     return topChunks
