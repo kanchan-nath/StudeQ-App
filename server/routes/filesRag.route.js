@@ -1,7 +1,7 @@
 import { Router } from "express"
 import { verifyJWT } from "../middlewares/auth.middleware.js"
 import { upload } from "../middlewares/multer.middleware.js"
-import { uploadFile } from "../controllers/filesRag.controller.js"
+import { uploadFile, askQuery } from "../controllers/filesRag.controller.js"
 
 const router = Router()
 
@@ -13,5 +13,7 @@ router.route("/upload").post(verifyJWT,
     ]),
     uploadFile
 )
+
+router.route("/:id/chat").post(verifyJWT, askQuery)
 
 export default router

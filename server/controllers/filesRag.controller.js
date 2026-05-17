@@ -35,10 +35,16 @@ const uploadFile = asyncHandler(async(req, res)=>{
     // console.log(results);
     return res
     .status(200)
-    .json(new ApiResponse(200, {}, "Document's metadata uploaded successfully"))
+    .json(new ApiResponse(200, metadata._id, "Document's metadata uploaded successfully"))
     
 })
 
+const askQuery = asyncHandler(async(req, res)=>{
+    const {id} = req.params
+    const userId = req.user.id
+})
+
 export {
-    uploadFile
+    uploadFile,
+    askQuery
 }
