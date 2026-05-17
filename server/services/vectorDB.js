@@ -5,7 +5,7 @@ import embedText from "./embedText.js";
 import chunking from "./chunking.js";
 import textExtractor from "./textExtractor.js";
 
-const vectorDB = async (question, file) => {
+const vectorDB = async (file) => {
     const extractedText = await textExtractor(file)
 
     const chunks = await chunking(extractedText)
@@ -37,18 +37,33 @@ const vectorDB = async (question, file) => {
     ))
 
     await ns.upsert({ records })
+    
+}
 
-    const questionVector = await embedText(question)
+const queryDB = async(query)=>{
+    const pc = new Pinecone(
+        {
+            apiKey: process.env.PINECONE_API_KEY
+        }
+    )
 
+    const index = pc.index("vectordb")
+
+    const namespace = process.env.PINECONE_NAME_SPACE ? process.env.PINECONE_NAME_SPACE.replace(/['"]/g, '') : "Kanchan_12345"
+
+    const ns = index.namespace(namespace);
+
+
+    const queryVector = await embedText(query)
 
     const results = await ns.query({
-        vector: questionVector,
+        vector: queryVector,
         topK: 5,
         includeMetadata: true
     })
-
-    const topChunks = results.matches.map(m => m.metadata.text);
+    console.log(results.matches);
+    
+    const topChunks = results.matches.map((m)=>(m.metadata.text))
     return topChunks
 }
-
-export default vectorDB
+export  {vectorDB, queryDB}
