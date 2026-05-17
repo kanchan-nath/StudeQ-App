@@ -21,6 +21,9 @@ const AIResponseSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    createdAt:{
+        type: Date.now()
+    }
 
 },{timestamps:true})
 
