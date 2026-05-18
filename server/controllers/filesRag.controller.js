@@ -5,6 +5,7 @@ import llmCall from "../lib/groq/llmCall.js"
 import { Documents } from "../models/document.model.js"
 import { v4 as uuid4 } from "uuid"
 import { ChatRoom } from "../models/chatRoom.model.js"
+import mongoose from "mongoose"
 
 const uploadFile = asyncHandler(async (req, res) => {
     const userId = req.user?.id
@@ -49,6 +50,10 @@ const uploadFile = asyncHandler(async (req, res) => {
 const askQuery = asyncHandler(async (req, res) => {
     const { id, chatRoomKey } = req.params
     const userId = req.user.id
+
+    if (!id || !chatRoomKey) {
+        throw new ApiError(400, "Something went wrong")
+    }
     const { query } = req.body
 
     if (!query) {
@@ -60,7 +65,6 @@ const askQuery = asyncHandler(async (req, res) => {
 
     await ChatRoom.findOneAndUpdate(
         {
-            _id: id,
             userId,
             chatRoomKey
         },
@@ -87,7 +91,68 @@ const askQuery = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, results, "Response is provided successfully"))
 })
 
+const allChats = asyncHandler(async(req, res)=>{
+    const { id, chatRoomKey } = req.params
+    const userId = req.user.id
+
+    if(!id || !chatRoomKey){
+        throw new ApiError(400 , "Something went wrong")
+    }
+
+    const data = await ChatRoom.find(
+        {
+            chatRoomKey,
+            userId
+        }
+    )
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, data, "All chats fetched"))
+})
+
+const updateQuery = asyncHandler(async(req, res)=>{
+    const {id, chatRoomKey, chatId} = req.params
+    const {query} = req.body
+    const userId = req.user.id
+    
+    if(!id || !chatRoomKey || !chatId || !query){
+        throw new ApiError(400, "Something went wrong")
+    }
+
+    const topChunks = await queryDB(query)
+
+    if(!topChunks){
+        throw new ApiError(400, "topChunks generation error")
+    }
+    const results = await llmCall(query, topChunks,userId)
+
+    if (!results) {
+        throw new ApiError(400, "Query answer problem, Try Again")
+    }
+
+    const data = await ChatRoom.findOneAndUpdate(
+        {
+            userId,
+            chatRoomKey,
+            "messages._id": new mongoose.Types.ObjectId(chatId)
+            
+        },
+        {
+           $set:{
+            "messages.$.content": results
+           }
+        }
+    )
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, data, "Query upadated"))
+})
+
 export {
     uploadFile,
-    askQuery
+    askQuery,
+    allChats,
+    updateQuery
 }
