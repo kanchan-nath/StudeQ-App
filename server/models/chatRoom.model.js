@@ -10,6 +10,11 @@ const chatRoomSchema = new mongoose.Schema({
         Unique: true,
         required: true
     },
+    docId:{
+        type: String,
+        required: true,
+        unique: true
+    },
     messages:[
         {
             role:{

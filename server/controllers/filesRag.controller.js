@@ -9,12 +9,9 @@ import mongoose from "mongoose"
 
 const uploadFile = asyncHandler(async (req, res) => {
     const userId = req.user?.id
-    // const {query} = req.body
 
-    // if(!query){
-    //     throw new ApiError(400, "Type something")
-    // }
-    const localFile = req.files.file[0]
+    const localFile = req.files?.file[0]
+    
     const chatRoomKey = uuid4()
 
     if (!chatRoomKey) {
@@ -38,7 +35,8 @@ const uploadFile = asyncHandler(async (req, res) => {
     await vectorDB(localFile)
     await ChatRoom.create({
         userId,
-        chatRoomKey
+        chatRoomKey,
+        docId:id
     })
 
     return res
@@ -91,7 +89,7 @@ const askQuery = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, results, "Response is provided successfully"))
 })
 
-const allChats = asyncHandler(async(req, res)=>{
+const allChatsMessage = asyncHandler(async(req, res)=>{
     const { id, chatRoomKey } = req.params
     const userId = req.user.id
 
@@ -131,6 +129,15 @@ const updateQuery = asyncHandler(async(req, res)=>{
         throw new ApiError(400, "Query answer problem, Try Again")
     }
 
+
+    const chatRoom = await ChatRoom.findOne({ userId, chatRoomKey })
+
+    const msgIndex = chatRoom.messages.findIndex(
+        m => m._id.toString() == chatId
+    )
+    
+    if (msgIndex === -1) throw new ApiError(404, "Message not found")
+
     const data = await ChatRoom.findOneAndUpdate(
         {
             userId,
@@ -140,7 +147,8 @@ const updateQuery = asyncHandler(async(req, res)=>{
         },
         {
            $set:{
-            "messages.$.content": results
+                [`messages.${msgIndex}.content`]: query, 
+                [`messages.${msgIndex + 1}.content`]: results
            }
         }
     )
@@ -150,9 +158,23 @@ const updateQuery = asyncHandler(async(req, res)=>{
     .json(new ApiResponse(200, data, "Query upadated"))
 })
 
+const allChats = asyncHandler(async(req,res)=>{
+    const userId = req.user?.id
+
+    const data = await ChatRoom.find(
+        {
+            userId
+        }
+    ).select({ docId: 1, chatRoomKey: 1 })
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, data, "All chats fetched successfully"))
+})
 export {
     uploadFile,
     askQuery,
-    allChats,
-    updateQuery
+    allChatsMessage,
+    updateQuery,
+    allChats
 }
