@@ -32,6 +32,8 @@ const uploadFile = asyncHandler(async (req, res) => {
         throw new ApiError(400, "metadata saving error")
     }
     const id = metadata._id
+    const fileName = metadata.originalName
+
     await vectorDB(localFile)
     await ChatRoom.create({
         userId,
@@ -41,7 +43,7 @@ const uploadFile = asyncHandler(async (req, res) => {
 
     return res
         .status(200)
-        .json(new ApiResponse(200, { id, chatRoomKey }, "Document's metadata uploaded successfully"))
+        .json(new ApiResponse(200, { id, chatRoomKey, fileName  }, "Document's metadata uploaded successfully"))
 
 })
 
