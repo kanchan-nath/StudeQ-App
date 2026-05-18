@@ -9,6 +9,7 @@ const NAV_MAIN = [
     { to: '/flashcards', label: 'Flashcards', icon: '⚡', color: 'purple' },
     { to: '/study-room', label: 'Study Room', icon: '📚', color: 'green' },
     { to: '/scheduler', label: 'Scheduler', icon: '📅', color: 'orange' },
+    { to: '/notebook', label: 'Notebook', icon: '📅', color: 'blue' },
 ]
 
 const NAV_AI = [

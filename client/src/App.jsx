@@ -18,6 +18,7 @@ import GeneratePlanView from './pages/GeneratePlanView.jsx'
 import Navbar from '../src/components/Navbar.jsx'
 import AppShell from './components/layouts/AppShell.jsx'
 import Flashcards from './pages/Flashcards.jsx'
+import Notebook from './pages/Notebook.jsx'
 
 const App = () => {
 
@@ -46,6 +47,7 @@ const App = () => {
           <Route path='/pdf-analysis' element={<ProtectedRoute component={<PDFSummary />} />} />
           <Route path='/scheduler' element={<ProtectedRoute component={<Scheduler />} />} />
           <Route path='/scheduler/generate-plan' element={<ProtectedRoute component={<GeneratePlanView />} />} />
+          <Route path='/notebook' element={<ProtectedRoute component={<Notebook />} />} />
 
         </Route>
         
