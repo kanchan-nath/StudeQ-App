@@ -8,10 +8,10 @@ import fs from "fs"
 import {pdfToFlashcard} from "../lib/groq/pdfToFlashcard.js"
 
 const generateQuiz = asyncHandler(async (req, res) => {
-    const { topic, subject, quizId } = req.body
+    const { topic, subject, types } = req.body
     const userId = req.user.id
 
-    if (!topic || !subject || !quizId) {
+    if (!topic || !subject ||!types ) {
         throw new ApiError(400, "All fields are required")
     }
 
@@ -115,27 +115,46 @@ const getAllQuiz = asyncHandler(async(req, res)=>{
 })
 
 const generateQuizFromFiles = asyncHandler(async(req, res)=>{
-    const {file} = req.body
+    const {types, total} = req.body
 
+    const userId = req.user.id
 
     const localFilePath = req.files?.file?.[0].path
+
+    if(!types || !localFilePath ||!total){
+        throw new ApiError(404, "All fields are required")
+    }
+    
     console.log(localFilePath);
 
     const dataBuffer = fs.readFileSync(localFilePath)
-    const unit8Array = await Uint8Array(dataBuffer)
+    const unit8Array = new Uint8Array(dataBuffer)
     const parser = new PDFParse(unit8Array)
 
     const extractedText = parser.getText()
 
     console.log(extractedText);
-    const result = await quizFromFile(extractedText)
-    console.log(data);
+
+    const result = await quizFromFile(types, extractedText, userId)
+    const { title, questions} = result
+    console.log(result);
     
 
-    const data = ""
+    const data = await Quiz.create({
+        userId,
+        quiz: {
+            title,
+            totalQuestion:total,
+            questions: questions
+        }
+    })
+
+    fs.unlinkSync(localFilePath)
+    return res
+    .status(200)
+    .json(new ApiResponse(200, data,"Quiz created" ))
 
     
-    const userId = req.user.id
 })
 
 

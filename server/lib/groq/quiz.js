@@ -1,6 +1,7 @@
 import groq from "./groq.js";
+import {AIResponse} from "../../models/aiResponse.model.js"
 
-const quiz = async (type, topic, subject) => {
+const quiz = async (type, topic, subject, userId) => {
 
     const prompt = `
 You are a quiz generator for the subject: ${subject}.
@@ -70,7 +71,7 @@ Rules:
     return data
 }
 
-const quizFromFile = async (types, extractedText) => {
+const quizFromFile = async (types, extractedText, userId) => {
 
     const prompt = `
 You are a quiz generator.
@@ -80,7 +81,7 @@ Here is the extracted content from the user's uploaded document:
 ${extractedText}
 """
 
-Question types to use: ${JSON.stringify(types)}
+Question types to use: ${types}
 
 Generate at least 5 questions based solely on the above content.
 Distribute the provided types evenly across all questions. Cycle through the types array if needed.
@@ -107,7 +108,7 @@ Rules:
 - Return valid JSON object with "title" string and "questions" array.
 - Minimum 5 question objects.
 - "number" starts at 1, increments by 1.
-- "type" must be picked by cycling through: ${JSON.stringify(types)} — distribute evenly.
+- "type" must be picked by cycling through: ${types} — distribute evenly.
 - Every string may contain Markdown formatting.
 - "options" must be array of exactly 4 strings.
 - "answer" must be exact text of one option from the "options" array.
@@ -135,6 +136,8 @@ Rules:
 
     const result = response.choices[0].message.content
 
+    console.log(result);
+    
     await AIResponse.create({
         userId,
         prompt,
@@ -147,6 +150,9 @@ Rules:
 
     })
     const data = JSON.parse(result)
+    console.log(data);
+    
+    
     return data
 }
 
