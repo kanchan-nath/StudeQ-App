@@ -14,6 +14,7 @@ const Quiz = () => {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const [quizId, setQuizId] = useState("")
+  const [allQuizResult, setAllQuizResult] = useState([])
 
   const token = localStorage.getItem("token")
 
@@ -64,9 +65,36 @@ const Quiz = () => {
 
   }
 
+  const fetchAllQuiz = async()=>{
+    try {
+      const res = await fetch(`${BASE_URL}/api/quiz/all`,{
+        method:"GET",
+        headers:{
+          "Content-Type":"application.json",
+          "Authorization":`Bearer ${token}`
+        }
+      })
+
+      if(!res.ok){
+        throw new Error("not all quiz fetchd")
+      }
+
+      const data = await res.json()
+      console.log(data);
+      setAllQuizResult(data.data)
+      
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
   useEffect(() => {
     setQuizId(uuidv4())
   }, [])
+
+  useEffect(()=>{
+    fetchAllQuiz()
+  },[])
 
   return (
     <>
@@ -125,6 +153,30 @@ const Quiz = () => {
             ))
           } 
         </div>
+      </div>
+
+      <div>
+        {
+          allQuizResult.map((item,index)=>(
+            <div key={index}>
+              {
+                item.quiz.map((quiz, i)=>(
+                  <div key={i}>
+                    <p>{quiz.question}</p>
+                    {quiz.options.map((option,j)=>(
+                      <div key={j}>
+                        <p>{option.optionId}</p>
+                        <p>{option.text}</p>
+
+                      </div>
+                    ))}
+                  </div>
+
+                ))
+              }
+            </div>
+          ))
+        }
       </div>
     </>
   )
