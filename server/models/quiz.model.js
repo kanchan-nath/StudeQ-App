@@ -9,6 +9,10 @@ const quizSchema = new mongoose.Schema({
         type:String,
         required:true,
     },
+    userAnswer:{
+        type:String,
+        default: null
+    },
     quiz:[
         {
             question:{
@@ -25,7 +29,7 @@ const quizSchema = new mongoose.Schema({
                 }
             ],
             answer:{
-                type:String
+                type:String,
             }
         }
     ],
