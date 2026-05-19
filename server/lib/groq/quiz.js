@@ -8,32 +8,32 @@ Generate at least 5 ${type} questions on the topic: ${topic}.
 The questions must be strictly relevant to "${topic}" within "${subject}".
 
 Return ONLY valid JSON. No explanations, headings, notes, markdown fences, or extra text.
-
+Question types to use: ${JSON.stringify(types)}
 Response format:
 
 [
   {
-    "id": 1,
+    "number": 1,
     "type": "${type}",
     "question": "Markdown formatted question",
     "options": ["Markdown option A", "Markdown option B", "Markdown option C", "Markdown option D"],
     "answer": "Exact text of correct option",
-    "user_response": null,
-    "is_correct": null
+    "userResponse": null,
+    "isCorrect": null
   }
 ]
 
 Rules:
 - Return valid JSON array only.
 - Minimum 5 question objects.
-- "id" starts at 1, increments by 1.
-- "type" must always be exactly: "${type}".
+- "number" starts at 1, increments by 1.
+- "type" must be picked by cycling through: ${JSON.stringify(types)} — distribute evenly.
 - Every string value may contain Markdown formatting.
 - "options" must be array of exactly 4 strings.
 - "answer" must be exact text of one option from the "options" array.
 - Distribute correct answers across all options — do not cluster on same position.
-- "user_response" must always be null.
-- "is_correct" must always be null.
+- "userResponse" must always be null.
+- "isCorrect" must always be null.
 - No trailing commas.
 - Escape quotes properly inside strings.
 `
@@ -49,7 +49,7 @@ Rules:
     })
 
     const { prompt_tokens, completion_tokens, total_tokens, total_time } = response.usage
-    
+
     const model = response.model
 
     const result = response.choices[0].message.content
@@ -70,7 +70,7 @@ Rules:
     return data
 }
 
-const quizFromFile = async (topic, subject) => {
+const quizFromFile = async (types, extractedText) => {
 
     const prompt = `
 You are a quiz generator.
@@ -80,7 +80,10 @@ Here is the extracted content from the user's uploaded document:
 ${extractedText}
 """
 
-Generate at least 5 multiple choice questions based solely on the above content.
+Question types to use: ${JSON.stringify(types)}
+
+Generate at least 5 questions based solely on the above content.
+Distribute the provided types evenly across all questions. Cycle through the types array if needed.
 
 Return ONLY valid JSON. No markdown fences, no explanations, no extra text.
 
@@ -89,26 +92,28 @@ Response format:
   "title": "Provide a title based on the document content",
   "questions": [
     {
+      "number": 1,
+      "type": "one of the provided types",
       "question": "Markdown formatted question",
-      "options": [
-        { "optionId": "A", "text": "Markdown formatted option" },
-        { "optionId": "B", "text": "Markdown formatted option" },
-        { "optionId": "C", "text": "Markdown formatted option" },
-        { "optionId": "D", "text": "Markdown formatted option" }
-      ],
-      "answer": "A"
+      "options": ["Markdown option A", "Markdown option B", "Markdown option C", "Markdown option D"],
+      "answer": "Exact text of correct option",
+      "userResponse": null,
+      "isCorrect": null
     }
   ]
 }
 
 Rules:
 - Return valid JSON object with "title" string and "questions" array.
-- Minimum 5 question objects in "questions".
+- Minimum 5 question objects.
+- "number" starts at 1, increments by 1.
+- "type" must be picked by cycling through: ${JSON.stringify(types)} — distribute evenly.
 - Every string may contain Markdown formatting.
-- Each question must have exactly 4 options.
-- Option IDs must be exactly: A, B, C, D — in order.
-- "answer" must be one of: A, B, C, D.
-- Distribute correct answers across A, B, C, D — no clustering.
+- "options" must be array of exactly 4 strings.
+- "answer" must be exact text of one option from the "options" array.
+- Distribute correct answers across all option positions — no clustering.
+- "userResponse" must always be null.
+- "isCorrect" must always be null.
 - No trailing commas.
 - Escape quotes properly inside strings.
 - Return nothing except the JSON object.
@@ -118,13 +123,29 @@ Rules:
         model: "llama-3.3-70b-versatile",
         messages: [
             {
-                role: "user",
+                role: "assistant",
                 content: prompt
             }
         ]
     })
 
+    const { prompt_tokens, completion_tokens, total_tokens, total_time } = response.usage
+
+    const model = response.model
+
     const result = response.choices[0].message.content
+
+    await AIResponse.create({
+        userId,
+        prompt,
+        response: result,
+        model,
+        promptTokens: prompt_tokens,
+        completionTokens: completion_tokens,
+        totalTokens: total_tokens,
+        totalTime: total_time,
+
+    })
     const data = JSON.parse(result)
     return data
 }
