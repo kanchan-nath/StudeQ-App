@@ -1,6 +1,6 @@
 import { asyncHandler } from "../utils/asyncHandler.js"
 import { ApiError, ApiResponse } from "../utils/Async.js"
-import { quiz, flashcards } from "../lib/groq/quiz.js"
+import { quiz, flashcards, quizFromFile } from "../lib/groq/quiz.js"
 import { Quiz } from "../models/quiz.model.js"
 import { Flascards } from "../models/flashcard.model.js"
 import { PDFParse } from "pdf-parse"
@@ -114,7 +114,29 @@ const getAllQuiz = asyncHandler(async(req, res)=>{
     .json(new ApiResponse(200, data, "All quiz lists fetched"))
 })
 
+const generateQuizFromFiles = asyncHandler(async(req, res)=>{
+    const {file} = req.body
 
+
+    const localFilePath = req.files?.file?.[0].path
+    console.log(localFilePath);
+
+    const dataBuffer = fs.readFileSync(localFilePath)
+    const unit8Array = await Uint8Array(dataBuffer)
+    const parser = new PDFParse(unit8Array)
+
+    const extractedText = parser.getText()
+
+    console.log(extractedText);
+    const result = await quizFromFile(extractedText)
+    console.log(data);
+    
+
+    const data = ""
+
+    
+    const userId = req.user.id
+})
 
 
 const generateFlashcards = asyncHandler(async (req, res) => {
@@ -264,6 +286,7 @@ export {
     getQuizAnswer,
     deleteQuiz,
     getAllQuiz,
+    generateQuizFromFiles,
 
     generateFlashcards,
     getFlashcards,

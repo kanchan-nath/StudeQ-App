@@ -1,39 +1,99 @@
 import mongoose from "mongoose"
 
+// const quizSchema = new mongoose.Schema({
+//     userId:{
+//         type:String,
+//         required: true 
+//     },
+//     quizId:{
+//         type:String,
+//         required:true,
+//     },
+//     userAnswer:{
+//         type:String,
+//         default: null
+//     },
+//     quiz:[
+//         {
+//             question:{
+//                 type:String
+//             },
+//             options:[
+//                 {
+//                     optionId:{
+//                         type:String
+//                     },
+//                     text:{
+//                         type :String
+//                     }
+//                 }
+//             ],
+//             answer:{
+//                 type:String,
+//             }
+//         }
+//     ],
+//     createdAt: Date
+// },{timestamps:true })
+
+
 const quizSchema = new mongoose.Schema({
-    userId:{
-        type:String,
-        required: true 
-    },
-    quizId:{
-        type:String,
-        required:true,
-    },
-    userAnswer:{
-        type:String,
-        default: null
-    },
-    quiz:[
-        {
-            question:{
-                type:String
+     userId:{
+        type: String,
+        required: true
+     },
+     quiz:{
+        title:{
+            type:String,
+            required: true
+        },
+        totalQuestion:{
+            type:Number,
+            required: true
+        },
+        meta:{
+            startedAt:{
+                type: Date,
+                default:null
             },
-            options:[
-                {
-                    optionId:{
-                        type:String
-                    },
-                    text:{
-                        type :String
-                    }
-                }
-            ],
-            answer:{
-                type:String,
+            submittedAt:{
+                type: String,
+                default:null
+            },
+            score:{
+                type: String,
+                default: null
             }
         }
-    ],
-    createdAt: Date
-},{timestamps:true })
+     },
+     questions:[
+        {
+            types:{
+                type: String,
+                required: true
+            },
+            question:{
+                type: String,
+                required: true,
+            },
+            options: {
+                type: [String],
+                required: true
+            },
+            answer:{
+                type: String,
+                required: true
+            },
+            userResponse:{
+                type: String,
+                default: null
+            },
+            isCorrect:{
+                type: Boolean,
+                default:false
+            }
+        }
+     ]
 
+},{timestamps:true})
 export const Quiz = mongoose.model("Quiz", quizSchema)

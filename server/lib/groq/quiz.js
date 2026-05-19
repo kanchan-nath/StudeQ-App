@@ -1,42 +1,41 @@
 import groq from "./groq.js";
 
-const quiz = async (topic, subject) => {
+const quiz = async (type, topic, subject) => {
 
     const prompt = `
 You are a quiz generator for the subject: ${subject}.
-Generate at least 5 multiple choice questions on the topic: ${topic}.
+Generate at least 5 ${type} questions on the topic: ${topic}.
 The questions must be strictly relevant to "${topic}" within "${subject}".
 
-Return ONLY valid JSON.
-Do not add explanations, headings, notes, markdown fences, or extra text outside the JSON.
-
+Return ONLY valid JSON. No explanations, headings, notes, markdown fences, or extra text.
+Question types to use: ${JSON.stringify(types)}
 Response format:
 
 [
-    {
-        "question": "Markdown formatted question",
-        "options": [
-            { "optionId": "A", "text": "Markdown formatted option" },
-            { "optionId": "B", "text": "Markdown formatted option" },
-            { "optionId": "C", "text": "Markdown formatted option" },
-            { "optionId": "D", "text": "Markdown formatted option" }
-        ],
-        "answer": "A"
-    }
+  {
+    "number": 1,
+    "type": "${type}",
+    "question": "Markdown formatted question",
+    "options": ["Markdown option A", "Markdown option B", "Markdown option C", "Markdown option D"],
+    "answer": "Exact text of correct option",
+    "userResponse": null,
+    "isCorrect": null
+  }
 ]
 
 Rules:
-- The entire response must be valid JSON array.
-- The array must contain a minimum of 5 question objects.
+- Return valid JSON array only.
+- Minimum 5 question objects.
+- "number" starts at 1, increments by 1.
+- "type" must be picked by cycling through: ${JSON.stringify(types)} — distribute evenly.
 - Every string value may contain Markdown formatting.
-- Each question must contain exactly 4 options.
-- Option IDs must always be exactly: A, B, C, D — in that order.
-- "answer" must contain only the single correct option ID (one of: A, B, C, or D).
-- Do not duplicate answer text inside "answer".
-- Distribute correct answers across A, B, C, D — do not cluster them on the same option.
-- Do not use trailing commas.
+- "options" must be array of exactly 4 strings.
+- "answer" must be exact text of one option from the "options" array.
+- Distribute correct answers across all options — do not cluster on same position.
+- "userResponse" must always be null.
+- "isCorrect" must always be null.
+- No trailing commas.
 - Escape quotes properly inside strings.
-- Do not return anything except the JSON array.
 `
 
     const response = await groq.chat.completions.create({
@@ -49,7 +48,104 @@ Rules:
         ]
     })
 
+    const { prompt_tokens, completion_tokens, total_tokens, total_time } = response.usage
+
+    const model = response.model
+
     const result = response.choices[0].message.content
+
+    await AIResponse.create({
+        userId,
+        prompt,
+        response: result,
+        model,
+        promptTokens: prompt_tokens,
+        completionTokens: completion_tokens,
+        totalTokens: total_tokens,
+        totalTime: total_time,
+
+    })
+
+    const data = JSON.parse(result)
+    return data
+}
+
+const quizFromFile = async (types, extractedText) => {
+
+    const prompt = `
+You are a quiz generator.
+
+Here is the extracted content from the user's uploaded document:
+"""
+${extractedText}
+"""
+
+Question types to use: ${JSON.stringify(types)}
+
+Generate at least 5 questions based solely on the above content.
+Distribute the provided types evenly across all questions. Cycle through the types array if needed.
+
+Return ONLY valid JSON. No markdown fences, no explanations, no extra text.
+
+Response format:
+{
+  "title": "Provide a title based on the document content",
+  "questions": [
+    {
+      "number": 1,
+      "type": "one of the provided types",
+      "question": "Markdown formatted question",
+      "options": ["Markdown option A", "Markdown option B", "Markdown option C", "Markdown option D"],
+      "answer": "Exact text of correct option",
+      "userResponse": null,
+      "isCorrect": null
+    }
+  ]
+}
+
+Rules:
+- Return valid JSON object with "title" string and "questions" array.
+- Minimum 5 question objects.
+- "number" starts at 1, increments by 1.
+- "type" must be picked by cycling through: ${JSON.stringify(types)} — distribute evenly.
+- Every string may contain Markdown formatting.
+- "options" must be array of exactly 4 strings.
+- "answer" must be exact text of one option from the "options" array.
+- Distribute correct answers across all option positions — no clustering.
+- "userResponse" must always be null.
+- "isCorrect" must always be null.
+- No trailing commas.
+- Escape quotes properly inside strings.
+- Return nothing except the JSON object.
+`
+
+    const response = await groq.chat.completions.create({
+        model: "llama-3.3-70b-versatile",
+        messages: [
+            {
+                role: "assistant",
+                content: prompt
+            }
+        ]
+    })
+
+    const { prompt_tokens, completion_tokens, total_tokens, total_time } = response.usage
+
+    const model = response.model
+
+    const result = response.choices[0].message.content
+
+    await AIResponse.create({
+        userId,
+        prompt,
+        response: result,
+        model,
+        promptTokens: prompt_tokens,
+        completionTokens: completion_tokens,
+        totalTokens: total_tokens,
+        totalTime: total_time,
+
+    })
     const data = JSON.parse(result)
     return data
 }
@@ -98,5 +194,6 @@ Rules:
 }
 export {
     quiz,
+    quizFromFile,
     flashcards
 }
