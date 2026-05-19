@@ -125,28 +125,32 @@ const generateQuizFromFiles = asyncHandler(async(req, res)=>{
         throw new ApiError(404, "All fields are required")
     }
     
-    console.log(localFilePath);
+    // console.log(localFilePath);
 
     const dataBuffer = fs.readFileSync(localFilePath)
     const unit8Array = new Uint8Array(dataBuffer)
     const parser = new PDFParse(unit8Array)
 
-    const extractedText = parser.getText()
+    const extractedText = await parser.getText()
 
-    console.log(extractedText);
+    const result = await quizFromFile(types, extractedText.text, userId)
+    const {title, questions} = result
 
-    const result = await quizFromFile(types, extractedText, userId)
-    const { title, questions} = result
-    console.log(result);
-    
 
     const data = await Quiz.create({
         userId,
         quiz: {
             title,
-            totalQuestion:total,
-            questions: questions
-        }
+            totalQuestion: questions.length,
+        },
+        questions: questions.map(q => ({
+            types: q.type,
+            question: q.question,
+            options: q.options,
+            answer: q.answer,
+            userResponse: null,
+            isCorrect: false
+        }))
     })
 
     fs.unlinkSync(localFilePath)

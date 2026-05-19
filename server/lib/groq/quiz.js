@@ -124,7 +124,7 @@ Rules:
         model: "llama-3.3-70b-versatile",
         messages: [
             {
-                role: "assistant",
+                role: "user",
                 content: prompt
             }
         ]
@@ -134,14 +134,16 @@ Rules:
 
     const model = response.model
 
-    const result = response.choices[0].message.content
-
-    console.log(result);
+    const rawData = response.choices[0].message.content
+    console.log(rawData);
+    
+    const data = await JSON.parse(rawData)
+    console.log(data);
     
     await AIResponse.create({
         userId,
         prompt,
-        response: result,
+        response: rawData,
         model,
         promptTokens: prompt_tokens,
         completionTokens: completion_tokens,
@@ -149,8 +151,9 @@ Rules:
         totalTime: total_time,
 
     })
-    const data = JSON.parse(result)
-    console.log(data);
+
+    
+    // const data = JSON.parse(result)
     
     
     return data
