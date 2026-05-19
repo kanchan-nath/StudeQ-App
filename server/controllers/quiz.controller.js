@@ -61,9 +61,60 @@ const getQuizzes = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, existedQuiz, "All quizzes fetched"))
 })
 
-const getQuizAnswer = asyncHandler(async (req, rs) => {
+const getQuizAnswer = asyncHandler(async (req, res) => {
+    const {answer} = req.body
+    const {id} = req.params
+    console.log(id);
+    
+    const userId = req.user.id
 
+    if(!answer || !id ){
+        throw new  ApiError(404, "All fields are required")
+    }
+
+    const data = await Quiz.findOneAndUpdate(
+        {
+            _id:id,
+            userId
+            
+        },
+        {
+            userAnswer:answer
+        }
+    )
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, data, "User answer is updated"))
 })
+
+const deleteQuiz = asyncHandler(async(req, res)=>{
+    const {id} = req.params
+
+    if(!id){
+        throw new ApiError(404, "Quiz id is not found")
+    }
+
+    const userId = req.user.id
+
+    await Quiz.findByIdAndDelete(id)
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, {}, "Quiz deleted"))
+})
+
+const getAllQuiz = asyncHandler(async(req, res)=>{
+    const userId = req.user.id
+
+    const data = await Quiz.find({userId})
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, data, "All quiz lists fetched"))
+})
+
+
 
 
 const generateFlashcards = asyncHandler(async (req, res) => {
@@ -211,6 +262,8 @@ export {
     generateQuiz,
     getQuizzes,
     getQuizAnswer,
+    deleteQuiz,
+    getAllQuiz,
 
     generateFlashcards,
     getFlashcards,
