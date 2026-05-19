@@ -5,7 +5,8 @@ import {
     getQuizAnswer,
     deleteQuiz,
     getAllQuiz,
-    
+    generateQuizFromFiles,
+
     generateFlashcards,
     getFlashcards,
     deleteFlashcards,
@@ -18,6 +19,13 @@ import {upload} from "../middlewares/multer.middleware.js"
 const router = Router()
 
 router.route("/generate").post(verifyJWT, generateQuiz)
+router.route("/generate/file").post(verifyJWT,
+    upload.fields([
+        {
+            name:"file"
+        }
+    ]),
+    generateQuizFromFiles)
 router.route("/:id").get(verifyJWT, getQuizzes)
 router.route("/:id/answer").patch(verifyJWT, getQuizAnswer)
 router.route("/:id").delete(verifyJWT, deleteQuiz)
