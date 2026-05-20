@@ -1,10 +1,10 @@
 import { Router } from "express"
 import {
     generateQuiz,
-    getQuizzes,
-    getQuizAnswer,
-    deleteQuiz,
     getAllQuiz,
+    getQuizById,
+    submitQuizAnswers,
+    deleteQuiz,
     generateQuizFromFiles,
 
     generateFlashcards,
@@ -26,10 +26,12 @@ router.route("/generate/file").post(verifyJWT,
         }
     ]),
     generateQuizFromFiles)
-router.route("/:id").get(verifyJWT, getQuizzes)
-router.route("/:id/answer").patch(verifyJWT, getQuizAnswer)
-router.route("/:id").delete(verifyJWT, deleteQuiz)
 router.route("/all").get(verifyJWT, getAllQuiz)
+router.route("/:id").get(verifyJWT, getQuizById)
+router.route("/:id/submit").patch(verifyJWT, submitQuizAnswers)
+router.route("/:id").delete(verifyJWT, deleteQuiz)
+
+
 router.route("/flashcards").post(verifyJWT,
     upload.fields ([
         {

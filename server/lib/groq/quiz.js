@@ -135,10 +135,8 @@ Rules:
     const model = response.model
 
     const rawData = response.choices[0].message.content
-    console.log(rawData);
     
     const data = await JSON.parse(rawData)
-    console.log(data);
     
     await AIResponse.create({
         userId,
