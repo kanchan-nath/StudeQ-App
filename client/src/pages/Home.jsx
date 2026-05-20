@@ -1,18 +1,3 @@
-/*
-  LandingPage.jsx
-  ===============
-  FUSION DECISIONS:
-  - Hero:         turbo.ai dark starfield + announcement badge + split hero with drop zone
-                  → fastest value communication for Spark.E's content
-  - Comparison:   penseum.com two-column card w/ dot lists (green ✓ / red ✗)
-                  → adapted to dark bg, strongest visual contrast
-  - Timeline:     penseum.com large numbered steps with pill labels
-                  → adapted to light section bg for contrast break
-  - Testimonials: turbo.ai 3×2 grid of dark cards with institution header
-  - Footer:       penseum.com giant wordmark fused with turbo.ai link columns
-  - Unique elem:  Live activity ticker + Subject chips in hero (signals tutor feature)
-*/
-
 import React, { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import styles from './styles/Home.module.css'
@@ -22,7 +7,7 @@ import styles from './styles/Home.module.css'
 const SUBJECTS = [
   'Mathematics', 'Physics', 'Chemistry',
   'Biology', 'History', 'Computer Science',
-  'English', 'Economics',
+  'English', 'Economics','AI'
 ]
 
 const TABS = [
@@ -199,10 +184,10 @@ const FAQS = [
 ]
 
 const TICKER_MESSAGES = [
-  '247 students studying right now',
-  '12,400+ notes generated today',
-  'Used across 40+ countries',
-  'New: Image Analysis now live ⚡',
+  ' Early access — shape the product with us',
+  ' Built for students, by a student',
+  'New: AI-powered notes & quizzes live now',
+  ' Feedback? We read every message',
 ]
 
 const MARQUEE_LOGOS = [
@@ -299,7 +284,7 @@ function LiveTicker() {
   return (
     <div className={styles.ticker} style={{ opacity: fade ? 1 : 0 }}>
       <div className={styles.tickerDot} />
-      <span>🟢 {TICKER_MESSAGES[idx]}</span>
+      <span> {TICKER_MESSAGES[idx]}</span>
     </div>
   )
 }
@@ -375,7 +360,7 @@ const LandingPage = () => {
   const wrapRef = useRef(null)
   const lineRef = useRef(null)
   const itemRefs = useRef([])
-  
+
   useEffect(() => {
     const wrap = wrapRef.current
     const line = lineRef.current
@@ -413,8 +398,10 @@ const LandingPage = () => {
               SPARK<span>.E</span>
             </Link>
             <ul className={styles.navLinks} role="list">
+              <li><a href="#" className={styles.navLink}>Features</a></li>
+              <li><a href="#" className={styles.navLink}>Pricing</a></li>
               <li><a href="#" className={styles.navLink}>Blog</a></li>
-              <li><a href="#" className={styles.navLink}>Careers</a></li>
+              <li><a href="#" className={styles.navLink}>How It Works</a></li>
             </ul>
           </div>
           <Link to="/register" className={styles.navCta}>Start now</Link>
@@ -435,7 +422,7 @@ const LandingPage = () => {
           </div>
 
           <h1 className={styles.heroH1}>
-            Turn anything into notes,<br />flashcards, quizzes, and more.
+            Turn anything into notes,<br />flashcards, quizzes, and more...
           </h1>
 
           <p className={styles.heroSub}>
