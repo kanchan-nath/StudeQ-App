@@ -191,9 +191,8 @@ const TICKER_MESSAGES = [
 ]
 
 const MARQUEE_LOGOS = [
-  'Harvard', 'MIT', 'Yale', 'Stanford', 'Google', 'McKinsey',
-  'Goldman Sachs', 'Deloitte', 'Duke', 'Northwestern', 'UT Austin', 'IIT Delhi',
-]
+  'Exam Prep', 'Lecture Notes', 'Concept Summaries', 'Practice Quizzes', 'Doubt Solving', 'Revision Cards',
+  'One-One AI Tutor']
 
 /* ─── HOOKS ─────────────────────────────────────────────────────────────── */
 
@@ -441,19 +440,19 @@ const LandingPage = () => {
             </Link>
           </div>
 
-          <div className={styles.dropZone} role="button" tabIndex={0} aria-label="Upload study material">
+          {/* <div className={styles.dropZone} role="button" tabIndex={0} aria-label="Upload study material">
             <span className={styles.dropIcon}>📄</span>
             <p className={styles.dropText}>Drop a PDF, image, or paste your notes</p>
             <p className={styles.dropSub}>PDF · PNG · JPG · Typed text — any format</p>
-          </div>
+          </div> */}
         </div>
 
-        <SparkMeter />
+        {/* <SparkMeter /> */}
       </section>
 
       {/* ── MARQUEE ─────────────────────────────────────────────── */}
       <section className={styles.marqueeSection} aria-label="Trusted by students at">
-        <p className={styles.marqueeLabel}>Used by 10,000+ students across 12+ subjects at</p>
+        <p className={styles.marqueeLabel}>One tool, Every subject, Any exam. </p>
         <div className={styles.marqueeTrack} aria-hidden="true">
           <ul className={styles.marqueeList} role="list">
             {[...MARQUEE_LOGOS, ...MARQUEE_LOGOS].map((name, i) => (

@@ -78,19 +78,19 @@ export default function Quiz() {
   const fetchAllQuizzes = useCallback(async () => {
     try {
       const res = await fetch(`${BASE_URL}/api/quiz/all`, {
-        method:"GET",
+        method: "GET",
         headers: { Authorization: `Bearer ${token}` },
       })
       const data = await res.json()
       console.log(data);
-      
+
       if (data.data) setAllQuizzes(data.data)
     } catch (e) {
       console.error("fetchAllQuizzes:", e)
     }
   }, [token])
 
-  useEffect(() => {    
+  useEffect(() => {
     fetchAllQuizzes()
   }, [fetchAllQuizzes])
 
