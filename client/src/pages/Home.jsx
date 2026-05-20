@@ -41,6 +41,56 @@ const TABS = [
       'Live Study Rooms — study with friends in real-time.',
     ],
   },
+  {
+    id: 'tools',
+    label: 'AI Flashcard',
+    features: [
+      'Generate flashcards from any topic, PDF, or pasted notes instantly.',
+      'SM-2 spaced repetition schedules cards based on how well you know them.',
+      'Flip, rate, and track mastery — card by card.',
+      'Export decks or share with classmates in one click.',
+    ],
+  },
+  {
+    id: 'notes',
+    label: 'AI Quiz',
+    features: [
+      '6 question types: MCQ, True/False, Fill-in-the-blank, Short Answer, Free Response, Passage.',
+      'Generate from your own notes, a topic name, or an uploaded PDF.',
+      'Instant feedback with explanations after every answer.',
+      'Track score history and weak areas across all quizzes.',
+    ],
+  },
+  {
+    id: 'tools',
+    label: 'Live Study Room',
+    features: [
+      'Create or join a room and study alongside others in real time.',
+      'Shared focus timer with Pomodoro and custom session modes.',
+      'See who is active, what they are studying, and stay accountable.',
+      'Room chat for quick questions without breaking focus.',
+    ],
+  },
+  {
+    id: 'tools',
+    label: 'Real Time Chat',
+    features: [
+      'Instant messaging with classmates or study group members.',
+      'Share notes, flashcard decks, and quiz links directly in chat.',
+      'Threaded replies keep discussions organized by topic.',
+      'Persistent history — revisit what was discussed any time.',
+    ],
+  },
+  {
+    id: 'tools',
+    label: 'Doubt Solving',
+    features: [
+      'Snap a photo of any question — handwritten or printed — and get a step-by-step solution.',
+      'Subject-aware explanations adapt to your level, not just the answer.',
+      'Ask follow-ups until the concept actually clicks.',
+      'All solved doubts saved to your history for revision later.',
+    ],
+  },
 ]
 
 const COMPARISON = [
@@ -192,7 +242,8 @@ const TICKER_MESSAGES = [
 
 const MARQUEE_LOGOS = [
   'Exam Prep', 'Lecture Notes', 'Concept Summaries', 'Practice Quizzes', 'Doubt Solving', 'Revision Cards',
-  'One-One AI Tutor']
+  'One-One AI Tutor'
+]
 
 /* ─── HOOKS ─────────────────────────────────────────────────────────────── */
 
@@ -292,22 +343,28 @@ function LiveTicker() {
 function StatsBar() {
   const ref = useRef(null)
   const visible = useReveal(ref)
-  const students = useCountUp(10000, visible)
-  const accuracy = useCountUp(99, visible)
-  const seconds = useCountUp(30, visible)
+  const students = useCountUp(8, visible)
+  // const accuracy = useCountUp(24 / 7, visible)
+  const seconds = useCountUp(100, visible)
+  const noteSeconds = useCountUp(30, visible)
+
   return (
     <div className={styles.statsBar} ref={ref}>
       <div className={styles.statItem}>
         <div className={styles.statNum}>{students.toLocaleString()}+</div>
-        <div className={styles.statLabel}>Active Students</div>
+        <div className={styles.statLabel}> AI-powered study tools</div>
       </div>
       <div className={styles.statItem}>
-        <div className={styles.statNum}>{accuracy}%</div>
-        <div className={styles.statLabel}>Accuracy Rate</div>
+        <div className={styles.statNum}>24/7</div>
+        <div className={styles.statLabel}> AI tutor, always available</div>
       </div>
       <div className={styles.statItem}>
-        <div className={styles.statNum}>{seconds}s</div>
-        <div className={styles.statLabel}>Average Processing Time</div>
+        <div className={styles.statNum}>{seconds}%</div>
+        <div className={styles.statLabel}>Free to start, no credit card</div>
+      </div>
+      <div className={styles.statItem}>
+        <div className={styles.statNum}>{'< '}{noteSeconds}s</div>
+        <div className={styles.statLabel}>Notes generated from any PDF</div>
       </div>
     </div>
   )
@@ -591,7 +648,7 @@ const LandingPage = () => {
                 <ul className={styles.compList}>
                   {COMPARISON.map((row, i) => (
                     <li key={i} className={styles.compItem}>
-                      <div className={styles.compDotGreen} />
+                      <div className={styles.compDotGreen}><span>✓</span></div> 
                       <div>
                         <span className={styles.compFeatureLabel}>{row.feature}</span>
                         <span className={styles.compTextGood}>{row.sparke}</span>
@@ -609,7 +666,7 @@ const LandingPage = () => {
                 <ul className={styles.compList}>
                   {COMPARISON.map((row, i) => (
                     <li key={i} className={styles.compItem}>
-                      <div className={styles.compDotRed} />
+                      <div className={styles.compDotRed}><span>✗</span></div> 
                       <div>
                         <span className={styles.compFeatureLabel}>{row.feature}</span>
                         <span className={styles.compTextBad}>{row.other}</span>
@@ -659,7 +716,7 @@ const LandingPage = () => {
       <StatsBar />
 
       {/* ── TESTIMONIALS ────────────────────────────────────────── */}
-      <section className={styles.section} id="testimonials">
+      {/* <section className={styles.section} id="testimonials">
         <div className={styles.sectionInner}>
           <Reveal>
             <div className={styles.centered}>
@@ -697,7 +754,7 @@ const LandingPage = () => {
             ))}
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* ── FAQ ─────────────────────────────────────────────────── */}
       <section className={styles.section} id="faq">
@@ -736,7 +793,7 @@ const LandingPage = () => {
         <div className={styles.ctaBannerBeam} aria-hidden="true" />
         <Reveal>
           <h2 className={styles.ctaBannerH2}>Your exams won't wait. Neither should you.</h2>
-          <p className={styles.ctaBannerSub}>Join 10,000+ students studying smarter with Spark.E.</p>
+          <p className={styles.ctaBannerSub}>Your AI study partner — available 24/7, knows every subject.</p>
           <Link to="/register" className={styles.ctaBannerBtn}>
             Get Started — It's Free
           </Link>

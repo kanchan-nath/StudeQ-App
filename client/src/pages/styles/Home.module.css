@@ -814,8 +814,8 @@
 /* ── COMPARISON ──────────────────────────────────────────────────────────── */
 .comparisonSection {
     background: transparent;
-    border-top: 1px solid var(--border);
-    border-bottom: 1px solid var(--border);
+    /* border-top: 1px solid var(--border); */
+    /* border-bottom: 1px solid var(--border); */
 }
 
 .comparisonGrid {
@@ -827,13 +827,13 @@
 
 .compCol {
     background: #1c1c1f;
-    border: 1px solid rgba(124, 95, 245, 0.3);
+    border: 1px solid #ff0000;
     border-radius: var(--r-xl);
     padding: 28px 32px;
 }
 
 .compColLeft {
-    border-color: rgba(124, 95, 245, 0.3);
+    border-color: #22c55e;
     box-shadow: 0 0 0 1px rgba(124, 95, 245, 0.1), 0 4px 32px rgba(124, 95, 245, 0.08);
     /* background: linear-gradient(160deg, #ff0000 0%, var(--bg) 50%); */
 }
@@ -851,7 +851,7 @@
     font-weight: 800;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: var(--text);
+    color: white;
 }
 
 .compLogoAccent {
@@ -889,27 +889,32 @@
     border-bottom: none;
 }
 
-.compDotGreen {
-    width: 8px;
+.compDotGreen span {
+    /* width: 8px;
     height: 8px;
-    border-radius: 50%;
-    background: var(--green);
-    margin-top: 5px;
+    border-radius: 50%; */
+    /* background: var(--green); */
+    /* margin-top: 5px; */
     flex-shrink: 0;
-    box-shadow: 0 0 6px rgba(34, 197, 94, 0.5);
+    align-self: center;
+    /* box-shadow: 0 0 6px rgba(34, 197, 94, 0.5); */
+    color: rgb(4, 255, 4);
 }
 
-.compDotRed {
-    width: 8px;
+.compDotRed span {
+    /* width: 8px;
     height: 8px;
     border-radius: 50%;
     background: var(--red);
-    margin-top: 5px;
+    margin-top: 5px; */
     flex-shrink: 0;
+    color: red;
+    align-self: center;
 }
 
 .compTextGood {
-    color: var(--text);
+    /* color: white; */
+    color: var(--muted);
 }
 
 .compTextBad {
@@ -938,7 +943,7 @@
     font-weight: 700;
     line-height: 1.15;
     letter-spacing: -0.02em;
-    color: #0a0a0f;
+    color: white;
     margin: 0 0 16px;
     text-align: center;
 }
@@ -1053,7 +1058,7 @@
     font-family: var(--font-display);
     font-size: 1.3rem;
     font-weight: 700;
-    color: #0a0a0f;
+    color: white;
     line-height: 1.25;
     margin: 0 0 6px;
 }
@@ -1248,8 +1253,8 @@
     z-index: 1;
     overflow: hidden;
     background: transparent;
-    border-top: 1px solid var(--border);
-    border-bottom: 1px solid var(--border);
+    /* border-top: 1px solid var(--border); */
+    /* border-bottom: 1px solid var(--border); */
     text-align: center;
     padding: 80px 24px;
 }
@@ -1313,7 +1318,7 @@
     position: relative;
     z-index: 1;
     background: transparent;
-    border-top: 1px solid var(--border);
+    /* border-top: 1px solid var(--border); */
     overflow: hidden;
 }
 
@@ -1335,7 +1340,7 @@
 .footerLogo {
     font-family: var(--font-display);
     font-size: 1.3rem;
-    font-weight: 800;
+    font-weight: 900;
     letter-spacing: 0.1em;
     text-transform: uppercase;
     color: white;
@@ -1416,33 +1421,47 @@
 }
 
 .footerLink:hover {
-    color: var(--text);
+    color: white;
 }
 
 .footerWordmark {
     text-align: center;
-    padding: 0 24px 0;
-    overflow: hidden;
+        padding: 0 24px 0;
+        overflow: hidden;
+        pointer-events: none;
+        user-select: none;
+        position: relative;
+}
+
+.footerWordmark::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 60%;
+    background: linear-gradient(to top, rgba(124, 95, 245, 0.4) 0%, transparent 100%);
     pointer-events: none;
-    user-select: none;
 }
 
 .footerWordmarkText {
     font-family: var(--font-display);
-    font-size: clamp(4rem, 12vw, 10rem);
-    font-weight: 800;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    background: linear-gradient(to bottom, yellow 0%, transparent 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    line-height: 1;
-    display: block;
+        font-size: clamp(4rem, 12vw, 10rem);
+        font-weight: 800;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        background: linear-gradient(to bottom, var(--purple-light) 0%, transparent 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        line-height: 1;
+        display: block;
+        transform: perspective(400px) rotateX(20deg);
+        transform-origin: bottom center;
 }
 
 .footerBottom {
-    border-top: 1px solid var(--border);
+    /* border-top: 1px solid var(--border); */
     padding: 16px 24px;
     display: flex;
     align-items: center;
