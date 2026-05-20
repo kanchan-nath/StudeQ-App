@@ -2,142 +2,227 @@ import { asyncHandler } from "../utils/asyncHandler.js"
 import { ApiError, ApiResponse } from "../utils/Async.js"
 import { quiz, flashcards, quizFromFile } from "../lib/groq/quiz.js"
 import { Quiz } from "../models/quiz.model.js"
-import { Flascards } from "../models/flashcard.model.js"
 import { PDFParse } from "pdf-parse"
 import fs from "fs"
-import {pdfToFlashcard} from "../lib/groq/pdfToFlashcard.js"
+import { pdfToFlashcard } from "../lib/groq/pdfToFlashcard.js"
+import { v4 as uuidv4 } from "uuid" // ✅ ADDED: need this to generate unique quizId on server
 
+// ─────────────────────────────────────────────
+// GENERATE QUIZ FROM TEXT (topic + subject)
+// POST /api/quiz/generate
+// Body: { topic, subject, title, types, difficulty, audience }
+// ─────────────────────────────────────────────
 const generateQuiz = asyncHandler(async (req, res) => {
-    const { topic, subject, types } = req.body
+    const { topic, subject, types, title, difficulty, audience } = req.body
     const userId = req.user.id
-
-    if (!topic || !subject ||!types ) {
-        throw new ApiError(400, "All fields are required")
-    }
-
-    const data = await quiz(topic, subject)
-    console.log(data);
-
-
-    let quizStore = await Quiz.findOne({ quizId })
-
-    if (!quizStore) {
-        await Quiz.create({
-            userId,
-            quizId,
-            quiz: data
-        })
-    } else {
-        await Quiz.findOneAndUpdate(
-            {
-                quizId,
-            },
-            {
-                $push: {
-                    quiz: {
-                        $each: data
-                    }
-                }
-            }
-        )
-    }
-
-    return res
-        .status(200)
-        .json(new ApiResponse(200, data, "Quiz generate successfully"))
-})
-
-const getQuizzes = asyncHandler(async (req, res) => {
-    const userId = req.user.id
-
-    const existedQuiz = await Quiz.find({ userId })
-
-    if (!existedQuiz) {
-        throw new ApiError(400, "No quizzes found")
-    }
-
-    return res
-        .status(200)
-        .json(new ApiResponse(200, existedQuiz, "All quizzes fetched"))
-})
-
-const getQuizAnswer = asyncHandler(async (req, res) => {
-    const {answer} = req.body
-    const {id} = req.params
-    console.log(id);
+    console.log(types);
     
-    const userId = req.user.id
-
-    if(!answer || !id ){
-        throw new  ApiError(404, "All fields are required")
+    if (!topic || !subject || !types) {
+        throw new ApiError(400, "topic, subject, and types are required")
     }
 
-    const data = await Quiz.findOneAndUpdate(
-        {
-            _id:id,
-            userId
-            
+    // ✅ FIX: quizId was used below but never defined — now generated here on server
+    const quizId = uuidv4()
+
+    // Call Groq to generate quiz questions
+    // Expected return shape from quiz(): { title, questions: [{type, question, options, answer}] }
+    const data = await quiz(topic, subject, types, difficulty || "medium")
+
+    const { questions } = data
+
+    // ✅ FIX: old code tried findOne({quizId}) then conditionally create/update
+    //         but quizId was undefined → always created new doc with null quizId
+    //         Now we always create a fresh quiz doc per generation call
+    const quizDoc = await Quiz.create({
+        userId,
+        quiz: {
+            title: title || data.title || `${topic} Quiz`,  // use provided title or AI-generated
+            totalQuestion: questions.length,
+            // meta fields (startedAt, submittedAt, score) default to null — set later
         },
-        {
-            userAnswer:answer
+        questions: questions.map(q => ({
+            types: q.type,
+            question: q.question,
+            options: q.options,       // array of strings
+            answer: q.answer,
+            userResponse: null,       // filled when user submits
+            isCorrect: false          // updated on submit
+        }))
+    })
+
+    return res
+        .status(201)
+        .json(new ApiResponse(201, quizDoc, "Quiz generated successfully"))
+})
+
+
+// ─────────────────────────────────────────────
+// GET ALL QUIZZES FOR CURRENT USER
+// GET /api/quiz/all
+// ─────────────────────────────────────────────
+const getAllQuiz = asyncHandler(async (req, res) => {
+    const userId = req.user.id
+
+    // Returns all quiz docs belonging to this user
+    // Each doc has: quiz{title, totalQuestion, meta}, questions[]
+    const data = await Quiz.find({ userId }).sort({ createdAt: -1 }) // newest first
+
+    // ✅ FIX: old code threw error if empty array — empty array is valid, not an error
+    return res
+        .status(200)
+        .json(new ApiResponse(200, data, "All quizzes fetched"))
+})
+
+
+// ─────────────────────────────────────────────
+// GET SINGLE QUIZ BY ID
+// GET /api/quiz/:id
+// ─────────────────────────────────────────────
+const getQuizById = asyncHandler(async (req, res) => {
+    const { id } = req.params
+    const userId = req.user.id
+
+    // ✅ ADDED: was missing entirely — needed for quiz-taking screen to load questions
+    const quizDoc = await Quiz.findOne({ _id: id, userId })
+
+    if (!quizDoc) {
+        throw new ApiError(404, "Quiz not found")
+    }
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, quizDoc, "Quiz fetched"))
+})
+
+
+// ─────────────────────────────────────────────
+// SUBMIT QUIZ ANSWERS
+// PATCH /api/quiz/:id/submit
+// Body: { answers: ["answer1", "answer2", ...] }
+//       answers array index maps to questions array index
+// ─────────────────────────────────────────────
+const submitQuizAnswers = asyncHandler(async (req, res) => {
+    const { answers } = req.body   // array of user answer strings, index-matched to questions
+    const { id } = req.params
+    const userId = req.user.id
+
+    if (!answers || !Array.isArray(answers)) {
+        throw new ApiError(400, "answers must be an array")
+    }
+
+    // Load quiz to compare answers
+    const quizDoc = await Quiz.findOne({ _id: id, userId })
+
+    if (!quizDoc) {
+        throw new ApiError(404, "Quiz not found")
+    }
+
+    let correctCount = 0
+
+    // ✅ FIX: old getQuizAnswer only stored one answer string on the whole doc
+    //         New: iterate each question, store userResponse + mark isCorrect
+    const updatedQuestions = quizDoc.questions.map((q, i) => {
+        const userResp = answers[i] ?? null
+        const isCorrect = userResp === q.answer
+
+        if (isCorrect) correctCount++
+
+        return {
+            ...q.toObject(),
+            userResponse: userResp,
+            isCorrect
         }
+    })
+
+    const totalQ = quizDoc.questions.length
+    const scorePercent = Math.round((correctCount / totalQ) * 100)
+
+    // Update questions + meta (score, submittedAt) in one operation
+    const updated = await Quiz.findByIdAndUpdate(
+        id,
+        {
+            questions: updatedQuestions,
+            "quiz.meta.submittedAt": new Date().toISOString(),
+            "quiz.meta.score": `${correctCount}/${totalQ}` // e.g. "7/10"
+        },
+        { new: true } // return updated doc
     )
 
     return res
-    .status(200)
-    .json(new ApiResponse(200, data, "User answer is updated"))
+        .status(200)
+        .json(new ApiResponse(200, {
+            quiz: updated,
+            score: scorePercent,
+            correct: correctCount,
+            total: totalQ
+        }, "Quiz submitted successfully"))
 })
 
-const deleteQuiz = asyncHandler(async(req, res)=>{
-    const {id} = req.params
 
-    if(!id){
-        throw new ApiError(404, "Quiz id is not found")
+// ─────────────────────────────────────────────
+// DELETE QUIZ
+// DELETE /api/quiz/:id
+// ─────────────────────────────────────────────
+const deleteQuiz = asyncHandler(async (req, res) => {
+    const { id } = req.params
+    const userId = req.user.id
+
+    if (!id) {
+        throw new ApiError(400, "Quiz id is required")
     }
 
-    const userId = req.user.id
+    // ✅ FIX: old code deleted by _id only — anyone could delete anyone's quiz
+    //         Now checks userId too so users can only delete their own quizzes
+    const deleted = await Quiz.findOneAndDelete({ _id: id, userId })
 
-    await Quiz.findByIdAndDelete(id)
-
-    return res
-    .status(200)
-    .json(new ApiResponse(200, {}, "Quiz deleted"))
-})
-
-const getAllQuiz = asyncHandler(async(req, res)=>{
-    const userId = req.user.id
-
-    const data = await Quiz.find({userId})
+    if (!deleted) {
+        throw new ApiError(404, "Quiz not found or unauthorized")
+    }
 
     return res
-    .status(200)
-    .json(new ApiResponse(200, data, "All quiz lists fetched"))
+        .status(200)
+        .json(new ApiResponse(200, {}, "Quiz deleted"))
 })
 
-const generateQuizFromFiles = asyncHandler(async(req, res)=>{
-    const {types, total} = req.body
 
+// ─────────────────────────────────────────────
+// GENERATE QUIZ FROM UPLOADED FILE (PDF)
+// POST /api/quiz/generate-from-file
+// Multipart: file (PDF), body: { types, total }
+// ─────────────────────────────────────────────
+const generateQuizFromFiles = asyncHandler(async (req, res) => {    
+    const { types, total } = req.body
     const userId = req.user.id
-
     const localFilePath = req.files?.file?.[0].path
-
-    if(!types || !localFilePath ||!total){
-        throw new ApiError(404, "All fields are required")
-    }
+    console.log("Types: ",types);
     
-    // console.log(localFilePath);
+    if (!types || !localFilePath || !total) {
+        throw new ApiError(400, "file, types, and total are required")
+    }
 
-    const dataBuffer = fs.readFileSync(localFilePath)
-    const unit8Array = new Uint8Array(dataBuffer)
-    const parser = new PDFParse(unit8Array)
+    let extractedText = ""
 
-    const extractedText = await parser.getText()
+    try {
+        // Read PDF buffer and extract text
+        const dataBuffer = fs.readFileSync(localFilePath)
+        const unit8Array = new Uint8Array(dataBuffer)
+        const parser = new PDFParse(unit8Array)
+        const result = await parser.getText()
+        extractedText = result.text
+    } finally {
+        // ✅ FIX: old code had fs.unlinkSync AFTER return statement (unreachable)
+        //         Now cleanup always runs in finally block
+        if (fs.existsSync(localFilePath)) {
+            fs.unlinkSync(localFilePath)
+        }
+    }
 
-    const result = await quizFromFile(types, extractedText.text, userId)
-    const {title, questions} = result
+    // Pass extracted text to Groq — types is JSON string from FormData, parse it
+    // const parsedTypes = typeof types === "string" ? JSON.parse(types) : types
+    const result = await quizFromFile(types, extractedText, parseInt(total))
+    const { title, questions } = result
 
-
-    const data = await Quiz.create({
+    const quizDoc = await Quiz.create({
         userId,
         quiz: {
             title,
@@ -153,12 +238,9 @@ const generateQuizFromFiles = asyncHandler(async(req, res)=>{
         }))
     })
 
-    fs.unlinkSync(localFilePath)
     return res
-    .status(200)
-    .json(new ApiResponse(200, data,"Quiz created" ))
-
-    
+        .status(201)
+        .json(new ApiResponse(201, quizDoc, "Quiz created from file"))
 })
 
 
@@ -305,10 +387,10 @@ const addMoreFlashcards = asyncHandler(async (req, res) => {
 
 export {
     generateQuiz,
-    getQuizzes,
-    getQuizAnswer,
-    deleteQuiz,
     getAllQuiz,
+    getQuizById,
+    submitQuizAnswers,
+    deleteQuiz,
     generateQuizFromFiles,
 
     generateFlashcards,
