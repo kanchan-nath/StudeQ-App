@@ -36,10 +36,11 @@ const App = () => {
         <Route path='/' element={<Home/>} />
         <Route path='/register' element={<Register/>} />
         <Route path='/login' element={<Login/>} />
-
+        <Route path="/sso-callback" element={<SSOCallback/>} />
+        
         <Route element={<AppShell />}>
-        {/* <Route path="/sso-callback" element={<SSOCallback / >} /> */}
-        <Route path='/dashboard' element={<ProtectedRoute component={<Dashboard/>}/>} />
+        {/* <Route path='/dashboard' element={<ProtectedRoute component={<Dashboard/>}/>} /> */}
+          <Route path='/dashboard' element={<Dashboard />}/>
           <Route path='/notes' element={<ProtectedRoute component={<Notes />} />} />
           <Route path='/quiz' element={<ProtectedRoute component={<Quiz />} />} />
           <Route path='/flashcards' element={<ProtectedRoute component={<Flashcards />} />} />
