@@ -3,6 +3,7 @@ import { ApiError, ApiResponse } from "../utils/Async.js"
 import prisma from "../lib/prisma.js"
 import { generateAccessToken, generateRefreshToken } from "../helpers/generateToken.js"
 import bcrypt from "bcrypt"
+import { createClerkClient } from "@clerk/express"
 
 const isPasswordCorrect = async (email, password) => {
     try {
@@ -12,7 +13,7 @@ const isPasswordCorrect = async (email, password) => {
             }
         })
 
-       return await bcrypt.compare(password, user.password)
+        return await bcrypt.compare(password, user.password)
     } catch (error) {
         throw new ApiError(400, "Incorrect password")
     }
@@ -39,7 +40,7 @@ const generateAccessAndRefreshToken = async (user) => {
             refreshToken: refreshToken
         }
 
-    })    
+    })
 
     return { accessToken, refreshToken }
 
@@ -101,9 +102,9 @@ const login = asyncHandler(async (req, res) => {
         throw new ApiError(400, "User not exist")
     }
 
-    const isPasswordValid = await isPasswordCorrect(email,password)
+    const isPasswordValid = await isPasswordCorrect(email, password)
 
-    if (!isPasswordValid){
+    if (!isPasswordValid) {
         throw new ApiError(400, "Password not matched")
     }
 
@@ -115,11 +116,11 @@ const login = asyncHandler(async (req, res) => {
     }
 
     const loggedInUser = await prisma.user.findUnique({
-        where:{
-            id:existedUser.id
+        where: {
+            id: existedUser.id
         },
-        omit:{
-            refreshToken:true
+        omit: {
+            refreshToken: true
         }
     })
     return res
@@ -138,7 +139,7 @@ const logout = asyncHandler(async (req, res) => {
 
     const options = {
         httpOnly: true,
-        secure:true
+        secure: true
     }
 
     return res
@@ -148,17 +149,82 @@ const logout = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, {}, "User logged Out"))
 })
 
-const getUserData = asyncHandler(async(req, res)=>{
+const getUserData = asyncHandler(async (req, res) => {
     const user = req.user
-    
+
     return res
-    .status(200)
-    .json(new ApiResponse(200, user, "User data get successfully"))
-    
+        .status(200)
+        .json(new ApiResponse(200, user, "User data get successfully"))
+
 })
 
-const socialLogin = asyncHandler(async(req, res)=>{
-    
+const socialLogin = asyncHandler(async (req, res) => {
+    const { token } = req.body
+
+    if (!token) {
+        throw new ApiError(404, "Token is required")
+    }
+
+    const clerkClient = createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY })
+
+    let payload
+
+    try {
+        payload = await clerkClient.verifyToken(token)
+
+    } catch (error) {
+        throw new ApiError(404, "Invalid token")
+    }
+
+    const clerkUser = await clerkClient.users.getUser(payload.sub)
+    const email = clerkUser.emailAddresses[0].emailAddress
+    const name = `${clerkUser.firstName} ${clerkUser.lastName}`
+
+
+    let user = await prisma.user.findUnique(
+        {
+            where: {
+                email
+            }
+        }
+    )
+
+    if (!user) {
+        user = await prisma.user.create(
+            {
+                date: {
+                    name,
+                    email,
+                    clerkId: payload.sub,
+                    password: null
+                }
+            }
+        )
+    } else if (!user.clerkId) {
+        user = await prisma.user.update(
+            {
+                where: {
+                    email
+                },
+                data: {
+                    clerkId: payload.sub
+                }
+            }
+        )
+    }
+
+    const { accessToken, refreshToken } = await generateAccessAndRefreshToken(user)
+
+    const options = {
+        httpOnly: true,
+        secure: true
+    }
+
+    return res
+        .status(200)
+        .cookie("accessToken", accessToken, options)
+        .cookie("refreshToken", refreshToken, options)
+        .json(new ApiResponse(200, { accessToken, user }, "Social login success"))
 })
 export {
     register,

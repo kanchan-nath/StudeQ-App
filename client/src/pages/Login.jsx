@@ -97,7 +97,7 @@ const Login = () => {
       }
     }
     if (isSignedIn) handleBackendAuth()
-  }, [isSignedIn, token])
+  }, [isSignedIn])
   return (
     <>
       <div className={styles['auth-root']}>
