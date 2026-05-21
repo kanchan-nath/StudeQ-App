@@ -38,7 +38,7 @@ const App = () => {
         <Route path='/login' element={<Login/>} />
 
         <Route element={<AppShell />}>
-        <Route path="/sso-callback" element={<SSOCallback />} />
+        {/* <Route path="/sso-callback" element={<SSOCallback / >} /> */}
         <Route path='/dashboard' element={<ProtectedRoute component={<Dashboard/>}/>} />
           <Route path='/notes' element={<ProtectedRoute component={<Notes />} />} />
           <Route path='/quiz' element={<ProtectedRoute component={<Quiz />} />} />

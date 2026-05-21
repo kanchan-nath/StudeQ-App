@@ -192,7 +192,7 @@ const socialLogin = asyncHandler(async (req, res) => {
     if (!user) {
         user = await prisma.user.create(
             {
-                date: {
+                data: {
                     name,
                     email,
                     clerkId: payload.sub,
