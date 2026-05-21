@@ -63,18 +63,40 @@ const Login = () => {
   }
 
 
-  const handleBackendAuth = async ()=>{
-    try {
-      const clerkToken = await getToken()
 
-      const res = await fetch(`${BASE_URL}/`)
-      
-    } catch (error) {
-      console.error('Backend auth failed', error)
-    }
-  }
   useEffect(() => {
-    if(isSignedIn) handleBackendAuth()
+    const handleBackendAuth = async () => {
+      try {
+        const clerkToken = await getToken()
+
+        const res = await fetch(`${BASE_URL}/api/auth/login/social`, {
+          method:"POST",
+          headers:{
+            "Authorization":`Bearer ${clerkToken}`
+          },
+          body:JSON.stringify({token: clerkToken})
+        })
+
+        if(!res.ok){
+          throw new Error("Login FAiled")
+          return
+        }
+
+        const data = await res.json()
+
+        const token = data.data.accessToken
+
+        localStorage.setItem("token", token)
+        navigate("/dashboard")
+
+        console.log(res);
+        
+
+      } catch (error) {
+        console.error('Backend auth failed', error)
+      }
+    }
+    if (isSignedIn) handleBackendAuth()
   }, [isSignedIn])
   return (
     <>
