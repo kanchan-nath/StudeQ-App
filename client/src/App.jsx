@@ -20,7 +20,6 @@ import Navbar from '../src/components/Navbar.jsx'
 import AppShell from './components/layouts/AppShell.jsx'
 import Flashcards from './pages/Flashcards.jsx'
 import Notebook from './pages/Notebook.jsx'
-import { ClerkProvider } from '@clerk/clerk-react'
 
 
 const App = () => {
@@ -39,7 +38,7 @@ const App = () => {
         <Route path='/login' element={<Login/>} />
 
         <Route element={<AppShell />}>
-        <Route path="/sso-callback" element={<SSOCallback />} />
+        {/* <Route path="/sso-callback" element={<SSOCallback / >} /> */}
         <Route path='/dashboard' element={<ProtectedRoute component={<Dashboard/>}/>} />
           <Route path='/notes' element={<ProtectedRoute component={<Notes />} />} />
           <Route path='/quiz' element={<ProtectedRoute component={<Quiz />} />} />
