@@ -1,15 +1,16 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useState } from 'react'
 import { useNavigate } from "react-router-dom"
 import BASE_URL from "../lib/api.js"
 import { Link } from "react-router-dom"
 import styles from "../pages/styles/register.module.css"
-import {useSignUp} from "@clerk/clerk-react"
+import { useSignUp, useAuth } from "@clerk/react"
 
 const Register = () => {
 
   const navigate = useNavigate()
-  const {signUp, isLoaded} = useSignUp()
+  const { signUp, isLoaded } = useSignUp()
+  const { getToken } = useAuth()
 
   const [formData, setFormData] = useState({
     name: "",
@@ -53,9 +54,9 @@ const Register = () => {
     }
   }
 
-  const handleGoogleSignUp = async()=>{
+  const handleGoogleSignUp = async () => {
 
-    if(!isLoaded) return
+    if (!isLoaded) return
 
     try {
       await signUp.authenticateWithRedirect({
@@ -63,12 +64,22 @@ const Register = () => {
         redirectUrl: '/sso-callback',          // Must match your callback route
         redirectUrlComplete: '/dashboard',     // Where to go after success
       });
+
+      callHmm()
     } catch (error) {
       console.error('OAuth Error:', error);
     }
-    
+
   }
 
+  const callHmm = async () => {
+    const token = await getToken()
+    console.log("Token",token);
+  }
+  useEffect(() => {
+    callHmm()
+
+  }, [])
   return (
     <>
       <div className={styles['auth-root']}>

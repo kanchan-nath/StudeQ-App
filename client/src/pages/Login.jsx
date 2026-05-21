@@ -3,7 +3,7 @@ import { useNavigate, Link } from "react-router-dom"
 import BASE_URL from "../lib/api.js"
 import { useState } from 'react'
 import styles from "../pages/styles/login.module.css"
-import { useSignIn } from "@clerk/clerk-react"
+import { useSignIn } from "@clerk/react"
 
 const Login = () => {
 

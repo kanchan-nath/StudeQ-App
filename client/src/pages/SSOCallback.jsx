@@ -1,4 +1,4 @@
-import { AuthenticateWithRedirectCallback } from '@clerk/clerk-react'
+import { AuthenticateWithRedirectCallback } from '@clerk/react'
 
 export default function SSOCallback() {
     return <AuthenticateWithRedirectCallback />
