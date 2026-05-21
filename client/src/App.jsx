@@ -2,8 +2,9 @@ import React from 'react'
 import "./pages/styles/global.css"
 import { Routes, Route } from "react-router-dom"
 import  Home  from "../src/pages/Home.jsx"
-import Login from "./pages/Login.jsx"
 import Register from "./pages/Register.jsx"
+import Login from "./pages/Login.jsx"
+import SSOCallback from "./pages/SSOCallback.jsx"
 import Dashboard from "./pages/Dashboard.jsx"
 import ProtectedRoute from './components/ProtectedRoute.jsx'
 import Notes from "./pages/Notes.jsx"
@@ -19,10 +20,13 @@ import Navbar from '../src/components/Navbar.jsx'
 import AppShell from './components/layouts/AppShell.jsx'
 import Flashcards from './pages/Flashcards.jsx'
 import Notebook from './pages/Notebook.jsx'
+import { ClerkProvider } from '@clerk/clerk-react'
+
 
 const App = () => {
 
   const token = localStorage.getItem("token")
+  const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
 
   const hideNavOn = ["/login", "/register"];
   const showNavbar = token && !hideNavOn.includes(location.pathname);
@@ -35,7 +39,7 @@ const App = () => {
         <Route path='/login' element={<Login/>} />
 
         <Route element={<AppShell />}>
-
+        <Route path="/sso-callback" element={<SSOCallback />} />
         <Route path='/dashboard' element={<ProtectedRoute component={<Dashboard/>}/>} />
           <Route path='/notes' element={<ProtectedRoute component={<Notes />} />} />
           <Route path='/quiz' element={<ProtectedRoute component={<Quiz />} />} />
