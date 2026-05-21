@@ -12,7 +12,7 @@ const SUBJECTS = [
 
 const TABS = [
   {
-    id: 'notes',
+    id: '1',
     label: 'AI Notes',
     features: [
       'Paste text, upload PDF, or drop an image — structured notes in seconds.',
@@ -22,7 +22,7 @@ const TABS = [
     ],
   },
   {
-    id: 'tutor',
+    id: '2',
     label: 'AI Tutor',
     features: [
       'Subject-aware tutor across Maths, Physics, Chemistry, Biology, and more.',
@@ -32,7 +32,7 @@ const TABS = [
     ],
   },
   {
-    id: 'tools',
+    id: '3',
     label: 'Study Tools',
     features: [
       'SM-2 Spaced Repetition flashcards — proven to make you remember.',
@@ -42,7 +42,7 @@ const TABS = [
     ],
   },
   {
-    id: 'tools',
+    id: '4',
     label: 'AI Flashcard',
     features: [
       'Generate flashcards from any topic, PDF, or pasted notes instantly.',
@@ -52,7 +52,7 @@ const TABS = [
     ],
   },
   {
-    id: 'notes',
+    id: '5',
     label: 'AI Quiz',
     features: [
       '6 question types: MCQ, True/False, Fill-in-the-blank, Short Answer, Free Response, Passage.',
@@ -62,7 +62,7 @@ const TABS = [
     ],
   },
   {
-    id: 'tools',
+    id: '6',
     label: 'Live Study Room',
     features: [
       'Create or join a room and study alongside others in real time.',
@@ -72,7 +72,7 @@ const TABS = [
     ],
   },
   {
-    id: 'tools',
+    id: '7',
     label: 'Real Time Chat',
     features: [
       'Instant messaging with classmates or study group members.',
@@ -82,7 +82,7 @@ const TABS = [
     ],
   },
   {
-    id: 'tools',
+    id: '8',
     label: 'Doubt Solving',
     features: [
       'Snap a photo of any question — handwritten or printed — and get a step-by-step solution.',

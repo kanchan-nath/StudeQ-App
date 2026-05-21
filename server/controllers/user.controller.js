@@ -156,9 +156,14 @@ const getUserData = asyncHandler(async(req, res)=>{
     .json(new ApiResponse(200, user, "User data get successfully"))
     
 })
+
+const socialLogin = asyncHandler(async(req, res)=>{
+    
+})
 export {
     register,
     login,
     logout,
-    getUserData
+    getUserData,
+    socialLogin
 }
