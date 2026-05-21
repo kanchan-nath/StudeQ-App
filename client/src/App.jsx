@@ -20,7 +20,6 @@ import Navbar from '../src/components/Navbar.jsx'
 import AppShell from './components/layouts/AppShell.jsx'
 import Flashcards from './pages/Flashcards.jsx'
 import Notebook from './pages/Notebook.jsx'
-import { ClerkProvider } from '@clerk/clerk-react'
 
 
 const App = () => {
