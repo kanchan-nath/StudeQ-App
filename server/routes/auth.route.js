@@ -4,7 +4,6 @@ import {
     login,
     logout,
     getUserData,
-    socialLogin
 } from "../controllers/user.controller.js"
 import { verifyJWT } from "../middlewares/auth.middleware.js"
 
@@ -14,7 +13,6 @@ router.route("/register").post(register)
 router.route("/login").post(login)
 router.route("/logout").post(verifyJWT, logout)
 router.route("/userinfo").get(verifyJWT, getUserData)
-router.route("/login/social").post(socialLogin)
 
 
 

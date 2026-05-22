@@ -4,13 +4,10 @@ import { useNavigate } from "react-router-dom"
 import BASE_URL from "../lib/api.js"
 import { Link } from "react-router-dom"
 import styles from "../pages/styles/register.module.css"
-import { useSignUp, useAuth } from "@clerk/react"
 
 const Register = () => {
 
   const navigate = useNavigate()
-  const { signUp, isLoaded } = useSignUp()
-  const { getToken } = useAuth()
 
   const [formData, setFormData] = useState({
     name: "",
@@ -54,32 +51,6 @@ const Register = () => {
     }
   }
 
-  const handleGoogleSignUp = async () => {
-
-    if (!isLoaded) return
-
-    try {
-      await signUp.authenticateWithRedirect({
-        strategy: 'oauth_google',
-        redirectUrl: '/sso-callback',          // Must match your callback route
-        redirectUrlComplete: '/dashboard',     // Where to go after success
-      });
-
-      callHmm()
-    } catch (error) {
-      console.error('OAuth Error:', error);
-    }
-
-  }
-
-  const callHmm = async () => {
-    const token = await getToken()
-    console.log("Token",token);
-  }
-  useEffect(() => {
-    callHmm()
-
-  }, [])
   return (
     <>
       <div className={styles['auth-root']}>
@@ -100,7 +71,7 @@ const Register = () => {
                 <p className={styles['auth-subtitle']}>Your launchpad to learn</p>
               </div>
               {/* Social Sign IN */}
-              <div className={styles['auth-social-row']}>
+              {/* <div className={styles['auth-social-row']}>
                 <button type="button" onClick={handleGoogleSignUp} className={styles['auth-social-btn']}>
                   <svg width="18" height="18" viewBox="0 0 24 24">
                     <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -116,7 +87,7 @@ const Register = () => {
                   </svg>
                   Apple
                 </button>
-              </div>
+              </div> */}
 
               <div className={styles['auth-divider']}>
                 <span className={styles['auth-divider-text']}>or</span>
@@ -242,7 +213,7 @@ const Register = () => {
                   className={styles['auth-submit-btn']}
                   type="submit"
                   disabled={loading}
-                  onClick={() => setLoading(true)}
+                
                 >
                   {loading ? (
                     <span className={styles['auth-btn-loading']}>
