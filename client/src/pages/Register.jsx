@@ -141,11 +141,6 @@ const Register = () => {
                 </button>
               </div> */}
 
-              <div className={styles['auth-divider']}>
-                <span className={styles['auth-divider-text']}>or</span>
-              </div>
-
-
               <form className={styles['auth-form']} onSubmit={handleSubmit}>
                 {error && (
                   <div className={styles['auth-error']} role="alert">
