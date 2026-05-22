@@ -151,7 +151,7 @@
     font-family: var(--font-display);
     font-size: clamp(1.6rem, 2.8vw, 2.1rem);
     font-weight: 700;
-    color: var(--color-text-heading);
+    color: white;
     letter-spacing: -0.04em;
     line-height: 1.1;
     margin-bottom: var(--space-2);
