@@ -17,6 +17,7 @@ const Register = () => {
   })
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
+  const [redirecting, setRedirecting] = useState(false)
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
@@ -51,8 +52,24 @@ const Register = () => {
     }
   }
 
+  useEffect(() => {
+    const token = localStorage.getItem("token")
+
+    if (token) {
+      setRedirecting(true)
+
+      setTimeout(() => navigate("/dashboard"), 6000)
+    }
+  }, [])
   return (
     <>
+      {redirecting && (
+              <div className={styles['auth-toast']}>
+                <span className={styles['auth-toast-text']}>✓ Already logged in — Redirecting to Dashboard…</span>
+                <div className={styles['auth-toast-bar']} />
+              </div>
+            )}
+
       <div className={styles['auth-root']}>
 
         {/* ── LEFT PANEL ── */}
@@ -213,7 +230,7 @@ const Register = () => {
                   className={styles['auth-submit-btn']}
                   type="submit"
                   disabled={loading}
-                
+
                 >
                   {loading ? (
                     <span className={styles['auth-btn-loading']}>
