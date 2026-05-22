@@ -121,7 +121,7 @@ html {
 
 body {
     font-family: var(--font-body);
-    background: var(--clr-bg);
+    background: rgba(10, 12, 20, 1);
     color: var(--clr-text-primary);
     line-height: 1.6;
 }

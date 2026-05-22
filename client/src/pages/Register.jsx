@@ -5,6 +5,41 @@ import BASE_URL from "../lib/api.js"
 import { Link } from "react-router-dom"
 import styles from "../pages/styles/register.module.css"
 
+/* ─── STAR FIELD ────────────────────────────────────────────────────────── */
+function StarField() {
+  const stars = Array.from({ length: 120 }, (_, i) => {
+    const rand = Math.random()
+    const size = rand < 0.6 ? 1 : rand < 0.9 ? 2 : 3
+    return {
+      id: i,
+      top: `${Math.random() * 100}%`,
+      left: `${Math.random() * 100}%`,
+      dur: `${1.5 + Math.random() * 3}s`,
+      delay: `${Math.random() * 5}s`,
+      size: `${size}px`,
+      opacity: 0.3 + Math.random() * 0.5,
+    }
+  })
+  return (
+    <div className={styles.stars} aria-hidden="true">
+      {stars.map(s => (
+        <div
+          key={s.id}
+          className={styles.star}
+          style={{
+            top: s.top,
+            left: s.left,
+            '--dur': s.dur,
+            '--delay': s.delay,
+            '--size': s.size,
+            '--opacity': s.opacity,
+          }}
+        />
+      ))}
+    </div>
+  )
+}
+
 const Register = () => {
 
   const navigate = useNavigate()
@@ -63,22 +98,22 @@ const Register = () => {
   }, [])
   return (
     <>
+      <StarField />
       {redirecting && (
-              <div className={styles['auth-toast']}>
-                <span className={styles['auth-toast-text']}>✓ Already logged in — Redirecting to Dashboard…</span>
-                <div className={styles['auth-toast-bar']} />
-              </div>
-            )}
+        <div className={styles['auth-toast']}>
+          <span className={styles['auth-toast-text']}>✓ Already logged in — Redirecting to Dashboard…</span>
+          <div className={styles['auth-toast-bar']} />
+        </div>
+      )}
 
       <div className={styles['auth-root']}>
 
         {/* ── LEFT PANEL ── */}
         <div className={styles['auth-left']}>
           <header className={styles['auth-header']}>
-            <div className={styles['auth-logo']}>
-              <span className={styles['auth-logo-icon']}>✦</span>
-              <span className={styles['auth-logo-text']}>StudyFlow</span>
-            </div>
+            <Link to="/" className={styles.navLogo}>
+              SPARK<span>.E</span>
+            </Link>
           </header>
 
           <main className={styles['auth-form-wrapper']}>
