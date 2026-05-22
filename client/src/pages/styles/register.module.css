@@ -86,7 +86,7 @@
 
 .auth-root {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr 1px 1fr;
     min-height: 100dvh;
 }
 
@@ -441,6 +441,19 @@
 
 .auth-link:hover {
     border-color: var(--color-link);
+}
+
+.auth-divider-line {
+    width: 1px;
+    background: linear-gradient(to bottom,
+            transparent 0%,
+            rgba(255, 255, 255, 0.15) 20%,
+            rgba(255, 255, 255, 0.25) 50%,
+            rgba(255, 255, 255, 0.15) 80%,
+            transparent 100%);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    align-self: stretch;
 }
 
 /* ── RIGHT PANEL ──────────────────────────────────────────── */
@@ -802,5 +815,16 @@
 
     .auth-right-inner {
         max-width: 32rem;
+    }
+}
+
+@media (max-width: 1024px) {
+    .auth-root {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr;
+    }
+
+    .auth-divider-line {
+        display: none;
     }
 }
