@@ -4,7 +4,6 @@ import { Routes, Route } from "react-router-dom"
 import  Home  from "../src/pages/Home.jsx"
 import Register from "./pages/Register.jsx"
 import Login from "./pages/Login.jsx"
-import SSOCallback from "./pages/SSOCallback.jsx"
 import Dashboard from "./pages/Dashboard.jsx"
 import ProtectedRoute from './components/ProtectedRoute.jsx'
 import Notes from "./pages/Notes.jsx"
@@ -25,7 +24,6 @@ import Notebook from './pages/Notebook.jsx'
 const App = () => {
 
   const token = localStorage.getItem("token")
-  const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
 
   const hideNavOn = ["/login", "/register"];
   const showNavbar = token && !hideNavOn.includes(location.pathname);
@@ -36,7 +34,6 @@ const App = () => {
         <Route path='/' element={<Home/>} />
         <Route path='/register' element={<Register/>} />
         <Route path='/login' element={<Login/>} />
-        <Route path="/sso-callback" element={<SSOCallback/>} />
         
         <Route element={<AppShell />}>
         {/* <Route path='/dashboard' element={<ProtectedRoute component={<Dashboard/>}/>} /> */}

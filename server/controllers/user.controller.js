@@ -3,7 +3,6 @@ import { ApiError, ApiResponse } from "../utils/Async.js"
 import prisma from "../lib/prisma.js"
 import { generateAccessToken, generateRefreshToken } from "../helpers/generateToken.js"
 import bcrypt from "bcrypt"
-import { createClerkClient } from "@clerk/express"
 
 const isPasswordCorrect = async (email, password) => {
     try {
@@ -158,78 +157,9 @@ const getUserData = asyncHandler(async (req, res) => {
 
 })
 
-const socialLogin = asyncHandler(async (req, res) => {
-    const { token } = req.body
-
-    if (!token) {
-        throw new ApiError(404, "Token is required")
-    }
-
-    const clerkClient = createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY })
-
-    let payload
-
-    try {
-        payload = await clerkClient.verifyToken(token)
-
-    } catch (error) {
-        throw new ApiError(404, "Invalid token")
-    }
-
-    const clerkUser = await clerkClient.users.getUser(payload.sub)
-    const email = clerkUser.emailAddresses[0].emailAddress
-    const name = `${clerkUser.firstName} ${clerkUser.lastName}`
-
-
-    let user = await prisma.user.findUnique(
-        {
-            where: {
-                email
-            }
-        }
-    )
-
-    if (!user) {
-        user = await prisma.user.create(
-            {
-                data: {
-                    name,
-                    email,
-                    clerkId: payload.sub,
-                    password: null
-                }
-            }
-        )
-    } else if (!user.clerkId) {
-        user = await prisma.user.update(
-            {
-                where: {
-                    email
-                },
-                data: {
-                    clerkId: payload.sub
-                }
-            }
-        )
-    }
-
-    const { accessToken, refreshToken } = await generateAccessAndRefreshToken(user)
-
-    const options = {
-        httpOnly: true,
-        secure: true
-    }
-
-    return res
-        .status(200)
-        .cookie("accessToken", accessToken, options)
-        .cookie("refreshToken", refreshToken, options)
-        .json(new ApiResponse(200, { accessToken, user }, "Social login success"))
-})
 export {
     register,
     login,
     logout,
     getUserData,
-    socialLogin
 }

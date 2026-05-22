@@ -3,11 +3,8 @@ import { useNavigate, Link } from "react-router-dom"
 import BASE_URL from "../lib/api.js"
 import { useState } from 'react'
 import styles from "../pages/styles/login.module.css"
-import { useSignIn } from "@clerk/clerk-react"
 
 const Login = () => {
-
-  const {signIn, isLoaded} = useSignIn()
 
   const navigate = useNavigate()
   const [showPassword, setShowPassword] = useState(false)
@@ -53,21 +50,6 @@ const Login = () => {
     }
   }
 
-  const handleGoogleLogin = async()=>{
-    if(!isLoaded) return
-
-    try {
-      await signIn.authenticateWithRedirect({
-        strategy: 'oauth_google',
-        redirectUrl: '/sso-callback',          // Must match your callback route
-        redirectUrlComplete: '/dashboard',     // Where to send them after login
-      });
-    } catch (error) {
-      console.error('Google sign-in failed:', error)
-    }
-  }
-
-
   return (
     <>
       <div className={styles['auth-root']}>
@@ -90,7 +72,7 @@ const Login = () => {
               </div>
 
               {/* Social buttons */}
-              <div className={styles['auth-social-row']}>
+              {/* <div className={styles['auth-social-row']}>
                 <button type="button" onClick={handleGoogleLogin} className={styles['auth-social-btn']}>
                   <svg width="18" height="18" viewBox="0 0 24 24">
                     <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -106,7 +88,7 @@ const Login = () => {
                   </svg>
                   Apple
                 </button>
-              </div>
+              </div> */}
 
               <div className={styles['auth-divider']}>
                 <span className={styles['auth-divider-text']}>or</span>
