@@ -14,6 +14,7 @@ const Login = () => {
   })
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
+  const [redirecting, setRedirecting] = useState(false)
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
@@ -50,8 +51,24 @@ const Login = () => {
     }
   }
 
+
+  useEffect(() => {
+    const token = localStorage.getItem("token")
+
+    if (token) {
+      setRedirecting(true)
+
+      setTimeout(() => navigate("/dashboard"), 6000)
+    }
+  }, [])
   return (
     <>
+      {redirecting && (
+        <div className={styles['auth-toast']}>
+          <span className={styles['auth-toast-text']}>✓ Already logged in — Redirecting to Dashboard…</span>
+          <div className={styles['auth-toast-bar']} />
+        </div>
+      )}
       <div className={styles['auth-root']}>
 
         {/* ── LEFT PANEL ── */}
