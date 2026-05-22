@@ -288,6 +288,7 @@ const Register = () => {
           </main>
         </div>
 
+        <div className={styles['auth-divider-line']} />
         {/* ── RIGHT PANEL ── */}
         <aside className={styles['auth-right']} aria-hidden="true">
           <div className={styles['auth-right-inner']}>
