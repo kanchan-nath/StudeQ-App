@@ -5,18 +5,11 @@ const noteSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    title:{
-        type:String,
-
-    },
     content:{
         type: String
     },
     summary:{
         type: String
-    },
-    keyPoints:{
-        type: [String]
     },
     isPinned:{
         type :Boolean,

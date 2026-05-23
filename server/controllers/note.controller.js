@@ -3,6 +3,12 @@ import { ApiError, ApiResponse } from "../utils/Async.js"
 import { summarizeText } from "../lib/groq/summarizer.js"
 import { Note } from "../models/note.model.js"
 
+
+const titleExtract = async (markdownResponse)=>{
+    const title = await markdownResponse.match(/##\s*📌\s*Topic\s*\n+(.+)/)
+    return title ? title[1].trim()  : "Summary"
+}
+
 const createNote = asyncHandler(async (req, res) => {
     const { content } = req.body
     const userId = req.user.id
@@ -11,19 +17,17 @@ const createNote = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Content is required")
     }
 
-    const result = await summarizeText(content)
-
+    const raw = await summarizeText(content)
+    const result = await JSON.parse(raw)
     if (!result) {
         throw new ApiError(400, "Something went wrong, Try again !")
     }
-
-    const { title, summary, keyPoints } = result
+    console.log(result);
+    
 
     const data = await Note.create({
         userId,
-        title,
-        summary,
-        keyPoints
+        summary: raw,
     })
     return res
         .status(200)
