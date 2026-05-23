@@ -5,10 +5,11 @@ import styles from './styles/notes.module.css'
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
+import html2canvas from 'html2canvas'
 
-const LLMMarkdown = ({content})=>{
+const LLMMarkdown = ({ content }) => {
   return (
-     <ReactMarkdown
+    <ReactMarkdown
       remarkPlugins={[remarkGfm]}
       rehypePlugins={[rehypeRaw]}       // enables raw HTML like <u> and <mark>
       components={{
@@ -109,7 +110,7 @@ const StyledSummary = ({ content }) => {
       elements.push(<ul key={`ul-${i}`} className={styles['sum-list']}>{bullets}</ul>)
       continue
     } else {
-      elements.push(<p key={i} className={styles['sum-para']}><LLMMarkdown content={line} /></p>)
+      elements.push(<div key={i} className={styles['sum-para']}><LLMMarkdown content={line} /></div>)
     }
     i++
   }
@@ -117,7 +118,7 @@ const StyledSummary = ({ content }) => {
   return <div className={styles['sum-body']}>{elements}</div>
 }
 /* ─── single note document view ─────────────────────────────── */
-const NoteDocument = ({ note, onEdit, onDelete, onDownload, onPin, onCopy, isCopied }) => {
+const NoteDocument = ({ note, onEdit, onDelete, onDownload, onPin, onCopy, isCopied, docRef }) => {
   const keyPoints = Array.isArray(note.keyPoints)
     ? note.keyPoints
     : typeof note.keyPoints === 'string'
@@ -125,7 +126,7 @@ const NoteDocument = ({ note, onEdit, onDelete, onDownload, onPin, onCopy, isCop
       : []
 
   return (
-    <article className={styles['note-doc']} aria-label={`Note: ${note.title}`}>
+    <article ref={docRef} className={styles['note-doc']} aria-label={`Note: ${note.title}`}>
       <header className={styles['note-doc__header']}>
         <div className={styles['note-doc__meta']}>
           <span className={styles['note-doc__badge']}>Summary</span>
@@ -273,6 +274,7 @@ const Notes = () => {
   const [generatedIds, setGeneratedIds] = useState(new Set())
   const [toast, setToast] = useState(null)
   const [panelView, setPanelView] = useState('welcome')
+  const noteDocRef = useRef(null)
 
   const inputRef = useRef(null)
   const token = localStorage.getItem("token")
@@ -394,27 +396,62 @@ const Notes = () => {
     } catch (err) {
       showToast("Copy failed", 'error')
     }
+
   }
 
-  const handleDownload = (note) => {
-    const doc = new jsPDF()
-    const lines = [
-      `Title: ${note.title}`, '',
-      'Summary:', note.summary, '',
-      'Key Points:',
-      ...(Array.isArray(note.keyPoints) ? note.keyPoints : [note.keyPoints])
-    ]
-    doc.setFont('helvetica', 'normal')
-    doc.setFontSize(12)
-    let y = 15
-    lines.forEach(line => {
-      const wrapped = doc.splitTextToSize(line, 180)
-      doc.text(wrapped, 15, y)
-      y += wrapped.length * 7 + 2
-      if (y > 270) { doc.addPage(); y = 15 }
-    })
-    doc.save(`${note.title}.pdf`)
-    showToast("PDF downloaded!")
+  const handleDownload = async (note) => {
+    const element = noteDocRef.current
+    if (!element) return showToast("Nothing to export", 'error')
+
+    showToast("Generating PDF…")
+
+    try {
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: null,
+        windowWidth: element.scrollWidth,
+        windowHeight: element.scrollHeight,
+      })
+
+      const imgData = canvas.toDataURL('image/png')
+      const { jsPDF } = await import('jspdf')
+
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4',
+      })
+
+      const pageWidth = pdf.internal.pageSize.getWidth()   // 210mm
+      const pageHeight = pdf.internal.pageSize.getHeight() // 297mm
+
+      const imgWidthPx = canvas.width
+      const imgHeightPx = canvas.height
+
+      // scale image to fit page width
+      const ratio = pageWidth / imgWidthPx
+      const imgHeightMm = imgHeightPx * ratio
+
+      let yOffset = 0
+
+      // paginate if content taller than one page
+      while (yOffset < imgHeightMm) {
+        if (yOffset > 0) pdf.addPage()
+        pdf.addImage(
+          imgData, 'PNG',
+          0, -yOffset,           // shift up for each page
+          pageWidth, imgHeightMm
+        )
+        yOffset += pageHeight
+      }
+
+      pdf.save(`${note.title.replace(/\*\*/g, '')}.pdf`)
+      showToast("PDF downloaded!")
+    } catch (err) {
+      console.error(err)
+      showToast("PDF export failed", 'error')
+    }
   }
 
   const tooglePin = async (note) => {
@@ -568,6 +605,7 @@ const Notes = () => {
             onPin={tooglePin}
             onCopy={handleCopy}
             isCopied={isCopied}
+            docRef={noteDocRef}
           />
         )}
 
