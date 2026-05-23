@@ -17,15 +17,19 @@ const createNote = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Content is required")
     }
 
-    const result = await summarizeText(content)
+    // const result = await summarizeText(content)
+    const result = true
 
     const title = await titleExtract(result)
 
-    if (!result) {
+    if (result) {
         // throw new ApiError(400, "Something went wrong, Try again !")
         await AIResponseQueue(content)
-
         
+        return res
+        .status(200)
+        .json(new ApiResponse(200, {}, "retrying"))
+
     }
 
     const data = await Note.create({

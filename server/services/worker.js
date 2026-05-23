@@ -4,11 +4,11 @@ const connection = {
     host:"localhost",
     port:6379
 }
-const AIResponseQueueWorker = async (queueName) => {
-    const worker = new Worker(queueName, async(job)=>{
-        
-        
-    }, {connection})
+const processJob = async (job)=>{
+    console.log(`Job is processing with Id: ${job.id}`);
+    console.log(`Job is processing Data: ${job.data}`);
+
+    
 }
 
-AIResponseQueueWorker("ai-response")
+const AIResponseQueueWorker = new Worker("ai-response-handler", processJob, {connection})
