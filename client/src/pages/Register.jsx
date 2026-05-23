@@ -293,8 +293,8 @@ const Register = () => {
         <aside className={styles['auth-right']} aria-hidden="true">
           <div className={styles['auth-right-inner']}>
             <div className={styles['auth-stat-banner']}>
-              <span className={styles['auth-stat-number']}>92%</span>
-              <span className={styles['auth-stat-label']}>of students get higher grades with StudyFlow</span>
+              <span className={styles['auth-stat-number']}>100+</span>
+              <span className={styles['auth-stat-label']}>students studying smarter with AI.</span>
             </div>
 
             <div className={styles['auth-showcase-card']}>
@@ -312,11 +312,11 @@ const Register = () => {
 
             <div className={styles['auth-tagline']}>
               <p className={styles['auth-tagline-main']}>Drop your class materials,<br />we'll make your study plan.</p>
-              <p className={styles['auth-tagline-sub']}>Trusted by students from top institutions</p>
+              <p className={styles['auth-tagline-sub']}>Built for students who take their goals seriously</p>
               <div className={styles['auth-trust-logos']}>
-                <span className={styles['auth-trust-logo']}>HARVARD</span>
-                <span className={`${styles['auth-trust-logo']} ${styles['auth-trust-logo--lg']}`}>Yale</span>
-                <span className={styles['auth-trust-logo']}>MIT</span>
+                <span className={styles['auth-trust-logo']}>Study Less</span>
+                <span className={`${styles['auth-trust-logo']} ${styles['auth-trust-logo--lg']}`}>Remember More</span>
+                <span className={styles['auth-trust-logo']}>Score Higher.</span>
               </div>
             </div>
           </div>

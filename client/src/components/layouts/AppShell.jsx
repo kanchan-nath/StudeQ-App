@@ -1,21 +1,39 @@
 import React, { useState, useEffect } from 'react'
 import { Link, Outlet, useNavigate, useLocation } from 'react-router-dom'
 import styles from './appShell.module.css'
+import {
+    Home03Icon,
+    NoteEditIcon,
+    Quiz03Icon,
+    Cards02Icon,
+    Book01Icon,
+    Calendar03Icon,
+    Notebook01Icon,
+    TeachingIcon,
+    SearchList01Icon,
+    Pdf02Icon,
+    Logout02Icon,
+    CashbackIcon,
+    StarsIcon
+} from "hugeicons-react"
 
 const NAV_MAIN = [
-    { to: '/dashboard', label: 'Home', icon: '🏠', color: 'blue' },
-    { to: '/notes', label: 'Notes', icon: '📝', color: 'teal' },
-    { to: '/quiz', label: 'Quiz', icon: '⚡', color: 'purple' },
-    { to: '/flashcards', label: 'Flashcards', icon: '⚡', color: 'purple' },
-    { to: '/study-room', label: 'Study Room', icon: '📚', color: 'green' },
-    { to: '/scheduler', label: 'Scheduler', icon: '📅', color: 'orange' },
-    { to: '/notebook', label: 'Notebook', icon: '📅', color: 'blue' },
+    { to: '/dashboard', label: 'Home', icon: Home03Icon, color: 'blue' },
+    { to: '/notes', label: 'Notes', icon: NoteEditIcon, color: 'teal' },
+    { to: '/quiz', label: 'Quiz', icon: Quiz03Icon, color: 'purple' },
+    { to: '/flashcards', label: 'Flashcards', icon: Cards02Icon, color: 'purple' },
+    {
+        to: '/study-room', label: 'Study Room', icon: Book01Icon,
+        color: 'green'
+    },
+    { to: '/scheduler', label: 'Scheduler', icon: Calendar03Icon, color: 'orange' },
+    { to: '/notebook', label: 'Notebook', icon: Notebook01Icon, color: 'blue' },
 ]
 
 const NAV_AI = [
-    { to: '/tutor', label: 'AI Tutor', icon: '🤖', color: 'purple' },
-    { to: '/image-analysis', label: 'Image Analysis', icon: '🖼️', color: 'pink' },
-    { to: '/pdf-analysis', label: 'PDF Analysis', icon: '📄', color: 'teal' },
+    { to: '/tutor', label: 'AI Tutor', icon: TeachingIcon, color: 'purple' },
+    { to: '/image-analysis', label: 'Image Analysis', icon: SearchList01Icon, color: 'pink' },
+    { to: '/pdf-analysis', label: 'PDF Analysis', icon: Pdf02Icon, color: 'teal' },
 ]
 
 const AppShell = ({ userName = '' }) => {
@@ -45,12 +63,12 @@ const AppShell = ({ userName = '' }) => {
             {/* ── TOP BAR ── */}
             <header className={styles.topbar} role="banner">
                 <div className={styles['topbar__left']}>
-                    <button className={styles['topbar__icon-btn']} aria-label="Search">🔍</button>
-                    <button className={styles['topbar__icon-btn']} aria-label="Collapse sidebar">◀</button>
+                    {/* <button className={styles['topbar__icon-btn']} aria-label="Search">🔍</button> */}
+                    {/* <button className={styles['topbar__icon-btn']} aria-label="Collapse sidebar">◀</button> */}
                 </div>
 
                 <button className={styles['topbar__upgrade-btn']} aria-label="Upgrade to premium">
-                    ⬆ Upgrade
+                    <CashbackIcon /> Upgrade
                 </button>
 
                 <div
@@ -65,35 +83,34 @@ const AppShell = ({ userName = '' }) => {
             {/* ── LEFT SIDEBAR ── */}
             <aside className={styles.sidebar} role="navigation" aria-label="Main navigation">
                 <Link to="/" className={styles['sidebar__logo']} aria-label="SPARK.E home">
-                    <div className={styles['sidebar__logo-icon']} aria-hidden="true">✦</div>
                     <div className={styles['sidebar__logo-text']}>SPARK<span>.E</span></div>
                 </Link>
 
                 <nav className={styles['sidebar__nav']}>
                     <span className={styles['sidebar__section-label']}>Main</span>
 
-                    {NAV_MAIN.map(({ to, label, icon, color }) => (
+                    {NAV_MAIN.map(({ to, label, icon: Icon, color }) => (
                         <Link
                             key={to}
                             to={to}
                             className={`${styles['sidebar__link']}${location.pathname === to ? ` ${styles.active}` : ''}`}
                             data-color={color}
                         >
-                            <span className={styles['sidebar__link-icon']} aria-hidden="true">{icon}</span>
+                            <span className={styles['sidebar__link-icon']} aria-hidden="true"><Icon size={20} color="white" /></span>
                             {label}
                         </Link>
                     ))}
 
                     <span className={styles['sidebar__section-label']}>AI Tools</span>
 
-                    {NAV_AI.map(({ to, label, icon, color }) => (
+                    {NAV_AI.map(({ to, label, icon:Icon, color }) => (
                         <Link
                             key={to}
                             to={to}
                             className={`${styles['sidebar__link']}${location.pathname === to ? ` ${styles.active}` : ''}`}
                             data-color={color}
                         >
-                            <span className={styles['sidebar__link-icon']} aria-hidden="true">{icon}</span>
+                            <span className={styles['sidebar__link-icon']} aria-hidden="true"><Icon size={20} color="white" /></span>
                             {label}
                         </Link>
                     ))}
@@ -101,7 +118,7 @@ const AppShell = ({ userName = '' }) => {
 
                 <div className={styles['sidebar__footer']}>
                     <button className={styles['sidebar__logout-btn']} onClick={handleLogout} aria-label="Log out">
-                        <span aria-hidden="true">🚪</span>
+                        <span aria-hidden="true"><Logout02Icon /></span>
                         Log out
                     </button>
                 </div>
@@ -124,14 +141,14 @@ const AppShell = ({ userName = '' }) => {
 
                 <div className={styles['upgrade-card']}>
                     <div className={styles['upgrade-card__header']}>
-                        <div className={styles['upgrade-card__badge']} aria-hidden="true">⭐</div>
+                        <div className={styles['upgrade-card__badge']} aria-hidden="true"><StarsIcon /></div>
                         <h3 className={styles['upgrade-card__title']}>Go Premium</h3>
                     </div>
                     <p className={styles['upgrade-card__desc']}>
                         Unlock unlimited AI sessions, advanced PDF analysis, priority tutor access,
                         and your full study history.
                     </p>
-                    <button className={styles['upgrade-card__btn']}>Upgrade now</button>
+                    <button className={styles['upgrade-card__btn']}><CashbackIcon />Upgrade now</button>
                 </div>
 
                 <div className={styles['panel-widget']} aria-labelledby="upcoming-heading">
