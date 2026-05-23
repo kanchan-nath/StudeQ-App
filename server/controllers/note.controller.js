@@ -4,10 +4,10 @@ import { summarizeText } from "../lib/groq/summarizer.js"
 import { Note } from "../models/note.model.js"
 
 
-const titleExtract = async (markdownResponse)=>{
-    const title = await markdownResponse.match(/##\s*📌\s*Topic\s*\n+(.+)/)
-    return title ? title[1].trim()  : "Summary"
-}
+const titleExtract = (markdownResponse) => {
+    const match = markdownResponse.match(/##\s+Topic\s*\n+(.+)/);
+    return match ? match[1].trim() : "Summary";
+};
 
 const createNote = asyncHandler(async (req, res) => {
     const { content } = req.body
@@ -17,17 +17,18 @@ const createNote = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Content is required")
     }
 
-    const raw = await summarizeText(content)
-    const result = await JSON.parse(raw)
+    const result = await summarizeText(content)
+
+    const title = await titleExtract(result)
+
     if (!result) {
         throw new ApiError(400, "Something went wrong, Try again !")
     }
-    console.log(result);
-    
 
     const data = await Note.create({
         userId,
-        summary: raw,
+        title,
+        summary: result,
     })
     return res
         .status(200)
@@ -105,17 +106,17 @@ const updateNote = asyncHandler(async (req, res) => {
 
 })
 
-const tooglePin = asyncHandler(async(req, res)=>{
-    const {isPinned} =  req.body
+const tooglePin = asyncHandler(async (req, res) => {
+    const { isPinned } = req.body
 
-    const {id} = req.params
+    const { id } = req.params
 
-    const userId= req.user.id
+    const userId = req.user.id
 
     await Note.findOneAndUpdate(
         {
             userId,
-            _id:id
+            _id: id
         },
         {
             isPinned
@@ -128,10 +129,10 @@ const tooglePin = asyncHandler(async(req, res)=>{
             userId
         }
     ).sort(sortQuery)
-    
+
     return res
-    .status(200)
-    .json(new ApiResponse(200, data, "pin successful"))
+        .status(200)
+        .json(new ApiResponse(200, data, "pin successful"))
 })
 export {
     createNote,

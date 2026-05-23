@@ -2,7 +2,28 @@ import React, { useRef, useState, useEffect } from 'react'
 import BASE_URL from "../lib/api.js"
 import { jsPDF } from "jspdf"
 import styles from './styles/notes.module.css'
+import ReactMarkdown from "react-markdown"
+import remarkGfm from "remark-gfm";
+import rehypeRaw from "rehype-raw";
 
+const LLMMarkdown = ({content})=>{
+  return (
+     <ReactMarkdown
+      remarkPlugins={[remarkGfm]}
+      rehypePlugins={[rehypeRaw]}       // enables raw HTML like <u> and <mark>
+      components={{
+        mark({ children }) {
+          return <mark style={{ background: "#ffe066", padding: "0 2px", borderRadius: "3px" }}>{children}</mark>;
+        },
+        u({ children }) {
+          return <u>{children}</u>;
+        },
+      }}
+    >
+      {content}
+    </ReactMarkdown>
+  )
+}
 /* ─── tiny toast helper ─────────────────────────────────────── */
 const Toast = ({ message, type = 'success', onClose }) => (
   <div className={`${styles.toast} ${styles[`toast--${type}`]}`} role="alert">
@@ -64,6 +85,37 @@ const WelcomePanel = ({ onStart }) => (
   </section>
 )
 
+const StyledSummary = ({ content }) => {
+  const lines = content.split('\n')
+  const elements = []
+  let i = 0
+
+  while (i < lines.length) {
+    const line = lines[i].trim()
+    if (!line) { i++; continue }
+
+    if (line.startsWith('### ')) {
+      elements.push(<h4 key={i} className={styles['sum-h3']}>{line.slice(4)}</h4>)
+    } else if (line.startsWith('## ')) {
+      elements.push(<h3 key={i} className={styles['sum-h2']}>{line.slice(3)}</h3>)
+    } else if (line.startsWith('# ')) {
+      elements.push(<h2 key={i} className={styles['sum-h1']}>{line.slice(2)}</h2>)
+    } else if (line.startsWith('- ') || line.startsWith('* ')) {
+      const bullets = []
+      while (i < lines.length && (lines[i].trim().startsWith('- ') || lines[i].trim().startsWith('* '))) {
+        bullets.push(<li key={i}><LLMMarkdown content={lines[i].trim().slice(2)} /></li>)
+        i++
+      }
+      elements.push(<ul key={`ul-${i}`} className={styles['sum-list']}>{bullets}</ul>)
+      continue
+    } else {
+      elements.push(<p key={i} className={styles['sum-para']}><LLMMarkdown content={line} /></p>)
+    }
+    i++
+  }
+
+  return <div className={styles['sum-body']}>{elements}</div>
+}
 /* ─── single note document view ─────────────────────────────── */
 const NoteDocument = ({ note, onEdit, onDelete, onDownload, onPin, onCopy, isCopied }) => {
   const keyPoints = Array.isArray(note.keyPoints)
@@ -79,7 +131,7 @@ const NoteDocument = ({ note, onEdit, onDelete, onDownload, onPin, onCopy, isCop
           <span className={styles['note-doc__badge']}>Summary</span>
           {note.isPinned && <span className={`${styles['note-doc__badge']} ${styles['note-doc__badge--pinned']}`}>📌 Pinned</span>}
         </div>
-        <h1 className={styles['note-doc__title']}>{note.title}</h1>
+        <h1 className={styles['note-doc__title']}><ReactMarkdown>{note.title}</ReactMarkdown></h1>
         <div className={styles['note-doc__actions']}>
           <button
             className={`${styles['note-doc__btn']} ${styles['note-doc__btn--ghost']}`}
@@ -125,7 +177,9 @@ const NoteDocument = ({ note, onEdit, onDelete, onDownload, onPin, onCopy, isCop
             <span className={styles['note-doc__section-icon']} aria-hidden="true">≡</span>
             Summary
           </h2>
-          <p className={styles['note-doc__summary-text']}>{note.summary}</p>
+          <div className={styles['note-doc__summary-text']}>
+            <StyledSummary content={note.summary} />
+          </div>
         </section>
 
         {keyPoints.length > 0 && (
@@ -138,7 +192,7 @@ const NoteDocument = ({ note, onEdit, onDelete, onDownload, onPin, onCopy, isCop
               {keyPoints.map((pt, i) => (
                 <li key={i} className={styles['note-doc__keypoint']}>
                   <span className={styles['note-doc__keypoint-num']} aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
-                  <span>{pt}</span>
+                  <ReactMarkdown>{pt}</ReactMarkdown>
                 </li>
               ))}
             </ul>
@@ -201,7 +255,7 @@ const NoteInputForm = ({ content, onChange, onSubmit, loading, editId, onCancelE
 )
 
 /* ═══════════════════════════════════════════════════════════════
-   MAIN COMPONENT
+  MAIN COMPONENT
 ═══════════════════════════════════════════════════════════════ */
 const Notes = () => {
   const [isCopied, setIsCopied] = useState(false)
@@ -458,7 +512,9 @@ const Notes = () => {
                 aria-current={activeNoteId === note._id ? 'true' : undefined}
               >
                 <span className={styles['notes-sidebar__item-icon']} aria-hidden="true">📄</span>
-                <span className={styles['notes-sidebar__item-title']}>{note.title}</span>
+                <span className={styles['notes-sidebar__item-title']}>
+                  {note.title.replace(/\*\*/g, '')}
+                </span>
               </button>
             ))}
           </div>

@@ -590,6 +590,104 @@
 }
 
 /* ── NOTE DOCUMENT ───────────────────────────────────────────── */
+/* ── STYLED SUMMARY BODY ─────────────────────────────────────── */
+.sum-body {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.sum-h1 {
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--n-text-primary);
+    letter-spacing: -.01em;
+    margin: 18px 0 6px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--n-primary-light);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.sum-h1::before {
+    content: '';
+    display: inline-block;
+    width: 4px;
+    height: 18px;
+    background: linear-gradient(135deg, var(--n-primary), var(--n-purple));
+    border-radius: 99px;
+    flex-shrink: 0;
+}
+
+.sum-h2 {
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--n-primary);
+    letter-spacing: .02em;
+    text-transform: uppercase;
+    font-size: .78rem;
+    margin: 16px 0 4px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.sum-h2::before {
+    content: '◆';
+    font-size: .55rem;
+    opacity: .7;
+}
+
+.sum-h3 {
+    font-family: var(--font-display);
+    font-size: .88rem;
+    font-weight: 600;
+    color: var(--n-text-secondary);
+    margin: 12px 0 2px;
+}
+
+.sum-para {
+    font-size: .93rem;
+    color: var(--n-text-secondary);
+    line-height: 1.85;
+    margin: 0;
+}
+
+.sum-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 0;
+    margin: 4px 0;
+    list-style: none;
+}
+
+.sum-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: .88rem;
+    color: var(--n-text-secondary);
+    line-height: 1.7;
+    padding: 8px 12px;
+    background: var(--n-surface-raised);
+    border-radius: var(--n-r-md);
+    border-left: 3px solid var(--n-primary);
+    transition: background var(--n-t-fast), border-color var(--n-t-fast);
+}
+
+.sum-list li:hover {
+    background: var(--n-primary-light);
+    border-color: var(--n-purple);
+}
+
+.sum-list li p {
+    margin: 0;
+}
+
 .note-doc {
     max-width: 760px;
     margin: 0 auto;
@@ -742,9 +840,11 @@
 }
 
 .note-doc__summary-text {
-    font-size: .95rem;
+    font-size: .96rem;
     color: var(--n-text-secondary);
-    line-height: 1.8;
+    line-height: 1.9;
+    letter-spacing: .01em;
+    padding: 4px 0;
 }
 
 .note-doc__keypoints {

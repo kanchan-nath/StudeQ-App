@@ -10,7 +10,8 @@ Use markdown formatting throughout:
 - *Italic* for definitions or emphasis
 - "code" for technical terms, formulas, or names
 - > blockquote for critical rules or must-remember lines
-- ==highlight== for exam-critical points (if renderer supports it)
+- <mark>text</mark> for exam-critical points
+- <u>text</u> for underlined terms
 
 Format the summary exactly like this:
 
@@ -21,15 +22,15 @@ One line — what this text is about.
 - Bullet each major idea — **bold the concept name**, then explain briefly
 
 ##  Detailed Summary
-3–5 paragraphs. Use **bold** for important terms. Use *italics* for definitions.
+3-5 paragraphs. Use **bold** for important terms. Use *italics* for definitions.
 Wrap critical rules in blockquotes:
 > Rule or principle to remember
 
-##  Quick Recap (TL;DR)
-2–3 sentences. Bold the most critical words.
+##  Quick Recap
+2-3 sentences. Bold the most critical words.
 
 ##  Likely Exam Points
-- ==**Term or fact**== — short explanation
+- **Term or fact** — short explanation
 - Repeat for each point
 
 ---
