@@ -3,7 +3,17 @@ import { jwtDecode } from "jwt-decode"
 import BASE_URL from "../lib/api.js"
 import { useNavigate, Link } from "react-router-dom"
 import styles from "../pages/styles/dashboard.module.css"
-
+import {
+  Upload01Icon,
+  Quiz04Icon,
+  Chat01Icon,
+  MeetingRoomIcon,
+  Image01Icon,
+  Pdf02Icon,
+  Cards01Icon,
+  CpuChargeIcon,
+  Calendar01Icon
+} from "hugeicons-react"
 const Dashboard = () => {
   const [activeNav, setActiveNav] = useState('home');
   const navigate = useNavigate()
@@ -43,47 +53,47 @@ const Dashboard = () => {
   }
 
   const QUICK_ACTIONS = [
-    { label: 'Upload Material', icon: '⬆️', to: '/notes' },
-    { label: 'Create Quiz', icon: '⚡', to: '/quiz' },
-    { label: 'Chat with AI', icon: '💬', to: '/tutor' },
-    { label: 'Study Room', icon: '📚', to: '/studyroom' },
-    { label: 'Image Analysis', icon: '🖼️', to: '/image-analysis' },
-    { label: 'PDF Analysis', icon: '📄', to: '/pdf-analysis' },
+    { label: 'Upload Material', icon: Upload01Icon, to: '/notes' },
+    { label: 'Create Quiz', icon: Quiz04Icon, to: '/quiz' },
+    { label: 'Chat with AI', icon: Chat01Icon, to: '/tutor' },
+    { label: 'Study Room', icon: MeetingRoomIcon, to: '/studyroom' },
+    { label: 'Image Analysis', icon: Image01Icon, to: '/image-analysis' },
+    { label: 'PDF Analysis', icon: Pdf02Icon, to: '/pdf-analysis' },
   ];
 
   const FEATURE_CARDS = [
     {
-      icon: '🧠', colorClass: 'blue',
+      icon: Cards01Icon, colorClass: 'blue',
       title: 'Flashcard Practice',
       desc: 'Reinforce what you know with smart flashcard sessions built from your uploaded notes.',
       cta: 'Start practicing', to: '/studyroom',
     },
     {
-      icon: '⚡', colorClass: 'purple',
+      icon: Quiz04Icon, colorClass: 'purple',
       title: 'Generate a Quiz',
       desc: 'Turn any material into an instant quiz. Get real-time feedback on every answer.',
       cta: 'Create quiz', to: '/quiz',
     },
     {
-      icon: '🖼️', colorClass: 'teal',
+      icon: Image01Icon, colorClass: 'teal',
       title: 'Analyze an Image',
       desc: 'Drop a diagram, chart, or handwritten page — get a full AI-powered explanation.',
       cta: 'Analyze image', to: '/image-analysis',
     },
     {
-      icon: '📄', colorClass: 'orange',
+      icon: Pdf02Icon, colorClass: 'orange',
       title: 'Break Down a PDF',
       desc: 'Upload any PDF and extract key concepts, summaries, and quiz questions in seconds.',
       cta: 'Analyze PDF', to: '/pdf-analysis',
     },
     {
-      icon: '🤖', colorClass: 'pink',
+      icon: CpuChargeIcon, colorClass: 'pink',
       title: 'AI Tutor Session',
       desc: 'Ask anything. Your personal AI tutor walks you through tough concepts step by step.',
       cta: 'Start session', to: '/tutor',
     },
     {
-      icon: '📅', colorClass: 'green',
+      icon: Calendar01Icon, colorClass: 'green',
       title: 'Plan Your Week',
       desc: 'Build a smart study schedule around your exams, deadlines, and learning goals.',
       cta: 'Open scheduler', to: '/scheduler',
@@ -122,7 +132,7 @@ const Dashboard = () => {
           </div>
 
           <div className={styles['quick-actions__grid']} role="list">
-            {QUICK_ACTIONS.map(({ label, icon, to }) => (
+            {QUICK_ACTIONS.map(({ label, icon: Icon, to }) => (
               <Link
                 key={to}
                 to={to}
@@ -130,7 +140,7 @@ const Dashboard = () => {
                 role="listitem"
               >
                 <div className={styles['quick-action-card__icon']} aria-hidden="true">
-                  {icon}
+                  <Icon color='white'/>
                 </div>
                 {label}
               </Link>
@@ -178,10 +188,10 @@ const Dashboard = () => {
           </div>
 
           <div className={styles['feature-cards-grid']} role="list">
-            {FEATURE_CARDS.map(({ icon, colorClass, title, desc, cta, to }) => (
+            {FEATURE_CARDS.map(({ icon: Icon, colorClass, title, desc, cta, to }) => (
               <article key={to} className={styles['feature-card']} role="listitem">
                 <div className={`${styles['feature-card__icon']} ${styles[`feature-card__icon--${colorClass}`]}`} aria-hidden="true">
-                  {icon}
+                  <Icon color='white'/>
                 </div>
                 <h3 className={styles['feature-card__title']}>{title}</h3>
                 <p className={styles['feature-card__desc']}>{desc}</p>
