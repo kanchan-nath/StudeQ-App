@@ -2,7 +2,29 @@ import React, { useRef, useState, useEffect } from 'react'
 import BASE_URL from "../lib/api.js"
 import { jsPDF } from "jspdf"
 import styles from './styles/notes.module.css'
+import ReactMarkdown from "react-markdown"
+import remarkGfm from "remark-gfm";
+import rehypeRaw from "rehype-raw";
+import html2canvas from 'html2canvas'
 
+const LLMMarkdown = ({ content }) => {
+  return (
+    <ReactMarkdown
+      remarkPlugins={[remarkGfm]}
+      rehypePlugins={[rehypeRaw]}       // enables raw HTML like <u> and <mark>
+      components={{
+        mark({ children }) {
+          return <mark style={{ background: "#ffe066", padding: "0 2px", borderRadius: "3px" }}>{children}</mark>;
+        },
+        u({ children }) {
+          return <u>{children}</u>;
+        },
+      }}
+    >
+      {content}
+    </ReactMarkdown>
+  )
+}
 /* ─── tiny toast helper ─────────────────────────────────────── */
 const Toast = ({ message, type = 'success', onClose }) => (
   <div className={`${styles.toast} ${styles[`toast--${type}`]}`} role="alert">
@@ -64,8 +86,39 @@ const WelcomePanel = ({ onStart }) => (
   </section>
 )
 
+const StyledSummary = ({ content }) => {
+  const lines = content.split('\n')
+  const elements = []
+  let i = 0
+
+  while (i < lines.length) {
+    const line = lines[i].trim()
+    if (!line) { i++; continue }
+
+    if (line.startsWith('### ')) {
+      elements.push(<h4 key={i} className={styles['sum-h3']}>{line.slice(4)}</h4>)
+    } else if (line.startsWith('## ')) {
+      elements.push(<h3 key={i} className={styles['sum-h2']}>{line.slice(3)}</h3>)
+    } else if (line.startsWith('# ')) {
+      elements.push(<h2 key={i} className={styles['sum-h1']}>{line.slice(2)}</h2>)
+    } else if (line.startsWith('- ') || line.startsWith('* ')) {
+      const bullets = []
+      while (i < lines.length && (lines[i].trim().startsWith('- ') || lines[i].trim().startsWith('* '))) {
+        bullets.push(<li key={i}><LLMMarkdown content={lines[i].trim().slice(2)} /></li>)
+        i++
+      }
+      elements.push(<ul key={`ul-${i}`} className={styles['sum-list']}>{bullets}</ul>)
+      continue
+    } else {
+      elements.push(<div key={i} className={styles['sum-para']}><LLMMarkdown content={line} /></div>)
+    }
+    i++
+  }
+
+  return <div className={styles['sum-body']}>{elements}</div>
+}
 /* ─── single note document view ─────────────────────────────── */
-const NoteDocument = ({ note, onEdit, onDelete, onDownload, onPin, onCopy, isCopied }) => {
+const NoteDocument = ({ note, onEdit, onDelete, onDownload, onPin, onCopy, isCopied, docRef }) => {
   const keyPoints = Array.isArray(note.keyPoints)
     ? note.keyPoints
     : typeof note.keyPoints === 'string'
@@ -73,13 +126,13 @@ const NoteDocument = ({ note, onEdit, onDelete, onDownload, onPin, onCopy, isCop
       : []
 
   return (
-    <article className={styles['note-doc']} aria-label={`Note: ${note.title}`}>
+    <article ref={docRef} className={styles['note-doc']} aria-label={`Note: ${note.title}`}>
       <header className={styles['note-doc__header']}>
         <div className={styles['note-doc__meta']}>
           <span className={styles['note-doc__badge']}>Summary</span>
           {note.isPinned && <span className={`${styles['note-doc__badge']} ${styles['note-doc__badge--pinned']}`}>📌 Pinned</span>}
         </div>
-        <h1 className={styles['note-doc__title']}>{note.title}</h1>
+        <h1 className={styles['note-doc__title']}><ReactMarkdown>{note.title}</ReactMarkdown></h1>
         <div className={styles['note-doc__actions']}>
           <button
             className={`${styles['note-doc__btn']} ${styles['note-doc__btn--ghost']}`}
@@ -125,7 +178,9 @@ const NoteDocument = ({ note, onEdit, onDelete, onDownload, onPin, onCopy, isCop
             <span className={styles['note-doc__section-icon']} aria-hidden="true">≡</span>
             Summary
           </h2>
-          <p className={styles['note-doc__summary-text']}>{note.summary}</p>
+          <div className={styles['note-doc__summary-text']}>
+            <StyledSummary content={note.summary} />
+          </div>
         </section>
 
         {keyPoints.length > 0 && (
@@ -138,7 +193,7 @@ const NoteDocument = ({ note, onEdit, onDelete, onDownload, onPin, onCopy, isCop
               {keyPoints.map((pt, i) => (
                 <li key={i} className={styles['note-doc__keypoint']}>
                   <span className={styles['note-doc__keypoint-num']} aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
-                  <span>{pt}</span>
+                  <ReactMarkdown>{pt}</ReactMarkdown>
                 </li>
               ))}
             </ul>
@@ -201,7 +256,7 @@ const NoteInputForm = ({ content, onChange, onSubmit, loading, editId, onCancelE
 )
 
 /* ═══════════════════════════════════════════════════════════════
-   MAIN COMPONENT
+  MAIN COMPONENT
 ═══════════════════════════════════════════════════════════════ */
 const Notes = () => {
   const [isCopied, setIsCopied] = useState(false)
@@ -219,6 +274,7 @@ const Notes = () => {
   const [generatedIds, setGeneratedIds] = useState(new Set())
   const [toast, setToast] = useState(null)
   const [panelView, setPanelView] = useState('welcome')
+  const noteDocRef = useRef(null)
 
   const inputRef = useRef(null)
   const token = localStorage.getItem("token")
@@ -330,9 +386,41 @@ const Notes = () => {
     setPanelView(activeNoteId ? 'note' : 'welcome')
   }
 
+ 
   const handleCopy = async (note) => {
     try {
-      const text = `Title: ${note.title}\n\nSummary:\n${note.summary}\n\nKey Points:\n${Array.isArray(note.keyPoints) ? note.keyPoints.join('\n') : note.keyPoints}`
+      const stripMarkdown = (text) => {
+        if (!text) return ''
+        return text
+          .replace(/#{1,6}\s+/g, '')           // headings
+          .replace(/\*\*(.*?)\*\*/g, '$1')     // bold
+          .replace(/\*(.*?)\*/g, '$1')         // italic
+          .replace(/__(.*?)__/g, '$1')         // bold alt
+          .replace(/_(.*?)_/g, '$1')           // italic alt
+          .replace(/~~(.*?)~~/g, '$1')         // strikethrough
+          .replace(/`{1,3}[^`]*`{1,3}/g, '')  // code
+          .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // links → label only
+          .replace(/^[-*+]\s+/gm, '• ')       // bullets → •
+          .replace(/^\d+\.\s+/gm, '')         // numbered lists
+          .replace(/^>\s+/gm, '')             // blockquotes
+          .replace(/---+/g, '')               // hr
+          .replace(/<[^>]+>/g, '')            // html tags
+          .replace(/\n{3,}/g, '\n\n')         // excess newlines
+          .trim()
+      }
+
+      const keyPointsText = Array.isArray(note.keyPoints)
+        ? note.keyPoints.map((pt, i) => `${i + 1}. ${stripMarkdown(pt)}`).join('\n')
+        : stripMarkdown(note.keyPoints)
+
+      const text = [
+        stripMarkdown(note.title),
+        '',
+        'Summary:',
+        stripMarkdown(note.summary),
+        ...(keyPointsText ? ['\nKey Points:', keyPointsText] : [])
+      ].join('\n')
+
       await navigator.clipboard.writeText(text)
       setIsCopied(true)
       showToast("Copied to clipboard!")
@@ -342,29 +430,64 @@ const Notes = () => {
     }
   }
 
-  const handleDownload = (note) => {
-    const doc = new jsPDF()
-    const lines = [
-      `Title: ${note.title}`, '',
-      'Summary:', note.summary, '',
-      'Key Points:',
-      ...(Array.isArray(note.keyPoints) ? note.keyPoints : [note.keyPoints])
-    ]
-    doc.setFont('helvetica', 'normal')
-    doc.setFontSize(12)
-    let y = 15
-    lines.forEach(line => {
-      const wrapped = doc.splitTextToSize(line, 180)
-      doc.text(wrapped, 15, y)
-      y += wrapped.length * 7 + 2
-      if (y > 270) { doc.addPage(); y = 15 }
-    })
-    doc.save(`${note.title}.pdf`)
-    showToast("PDF downloaded!")
+  const handleDownload = async (note) => {
+    const element = noteDocRef.current
+    if (!element) return showToast("Nothing to export", 'error')
+
+    showToast("Generating PDF…")
+
+    try {
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: null,
+        windowWidth: element.scrollWidth,
+        windowHeight: element.scrollHeight,
+      })
+
+      const imgData = canvas.toDataURL('image/png')
+      const { jsPDF } = await import('jspdf')
+
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4',
+      })
+
+      const pageWidth = pdf.internal.pageSize.getWidth()   // 210mm
+      const pageHeight = pdf.internal.pageSize.getHeight() // 297mm
+
+      const imgWidthPx = canvas.width
+      const imgHeightPx = canvas.height
+
+      // scale image to fit page width
+      const ratio = pageWidth / imgWidthPx
+      const imgHeightMm = imgHeightPx * ratio
+
+      let yOffset = 0
+
+      // paginate if content taller than one page
+      while (yOffset < imgHeightMm) {
+        if (yOffset > 0) pdf.addPage()
+        pdf.addImage(
+          imgData, 'PNG',
+          0, -yOffset,           // shift up for each page
+          pageWidth, imgHeightMm
+        )
+        yOffset += pageHeight
+      }
+
+      pdf.save(`${note.title.replace(/\*\*/g, '')}.pdf`)
+      showToast("PDF downloaded!")
+    } catch (err) {
+      console.error(err)
+      showToast("PDF export failed", 'error')
+    }
   }
 
   const tooglePin = async (note) => {
-    const newPinned = !note.isPinned
+    const newPinned = !(note.isPinned)
+    
     try {
       const res = await fetch(`${BASE_URL}/api/notes/${note._id}/pin`, {
         method: "PATCH",
@@ -373,11 +496,11 @@ const Notes = () => {
       })
       if (!res.ok) throw new Error(res.statusText)
       const result = await res.json()
-      setNotes(result.data)
       showToast(newPinned ? "Note pinned!" : "Note unpinned")
       if (summaryData && summaryData._id === note._id) {
         setSummaryData(prev => ({ ...prev, isPinned: newPinned }))
       }
+      fetchNotes()
     } catch (err) {
       showToast("Pin toggle failed", 'error')
     }
@@ -458,7 +581,9 @@ const Notes = () => {
                 aria-current={activeNoteId === note._id ? 'true' : undefined}
               >
                 <span className={styles['notes-sidebar__item-icon']} aria-hidden="true">📄</span>
-                <span className={styles['notes-sidebar__item-title']}>{note.title}</span>
+                <span className={styles['notes-sidebar__item-title']}>
+                  {note.title.replace(/\*\*/g, '')}
+                </span>
               </button>
             ))}
           </div>
@@ -512,6 +637,7 @@ const Notes = () => {
             onPin={tooglePin}
             onCopy={handleCopy}
             isCopied={isCopied}
+            docRef={noteDocRef}
           />
         )}
 

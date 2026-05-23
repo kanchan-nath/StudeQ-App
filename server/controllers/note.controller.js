@@ -2,6 +2,12 @@ import { asyncHandler } from "../utils/asyncHandler.js"
 import { ApiError, ApiResponse } from "../utils/Async.js"
 import { summarizeText } from "../lib/groq/summarizer.js"
 import { Note } from "../models/note.model.js"
+import {AIResponseQueue} from "../services/queue.js"
+
+const titleExtract = (markdownResponse) => {
+    const match = markdownResponse.match(/##\s+Topic\s*\n+(.+)/);
+    return match ? match[1].trim() : "Summary";
+};
 
 const createNote = asyncHandler(async (req, res) => {
     const { content } = req.body
@@ -11,19 +17,26 @@ const createNote = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Content is required")
     }
 
-    const result = await summarizeText(content)
+    // const result = await summarizeText(content)
+    const result = true
 
-    if (!result) {
-        throw new ApiError(400, "Something went wrong, Try again !")
+    const title = await titleExtract(result)
+
+    if (result) {
+        // throw new ApiError(400, "Something went wrong, Try again !")
+        await AIResponseQueue(content)
+        
+        return res
+        .status(200)
+        .json(new ApiResponse(200, {}, "retrying"))
+
     }
-
-    const { title, summary, keyPoints } = result
 
     const data = await Note.create({
         userId,
         title,
-        summary,
-        keyPoints
+        content,
+        summary: result,
     })
     return res
         .status(200)
@@ -36,7 +49,7 @@ const getNote = asyncHandler(async (req, res) => {
 
     const allNotes = await Note.find({
         userId: userId
-    })
+    }).sort({isPinned:-1})
 
     return res
         .status(200)
@@ -101,33 +114,26 @@ const updateNote = asyncHandler(async (req, res) => {
 
 })
 
-const tooglePin = asyncHandler(async(req, res)=>{
-    const {isPinned} =  req.body
+const tooglePin = asyncHandler(async (req, res) => {
+    const { newPinned } = req.body
+    
+    const { id } = req.params
 
-    const {id} = req.params
-
-    const userId= req.user.id
+    const userId = req.user.id
 
     await Note.findOneAndUpdate(
         {
             userId,
-            _id:id
+            _id: id
         },
         {
-            isPinned
+            isPinned: newPinned
         }
     )
-    const sortQuery = isPinned ? { isPinned: -1, createdAt: -1 } : { createdAt: -1 };
 
-    const data = await Note.find(
-        {
-            userId
-        }
-    ).sort(sortQuery)
-    
     return res
-    .status(200)
-    .json(new ApiResponse(200, data, "pin successful"))
+        .status(200)
+        .json(new ApiResponse(200, {}, "pin successful"))
 })
 export {
     createNote,

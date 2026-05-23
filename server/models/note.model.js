@@ -15,9 +15,6 @@ const noteSchema = new mongoose.Schema({
     summary:{
         type: String
     },
-    keyPoints:{
-        type: [String]
-    },
     isPinned:{
         type :Boolean,
         default:false
