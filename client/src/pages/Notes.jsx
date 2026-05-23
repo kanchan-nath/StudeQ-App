@@ -386,9 +386,41 @@ const Notes = () => {
     setPanelView(activeNoteId ? 'note' : 'welcome')
   }
 
+ 
   const handleCopy = async (note) => {
     try {
-      const text = `Title: ${note.title}\n\nSummary:\n${note.summary}\n\nKey Points:\n${Array.isArray(note.keyPoints) ? note.keyPoints.join('\n') : note.keyPoints}`
+      const stripMarkdown = (text) => {
+        if (!text) return ''
+        return text
+          .replace(/#{1,6}\s+/g, '')           // headings
+          .replace(/\*\*(.*?)\*\*/g, '$1')     // bold
+          .replace(/\*(.*?)\*/g, '$1')         // italic
+          .replace(/__(.*?)__/g, '$1')         // bold alt
+          .replace(/_(.*?)_/g, '$1')           // italic alt
+          .replace(/~~(.*?)~~/g, '$1')         // strikethrough
+          .replace(/`{1,3}[^`]*`{1,3}/g, '')  // code
+          .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // links → label only
+          .replace(/^[-*+]\s+/gm, '• ')       // bullets → •
+          .replace(/^\d+\.\s+/gm, '')         // numbered lists
+          .replace(/^>\s+/gm, '')             // blockquotes
+          .replace(/---+/g, '')               // hr
+          .replace(/<[^>]+>/g, '')            // html tags
+          .replace(/\n{3,}/g, '\n\n')         // excess newlines
+          .trim()
+      }
+
+      const keyPointsText = Array.isArray(note.keyPoints)
+        ? note.keyPoints.map((pt, i) => `${i + 1}. ${stripMarkdown(pt)}`).join('\n')
+        : stripMarkdown(note.keyPoints)
+
+      const text = [
+        stripMarkdown(note.title),
+        '',
+        'Summary:',
+        stripMarkdown(note.summary),
+        ...(keyPointsText ? ['\nKey Points:', keyPointsText] : [])
+      ].join('\n')
+
       await navigator.clipboard.writeText(text)
       setIsCopied(true)
       showToast("Copied to clipboard!")
@@ -396,7 +428,6 @@ const Notes = () => {
     } catch (err) {
       showToast("Copy failed", 'error')
     }
-
   }
 
   const handleDownload = async (note) => {
