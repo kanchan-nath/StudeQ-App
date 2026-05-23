@@ -2,7 +2,7 @@ import { asyncHandler } from "../utils/asyncHandler.js"
 import { ApiError, ApiResponse } from "../utils/Async.js"
 import { summarizeText } from "../lib/groq/summarizer.js"
 import { Note } from "../models/note.model.js"
-
+import {AIResponseQueue} from "../services/queue.js"
 
 const titleExtract = (markdownResponse) => {
     const match = markdownResponse.match(/##\s+Topic\s*\n+(.+)/);
@@ -22,12 +22,16 @@ const createNote = asyncHandler(async (req, res) => {
     const title = await titleExtract(result)
 
     if (!result) {
-        throw new ApiError(400, "Something went wrong, Try again !")
+        // throw new ApiError(400, "Something went wrong, Try again !")
+        await AIResponseQueue(content)
+
+        
     }
 
     const data = await Note.create({
         userId,
         title,
+        content,
         summary: result,
     })
     return res
