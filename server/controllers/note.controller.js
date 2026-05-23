@@ -41,7 +41,7 @@ const getNote = asyncHandler(async (req, res) => {
 
     const allNotes = await Note.find({
         userId: userId
-    })
+    }).sort({isPinned:-1})
 
     return res
         .status(200)
@@ -107,8 +107,8 @@ const updateNote = asyncHandler(async (req, res) => {
 })
 
 const tooglePin = asyncHandler(async (req, res) => {
-    const { isPinned } = req.body
-
+    const { newPinned } = req.body
+    
     const { id } = req.params
 
     const userId = req.user.id
@@ -119,20 +119,13 @@ const tooglePin = asyncHandler(async (req, res) => {
             _id: id
         },
         {
-            isPinned
+            isPinned: newPinned
         }
     )
-    const sortQuery = isPinned ? { isPinned: -1, createdAt: -1 } : { createdAt: -1 };
-
-    const data = await Note.find(
-        {
-            userId
-        }
-    ).sort(sortQuery)
 
     return res
         .status(200)
-        .json(new ApiResponse(200, data, "pin successful"))
+        .json(new ApiResponse(200, {}, "pin successful"))
 })
 export {
     createNote,

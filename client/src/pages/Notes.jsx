@@ -486,7 +486,8 @@ const Notes = () => {
   }
 
   const tooglePin = async (note) => {
-    const newPinned = !note.isPinned
+    const newPinned = !(note.isPinned)
+    
     try {
       const res = await fetch(`${BASE_URL}/api/notes/${note._id}/pin`, {
         method: "PATCH",
@@ -495,11 +496,11 @@ const Notes = () => {
       })
       if (!res.ok) throw new Error(res.statusText)
       const result = await res.json()
-      setNotes(result.data)
       showToast(newPinned ? "Note pinned!" : "Note unpinned")
       if (summaryData && summaryData._id === note._id) {
         setSummaryData(prev => ({ ...prev, isPinned: newPinned }))
       }
+      fetchNotes()
     } catch (err) {
       showToast("Pin toggle failed", 'error')
     }
