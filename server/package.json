@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon index.js"
+    "dev": "nodemon index.js",
+    "dev-worker": "nodemon services/worker.js"
   },
   "keywords": [],
   "author": "KANCHAN NATH",

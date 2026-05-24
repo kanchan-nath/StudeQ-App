@@ -5,12 +5,13 @@ const connection = {
     port: 6379,
 }
 
-const AIResponseQueue = async (jobData) => {
-    const queue = new Queue("ai-response-handler", connection)
+const AIResponseQueue = async (userId, data) => {
+    const queue = new Queue("ai-response-handler", {connection})
     console.log('Queue created:', queue.name);
 
-    queue.add(queueName, jobData,{
-        delay: 5000,
+    const jobData = {userId, data}
+    await queue.add("ai-response-handler", jobData,{
+        // delay: 5000,
         backoff:{
             type:"exponential",
             delay: 1000,
@@ -19,7 +20,7 @@ const AIResponseQueue = async (jobData) => {
         removeOnFail:false
     })
 }
-AIResponseQueue("ai-response", {data:"Hello Z wrold"})
+// AIResponseQueue("ai-response", {data:"Hello Z wrold"})
 
 export {
     AIResponseQueue

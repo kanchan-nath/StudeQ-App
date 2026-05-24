@@ -17,21 +17,20 @@ const createNote = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Content is required")
     }
 
-    // const result = await summarizeText(content)
-    const result = true
+    const result = await summarizeText(content)
 
     const title = await titleExtract(result)
 
-    if (result) {
+    if (!result) {
         // throw new ApiError(400, "Something went wrong, Try again !")
-        await AIResponseQueue(content)
+        const response = await AIResponseQueue(userId, content)        
         
         return res
         .status(200)
         .json(new ApiResponse(200, {}, "retrying"))
 
     }
-
+    
     const data = await Note.create({
         userId,
         title,
@@ -140,5 +139,6 @@ export {
     getNote,
     deleteNote,
     updateNote,
-    tooglePin
+    tooglePin,
+    titleExtract
 }
