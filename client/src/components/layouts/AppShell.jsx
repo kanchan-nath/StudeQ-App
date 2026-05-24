@@ -16,6 +16,7 @@ import {
     CashbackIcon,
     StarsIcon
 } from "hugeicons-react"
+import { disConnectSocket } from '../../lib/socket.js'
 
 const NAV_MAIN = [
     { to: '/dashboard', label: 'Home', icon: Home03Icon, color: 'blue' },
@@ -53,6 +54,7 @@ const AppShell = ({ userName = '' }) => {
 
     const handleLogout = (e) => {
         e.preventDefault()
+        disConnectSocket()
         localStorage.removeItem('token')
         navigate('/login')
     }

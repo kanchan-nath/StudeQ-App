@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useSyncExternalStore } from 'react'
-import { socket } from "../lib/socket.js"
+import { getSocket } from "../lib/socket.js"
 import useUser from "../ContextApi/useUser.js"
 
 const RoomChat = () => {
@@ -9,6 +9,8 @@ const RoomChat = () => {
   const [joinUser, setJoinUser] = useState("")
   const name = user?.name?.toUpperCase()
   const roomId = "1"
+
+  const socket = getSocket()
 
   const handleChange = (e) => {
     setText(e.target.value)

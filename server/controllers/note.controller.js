@@ -18,13 +18,13 @@ const createNote = asyncHandler(async (req, res) => {
     }
 
     // const result = await summarizeText(content)
-    const result = true
+    const result = true // lets say for now llm failed first time to generate
 
-    const title = await titleExtract(result)
+    // const title = await titleExtract(result)
 
     if (result) {
         // throw new ApiError(400, "Something went wrong, Try again !")
-        await AIResponseQueue(content)
+        const response = await AIResponseQueue(userId, content)        
         
         return res
         .status(200)

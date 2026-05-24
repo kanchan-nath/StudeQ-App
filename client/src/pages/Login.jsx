@@ -3,6 +3,7 @@ import { useNavigate, Link } from "react-router-dom"
 import BASE_URL from "../lib/api.js"
 import { useState } from 'react'
 import styles from "../pages/styles/login.module.css"
+import { connectSocket } from '../lib/socket.js'
 
 const Login = () => {
 
@@ -43,6 +44,7 @@ const Login = () => {
       const token = data.data.accessToken
       localStorage.setItem("token", token)
       navigate("/dashboard")
+      connectSocket()
 
     } catch (error) {
       setError(setError(error) || "Something went wrong. Try again.")

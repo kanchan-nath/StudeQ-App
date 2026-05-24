@@ -14,7 +14,6 @@ const verifyClerkToken = asyncHandler(async(req, res, next)=>{
         }
 
         const decodedToken = await clerkClient.verifyClerkToken(token)
-        console.log(token);
         req.clerkUserId = decodedToken.sub
 
         next()

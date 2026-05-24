@@ -6,6 +6,7 @@ import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
 import html2canvas from 'html2canvas'
+import { getSocket, connectSocket } from "../lib/socket.js"
 
 const LLMMarkdown = ({ content }) => {
   return (
@@ -278,6 +279,18 @@ const Notes = () => {
 
   const inputRef = useRef(null)
   const token = localStorage.getItem("token")
+
+  useEffect(() => {
+    connectSocket()
+    const socket = getSocket()
+    if (!socket) return        // not connected yet, skip
+
+    socket.on("ai-response", (data) => {
+      console.log(data)
+    })
+
+    return () => socket.off("ai_response")
+  }, [])
 
   const showToast = (message, type = 'success') => {
     setToast({ message, type })

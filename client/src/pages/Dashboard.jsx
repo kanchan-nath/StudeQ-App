@@ -14,6 +14,7 @@ import {
   CpuChargeIcon,
   Calendar01Icon
 } from "hugeicons-react"
+
 const Dashboard = () => {
   const [activeNav, setActiveNav] = useState('home');
   const navigate = useNavigate()
