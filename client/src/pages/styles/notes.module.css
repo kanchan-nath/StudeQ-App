@@ -74,6 +74,7 @@
     overflow: hidden;
     background: var(--n-bg);
     animation: fadeIn var(--n-t-slow) both;
+    transition: grid-template-columns var(--n-t-base);
 }
 
 @keyframes fadeIn {
@@ -89,9 +90,19 @@
 }
 
 /* ── NOTES SIDEBAR (RIGHT) ───────────────────────────────────── */
-.notes-sidebar {
+.sidebar-wrapper {
+    position: relative;
+    display: flex;
     grid-column: 2;
     grid-row: 1;
+    overflow: hidden;
+}
+
+.notes-sidebar {
+    /* grid-column: 2; */
+    /* grid-row: 1; */
+    /* width: 220px; */
+    /* transition: width var(--n-t-base), opacity var(--n-t-base); */
     background: var(--n-surface);
     border-left: 1px solid var(--n-border);
     display: flex;
@@ -99,6 +110,48 @@
     overflow-y: auto;
     overflow-x: hidden;
     gap: 0;
+}
+
+/* .notes-sidebar--collapsed {
+    width: 0;
+    opacity: 0;
+    pointer-events: none;
+    border-left: none;
+    overflow: hidden;
+} */
+
+.sidebar-toggle {
+    width: 28px;
+    height: 28px;
+    background: var(--n-primary-light);
+    border: 1px solid var(--n-border);
+    border-radius: var(--n-r-sm);
+    color: var(--n-primary);
+    font-size: .85rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: background var(--n-t-fast), color var(--n-t-fast);
+    position: static;
+    transform: none;
+}
+
+.sidebar-toggle:hover {
+    background: var(--n-primary);
+    color: var(--n-text-inverse);
+}
+
+.sidebar-toggle__arrow {
+    font-size: .75rem;
+    font-weight: 700;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    color: inherit;
 }
 
 .notes-sidebar::-webkit-scrollbar {
