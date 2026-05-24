@@ -34,6 +34,7 @@ const LOADER_STATUSES = [
 ]
 
 export default function Quiz() {
+  const [sidebarOpen, setSidebarOpen] = useState(false)
   // ─── GLOBAL STATE ──────────────────────────────────────────────
   const [phase, setPhase] = useState(PHASE.HOME)
   const [method, setMethod] = useState(null)          // "materials" | "text"
@@ -238,41 +239,72 @@ export default function Quiz() {
 
       {/* ── HOME ─────────────────────────────────────────────────── */}
       {phase === PHASE.HOME && (
-        <div className={styles.homeScreen}>
-          <div className={styles.homeCenter}>
-            <div className={styles.homeIcon}>🧠</div>
-            <h1 className={styles.homeH1}>
-              Generate Quizzes from{" "}
-              <span className={styles.accent}>Any Material</span>
-            </h1>
-            <p className={styles.homeSub}>
-              Upload a document or type your content — AI crafts targeted quiz
-              questions in seconds.
-            </p>
-            <div className={styles.homeCards}>
-              <div
-                className={styles.homeCard}
-                onClick={() => { setMethod("materials"); setPhase(PHASE.STEP1) }}
-              >
-                <div className={styles.homeCardIcon}>📄</div>
-                <h3>Create from Materials</h3>
-                <p>Upload PDF, Word, PPT, or images</p>
-              </div>
-              <div
-                className={styles.homeCard}
-                onClick={() => { setMethod("text"); setPhase(PHASE.STEP1) }}
-              >
-                <div className={styles.homeCardIcon}>✏️</div>
-                <h3>Create from Text</h3>
-                <p>Paste or type your content directly</p>
+        <div className={styles.homeWrapper}>
+          {/* ── MAIN ── */}
+          <div className={`${styles.homeScreen} ${sidebarOpen ? styles.homeScreenShrunk : ""}`}>
+            <div className={styles.homeCenter}>
+              <div className={styles.homeIcon}>🧠</div>
+              <h1 className={styles.homeH1}>
+                Generate Quizzes from{" "}
+                <span className={styles.accent}>Any Material</span>
+              </h1>
+              <p className={styles.homeSub}>
+                Upload a document or type your content — AI crafts targeted quiz
+                questions in seconds.
+              </p>
+              <div className={styles.homeCards}>
+                <div
+                  className={styles.homeCard}
+                  onClick={() => { setMethod("materials"); setPhase(PHASE.STEP1) }}
+                >
+                  <div className={styles.homeCardIcon}>📄</div>
+                  <h3>Create from Materials</h3>
+                  <p>Upload PDF, Word, PPT, or images</p>
+                </div>
+                <div
+                  className={styles.homeCard}
+                  onClick={() => { setMethod("text"); setPhase(PHASE.STEP1) }}
+                >
+                  <div className={styles.homeCardIcon}>✏️</div>
+                  <h3>Create from Text</h3>
+                  <p>Paste or type your content directly</p>
+                </div>
               </div>
             </div>
+          </div>
+
+          {/* ── SIDEBAR ── */}
+          <div className={`${styles.historySidebar} ${sidebarOpen ? styles.sidebarOpen : styles.sidebarClosed}`}>
+            {/* Toggle arrow */}
             <button
-              className={styles.historyBtn}
-              onClick={() => setPhase(PHASE.HISTORY)}
+              className={styles.sidebarToggleBtn}
+              onClick={() => setSidebarOpen(o => !o)}
             >
-              🕓 View Quiz History ({allQuizzes.length})
+              {sidebarOpen ? "→" : "←"}
             </button>
+
+            {/* Content — only render when open */}
+            {sidebarOpen && (
+              <div className={styles.sidebarContent}>
+                <h3 className={styles.sidebarTitle}>🕓 Quiz History</h3>
+                {allQuizzes.length === 0 ? (
+                  <p className={styles.sidebarEmpty}>No quizzes yet.</p>
+                ) : (
+                  allQuizzes.map((q) => (
+                    <div
+                      key={q._id}
+                      className={styles.sidebarItem}
+                      onClick={() => startQuiz(q)}
+                    >
+                      <div className={styles.sidebarItemTitle}>{q.quiz?.title || "Untitled"}</div>
+                      <div className={styles.sidebarItemMeta}>
+                        {q.quiz?.totalQuestion} q · {new Date(q.createdAt).toLocaleDateString()}
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -449,30 +481,33 @@ export default function Quiz() {
                 sub="Select the types and quantities for your quiz"
               />
               {error && <p className={styles.errorMsg}>{error}</p>}
-              <div className={styles.totalBar}>
-                <span>Total: <strong className={styles.accent}>{totalQuestions}</strong> / 250</span>
-                <span className={styles.mutedText}>Max 200 per type</span>
-              </div>
-              <div className={styles.qtypeList}>
-                {QTYPES.map((qt, i) => (
-                  <div key={qt.id} className={styles.qtypeRow}>
-                    <div className={styles.qtypeIcon} style={{ background: qt.bg }}>{qt.icon}</div>
-                    <div className={styles.qtypeInfo}>
-                      <div className={styles.qtypeName}>{qt.name}</div>
-                      <div className={styles.qtypeDesc}>{qt.desc}</div>
+              <div style={{ flex: 1, overflowY: "auto", minHeight: 0 }}>
+
+                <div className={styles.totalBar}>
+                  <span>Total: <strong className={styles.accent}>{totalQuestions}</strong> / 250</span>
+                  <span className={styles.mutedText}>Max 200 per type</span>
+                </div>
+                <div className={styles.qtypeList}>
+                  {QTYPES.map((qt, i) => (
+                    <div key={qt.id} className={styles.qtypeRow}>
+                      <div className={styles.qtypeIcon} style={{ background: qt.bg }}>{qt.icon}</div>
+                      <div className={styles.qtypeInfo}>
+                        <div className={styles.qtypeName}>{qt.name}</div>
+                        <div className={styles.qtypeDesc}>{qt.desc}</div>
+                      </div>
+                      <div className={styles.counter}>
+                        <button className={styles.cntBtn} onClick={() => setTypeCounts(c => ({ ...c, [qt.id]: Math.max(0, c[qt.id] - 1) }))}>−</button>
+                        <input
+                          className={styles.cntVal}
+                          type="number" min="0" max="200"
+                          value={typeCounts[qt.id]}
+                          onChange={e => setTypeCounts(c => ({ ...c, [qt.id]: Math.min(200, Math.max(0, parseInt(e.target.value) || 0)) }))}
+                        />
+                        <button className={styles.cntBtn} onClick={() => setTypeCounts(c => ({ ...c, [qt.id]: Math.min(200, c[qt.id] + 1) }))}>+</button>
+                      </div>
                     </div>
-                    <div className={styles.counter}>
-                      <button className={styles.cntBtn} onClick={() => setTypeCounts(c => ({ ...c, [qt.id]: Math.max(0, c[qt.id] - 1) }))}>−</button>
-                      <input
-                        className={styles.cntVal}
-                        type="number" min="0" max="200"
-                        value={typeCounts[qt.id]}
-                        onChange={e => setTypeCounts(c => ({ ...c, [qt.id]: Math.min(200, Math.max(0, parseInt(e.target.value) || 0)) }))}
-                      />
-                      <button className={styles.cntBtn} onClick={() => setTypeCounts(c => ({ ...c, [qt.id]: Math.min(200, c[qt.id] + 1) }))}>+</button>
-                    </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             </div>
             <div className={styles.splitRight}>
@@ -530,13 +565,22 @@ export default function Quiz() {
 
         return (
           <div className={styles.quizScreen}>
+            <div style={{ height: 56, background: "#fff", borderBottom: "1px solid #e2e5ef", display: "flex", alignItems: "center", padding: "0 24px", position: "sticky", top: 0, zIndex: 100 }}>
+              <div style={{ width: 32, height: 32, background: "linear-gradient(135deg,#f59e0b,#f97316)", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16 }}>📋</div>
+              <span style={{ fontWeight: 600, fontSize: 15, marginLeft: 12 }}>Quiz Results</span>
+              <button onClick={() => setPhase(PHASE.HOME)} style={{ marginLeft: "auto", border: "1px solid #e2e5ef", background: "none", padding: "6px 14px", borderRadius: 8, fontSize: 13, color: "#5a6080", cursor: "pointer" }}>
+                ✕ Exit
+              </button>
+            </div>
             <div className={styles.quizTopbar}>
+
               <span className={styles.quizTitleBar}>{quizData.quiz?.title || "Quiz"}</span>
               <div className={styles.quizProgress}>
                 <div className={styles.quizProgressFill} style={{ width: `${((currentQ + 1) / total) * 100}%` }} />
               </div>
               <span className={styles.quizQnum}>{currentQ + 1} / {total}</span>
               <div className={styles.quizTimer}>⏱ {fmtTime(elapsedSec)}</div>
+
             </div>
             <div className={styles.quizBody}>
               <p className={styles.quizQText}>{q.question}</p>
@@ -573,38 +617,7 @@ export default function Quiz() {
       })()}
 
       {/* ── HISTORY ──────────────────────────────────────────────── */}
-      {phase === PHASE.HISTORY && (
-        <div className={styles.homeScreen}>
-          <div className={styles.homeCenter}>
-            <button onClick={() => setPhase(PHASE.HOME)} style={{ marginBottom: 16, background: "none", border: "1px solid #e2e5ef", borderRadius: 8, padding: "8px 16px", cursor: "pointer", color: "#5a6080" }}>
-              ← Back
-            </button>
-            <h2 style={{ marginBottom: 24 }}>🕓 Quiz History</h2>
 
-            {allQuizzes.length === 0 ? (
-              <p style={{ color: "#9298b0" }}>No quizzes yet. Create one to get started!</p>
-            ) : (
-              <div style={{ display: "flex", flexDirection: "column", gap: 12, width: "100%", maxWidth: 600 }}>
-                {allQuizzes.map((q) => (
-                  <div
-                    key={q._id}
-                    onClick={() => startQuiz(q)}
-                    style={{ background: "#fff", border: "1.5px solid #e2e5ef", borderRadius: 12, padding: "16px 20px", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}
-                  >
-                    <div>
-                      <div style={{ fontWeight: 600, marginBottom: 4 }}>{q.quiz?.title || "Untitled"}</div>
-                      <div style={{ fontSize: 13, color: "#9298b0" }}>
-                        {q.quiz?.totalQuestion} questions · {new Date(q.createdAt).toLocaleDateString()}
-                      </div>
-                    </div>
-                    <span style={{ fontSize: 20 }}>→</span>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-      )}
 
       {/* ── RESULTS ──────────────────────────────────────────────── */}
       {phase === PHASE.RESULTS && quizData && (() => {
@@ -620,9 +633,16 @@ export default function Quiz() {
 
         return (
           <div className={styles.resultsScreen}>
+            <div style={{ height: 56, background: "#fff", borderBottom: "1px solid #e2e5ef", display: "flex", alignItems: "center", padding: "0 24px", position: "sticky", top: 0, zIndex: 100 }}>
+              <div style={{ width: 32, height: 32, background: "linear-gradient(135deg,#f59e0b,#f97316)", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16 }}>📋</div>
+              <span style={{ fontWeight: 600, fontSize: 15, marginLeft: 12 }}>Quiz Results</span>
+              <button onClick={() => setPhase(PHASE.HOME)} style={{ marginLeft: "auto", border: "1px solid #e2e5ef", background: "none", padding: "6px 14px", borderRadius: 8, fontSize: 13, color: "#5a6080", cursor: "pointer" }}>
+                ✕ Exit
+              </button>
+            </div>
             <div className={styles.resultsTop}>
               <div className={styles.scoreRing}>
-                <svg width="120" height="120" viewBox="0 0 120 120" style={{ transform: "rotate(-90deg)" }}>
+                <svg width="90" height="90" viewBox="0 0 120 120" style={{ transform: "rotate(-90deg)" }}>
                   <circle cx="60" cy="60" r="52" fill="none" stroke="#e2e5ef" strokeWidth="10" />
                   <circle
                     cx="60" cy="60" r="52" fill="none"
