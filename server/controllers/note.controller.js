@@ -17,12 +17,11 @@ const createNote = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Content is required")
     }
 
-    // const result = await summarizeText(content)
-    const result = true // lets say for now llm failed first time to generate
+    const result = await summarizeText(content)
 
-    // const title = await titleExtract(result)
+    const title = await titleExtract(result)
 
-    if (result) {
+    if (!result) {
         // throw new ApiError(400, "Something went wrong, Try again !")
         const response = await AIResponseQueue(userId, content)        
         
@@ -31,7 +30,7 @@ const createNote = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, {}, "retrying"))
 
     }
-
+    
     const data = await Note.create({
         userId,
         title,
@@ -140,5 +139,6 @@ export {
     getNote,
     deleteNote,
     updateNote,
-    tooglePin
+    tooglePin,
+    titleExtract
 }

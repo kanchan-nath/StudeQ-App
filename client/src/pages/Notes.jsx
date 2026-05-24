@@ -283,10 +283,16 @@ const Notes = () => {
   useEffect(() => {
     connectSocket()
     const socket = getSocket()
-    if (!socket) return        // not connected yet, skip
+    if (!socket) return        
 
-    socket.on("ai-response", (data) => {
-      console.log(data)
+    socket.on("ai-response", (data) => {      
+      const { title, summary, keyPoints, _id, isPinned } = data
+      setSummaryData({ title, summary, keyPoints, _id, isPinned })
+      setActiveNoteId(_id)
+      setGeneratedIds(prev => new Set(prev).add(_id))
+      showToast("Note created!")
+      fetchNotes()
+      setPanelView('note')
     })
 
     return () => socket.off("ai_response")
@@ -332,7 +338,7 @@ const Notes = () => {
         })
         if (!res.ok) throw new Error("Summarisation failed. Try again.")
         const data = await res.json()
-        const { title, summary, keyPoints, _id, isPinned } = data.data
+        const { title, summary, keyPoints, _id, isPinned } = data.data        
 
         setSummaryData({ title, summary, keyPoints, _id, isPinned })
         setActiveNoteId(_id)

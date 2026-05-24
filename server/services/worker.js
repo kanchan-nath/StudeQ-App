@@ -1,21 +1,24 @@
 import { Worker } from "bullmq";
 import { summarizeText } from "../lib/groq/summarizer.js"
+import { Note } from "../models/note.model.js";
 
 console.log("Worker started, listening on PORT 6379");
 
 const connection = {
-    host:"localhost",
-    port:6379
+    host: "localhost",
+    port: 6379
 }
-const processJob = async (job)=>{
-    const {data, userId} = job.data
-    const result = await summarizeText(data)  
+const processJob = async (job) => {
+    const { data, userId } = job.data
+    const result = await summarizeText(data)
+
+    const content = job.data.data
     
-    return {result, userId}
-    
+    return { result, userId,content }
+
 }
 
-const AIResponseQueueWorker = new Worker("ai-response-handler", processJob, {connection})
+const AIResponseQueueWorker = new Worker("ai-response-handler", processJob, { connection })
 
 
 AIResponseQueueWorker.on('active', (job) => {
