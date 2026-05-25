@@ -1240,7 +1240,7 @@ const Flashcards = () => {
   }, []);
 
   const navigateTo = (view) => setCurrentView(view);
-  const exitToViewer = () => setCurrentView(VIEW.VIEWER);
+  const exitToViewer = () => setCurrentView(VIEW.HOME);
 
   return (
     <div className={styles.appShell}>
