@@ -69,6 +69,95 @@
 
 /* ── App Shell ───────────────────────────────────────────────────────────── */
 /* height:100% fills AppShell main-content slot exactly; overflow:hidden kills page scroll */
+
+/* ── Flashcard Homepage ──────────────────────────────────────────────────── */
+.flashHomeWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  padding: 60px 24px;
+  text-align: center;
+  min-height: 100%;
+}
+
+.flashHomeIcon {
+  font-size: 3.5rem;
+  width: 80px;
+  height: 80px;
+  background: var(--accent);
+  border-radius: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 28px;
+}
+
+.flashHomeHeading {
+  font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 0 0 14px;
+  letter-spacing: -0.03em;
+  max-width: 600px;
+}
+
+.flashHomeSub {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  margin: 0 0 40px;
+  max-width: 480px;
+  line-height: 1.6;
+}
+
+.flashHomeCard {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 28px 36px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: all var(--transition-mid);
+  text-align: left;
+  max-width: 480px;
+  width: 100%;
+}
+
+.flashHomeCard:hover {
+  border-color: var(--accent);
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-4px);
+}
+
+.flashHomeCardIcon {
+  width: 52px;
+  height: 52px;
+  background: var(--accent-light);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.flashHomeCardTitle {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 4px;
+}
+
+.flashHomeCardSub {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
 .appShell {
   display: flex;
   flex-direction: row;
@@ -637,11 +726,9 @@
 
 .cardBack {
   transform: rotateX(180deg);
-  background: linear-gradient(
-    135deg,
-    var(--bg-card) 0%,
-    var(--accent-light) 100%
-  );
+  background: linear-gradient(135deg,
+      var(--bg-card) 0%,
+      var(--accent-light) 100%);
 }
 
 .cardText {

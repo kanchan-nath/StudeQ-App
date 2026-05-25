@@ -6,6 +6,9 @@
 -  feature 1: When paste the text - also paste as copied format to input box.
 -  feature 2:
 
+### [Quiz.jsx]
+- 1. npx prettier --write src/
+
 ### [RAG Pipeline]:
 - 1. where the answer come from ref to the doc, mark/highlight
 - 2. store all your prompt in versioned system config files 

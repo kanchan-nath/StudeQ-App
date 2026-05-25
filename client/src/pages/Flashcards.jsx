@@ -448,6 +448,7 @@ const IconNote = () => (
 );
 
 const VIEW = {
+  HOME: "home", 
   VIEWER: "viewer",
   CREATE_STEP1: "create_step1",
   CREATE_STEP2_TOPIC: "create_step2_topic",
@@ -1106,6 +1107,30 @@ const CreateStep2PDF = ({ onBack, onExit, onPdfSubmit }) => {
   );
 };
 
+const FlashcardHome = ({ onNavigate }) => (
+  <div className={styles.flashHomeWrapper}>
+    <div className={styles.flashHomeIcon}>🃏</div>
+    <h1 className={styles.flashHomeHeading}>
+      Build Flashcards from <span className={styles.accent}>Any Material</span>
+    </h1>
+    <p className={styles.flashHomeSub}>
+      Upload a PDF, enter a topic, or build manually — AI generates your study set in seconds.
+    </p>
+    <button
+      className={styles.flashHomeCard}
+      onClick={() => onNavigate(VIEW.CREATE_STEP1)}
+    >
+      <div className={styles.flashHomeCardIcon}>
+        <IconFlash />
+      </div>
+      <div>
+        <p className={styles.flashHomeCardTitle}>Create Your Flashcards</p>
+        <p className={styles.flashHomeCardSub}>Upload PDF, enter a topic, or build from scratch</p>
+      </div>
+    </button>
+  </div>
+);
+
 // ─── Main Component ───────────────────────────────────────────────────────────
 const Flashcards = () => {
   const [pdfFilePath, setPdfFilePath] = useState("");
@@ -1115,7 +1140,7 @@ const Flashcards = () => {
   const [loading, setLoading] = useState(false);
   const [inputResult, setInputResult] = useState({});
   const [allFlashcards, setAllFlashcards] = useState([]);
-  const [currentView, setCurrentView] = useState(VIEW.VIEWER);
+  const [currentView, setCurrentView] = useState(VIEW.HOME);
   const [selectedSet, setSelectedSet] = useState(null);
 
   const inputRef = useRef(null);
@@ -1226,6 +1251,9 @@ const Flashcards = () => {
             allFlashcards={selectedSet ? [selectedSet] : allFlashcards}
             onNavigate={navigateTo}
           />
+        )}
+        {currentView === VIEW.HOME && (
+          <FlashcardHome onNavigate={navigateTo} />
         )}
         {currentView === VIEW.CREATE_STEP1 && (
           <CreateStep1
