@@ -1,93 +1,92 @@
-import React, { useEffect } from 'react'
-import { useNavigate, Link } from "react-router-dom"
-import BASE_URL from "../lib/api.js"
-import { useState } from 'react'
-import styles from "../pages/styles/login.module.css"
-import { connectSocket } from '../lib/socket.js'
+import React, { useEffect } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import BASE_URL from "../lib/api.js";
+import { useState } from "react";
+import styles from "../pages/styles/login.module.css";
+import { connectSocket } from "../lib/socket.js";
 
 const Login = () => {
-
-  const navigate = useNavigate()
-  const [showPassword, setShowPassword] = useState(false)
+  const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
-  })
-  const [error, setError] = useState("")
-  const [loading, setLoading] = useState(false)
-  const [redirecting, setRedirecting] = useState(false)
+  });
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [redirecting, setRedirecting] = useState(false);
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value })
-  }
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    setError("")
-    setLoading(true)
+    e.preventDefault();
+    setError("");
+    setLoading(true);
 
     try {
       const res = await fetch(`${BASE_URL}/api/auth/login`, {
         method: "POST",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData)
-      })
+        body: JSON.stringify(formData),
+      });
 
       if (!res.ok) {
-        const data = await res.json()
-        return setError(data.message || "Login failed")
+        const data = await res.json();
+        return setError(data.message || "Login failed");
       }
 
-      const data = await res.json()
-      const token = data.data.accessToken
-      localStorage.setItem("token", token)
-      navigate("/dashboard")
-      connectSocket()
-
+      const data = await res.json();
+      const token = data.data.accessToken;
+      localStorage.setItem("token", token);
+      navigate("/dashboard");
+      connectSocket();
     } catch (error) {
-      setError(setError(error) || "Something went wrong. Try again.")
+      setError(setError(error) || "Something went wrong. Try again.");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
-
+  };
 
   useEffect(() => {
-    const token = localStorage.getItem("token")
+    const token = localStorage.getItem("token");
 
     if (token) {
-      setRedirecting(true)
+      setRedirecting(true);
 
-      setTimeout(() => navigate("/dashboard"), 6000)
+      setTimeout(() => navigate("/dashboard"), 6000);
     }
-  }, [])
+  }, []);
   return (
     <>
       {redirecting && (
-        <div className={styles['auth-toast']}>
-          <span className={styles['auth-toast-text']}>✓ Already logged in — Redirecting to Dashboard…</span>
-          <div className={styles['auth-toast-bar']} />
+        <div className={styles["auth-toast"]}>
+          <span className={styles["auth-toast-text"]}>
+            ✓ Already logged in — Redirecting to Dashboard…
+          </span>
+          <div className={styles["auth-toast-bar"]} />
         </div>
       )}
-      <div className={styles['auth-root']}>
-
+      <div className={styles["auth-root"]}>
         {/* ── LEFT PANEL ── */}
-        <div className={styles['auth-left']}>
-          <header className={styles['auth-header']}>
-            <div className={styles['auth-logo']}>
-              <span className={styles['auth-logo-icon']}>✦</span>
-              <span className={styles['auth-logo-text']}>StudyFlow</span>
+        <div className={styles["auth-left"]}>
+          <header className={styles["auth-header"]}>
+            <div className={styles["auth-logo"]}>
+              <span className={styles["auth-logo-icon"]}>✦</span>
+              <span className={styles["auth-logo-text"]}>StudyFlow</span>
             </div>
           </header>
 
-          <main className={styles['auth-form-wrapper']}>
-            <div className={styles['auth-form-container']}>
-
-              <div className={styles['auth-heading-group']}>
-                <h1 className={styles['auth-title']}>Welcome back</h1>
-                <p className={styles['auth-subtitle']}>Your launchpad to learn</p>
+          <main className={styles["auth-form-wrapper"]}>
+            <div className={styles["auth-form-container"]}>
+              <div className={styles["auth-heading-group"]}>
+                <h1 className={styles["auth-title"]}>Welcome back</h1>
+                <p className={styles["auth-subtitle"]}>
+                  Your launchpad to learn
+                </p>
               </div>
 
               {/* Social buttons */}
@@ -109,30 +108,54 @@ const Login = () => {
                 </button>
               </div> */}
 
-              <div className={styles['auth-divider']}>
-                <span className={styles['auth-divider-text']}>or</span>
+              <div className={styles["auth-divider"]}>
+                <span className={styles["auth-divider-text"]}>or</span>
               </div>
 
-              <form className={styles['auth-form']} onSubmit={handleSubmit}>
+              <form
+                className={styles["auth-form"]}
+                onSubmit={handleSubmit}
+              >
                 {error && (
-                  <div className={styles['auth-error']} role="alert">
-                    <span className={styles['auth-error-icon']}>!</span>
-                    <p className={styles['auth-error-text']}>{error}</p>
+                  <div
+                    className={styles["auth-error"]}
+                    role="alert"
+                  >
+                    <span className={styles["auth-error-icon"]}>!</span>
+                    <p className={styles["auth-error-text"]}>{error}</p>
                   </div>
                 )}
 
                 {/* Email */}
-                <div className={styles['auth-field-group']}>
-                  <label className={styles['auth-label']} htmlFor="email">Your Email</label>
-                  <div className={styles['auth-input-wrapper']}>
-                    <span className={styles['auth-input-icon']}>
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <rect x="2" y="4" width="20" height="16" rx="2" />
+                <div className={styles["auth-field-group"]}>
+                  <label
+                    className={styles["auth-label"]}
+                    htmlFor="email"
+                  >
+                    Your Email
+                  </label>
+                  <div className={styles["auth-input-wrapper"]}>
+                    <span className={styles["auth-input-icon"]}>
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                      >
+                        <rect
+                          x="2"
+                          y="4"
+                          width="20"
+                          height="16"
+                          rx="2"
+                        />
                         <path d="m2 7 10 7 10-7" />
                       </svg>
                     </span>
                     <input
-                      className={styles['auth-input']}
+                      className={styles["auth-input"]}
                       id="email"
                       name="email"
                       type="email"
@@ -146,17 +169,35 @@ const Login = () => {
                 </div>
 
                 {/* Password + eye toggle */}
-                <div className={styles['auth-field-group']}>
-                  <label className={styles['auth-label']} htmlFor="password">Your Password</label>
-                  <div className={styles['auth-input-wrapper']}>
-                    <span className={styles['auth-input-icon']}>
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <rect x="3" y="11" width="18" height="11" rx="2" />
+                <div className={styles["auth-field-group"]}>
+                  <label
+                    className={styles["auth-label"]}
+                    htmlFor="password"
+                  >
+                    Your Password
+                  </label>
+                  <div className={styles["auth-input-wrapper"]}>
+                    <span className={styles["auth-input-icon"]}>
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                      >
+                        <rect
+                          x="3"
+                          y="11"
+                          width="18"
+                          height="11"
+                          rx="2"
+                        />
                         <path d="M7 11V7a5 5 0 0 1 10 0v4" />
                       </svg>
                     </span>
                     <input
-                      className={`${styles['auth-input']} ${styles['auth-input--password']}`}
+                      className={`${styles["auth-input"]} ${styles["auth-input--password"]}`}
                       id="password"
                       name="password"
                       type={showPassword ? "text" : "password"}
@@ -168,20 +209,45 @@ const Login = () => {
                     />
                     <button
                       type="button"
-                      className={styles['auth-eye-btn']}
-                      onClick={() => setShowPassword(p => !p)}
-                      aria-label={showPassword ? "Hide password" : "Show password"}
+                      className={styles["auth-eye-btn"]}
+                      onClick={() => setShowPassword((p) => !p)}
+                      aria-label={
+                        showPassword ? "Hide password" : "Show password"
+                      }
                     >
                       {showPassword ? (
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <svg
+                          width="16"
+                          height="16"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                        >
                           <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" />
                           <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" />
-                          <line x1="1" y1="1" x2="23" y2="23" />
+                          <line
+                            x1="1"
+                            y1="1"
+                            x2="23"
+                            y2="23"
+                          />
                         </svg>
                       ) : (
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <svg
+                          width="16"
+                          height="16"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                        >
                           <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                          <circle cx="12" cy="12" r="3" />
+                          <circle
+                            cx="12"
+                            cy="12"
+                            r="3"
+                          />
                         </svg>
                       )}
                     </button>
@@ -189,19 +255,27 @@ const Login = () => {
                 </div>
 
                 <button
-                  className={styles['auth-submit-btn']}
+                  className={styles["auth-submit-btn"]}
                   type="submit"
                   disabled={loading}
                 >
                   {loading ? (
-                    <span className={styles['auth-btn-loading']}>
-                      <span className={styles['auth-spinner']} />
+                    <span className={styles["auth-btn-loading"]}>
+                      <span className={styles["auth-spinner"]} />
                       Redirecting…
                     </span>
                   ) : (
-                    <span className={styles['auth-btn-label']}>
+                    <span className={styles["auth-btn-label"]}>
                       Login
-                      <svg className={styles['auth-btn-arrow']} width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                      <svg
+                        className={styles["auth-btn-arrow"]}
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2.5"
+                      >
                         <path d="M5 12h14M12 5l7 7-7 7" />
                       </svg>
                     </span>
@@ -209,67 +283,120 @@ const Login = () => {
                 </button>
               </form>
 
-              <footer className={styles['auth-form-footer']}>
-                <p className={`${styles['auth-footer-text']} ${styles['auth-footer-terms']}`}>
+              <footer className={styles["auth-form-footer"]}>
+                <p
+                  className={`${styles["auth-footer-text"]} ${styles["auth-footer-terms"]}`}
+                >
                   By logging in, you agree to our{" "}
-                  <a className={styles['auth-link']} href="/terms">Terms of Service</a>
-                  {" "}and{" "}
-                  <a className={styles['auth-link']} href="/privacy">Privacy Policy</a>
+                  <a
+                    className={styles["auth-link"]}
+                    href="/terms"
+                  >
+                    Terms of Service
+                  </a>{" "}
+                  and{" "}
+                  <a
+                    className={styles["auth-link"]}
+                    href="/privacy"
+                  >
+                    Privacy Policy
+                  </a>
                 </p>
-                <p className={styles['auth-footer-text']}>
+                <p className={styles["auth-footer-text"]}>
                   Don't have an account?{" "}
-                  <Link className={styles['auth-link']} to="/register">Register</Link>
+                  <Link
+                    className={styles["auth-link"]}
+                    to="/register"
+                  >
+                    Register
+                  </Link>
                 </p>
-                <p className={styles['auth-footer-text']}>
+                <p className={styles["auth-footer-text"]}>
                   Forgot your password?{" "}
-                  <Link className={styles['auth-link']} to="/reset-password">Reset Password</Link>
+                  <Link
+                    className={styles["auth-link"]}
+                    to="/reset-password"
+                  >
+                    Reset Password
+                  </Link>
                 </p>
               </footer>
-
             </div>
           </main>
         </div>
 
         {/* ── RIGHT PANEL ── */}
-        <aside className={styles['auth-right']} aria-hidden="true">
-          <div className={styles['auth-right-inner']}>
-            <div className={styles['auth-stat-banner']}>
-              <span className={styles['auth-stat-number']}>92%</span>
-              <span className={styles['auth-stat-label']}>of students get higher grades with StudyFlow</span>
+        <aside
+          className={styles["auth-right"]}
+          aria-hidden="true"
+        >
+          <div className={styles["auth-right-inner"]}>
+            <div className={styles["auth-stat-banner"]}>
+              <span className={styles["auth-stat-number"]}>92%</span>
+              <span className={styles["auth-stat-label"]}>
+                of students get higher grades with StudyFlow
+              </span>
             </div>
 
-            <div className={styles['auth-showcase-card']}>
-              <div className={styles['auth-showcase-header']}>
-                <span className={styles['auth-showcase-tag']}>FEATURED</span>
-                <h3 className={styles['auth-showcase-title']}>AI-Powered Study Plans</h3>
+            <div className={styles["auth-showcase-card"]}>
+              <div className={styles["auth-showcase-header"]}>
+                <span className={styles["auth-showcase-tag"]}>FEATURED</span>
+                <h3 className={styles["auth-showcase-title"]}>
+                  AI-Powered Study Plans
+                </h3>
               </div>
-              <div className={styles['auth-showcase-grid']}>
-                <div className={`${styles['auth-showcase-item']} ${styles['auth-showcase-item--blue']}`}>Flashcards</div>
-                <div className={`${styles['auth-showcase-item']} ${styles['auth-showcase-item--purple']}`}>Practice Tests</div>
-                <div className={`${styles['auth-showcase-item']} ${styles['auth-showcase-item--teal']}`}>Live Tutoring</div>
-                <div className={`${styles['auth-showcase-item']} ${styles['auth-showcase-item--orange']}`}>AI Chat</div>
+              <div className={styles["auth-showcase-grid"]}>
+                <div
+                  className={`${styles["auth-showcase-item"]} ${styles["auth-showcase-item--blue"]}`}
+                >
+                  Flashcards
+                </div>
+                <div
+                  className={`${styles["auth-showcase-item"]} ${styles["auth-showcase-item--purple"]}`}
+                >
+                  Practice Tests
+                </div>
+                <div
+                  className={`${styles["auth-showcase-item"]} ${styles["auth-showcase-item--teal"]}`}
+                >
+                  Live Tutoring
+                </div>
+                <div
+                  className={`${styles["auth-showcase-item"]} ${styles["auth-showcase-item--orange"]}`}
+                >
+                  AI Chat
+                </div>
               </div>
             </div>
 
-            <div className={styles['auth-tagline']}>
-              <p className={styles['auth-tagline-main']}>Drop your class materials,<br />we'll make your study plan.</p>
-              <p className={styles['auth-tagline-sub']}>Trusted by students from top institutions</p>
-              <div className={styles['auth-trust-logos']}>
-                <span className={styles['auth-trust-logo']}>HARVARD</span>
-                <span className={`${styles['auth-trust-logo']} ${styles['auth-trust-logo--lg']}`}>Yale</span>
-                <span className={styles['auth-trust-logo']}>MIT</span>
+            <div className={styles["auth-tagline"]}>
+              <p className={styles["auth-tagline-main"]}>
+                Drop your class materials,
+                <br />
+                we'll make your study plan.
+              </p>
+              <p className={styles["auth-tagline-sub"]}>
+                Trusted by students from top institutions
+              </p>
+              <div className={styles["auth-trust-logos"]}>
+                <span className={styles["auth-trust-logo"]}>HARVARD</span>
+                <span
+                  className={`${styles["auth-trust-logo"]} ${styles["auth-trust-logo--lg"]}`}
+                >
+                  Yale
+                </span>
+                <span className={styles["auth-trust-logo"]}>MIT</span>
               </div>
             </div>
           </div>
 
-          <div className={`${styles['auth-blob']} ${styles['auth-blob--1']}`} />
-          <div className={`${styles['auth-blob']} ${styles['auth-blob--2']}`} />
-          <div className={`${styles['auth-blob']} ${styles['auth-blob--3']}`} />
+          <div className={`${styles["auth-blob"]} ${styles["auth-blob--1"]}`} />
+          <div className={`${styles["auth-blob"]} ${styles["auth-blob--2"]}`} />
+          <div className={`${styles["auth-blob"]} ${styles["auth-blob--3"]}`} />
         </aside>
-
       </div>
     </>
-  )
-}
+  );
+};
 
-export default Login
+export default Login;

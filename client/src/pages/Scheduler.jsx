@@ -1,222 +1,219 @@
-import React, { useEffect, useState } from 'react'
-import BASE_URL from "../lib/api.js"
+import React, { useEffect, useState } from "react";
+import BASE_URL from "../lib/api.js";
 const Scheduler = () => {
-    const [formData, setFormData] = useState({
-        subject: "",
-        topic: "",
-        schedulerDate: "",
-        duration: "",
-        completed: false
-    })
-    const [loading, setLoading] = useState(false)
-    const [formResult, setFormResult] = useState([])
-    const [formDataResult, setFormDataResult] = useState({})
-    const [isGenerate_AI_Study_Plan, setIsGenerate_AI_Study_Plan] = useState(false)
+  const [formData, setFormData] = useState({
+    subject: "",
+    topic: "",
+    schedulerDate: "",
+    duration: "",
+    completed: false,
+  });
+  const [loading, setLoading] = useState(false);
+  const [formResult, setFormResult] = useState([]);
+  const [formDataResult, setFormDataResult] = useState({});
+  const [isGenerate_AI_Study_Plan, setIsGenerate_AI_Study_Plan] =
+    useState(false);
 
-    const [studyPlanData, setStudyPlanData] = useState({
-        subjects: "",
-        hoursPerDay: "",
-        goalDate: ""
-    })
+  const [studyPlanData, setStudyPlanData] = useState({
+    subjects: "",
+    hoursPerDay: "",
+    goalDate: "",
+  });
 
-    const token = localStorage.getItem("token")
+  const token = localStorage.getItem("token");
 
-    const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value })
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    console.log("data:");
+
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const res = await fetch(`${BASE_URL}/api/scheduler`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await res.json();
+      setFormDataResult(data.data);
+
+      setFormData("");
+    } catch (error) {
+      throw new Error(`Scheduler creation problem ${error}`);
+    } finally {
+      setLoading(false);
     }
+  };
 
-    const handleSubmit = async (e) => {
-        console.log("data:");
+  const fetchData = async () => {
+    try {
+      const res = await fetch(`${BASE_URL}/api/scheduler`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-        e.preventDefault()
-        setLoading(true)
+      const data = await res.json();
 
-        try {
-            const res = await fetch(`${BASE_URL}/api/scheduler`,
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${token}`
-                    },
-                    body: JSON.stringify(formData)
-                }
-            )
-
-            const data = await res.json()
-            setFormDataResult(data.data)
-
-            setFormData("")
-
-        } catch (error) {
-            throw new Error(`Scheduler creation problem ${error}`)
-        } finally {
-            setLoading(false)
-        }
+      setFormResult(data.data);
+    } catch (error) {
+      console.error(error);
     }
+  };
 
-    const fetchData = async () => {
-        try {
-            const res = await fetch(`${BASE_URL}/api/scheduler`, {
-                method: "GET",
-                headers: {
+  const handleClickCompletedButton = async (e, schedulerId) => {
+    try {
+      setFormData({ ...formData, [e.target.name]: true });
+      console.log(schedulerId);
 
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
-                }
-            })
+      const res = await fetch(`${BASE_URL}/api/scheduler/${schedulerId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ completed: true }),
+      });
 
-            const data = await res.json()
-
-            setFormResult(data.data)
-
-        } catch (error) {
-            console.error(error)
-        }
+      const data = await res.json();
+      console.log(data);
+    } catch (error) {
+      console.error(error);
     }
+  };
 
-    const handleClickCompletedButton = async (e, schedulerId) => {
-        try {
-            setFormData({ ...formData, [e.target.name]: true })
-            console.log(schedulerId);
+  const handlebuttonGenerativeAI = async (e) => {
+    e.preventDefault();
+    setIsGenerate_AI_Study_Plan(true);
 
-            const res = await fetch(`${BASE_URL}/api/scheduler/${schedulerId}`, {
-                method: "PATCH",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
-                },
-                body: JSON.stringify({ completed: true })
-            })
-
-            const data = await res.json()
-            console.log(data);
-        } catch (error) {
-            console.error(error)
-        }
-
-
+    try {
+      const res = await fetch(`${BASE_URL}/api/scheduler/generate-plan`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(studyPlanData),
+      });
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsGenerate_AI_Study_Plan(false);
     }
+  };
 
-    const handlebuttonGenerativeAI = async (e) => {
-        e.preventDefault()
-        setIsGenerate_AI_Study_Plan(true)
+  useEffect(() => {
+    fetchData();
+  }, [formDataResult]);
 
-        try {
-            const res = await fetch(`${BASE_URL}/api/scheduler/generate-plan`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
-                },
-                body: JSON.stringify(studyPlanData)
-            })
-        } catch (error) {
-            console.error(error)
-        } finally {
-            setIsGenerate_AI_Study_Plan(false)
-        }
-    }
+  return (
+    <>
+      <div>
+        <form onSubmit={handleSubmit}>
+          <label htmlFor="subject">Subject: </label>
+          <input
+            type="text"
+            name="subject"
+            value={formData.subject}
+            onChange={handleChange}
+            required
+          />
 
-    useEffect(() => {
-        fetchData()
+          <label htmlFor="topic">Topic: </label>
+          <input
+            type="text"
+            name="topic"
+            value={formData.topic}
+            onChange={handleChange}
+            required
+          />
 
-    }, [formDataResult])
+          <label htmlFor="date">Date: </label>
+          <input
+            type="date"
+            name="schedulerDate"
+            value={formData.schedulerDate}
+            onChange={handleChange}
+            required
+          />
 
-    return (
+          <label htmlFor="duration">Duration: </label>
+          <input
+            type="text"
+            name="duration"
+            value={formData.duration}
+            onChange={handleChange}
+            required
+          />
+          <button disabled={loading}>Create Scheduler</button>
+        </form>
+      </div>
 
-        <>
-            <div>
-                <form onSubmit={handleSubmit}>
-                    <label htmlFor="subject">Subject: </label>
-                    <input
-                        type="text"
-                        name='subject'
-                        value={formData.subject}
-                        onChange={handleChange}
-                        required
-                    />
+      <div>
+        {formResult.map((item, index) => (
+          <div key={index}>
+            <p>Subject: {item.subject} </p>
+            <p>Topic: {item.topic}</p>
+            <p>Date: {new Date(item.schedulerDate).toLocaleDateString()}</p>
+            <p>Duration: {item.duration}</p>
+            <p>
+              Completed:{" "}
+              <button
+                name="completed"
+                onClick={(e) => handleClickCompletedButton(e, item._id)}
+              >
+                Done
+              </button>
+            </p>
+          </div>
+        ))}
+      </div>
 
-                    <label htmlFor="topic">Topic: </label>
-                    <input
-                        type="text"
-                        name='topic'
-                        value={formData.topic}
-                        onChange={handleChange}
-                        required
-                    />
+      <div>
+        {!isGenerate_AI_Study_Plan ? (
+          <button onClick={() => setIsGenerate_AI_Study_Plan(true)}>
+            Generate AI Study Plan
+          </button>
+        ) : (
+          <form onSubmit={handlebuttonGenerativeAI}>
+            <label htmlFor="subjects">Subjects: </label>
+            <input
+              type="text"
+              name="subjects"
+              required
+              onChange={handleChangeStudyPlan}
+            />
 
-                    <label htmlFor="date">Date: </label>
-                    <input
-                        type="date"
-                        name='schedulerDate'
-                        value={formData.schedulerDate}
-                        onChange={handleChange}
-                        required
-                    />
+            <label htmlFor="hoursPerDay">Hours Per Day: </label>
+            <input
+              type="number"
+              name="hoursPerDay"
+              required
+              onChange={handleChangeStudyPlan}
+            />
 
-                    <label htmlFor="duration">Duration: </label>
-                    <input
-                        type="text"
-                        name='duration'
-                        value={formData.duration}
-                        onChange={handleChange}
-                        required
-                    />
-                    <button disabled={loading}>
-                        Create Scheduler
-                    </button>
-                </form>
-            </div>
+            <label htmlFor="goalDate">Goal Date : </label>
+            <input
+              type="text"
+              name="goalDate"
+              required
+              onChange={handleChangeStudyPlan}
+            />
+          </form>
+        )}
+      </div>
+    </>
+  );
+};
 
-            <div>
-                {
-                    formResult.map((item, index) => (
-                        <div key={index}>
-                            <p>Subject: {item.subject} </p>
-                            <p>Topic: {item.topic}</p>
-                            <p>Date:  {new Date(item.schedulerDate).toLocaleDateString()}</p>
-                            <p>Duration: {item.duration}</p>
-                            <p>Completed: <button name='completed' onClick={(e) => handleClickCompletedButton(e, item._id)}>Done</button></p>
-                        </div>
-                    ))
-                }
-            </div>
-
-            <div>
-
-                {!isGenerate_AI_Study_Plan
-                    ? <button onClick={() => setIsGenerate_AI_Study_Plan(true)}>Generate AI Study Plan</button>
-                    : <form onSubmit={handlebuttonGenerativeAI}>
-                        <label htmlFor="subjects">Subjects: </label>
-                        <input
-                            type="text"
-                            name='subjects'
-                            required
-                            onChange={handleChangeStudyPlan}
-                        />
-
-                        <label htmlFor="hoursPerDay">Hours Per Day: </label>
-                        <input
-                            type="number"
-                            name='hoursPerDay'
-                            required
-                            onChange={handleChangeStudyPlan}
-                        />
-
-                        <label htmlFor="goalDate">Goal Date : </label>
-                        <input
-                            type="text"
-                            name='goalDate'
-                            required
-                            onChange={handleChangeStudyPlan}
-                        />
-                    </form>
-                }
-            </div>
-        </>
-
-    )
-}
-
-export default Scheduler
+export default Scheduler;
