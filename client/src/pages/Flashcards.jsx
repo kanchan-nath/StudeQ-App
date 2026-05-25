@@ -471,18 +471,11 @@ const RightSidebar = ({ activeView, onNavigate, allFlashcards, onSelectSet }) =>
 
       {sidebarOpen && (
         <div className={styles.sidebarContent}>
-          <button
-            className={styles.uploadBtn}
-            onClick={() => onNavigate(VIEW.CREATE_STEP1)}
-          >
-            <IconUpload />
-            <span>New Set</span>
-          </button>
 
-          <h3 className={styles.sidebarTitle}>🕓 Recent Sets</h3>
+          <h3 className={styles.sidebarTitle}>🕓 Recent Flashcards</h3>
 
           {allFlashcards.length === 0 ? (
-            <p className={styles.sidebarEmpty}>No sets yet.</p>
+            <p className={styles.sidebarEmpty}>No flashcards yet.</p>
           ) : (
             allFlashcards.map((set) => (
               <div
