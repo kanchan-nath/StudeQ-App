@@ -202,6 +202,24 @@ export default function Quiz() {
     setPhase(PHASE.QUIZ)
   }
 
+  const viewResult = async (doc) => {
+    try {
+      const res = await fetch(`${BASE_URL}/api/quiz/${doc._id}/result`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      const data = await res.json()
+      const saved = data.data[0]
+
+      setQuizData(saved)
+      setAnswers(saved.questions.map(q => q.userResponse ?? null))
+      setElapsedSec(0)
+      setReviewFilter("all")
+      setPhase(PHASE.RESULTS)
+    } catch (e) {
+      console.error("viewResult:", e)
+    }
+  }
+
   // ─── SUBMIT QUIZ ─────────────────────────────────────────────────
   const submitQuiz = async () => {
     clearInterval(timerRef.current)
@@ -286,7 +304,7 @@ export default function Quiz() {
                     <div
                       key={q._id}
                       className={styles.sidebarItem}
-                      onClick={() => startQuiz(q)}
+                      onClick={() => viewResult(q)}
                     >
                       <div className={styles.sidebarItemTitle}>{q.quiz?.title || "Untitled"}</div>
                       <div className={styles.sidebarItemMeta}>
@@ -629,7 +647,7 @@ export default function Quiz() {
               <div style={{ width: 32, height: 32, background: "linear-gradient(135deg,#f59e0b,#f97316)", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16 }}>📋</div>
               <span style={{ fontWeight: 600, fontSize: 15, marginLeft: 12 }}>Quiz Results</span>
               <button onClick={() => setPhase(PHASE.HOME)} style={{ marginLeft: "auto", border: "1px solid #e2e5ef", background: "none", padding: "6px 14px", borderRadius: 8, fontSize: 13, color: "#5a6080", cursor: "pointer" }}>
-                ✕ Exit 
+                ✕ Exit
               </button>
             </div>
             <div className={styles.resultsTop}>
@@ -688,10 +706,17 @@ export default function Quiz() {
               </div>
             </div>
             <div className={styles.resultActions}>
-              <button className={`${styles.btnAction} ${styles.btnPrimary}`} onClick={() => { setQuizData(null); setPhase(PHASE.STEP1) }}>
-                🔁 Retake / New Quiz
+              <button className={`${styles.btnAction} ${styles.btnPrimary}`} onClick={() => {
+                setAnswers(new Array(quizData.questions.length).fill(null))
+                setCurrentQ(0)
+                setElapsedSec(0)
+                setPhase(PHASE.QUIZ)
+              }}>
+                🔁 Retake This Quiz
               </button>
-              <button className={styles.btnAction} onClick={() => setPhase(PHASE.HOME)}>🏠 Home</button>
+              <button className={styles.btnAction} onClick={() => { setQuizData(null); setPhase(PHASE.STEP1) }}>
+                ➕ New Quiz
+              </button>
             </div>
           </div>
         )

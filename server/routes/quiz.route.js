@@ -6,6 +6,7 @@ import {
     submitQuizAnswers,
     deleteQuiz,
     generateQuizFromFiles,
+    getResult,
 
     generateFlashcards,
     getFlashcards,
@@ -30,7 +31,7 @@ router.route("/all").get(verifyJWT, getAllQuiz)
 router.route("/:id").get(verifyJWT, getQuizById)
 router.route("/:id/submit").patch(verifyJWT, submitQuizAnswers)
 router.route("/:id").delete(verifyJWT, deleteQuiz)
-
+router.route("/:id/result").get(verifyJWT, getResult)
 
 router.route("/flashcards").post(verifyJWT,
     upload.fields ([

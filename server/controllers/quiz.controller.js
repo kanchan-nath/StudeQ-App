@@ -243,6 +243,22 @@ const generateQuizFromFiles = asyncHandler(async (req, res) => {
         .json(new ApiResponse(201, quizDoc, "Quiz created from file"))
 })
 
+const getResult = asyncHandler(async(req, res)=>{
+    const {id} = req.params
+    const userId = req.user.id
+
+    if(!id){
+        throw new ApiError(404, "Quiz not found")
+    }
+
+    const data = await Quiz.find({_id:id})
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, data, "All results"))
+
+})
+
 
 const generateFlashcards = asyncHandler(async (req, res) => {
     const { topic, subject, flashcardId } = req.body
@@ -392,6 +408,7 @@ export {
     submitQuizAnswers,
     deleteQuiz,
     generateQuizFromFiles,
+    getResult,
 
     generateFlashcards,
     getFlashcards,
