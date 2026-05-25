@@ -258,16 +258,8 @@ export default function Quiz() {
                   onClick={() => { setMethod("materials"); setPhase(PHASE.STEP1) }}
                 >
                   <div className={styles.homeCardIcon}>📄</div>
-                  <h3>Create from Materials</h3>
-                  <p>Upload PDF, Word, PPT, or images</p>
-                </div>
-                <div
-                  className={styles.homeCard}
-                  onClick={() => { setMethod("text"); setPhase(PHASE.STEP1) }}
-                >
-                  <div className={styles.homeCardIcon}>✏️</div>
-                  <h3>Create from Text</h3>
-                  <p>Paste or type your content directly</p>
+                  <h3>Create Your Quizzes</h3>
+                  <p>Upload PDF, Word, PPT, or images or Text</p>
                 </div>
               </div>
             </div>
@@ -637,7 +629,7 @@ export default function Quiz() {
               <div style={{ width: 32, height: 32, background: "linear-gradient(135deg,#f59e0b,#f97316)", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16 }}>📋</div>
               <span style={{ fontWeight: 600, fontSize: 15, marginLeft: 12 }}>Quiz Results</span>
               <button onClick={() => setPhase(PHASE.HOME)} style={{ marginLeft: "auto", border: "1px solid #e2e5ef", background: "none", padding: "6px 14px", borderRadius: 8, fontSize: 13, color: "#5a6080", cursor: "pointer" }}>
-                ✕ Exit
+                ✕ Exit 
               </button>
             </div>
             <div className={styles.resultsTop}>
