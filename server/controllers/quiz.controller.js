@@ -6,6 +6,7 @@ import { PDFParse } from "pdf-parse"
 import fs from "fs"
 import { pdfToFlashcard } from "../lib/groq/pdfToFlashcard.js"
 import { v4 as uuidv4 } from "uuid" // ✅ ADDED: need this to generate unique quizId on server
+import { Flascards } from "../models/flashcard.model.js"
 
 // ─────────────────────────────────────────────
 // GENERATE QUIZ FROM TEXT (topic + subject)

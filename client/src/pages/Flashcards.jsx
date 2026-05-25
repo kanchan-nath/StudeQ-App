@@ -457,29 +457,20 @@ const VIEW = {
 };
 
 // ─── RIGHT Sidebar ────────────────────────────────────────────────────────────
-const RightSidebar = ({
-  activeView,
-  onNavigate,
-  allFlashcards,
-  onSelectSet,
-}) => {
+const RightSidebar = ({ activeView, onNavigate, allFlashcards, onSelectSet }) => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   return (
-    <aside
-      className={`${styles.rightSidebar} ${sidebarOpen ? styles.sidebarExpanded : styles.sidebarCollapsed}`}
-    >
-      {/* Toggle on LEFT edge of sidebar */}
+    <aside className={`${styles.historySidebar} ${sidebarOpen ? styles.sidebarOpen : styles.sidebarClosed}`}>
       <button
-        className={styles.sidebarToggle}
+        className={styles.sidebarToggleBtn}
         onClick={() => setSidebarOpen((o) => !o)}
-        aria-label={sidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
       >
-        {sidebarOpen ? <IconChevronRight /> : <IconChevronLeft />}
+        {sidebarOpen ? "→" : "←"}
       </button>
 
-      <div className={styles.sidebarInner}>
-        <div className={styles.sidebarUpload}>
+      {sidebarOpen && (
+        <div className={styles.sidebarContent}>
           <button
             className={styles.uploadBtn}
             onClick={() => onNavigate(VIEW.CREATE_STEP1)}
@@ -487,36 +478,30 @@ const RightSidebar = ({
             <IconUpload />
             <span>New Set</span>
           </button>
-        </div>
 
-        <div className={styles.recentNotes}>
-          <div className={styles.recentHeader}>
-            <span>Recent Sets</span>
-            <button className={styles.viewAllBtn}>View All</button>
-          </div>
-          {allFlashcards.length === 0 && (
-            <p className={styles.emptyRecent}>No sets yet</p>
-          )}
-          {allFlashcards.map((set) => (
-            <div
-              key={set._id}
-              className={styles.noteItem}
-              onClick={() => onSelectSet(set)}
-              title={set.subject || ""}
-            >
-              <IconNote />
-              <div className={styles.noteItemText}>
-                <span className={styles.noteTopic}>
-                  {set.topic || "No Title Found"}
-                </span>
-                {set.subject && (
-                  <span className={styles.noteSubject}>{set.subject}</span>
-                )}
+          <h3 className={styles.sidebarTitle}>🕓 Recent Sets</h3>
+
+          {allFlashcards.length === 0 ? (
+            <p className={styles.sidebarEmpty}>No sets yet.</p>
+          ) : (
+            allFlashcards.map((set) => (
+              <div
+                key={set._id}
+                className={styles.sidebarItem}
+                onClick={() => onSelectSet(set)}
+              >
+                <div className={styles.sidebarItemTitle}>
+                  {set.topic || "Untitled"}
+                </div>
+                <div className={styles.sidebarItemMeta}>
+                  {set.flashcards?.length || 0} cards
+                  {set.subject ? ` · ${set.subject}` : ""}
+                </div>
               </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
-      </div>
+      )}
     </aside>
   );
 };

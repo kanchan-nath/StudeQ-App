@@ -180,20 +180,6 @@
 
 /* ── RIGHT Sidebar ───────────────────────────────────────────────────────── */
 /* Static: full height, never scrolls itself */
-.rightSidebar {
-  flex-shrink: 0;
-  width: var(--sidebar-width);
-  height: 100%;
-  background: var(--bg-sidebar);
-  border-left: 1px solid var(--border);
-  display: flex;
-  flex-direction: row;
-  position: relative;
-  z-index: 20;
-  box-shadow: var(--shadow-sm);
-  transition: width var(--transition-mid);
-  overflow: hidden;
-}
 
 .sidebarExpanded {
   width: var(--sidebar-width);
@@ -204,138 +190,147 @@
 }
 
 /* Toggle — left edge of sidebar */
-.sidebarToggle {
-  position: absolute;
-  top: 50%;
-  left: 0;
-  transform: translateY(-50%);
-  width: 40px;
-  height: 48px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+/* ── RIGHT Sidebar ───────────────────────────────────────────────────────── */
+.historySidebar {
+  position: relative;
+  height: 100%;
   background: var(--bg-sidebar);
-  border: none;
-  border-right: 1px solid var(--border);
-  color: var(--text-secondary);
+  border-left: 1px solid var(--border);
+  display: flex;
+  flex-direction: row;
+  transition: width 0.3s ease;
+  flex-shrink: 0;
+  overflow: hidden;
+  z-index: 20;
+}
+
+.sidebarOpen {
+  width: 260px;
+}
+
+.sidebarClosed {
+  width: 36px;
+}
+
+.sidebarToggleBtn {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 36px;
+  height: 48px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-left: none;
+  border-radius: 0 8px 8px 0;
   cursor: pointer;
-  flex-shrink: 0;
-  z-index: 2;
-  transition:
-    color var(--transition-fast),
-    background var(--transition-fast);
-}
-
-.sidebarToggle:hover {
-  color: var(--accent);
-  background: var(--accent-light);
-}
-
-/* Inner content — the ONLY part that scrolls in the sidebar */
-.sidebarInner {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  padding: 20px 0;
-  margin-left: 40px;
-  overflow-y: auto;
-  overflow-x: hidden;
-  min-width: calc(var(--sidebar-width) - 40px);
-  opacity: 1;
-  transition: opacity var(--transition-mid);
-}
-
-.sidebarCollapsed .sidebarInner {
-  opacity: 0;
-  pointer-events: none;
-}
-
-.sidebarLogo {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 0 16px 20px;
-  border-bottom: 1px solid var(--border);
-  margin-bottom: 16px;
-  flex-shrink: 0;
-}
-
-.logoMark {
-  width: 32px;
-  height: 32px;
-  background: var(--accent);
-  border-radius: var(--radius-sm);
+  font-size: 14px;
+  color: var(--text-secondary);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
-  flex-shrink: 0;
+  z-index: 10;
+  transition: background 0.2s;
 }
 
-.logoText {
-  font-size: 1rem;
-  font-weight: 700;
-  color: var(--text-primary);
-  letter-spacing: -0.02em;
-  white-space: nowrap;
+.sidebarToggleBtn:hover {
+  background: var(--accent-light);
+  color: var(--accent);
 }
 
-.sidebarNav {
+.sidebarContent {
+  padding: 20px 16px 24px 48px;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) var(--bg-card);
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  padding: 0 8px;
-  flex-shrink: 0;
 }
 
-.navItem {
+.sidebarContent::-webkit-scrollbar {
+  width: 4px;
+}
+
+.sidebarContent::-webkit-scrollbar-track {
+  background: var(--bg-card);
+}
+
+.sidebarContent::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 999px;
+}
+
+.sidebarContent::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+.uploadBtn {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 10px 12px;
-  border-radius: var(--radius-sm);
-  border: none;
-  background: transparent;
-  color: var(--text-secondary);
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition:
-    background var(--transition-fast),
-    color var(--transition-fast);
-  text-align: left;
+  justify-content: center;
+  gap: 8px;
   width: 100%;
+  padding: 10px;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--transition-fast), transform var(--transition-fast);
+  margin-bottom: 20px;
   white-space: nowrap;
 }
 
-.navItem:hover {
-  background: var(--accent-light);
-  color: var(--accent);
+.uploadBtn:hover {
+  background: var(--accent-hover);
+  transform: translateY(-1px);
 }
 
-.navItemActive {
-  background: var(--accent-light);
-  color: var(--accent);
-  font-weight: 600;
+.sidebarTitle {
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 16px;
+  color: var(--text-primary);
 }
 
-.navIcon {
+.sidebarEmpty {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.sidebarItem {
+  padding: 12px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  margin-bottom: 10px;
+  cursor: pointer;
+  background: var(--bg-card);
+  transition: all 0.2s;
   flex-shrink: 0;
-  display: flex;
-  align-items: center;
 }
 
-.navLabel {
+.sidebarItem:hover {
+  border-color: var(--accent);
+  background: var(--accent-light);
+}
+
+.sidebarItemTitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 3px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.sidebarUpload {
-  padding: 12px 8px;
-  border-top: 1px solid var(--border);
-  margin-top: 8px;
-  flex-shrink: 0;
+.sidebarItemMeta {
+  font-size: 11px;
+  color: var(--text-muted);
 }
 
 .uploadBtn {
@@ -363,52 +358,6 @@
   transform: translateY(-1px);
 }
 
-.recentNotes {
-  padding: 14px 8px;
-  flex: 1;
-}
-
-.recentHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
-  font-size: 0.72rem;
-  font-weight: 600;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  padding: 0 4px;
-}
-
-.viewAllBtn {
-  background: none;
-  border: none;
-  color: var(--accent);
-  font-size: 0.72rem;
-  cursor: pointer;
-  padding: 0;
-}
-
-.noteItem {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px;
-  border-radius: var(--radius-sm);
-  font-size: 0.8rem;
-  color: var(--text-secondary);
-  cursor: pointer;
-  transition: background var(--transition-fast);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.noteItem:hover {
-  background: var(--accent-light);
-  color: var(--accent);
-}
 
 /* ── Viewer Layout ───────────────────────────────────────────────────────── */
 .viewerLayout {
