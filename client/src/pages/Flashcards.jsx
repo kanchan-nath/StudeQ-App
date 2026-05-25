@@ -457,7 +457,8 @@ const VIEW = {
 };
 
 // ─── RIGHT Sidebar ────────────────────────────────────────────────────────────
-const RightSidebar = ({ activeView, onNavigate, allFlashcards, onSelectSet }) => {
+const RightSidebar = ({ activeView, onNavigate, allFlashcards, onSelectSet, onDeleteSet }) => {
+  const [openMenuId, setOpenMenuId] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   return (
@@ -477,21 +478,51 @@ const RightSidebar = ({ activeView, onNavigate, allFlashcards, onSelectSet }) =>
           {allFlashcards.length === 0 ? (
             <p className={styles.sidebarEmpty}>No flashcards yet.</p>
           ) : (
-            allFlashcards.map((set) => (
-              <div
-                key={set._id}
-                className={styles.sidebarItem}
-                onClick={() => onSelectSet(set)}
-              >
-                <div className={styles.sidebarItemTitle}>
-                  {set.topic || "Untitled"}
+              allFlashcards.map((set) => (
+                <div
+                  key={set._id}
+                  className={styles.sidebarItem}
+                  onClick={() => { setOpenMenuId(null); onSelectSet(set); }}
+                >
+                  <div className={styles.sidebarItemRow}>
+                    <div className={styles.sidebarItemText}>
+                      <div className={styles.sidebarItemTitle}>
+                        {set.topic || "Untitled"}
+                      </div>
+                      <div className={styles.sidebarItemMeta}>
+                        {set.flashcards?.length || 0} cards
+                        {set.subject ? ` · ${set.subject}` : ""}
+                      </div>
+                    </div>
+
+                    <div className={styles.sidebarItemMenuWrapper}>
+                      <button
+                        className={styles.threeDotBtn}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setOpenMenuId(openMenuId === set._id ? null : set._id);
+                        }}
+                      >
+                        ···
+                      </button>
+                      {openMenuId === set._id && (
+                        <div className={styles.dotMenu}>
+                          <button
+                            className={styles.dotMenuDelete}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setOpenMenuId(null);
+                              onDeleteSet(set._id);
+                            }}
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
-                <div className={styles.sidebarItemMeta}>
-                  {set.flashcards?.length || 0} cards
-                  {set.subject ? ` · ${set.subject}` : ""}
-                </div>
-              </div>
-            ))
+              ))
           )}
         </div>
       )}
@@ -556,37 +587,6 @@ const FlashcardViewer = ({ allFlashcards, onNavigate }) => {
     <div className={styles.viewerLayout}>
       {/* Headbar */}
       <div className={styles.headbar}>
-        <div className={styles.headbarLeft}>
-          <div className={styles.modeDropdownWrapper}>
-            <button
-              className={styles.modeBtn}
-              onClick={() => setModeOpen((o) => !o)}
-            >
-              <IconSets />
-              <span>{mode}</span>
-              <IconChevronDown />
-            </button>
-            {modeOpen && (
-              <div className={styles.modeDropdown}>
-                {modes.map((m) => (
-                  <button
-                    key={m}
-                    className={`${styles.modeOption} ${mode === m ? styles.modeOptionActive : ""}`}
-                    onClick={() => {
-                      setMode(m);
-                      setModeOpen(false);
-                    }}
-                  >
-                    {m === "Standard" && <IconSets />}
-                    {m === "Spaced Repetition" && <IconShuffle />}
-                    {m === "Bookmarked Flashcards" && <IconBookmark />}
-                    {m}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
 
         <div className={styles.progressDots}>
           {cards.slice(0, Math.min(cards.length, 12)).map((_, i) => (
@@ -601,12 +601,6 @@ const FlashcardViewer = ({ allFlashcards, onNavigate }) => {
         </div>
 
         <div className={styles.headbarRight}>
-          <button
-            className={styles.shuffleBtn}
-            title="Shuffle cards"
-          >
-            <IconShuffle />
-          </button>
           <div className={styles.cardCounter}>
             {currentIndex + 1} / {cards.length}
           </div>
@@ -633,32 +627,7 @@ const FlashcardViewer = ({ allFlashcards, onNavigate }) => {
           <span className={styles.cardSideLabel}>
             {isFlipped ? "Definition" : "Term"}
           </span>
-          <div className={styles.ratingBtns}>
-            <button
-              className={`${styles.ratingBtn} ${thumbUp ? styles.ratingBtnActive : ""}`}
-              onClick={() => {
-                setThumbUp((u) => !u);
-                setThumbDown(false);
-              }}
-            >
-              <IconThumbUp />
-            </button>
-            <button
-              className={`${styles.ratingBtn} ${thumbDown ? styles.ratingBtnDown : ""}`}
-              onClick={() => {
-                setThumbDown((d) => !d);
-                setThumbUp(false);
-              }}
-            >
-              <IconThumbDown />
-            </button>
-            <button
-              className={`${styles.ratingBtn} ${bookmarked ? styles.ratingBtnBookmark : ""}`}
-              onClick={() => setBookmarked((b) => !b)}
-            >
-              <IconBookmark />
-            </button>
-          </div>
+
         </div>
 
         <div
@@ -1217,6 +1186,26 @@ const Flashcards = () => {
     fetchFlashcards();
   }, []);
 
+  const handleDeleteSet = async (id) => {
+    try {
+      const res = await fetch(`${BASE_URL}/api/quiz/flashcards/${id}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (!res.ok) return console.error("Delete failed");
+      setAllFlashcards((prev) => prev.filter((s) => s._id !== id));
+      if (selectedSet?._id === id) {
+        setSelectedSet(null);
+        setCurrentView(VIEW.HOME);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   const navigateTo = (view) => setCurrentView(view);
   const exitToViewer = () => setCurrentView(VIEW.HOME);
 
@@ -1273,6 +1262,7 @@ const Flashcards = () => {
           setSelectedSet(set);
           navigateTo(VIEW.VIEWER);
         }}
+        onDeleteSet={handleDeleteSet}
       />
     </div>
   );
