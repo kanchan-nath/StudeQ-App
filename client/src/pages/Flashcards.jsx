@@ -461,6 +461,12 @@ const RightSidebar = ({ activeView, onNavigate, allFlashcards, onSelectSet, onDe
   const [openMenuId, setOpenMenuId] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
+
+  useEffect(() => {
+    const close = () => setOpenMenuId(null);
+    document.addEventListener("click", close);
+    return () => document.removeEventListener("click", close);
+  }, []);
   return (
     <aside className={`${styles.historySidebar} ${sidebarOpen ? styles.sidebarOpen : styles.sidebarClosed}`}>
       <button
@@ -1185,6 +1191,8 @@ const Flashcards = () => {
   useEffect(() => {
     fetchFlashcards();
   }, []);
+
+
 
   const handleDeleteSet = async (id) => {
     try {

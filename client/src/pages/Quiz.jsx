@@ -74,7 +74,7 @@ export default function Quiz() {
   // ─── GLOBAL STATE ──────────────────────────────────────────────
   const [phase, setPhase] = useState(PHASE.HOME);
   const [method, setMethod] = useState(null); // "materials" | "text"
-
+  const [openMenuId, setOpenMenuId] = useState(null);
   // Step 2A
   const [file, setFile] = useState(null);
 
@@ -127,6 +127,19 @@ export default function Quiz() {
     }
   }, [token]);
 
+  const deleteQuiz = async (id) => {
+    try {
+      await fetch(`${BASE_URL}/api/quiz/${id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setAllQuizzes((prev) => prev.filter((q) => q._id !== id));
+    } catch (e) {
+      console.error("deleteQuiz:", e);
+    }
+    setOpenMenuId(null);
+  };
+
   useEffect(() => {
     fetchAllQuizzes();
   }, [fetchAllQuizzes]);
@@ -156,6 +169,12 @@ export default function Quiz() {
     return () => clearInterval(loaderRef.current);
   }, [phase]);
 
+  useEffect(() => {
+    const close = () => setOpenMenuId(null);
+    document.addEventListener("click", close);
+    return () => document.removeEventListener("click", close);
+  }, []);
+  
   // ─── HELPERS ────────────────────────────────────────────────────
   const fmtTime = (sec) => {
     const m = Math.floor(sec / 60),
@@ -351,21 +370,48 @@ export default function Quiz() {
                 {allQuizzes.length === 0 ? (
                   <p className={styles.sidebarEmpty}>No quizzes yet.</p>
                 ) : (
-                  allQuizzes.map((q) => (
-                    <div
-                      key={q._id}
-                      className={styles.sidebarItem}
-                      onClick={() => viewResult(q)}
-                    >
-                      <div className={styles.sidebarItemTitle}>
-                        {q.quiz?.title || "Untitled"}
+                    allQuizzes.map((q) => (
+                      <div key={q._id} className={styles.sidebarItem}>
+                        <div className={styles.sidebarItemRow}>
+                          <div
+                            className={styles.sidebarItemText}
+                            onClick={() => viewResult(q)}
+                          >
+                            <div className={styles.sidebarItemTitle}>
+                              {q.quiz?.title || "Untitled"}
+                            </div>
+                            <div className={styles.sidebarItemMeta}>
+                              {q.quiz?.totalQuestion} q ·{" "}
+                              {new Date(q.createdAt).toLocaleDateString()}
+                            </div>
+                          </div>
+                          <div className={styles.sidebarItemMenuWrapper}>
+                            <button
+                              className={styles.threeDotBtn}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setOpenMenuId(openMenuId === q._id ? null : q._id);
+                              }}
+                            >
+                              ···
+                            </button>
+                            {openMenuId === q._id && (
+                              <div className={styles.dotMenu}>
+                                <button
+                                  className={styles.dotMenuDelete}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    deleteQuiz(q._id);
+                                  }}
+                                >
+                                  🗑 Delete
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        </div>
                       </div>
-                      <div className={styles.sidebarItemMeta}>
-                        {q.quiz?.totalQuestion} q ·{" "}
-                        {new Date(q.createdAt).toLocaleDateString()}
-                      </div>
-                    </div>
-                  ))
+                    ))
                 )}
               </div>
             )}
