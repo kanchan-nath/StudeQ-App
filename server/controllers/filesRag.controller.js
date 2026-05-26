@@ -167,16 +167,29 @@ const allChats = asyncHandler(async(req,res)=>{
         {
             userId
         }
-    ).select({ docId: 1, chatRoomKey: 1 })
+    ).select({ docId: 1, chatRoomKey: 1, messages:{$slice: 1} })
 
     return res
     .status(200)
     .json(new ApiResponse(200, data, "All chats fetched successfully"))
+})
+
+const deleteChat = asyncHandler(async(req, res)=>{
+    const {id} = req.params
+
+    const userId = req.user.id
+
+    const data = await ChatRoom.findOneAndDelete({userId, _id:id})
+    
+    return res
+    .status(200)
+    .json(new ApiResponse(200, data, "Vhat deleted"))
 })
 export {
     uploadFile,
     askQuery,
     allChatsMessage,
     updateQuery,
-    allChats
+    allChats,
+    deleteChat
 }

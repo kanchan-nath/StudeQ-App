@@ -1,6 +1,9 @@
 import React, { useRef, useState, useEffect } from "react";
 import BASE_URL from "../lib/api.js";
 import styles from "./styles/Notebook.module.css";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import rehypeRaw from "rehype-raw";
 
 // ── Toast helper ──────────────────────────────────────────────────────────────
 const Toast = ({ toasts, removeToast }) => (
@@ -48,7 +51,18 @@ const UploadLoader = () => (
 // ── Sidebar chat item ──────────────────────────────────────────────────────────
 const SidebarItem = ({ chat, isActive, onSelect, onDelete }) => {
   const [menuOpen, setMenuOpen] = useState(false);
-  const title = chat.firstMessage || "Untitled chat";
+  const title = chat.messages[0]?.content || "Untitled chat";  
+  const menuRef = useRef(null);
+
+  useEffect(() => {
+    const close = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        setMenuOpen(false);
+      }
+    };
+    document.addEventListener("click", close);
+    return () => document.removeEventListener("click", close);
+  }, []);
 
   return (
     <li
@@ -67,7 +81,7 @@ const SidebarItem = ({ chat, isActive, onSelect, onDelete }) => {
         ⋯
       </button>
       {menuOpen && (
-        <div className={styles.sidebarMenu}>
+        <div className={styles.sidebarMenu} ref={menuRef}>
           <button
             className={styles.sidebarMenuDelete}
             onClick={(e) => {
@@ -89,17 +103,18 @@ const Notebook = () => {
   // ── State ──────────────────────────────────────────────────────────────────
   const [inputFile, setInputFile] = useState(null);
   const [dragOver, setDragOver] = useState(false);
-  const [loading, setLoading] = useState(false); // upload loading
+  const [loading, setLoading] = useState(false);
   const [inputFileResult, setInputFileResult] = useState({});
   const [chatRoom, setChatRoom] = useState(false);
+  const [rightSidebarOpen, setRightSidebarOpen] = useState(true);
 
   const [query, setQuery] = useState("");
   const [loadingSendQuery, setLoadingQuery] = useState(false);
-  const [result, setResult] = useState([]); // all messages
+  const [result, setResult] = useState([]);
 
   const [editId, setEditId] = useState(null);
-  const [editingMessageId, setEditingMessageId] = useState(null); // inline edit hover UI
-  const [hiddenAiIds, setHiddenAiIds] = useState([]); // hide stale AI responses after re-edit
+  const [editingMessageId, setEditingMessageId] = useState(null);
+  const [hiddenAiIds, setHiddenAiIds] = useState([]);
 
   const [allChats, setAllChats] = useState([]);
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -198,7 +213,7 @@ const Notebook = () => {
         if (!res.ok) throw new Error("File upload failed.");
         const data = await res.json();
         setInputFileResult(data.data);
-        setActiveChatId(data.data.id);
+        setActiveChatId(data.data._id);
         setInputFile(null);
         setChatRoom(true);
         fetchAllChats();
@@ -217,12 +232,10 @@ const Notebook = () => {
     if (!query.trim()) return;
     setLoadingQuery(true);
 
-    // If editing a message, hide the old AI response after it
     if (editId) {
       setHiddenAiIds((prev) => [...prev, editId]);
     }
 
-    // Optimistic user message
     const tempUserMsg = {
       _id: `temp_${Date.now()}`,
       role: "user",
@@ -293,6 +306,8 @@ const Notebook = () => {
       });
       if (!res.ok) throw new Error("Failed to load chat history.");
       const data = await res.json();
+      console.log(data.data);
+      
       setAllChats(data.data || []);
     } catch (err) {
       pushToast(err.message, "error");
@@ -302,7 +317,7 @@ const Notebook = () => {
   // ── Delete chat ────────────────────────────────────────────────────────────
   const handleDeleteChat = async (chat) => {
     try {
-      const res = await fetch(`${BASE_URL}/api/documents/${chat.id}`, {
+      const res = await fetch(`${BASE_URL}/api/documents/${chat._id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -322,8 +337,8 @@ const Notebook = () => {
 
   // ── Select chat from sidebar ───────────────────────────────────────────────
   const handleSelectChat = (chat) => {
-    setInputFileResult({ id: chat.id, chatRoomKey: chat.chatRoomKey });
-    setActiveChatId(chat.id);
+    setInputFileResult({ id: chat._id, chatRoomKey: chat.chatRoomKey });
+    setActiveChatId(chat._id);
     setChatRoom(true);
   };
 
@@ -362,6 +377,7 @@ const Notebook = () => {
 
   // ── Render ─────────────────────────────────────────────────────────────────
   return (
+    // FIX: root is now a flex row containing appShell + rightSidebar
     <div className={styles.root}>
       {/* Theme toggle */}
       <button
@@ -372,157 +388,230 @@ const Notebook = () => {
         {theme === "light" ? "🌙" : "☀️"}
       </button>
 
-      <Toast
-        toasts={toasts}
-        removeToast={removeToast}
-      />
+      <Toast toasts={toasts} removeToast={removeToast} />
 
-      {/* ── VIEW 1: Upload ── */}
-      {!chatRoom && (
-        <main className={styles.uploadPage}>
-          <header className={styles.uploadHeader}>
-            <div className={styles.logoMark}>
-              <svg
-                width="36"
-                height="36"
-                viewBox="0 0 36 36"
-                fill="none"
-              >
-                <rect
-                  width="36"
-                  height="36"
-                  rx="10"
-                  fill="var(--accent)"
-                />
-                <path
-                  d="M10 18h16M18 10v16"
-                  stroke="#fff"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                />
-              </svg>
-            </div>
-            <h1 className={styles.uploadTitle}>
-              Turn Any Document Into
-              <br />
-              <em>Your Personal Tutor</em>
-            </h1>
-            <p className={styles.uploadSubtitle}>
-              Upload a file and ask anything — your AI study partner is ready.
-            </p>
-          </header>
+      {/* FIX: appShell wraps both views and fills remaining width */}
+      <div className={styles.appShell}>
 
-          {/* Supported formats */}
-          <ul className={styles.formatGrid}>
-            {[
-              { icon: "📄", label: "PDF" },
-              { icon: "📊", label: "Excel" },
-              { icon: "📑", label: "PPT" },
-              { icon: "🖼️", label: "Images" },
-              { icon: "📝", label: "Word" },
-              { icon: "📃", label: "Text" },
-            ].map((f) => (
-              <li
-                key={f.label}
-                className={styles.formatChip}
-              >
-                <span>{f.icon}</span>
-                <span>{f.label}</span>
-              </li>
-            ))}
-          </ul>
-
-          {/* Drop zone */}
-          <div
-            className={`${styles.dropZone} ${dragOver ? styles.dropZoneActive : ""} ${inputFile ? styles.dropZoneHasFile : ""}`}
-            onDragOver={(e) => {
-              e.preventDefault();
-              setDragOver(true);
-            }}
-            onDragLeave={() => setDragOver(false)}
-            onDrop={handleDrop}
-            onClick={() => fileInputRef.current?.click()}
-          >
-            <input
-              ref={fileInputRef}
-              type="file"
-              onChange={handleChangeFile}
-              accept=".pdf,.ppt,.pptx,.xls,.xlsx,.doc,.docx,.txt,.png,.jpg,.jpeg,.webp"
-              className={styles.hiddenInput}
-            />
-            {inputFile ? (
-              <div className={styles.filePreview}>
-                <span className={styles.fileIcon}>📎</span>
-                <span className={styles.fileName}>{inputFile.name}</span>
-                <button
-                  className={styles.fileRemove}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setInputFile(null);
-                  }}
-                >
-                  ×
-                </button>
+        {/* ── VIEW 1: Upload ── */}
+        {!chatRoom && (
+          <main className={styles.uploadPage}>
+            <header className={styles.uploadHeader}>
+              <div className={styles.logoMark}>
+                <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+                  <rect width="36" height="36" rx="10" fill="var(--accent)" />
+                  <path
+                    d="M10 18h16M18 10v16"
+                    stroke="#fff"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                  />
+                </svg>
               </div>
-            ) : (
-              <div className={styles.dropHint}>
-                <span className={styles.dropIcon}>⬆</span>
-                <p>
-                  Drag & drop your file here, or <u>browse</u>
-                </p>
-                <p className={styles.dropMeta}>
-                  Max 20 MB · PDF, PPT, Excel, Word, Images
-                </p>
-              </div>
-            )}
-          </div>
+              <h1 className={styles.uploadTitle}>
+                Turn Any Document Into
+                <br />
+                <em>Your Personal Tutor</em>
+              </h1>
+              <p className={styles.uploadSubtitle}>
+                Upload a file and ask anything — your AI study partner is ready.
+              </p>
+            </header>
 
-          {/* Upload loading or submit */}
-          {loading ? (
-            <UploadLoader />
-          ) : (
-            <button
-              className={`${styles.submitBtn} ${inputFile ? styles.submitBtnActive : ""}`}
-              onClick={handleClickSubmit}
-              disabled={!inputFile}
+            {/* Supported formats */}
+            <ul className={styles.formatGrid}>
+              {[
+                { icon: "📄", label: "PDF" },
+                { icon: "📊", label: "Excel" },
+                { icon: "📑", label: "PPT" },
+                { icon: "🖼️", label: "Images" },
+                { icon: "📝", label: "Word" },
+                { icon: "📃", label: "Text" },
+              ].map((f) => (
+                <li key={f.label} className={styles.formatChip}>
+                  <span>{f.icon}</span>
+                  <span>{f.label}</span>
+                </li>
+              ))}
+            </ul>
+
+            {/* Drop zone */}
+            <div
+              className={`${styles.dropZone} ${dragOver ? styles.dropZoneActive : ""} ${inputFile ? styles.dropZoneHasFile : ""}`}
+              onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+              onDragLeave={() => setDragOver(false)}
+              onDrop={handleDrop}
+              onClick={() => fileInputRef.current?.click()}
             >
-              <span>Start Studying</span>
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M5 12h14M12 5l7 7-7 7" />
-              </svg>
-            </button>
-          )}
-        </main>
-      )}
-
-      {/* ── VIEW 2: Chatroom ── */}
-      {chatRoom && (
-        <div className={styles.chatroomShell}>
-          {/* Sidebar */}
-          <aside
-            className={`${styles.sidebar} ${sidebarOpen ? styles.sidebarOpen : styles.sidebarClosed}`}
-          >
-            <div className={styles.sidebarHeader}>
-              {sidebarOpen && (
-                <h2 className={styles.sidebarHeading}>Study Sessions</h2>
+              <input
+                ref={fileInputRef}
+                type="file"
+                onChange={handleChangeFile}
+                accept=".pdf,.ppt,.pptx,.xls,.xlsx,.doc,.docx,.txt,.png,.jpg,.jpeg,.webp"
+                className={styles.hiddenInput}
+              />
+              {inputFile ? (
+                <div className={styles.filePreview}>
+                  <span className={styles.fileIcon}>📎</span>
+                  <span className={styles.fileName}>{inputFile.name}</span>
+                  <button
+                    className={styles.fileRemove}
+                    onClick={(e) => { e.stopPropagation(); setInputFile(null); }}
+                  >
+                    ×
+                  </button>
+                </div>
+              ) : (
+                <div className={styles.dropHint}>
+                  <span className={styles.dropIcon}>⬆</span>
+                  <p>Drag & drop your file here, or <u>browse</u></p>
+                  <p className={styles.dropMeta}>Max 20 MB · PDF, PPT, Excel, Word, Images</p>
+                </div>
               )}
-              <button
-                className={styles.sidebarToggle}
-                onClick={() => setSidebarOpen((v) => !v)}
-                aria-label={sidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
-              >
-                {sidebarOpen ? "◂" : "▸"}
-              </button>
             </div>
+
+            {loading ? (
+              <UploadLoader />
+            ) : (
+              <button
+                className={`${styles.submitBtn} ${inputFile ? styles.submitBtnActive : ""}`}
+                onClick={handleClickSubmit}
+                disabled={!inputFile}
+              >
+                <span>Start Studying</span>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M5 12h14M12 5l7 7-7 7" />
+                </svg>
+              </button>
+            )}
+          </main>
+        )}
+
+        {/* ── VIEW 2: Chatroom ── */}
+        {chatRoom && (
+          <div className={styles.chatroomShell}>
+            {/* Left Sidebar */}
+
+            {/* Main chat area */}
+            <div className={styles.chatroomMain}>
+              {/* Chat header */}
+              <header className={styles.chatHeader}>
+                <div className={styles.chatHeaderInner}>
+                  <span className={styles.chatHeaderDot} />
+                  <h2 className={styles.chatTitle}>{chatTitle}</h2>
+                </div>
+              </header>
+
+              {/* Messages */}
+              <section className={styles.messagesArea}>
+                {flatMessages.map((msg, i) => {
+                  const isUser = msg.role === "user";
+                  const isHidden =
+                    hiddenAiIds.includes(flatMessages[i - 1]?._id) && !isUser;
+                  if (isHidden) return null;
+
+                  return (
+                    <div
+                      key={msg._id || i}
+                      className={`${styles.messageRow} ${isUser ? styles.messageRowUser : styles.messageRowAI}`}
+                    >
+                      {!isUser && <div className={styles.aiAvatar}>AI</div>}
+                      <div
+                        className={`${styles.messageBubble} ${isUser ? styles.bubbleUser : styles.bubbleAI} ${editingMessageId === msg._id ? styles.bubbleEditing : ""}`}
+                        onMouseEnter={() => isUser && setEditingMessageId(msg._id)}
+                        onMouseLeave={() => isUser && setEditingMessageId(null)}
+                      >
+                        {isUser ? (
+                          <p className={styles.messageContent}>{msg.content}</p>
+                        ) : (
+                          <div className={styles.messageContent}>
+                            <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
+                              {msg.content}
+                            </ReactMarkdown>
+                          </div>
+                        )}
+                        <span className={styles.messageTime}>{fmtTime(msg.createdAt)}</span>
+
+                        {isUser && editingMessageId === msg._id && (
+                          <button
+                            className={styles.editBtn}
+                            onClick={() => handleClickEdit(msg._id, msg.content)}
+                          >
+                            ✏ Edit
+                          </button>
+                        )}
+                      </div>
+                      {isUser && <div className={styles.userAvatar}>You</div>}
+                    </div>
+                  );
+                })}
+
+                {loadingSendQuery && (
+                  <div className={`${styles.messageRow} ${styles.messageRowAI}`}>
+                    <div className={styles.aiAvatar}>AI</div>
+                    <ThinkingBubble />
+                  </div>
+                )}
+
+                <div ref={messagesEndRef} />
+              </section>
+
+              {/* Input bar */}
+              <footer className={styles.inputBar}>
+                {editId && (
+                  <div className={styles.editBanner}>
+                    <span>✏ Editing message</span>
+                    <button
+                      onClick={() => {
+                        setEditId(null);
+                        setEditingMessageId(null);
+                        setQuery("");
+                      }}
+                    >
+                      ✕ Cancel
+                    </button>
+                  </div>
+                )}
+                <form className={styles.inputForm} onSubmit={handleSubmitQuery}>
+                  <input
+                    ref={inputRef}
+                    type="text"
+                    className={styles.queryInput}
+                    placeholder="Ask anything about your document…"
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    disabled={loadingSendQuery}
+                  />
+                  <button
+                    type="submit"
+                    className={`${styles.sendBtn} ${query.trim() ? styles.sendBtnActive : ""}`}
+                    disabled={loadingSendQuery || !query.trim()}
+                    aria-label="Send"
+                  >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" />
+                    </svg>
+                  </button>
+                </form>
+              </footer>
+            </div>
+          </div>
+        )}
+
+      </div>{/* end appShell */}
+
+      {/* FIX: Right sidebar is NOW outside chatRoom block — always visible */}
+      <div className={`${styles.rightSidebar} ${rightSidebarOpen ? styles.rightSidebarOpen : styles.rightSidebarClosed}`}>
+        <button
+          className={styles.rightSidebarToggleBtn}
+          onClick={() => setRightSidebarOpen((o) => !o)}
+        >
+          {rightSidebarOpen ? "→" : "←"}
+        </button>
+
+        {rightSidebarOpen && (
+          <div className={styles.rightSidebarContent}>
+            <h3 className={styles.rightSidebarTitle}>📄 Document History</h3>
             {sidebarOpen && (
               <ul className={styles.sidebarList}>
                 {allChats.length === 0 && (
@@ -539,136 +628,10 @@ const Notebook = () => {
                 ))}
               </ul>
             )}
-            {sidebarOpen && (
-              <button
-                className={styles.newChatBtn}
-                onClick={() => {
-                  setChatRoom(false);
-                  setResult([]);
-                  setInputFileResult({});
-                  setActiveChatId(null);
-                }}
-              >
-                + New Upload
-              </button>
-            )}
-          </aside>
-
-          {/* Main chat area */}
-          <div className={styles.chatroomMain}>
-            {/* Chat header */}
-            <header className={styles.chatHeader}>
-              <div className={styles.chatHeaderInner}>
-                <span className={styles.chatHeaderDot} />
-                <h2 className={styles.chatTitle}>{chatTitle}</h2>
-              </div>
-            </header>
-
-            {/* Messages */}
-            <section className={styles.messagesArea}>
-              {flatMessages.map((msg, i) => {
-                const isUser = msg.role === "user";
-                const isHidden =
-                  hiddenAiIds.includes(flatMessages[i - 1]?._id) && !isUser;
-                if (isHidden) return null;
-
-                return (
-                  <div
-                    key={msg._id || i}
-                    className={`${styles.messageRow} ${isUser ? styles.messageRowUser : styles.messageRowAI}`}
-                  >
-                    {!isUser && <div className={styles.aiAvatar}>AI</div>}
-                    <div
-                      className={`${styles.messageBubble} ${isUser ? styles.bubbleUser : styles.bubbleAI} ${editingMessageId === msg._id ? styles.bubbleEditing : ""}`}
-                      onMouseEnter={() =>
-                        isUser && setEditingMessageId(msg._id)
-                      }
-                      onMouseLeave={() => isUser && setEditingMessageId(null)}
-                    >
-                      <p className={styles.messageContent}>{msg.content}</p>
-                      <span className={styles.messageTime}>
-                        {fmtTime(msg.createdAt)}
-                      </span>
-
-                      {/* Edit option on hover for user messages */}
-                      {isUser && editingMessageId === msg._id && (
-                        <button
-                          className={styles.editBtn}
-                          onClick={() => handleClickEdit(msg._id, msg.content)}
-                        >
-                          ✏ Edit
-                        </button>
-                      )}
-                    </div>
-                    {isUser && <div className={styles.userAvatar}>You</div>}
-                  </div>
-                );
-              })}
-
-              {/* AI thinking */}
-              {loadingSendQuery && (
-                <div className={`${styles.messageRow} ${styles.messageRowAI}`}>
-                  <div className={styles.aiAvatar}>AI</div>
-                  <ThinkingBubble />
-                </div>
-              )}
-
-              <div ref={messagesEndRef} />
-            </section>
-
-            {/* Input bar */}
-            <footer className={styles.inputBar}>
-              {editId && (
-                <div className={styles.editBanner}>
-                  <span>✏ Editing message</span>
-                  <button
-                    onClick={() => {
-                      setEditId(null);
-                      setEditingMessageId(null);
-                      setQuery("");
-                    }}
-                  >
-                    ✕ Cancel
-                  </button>
-                </div>
-              )}
-              <form
-                className={styles.inputForm}
-                onSubmit={handleSubmitQuery}
-              >
-                <input
-                  ref={inputRef}
-                  type="text"
-                  className={styles.queryInput}
-                  placeholder="Ask anything about your document…"
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  disabled={loadingSendQuery}
-                />
-                <button
-                  type="submit"
-                  className={`${styles.sendBtn} ${query.trim() ? styles.sendBtnActive : ""}`}
-                  disabled={loadingSendQuery || !query.trim()}
-                  aria-label="Send"
-                >
-                  <svg
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" />
-                  </svg>
-                </button>
-              </form>
-            </footer>
           </div>
-        </div>
-      )}
+        )}
+      </div>
+
     </div>
   );
 };
