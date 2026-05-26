@@ -7,7 +7,7 @@ import textExtractor from "./textExtractor.js";
 
 const vectorDB = async (file) => {
     const extractedText = await textExtractor(file)
-    console.log(extractedText);
+    console.log("Extracted Txt:",extractedText);
     
     const chunks = await chunking(extractedText)
 
@@ -37,6 +37,8 @@ const vectorDB = async (file) => {
         }
     ))
 
+    console.log("Records:",records);
+    
     await ns.upsert({ records })
     
 }
@@ -64,6 +66,8 @@ const queryDB = async(query)=>{
     })
     
     const topChunks = results.matches.map((m)=>(m.metadata.text))
+    console.log("Top chunks:",topChunks);
+    
     return topChunks
 }
 export  {vectorDB, queryDB}

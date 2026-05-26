@@ -1,5 +1,5 @@
-import {ApiError}from "../utils/Async.js"
-import {PDFParse} from "pdf-parse"
+import { ApiError } from "../utils/Async.js"
+import { PDFParse } from "pdf-parse"
 import fs from "fs"
 import XLSX from "xlsx"
 import Tesseract from "tesseract.js"
@@ -16,7 +16,7 @@ const textExtractor = async (file) => {
             const uint8Array = new Uint8Array(dataBuffer)
             const parser = new PDFParse(uint8Array)
             const extractedText = (await parser.getText()).text
-            
+
             embedText(extractedText)
             fs.unlinkSync(filePath)
             return extractedText
@@ -54,8 +54,6 @@ const textExtractor = async (file) => {
         fs.unlinkSync(filePath)
 
     }
-
-    
 }
 
 export default textExtractor
