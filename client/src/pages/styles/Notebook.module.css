@@ -73,7 +73,7 @@
    This is the key structural fix for both bugs.
 ══════════════════════════════════════════════════════════════════ */
 .root {
-  height: 100vh;
+  height: 100%;
   overflow: hidden;
   /* FIX: no page-level scroll */
   background: var(--bg);
@@ -134,7 +134,7 @@
    FIX: RIGHT SIDEBAR — always visible, full height, independent scroll
 ══════════════════════════════════════════════════════════════════ */
 .rightSidebar {
-  height: 100vh;
+  height: 100%;
   /* FIX: always full viewport height */
   background: var(--bg-surface);
   border-left: 1px solid var(--border);
@@ -842,6 +842,7 @@
   overflow: hidden;
   background: var(--bg);
   min-width: 0;
+  min-height: 0; 
 }
 
 /* Chat header */
@@ -902,6 +903,7 @@
   flex-direction: column;
   gap: 18px;
   scroll-behavior: smooth;
+  min-height: 0;
 }
 
 /* Message rows */

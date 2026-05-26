@@ -49,6 +49,17 @@ const UploadLoader = () => (
 const SidebarItem = ({ chat, isActive, onSelect, onDelete }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const title = chat.messages[0]?.content || "Untitled chat";  
+  const menuRef = useRef(null);
+
+  useEffect(() => {
+    const close = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        setMenuOpen(false);
+      }
+    };
+    document.addEventListener("click", close);
+    return () => document.removeEventListener("click", close);
+  }, []);
 
   return (
     <li
@@ -67,7 +78,7 @@ const SidebarItem = ({ chat, isActive, onSelect, onDelete }) => {
         ⋯
       </button>
       {menuOpen && (
-        <div className={styles.sidebarMenu}>
+        <div className={styles.sidebarMenu} ref={menuRef}>
           <button
             className={styles.sidebarMenuDelete}
             onClick={(e) => {
@@ -199,7 +210,7 @@ const Notebook = () => {
         if (!res.ok) throw new Error("File upload failed.");
         const data = await res.json();
         setInputFileResult(data.data);
-        setActiveChatId(data.data.id);
+        setActiveChatId(data.data._id);
         setInputFile(null);
         setChatRoom(true);
         fetchAllChats();
@@ -589,7 +600,7 @@ const Notebook = () => {
 
         {rightSidebarOpen && (
           <div className={styles.rightSidebarContent}>
-            <h3 className={styles.rightSidebarTitle}>📄 Document Info</h3>
+            <h3 className={styles.rightSidebarTitle}>📄 Document History</h3>
             {sidebarOpen && (
               <ul className={styles.sidebarList}>
                 {allChats.length === 0 && (
