@@ -1,6 +1,9 @@
 import React, { useRef, useState, useEffect } from "react";
 import BASE_URL from "../lib/api.js";
 import styles from "./styles/Notebook.module.css";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import rehypeRaw from "rehype-raw";
 
 // ── Toast helper ──────────────────────────────────────────────────────────────
 const Toast = ({ toasts, removeToast }) => (
@@ -518,7 +521,15 @@ const Notebook = () => {
                         onMouseEnter={() => isUser && setEditingMessageId(msg._id)}
                         onMouseLeave={() => isUser && setEditingMessageId(null)}
                       >
-                        <p className={styles.messageContent}>{msg.content}</p>
+                        {isUser ? (
+                          <p className={styles.messageContent}>{msg.content}</p>
+                        ) : (
+                          <div className={styles.messageContent}>
+                            <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
+                              {msg.content}
+                            </ReactMarkdown>
+                          </div>
+                        )}
                         <span className={styles.messageTime}>{fmtTime(msg.createdAt)}</span>
 
                         {isUser && editingMessageId === msg._id && (
