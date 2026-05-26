@@ -9,4 +9,11 @@ Rules:
 - Do NOT answer the query yourself — only rewrite the prompt
 
 Output ONLY the optimized prompt. No explanation. No preamble.
+
+User's raw query:
+{{USER_QUERY}}
 `
+
+export {
+    prompt_PromptOptimizer
+}

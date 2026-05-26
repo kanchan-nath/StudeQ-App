@@ -1,17 +1,12 @@
 import { AIResponse } from "../../models/aiResponse.model.js";
 import groq from "./groq.js";
+import { promptOptimizer } from "../../services/promptOptimizer.js";
 
 const llmCall = async (query, topChunks, userId) => {
 
-    const prompt = `You are a helpful assistant. Answer user questions using ONLY the context provided below.
-If answer not in context, say I don't know based on provided documents.
-Do not use prior knowledge. Be concise and accurate.
-
-Context
-${topChunks}
-
-Question
-${query}`
+    const optimizedPrompt  = await promptOptimizer(query)
+    const prompt = optimizedPrompt + `Context: ${topChunks}`;
+    
     const response = await groq.chat.completions.create(
         {
             model: "llama-3.3-70b-versatile",
