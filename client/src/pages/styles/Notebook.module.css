@@ -68,16 +68,39 @@
   --shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.55);
 }
 
-/* ── Root shell ─────────────────────────────────────────────────────── */
+/* ══════════════════════════════════════════════════════════════════
+   FIX 1 & 2: Root shell — flex row, fixed 100vh, no overflow
+   This is the key structural fix for both bugs.
+══════════════════════════════════════════════════════════════════ */
 .root {
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
+  /* FIX: no page-level scroll */
   background: var(--bg);
   color: var(--text);
   font-family: var(--font-body);
   position: relative;
+  display: flex;
+  /* FIX: flex row — appShell + rightSidebar side by side */
+  flex-direction: row;
   transition:
     background var(--transition),
     color var(--transition);
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   FIX: appShell — takes all remaining width, full height, clips overflow
+   Wraps both upload page and chatroom view.
+══════════════════════════════════════════════════════════════════ */
+.appShell {
+  flex: 1;
+  min-width: 0;
+  /* prevent flex blowout */
+  height: 100%;
+  overflow: hidden;
+  /* children manage their own scroll */
+  display: flex;
+  flex-direction: column;
 }
 
 /* ── Theme toggle ─────────────────────────────────────────────────── */
@@ -105,6 +128,90 @@
 .themeToggle:hover {
   transform: scale(1.1);
   box-shadow: var(--shadow-md);
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   FIX: RIGHT SIDEBAR — always visible, full height, independent scroll
+══════════════════════════════════════════════════════════════════ */
+.rightSidebar {
+  height: 100vh;
+  /* FIX: always full viewport height */
+  background: var(--bg-surface);
+  border-left: 1px solid var(--border);
+  display: flex;
+  flex-direction: row;
+  flex-shrink: 0;
+  overflow: hidden;
+  transition: width 0.3s ease;
+  position: relative;
+}
+
+.rightSidebarOpen {
+  width: 280px;
+}
+
+.rightSidebarClosed {
+  width: 36px;
+}
+
+.rightSidebarToggleBtn {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 36px;
+  height: 48px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-left: none;
+  border-radius: 0 8px 8px 0;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  transition: background 0.2s;
+}
+
+.rightSidebarToggleBtn:hover {
+  background: var(--accent-glow);
+  color: var(--accent);
+}
+
+.rightSidebarContent {
+  padding: 24px 16px 24px 48px;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  /* FIX: independent scroll */
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) var(--bg-input);
+}
+
+.rightSidebarContent::-webkit-scrollbar {
+  width: 4px;
+}
+
+.rightSidebarContent::-webkit-scrollbar-track {
+  background: var(--bg-input);
+}
+
+.rightSidebarContent::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 999px;
+}
+
+.rightSidebarContent::-webkit-scrollbar-thumb:hover {
+  background: var(--text-faint);
+}
+
+.rightSidebarTitle {
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 16px;
+  color: var(--text);
 }
 
 /* ══════════════════════════════════════════════════════════════════
@@ -209,13 +316,17 @@
 
 /* ══════════════════════════════════════════════════════════════════
    VIEW 1 — UPLOAD PAGE
+   FIX: flex:1 + overflow-y:auto = fills appShell, scrolls independently
 ══════════════════════════════════════════════════════════════════ */
 .uploadPage {
+  flex: 1;
+  /* FIX: fill appShell height */
+  overflow-y: auto;
+  /* FIX: upload page scrolls independently */
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 80px 24px 60px;
-  min-height: 100vh;
   gap: 32px;
 }
 
@@ -347,6 +458,7 @@
 }
 
 @keyframes floatUp {
+
   0%,
   100% {
     transform: translateY(0);
@@ -455,6 +567,7 @@
 }
 
 @keyframes pulse {
+
   0%,
   100% {
     opacity: 1;
@@ -505,14 +618,16 @@
 
 /* ══════════════════════════════════════════════════════════════════
    VIEW 2 — CHATROOM
+   FIX: height:100% (inherits from appShell), not 100vh
 ══════════════════════════════════════════════════════════════════ */
 .chatroomShell {
   display: flex;
-  height: 100vh;
+  height: 100%;
+  /* FIX: was 100vh — now fills appShell */
   overflow: hidden;
 }
 
-/* ── Sidebar ────────────────────────────────────────────────────── */
+/* ── Left Sidebar ───────────────────────────────────────────────── */
 .sidebar {
   background: var(--sidebar-bg);
   border-right: 1px solid var(--border);
@@ -755,6 +870,7 @@
 }
 
 @keyframes dotPulse {
+
   0%,
   100% {
     box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.25);
@@ -776,10 +892,11 @@
   text-overflow: ellipsis;
 }
 
-/* Messages area */
+/* Messages area — FIX: flex:1 + overflow-y:auto = independent scroll */
 .messagesArea {
   flex: 1;
   overflow-y: auto;
+  /* FIX: independent scroll */
   padding: 28px 28px 8px;
   display: flex;
   flex-direction: column;
@@ -948,6 +1065,7 @@
 }
 
 @keyframes dotBounce {
+
   0%,
   80%,
   100% {
@@ -961,7 +1079,7 @@
   }
 }
 
-/* ── Input bar ────────────────────────────────────────────────── */
+/* ── Input bar — flex-shrink:0 keeps it pinned at bottom ─────── */
 .inputBar {
   padding: 16px 28px 20px;
   background: var(--bg-surface);
@@ -1104,6 +1222,11 @@
     padding: 0;
     border: none;
   }
+
+  /* Hide right sidebar on small screens */
+  .rightSidebar {
+    display: none;
+  }
 }
 
 @media (max-width: 480px) {
@@ -1130,7 +1253,7 @@
   }
 }
 
-/* ── Scrollbar ───────────────────────────────────────────────────── */
+/* ── Scrollbar styling ───────────────────────────────────────────── */
 .messagesArea::-webkit-scrollbar,
 .sidebarList::-webkit-scrollbar {
   width: 4px;
