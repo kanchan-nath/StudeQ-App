@@ -5,21 +5,78 @@ import XLSX from "xlsx"
 import Tesseract from "tesseract.js"
 import chunking from "./chunking.js"
 import embedText from "./embedText.js"
+import { extractText } from "../lib/groq/extractText.js"
+import pdfToImages from "./pdfToImages.js"
+
+const cleanExtractedText = (text) => {
+    return text
+        // page markers
+        .replace(/--\s*\d+\s*of\s*\d+\s*--/g, '')
+        // unicode math symbols
+        .replace(/[²³°±×÷√∑∫∞≤≥≠αβγδεζηθλμπσφψω↑↓→←⟶⟹]/g, '')
+        // filter lines that are mostly math garbage
+        .split('\n')
+        .filter(line => {
+            const tokens = line.trim().split(/\s+/).filter(Boolean)
+            if (tokens.length === 0) return false
+            const realWords = tokens.filter(t => /[a-zA-Z]{3,}/.test(t))
+            // drop line if less than 40% tokens are real words
+            return (realWords.length / tokens.length) > 0.4
+        })
+        .join('\n')
+        // isolated 1-2 char tokens (standalone a b x 2 b2 etc)
+        .replace(/(?<![^\s])[a-zA-Z0-9]{1,2}(?![^\s])/g, '')
+        // collapse multiple spaces/newlines
+        .replace(/\n{3,}/g, '\n\n')
+        .replace(/ {2,}/g, ' ')
+        .trim()
+}
 
 const textExtractor = async (file) => {
     const mimeType = file.mimetype
     const filePath = file.path
 
+    const fileData = fs.readFileSync(filePath)
+    const base64File = fileData.toString('base64')
+    const THERESOLD_CHAR = 100
+    const THERESOLD_WORD = 70
+
     try {
         if (mimeType == "application/pdf") {
             const dataBuffer = fs.readFileSync(file.path)
             const uint8Array = new Uint8Array(dataBuffer)
-            const parser = new PDFParse(uint8Array)
-            const extractedText = (await parser.getText()).text
+            const parser = await new PDFParse(uint8Array)
 
-            embedText(extractedText)
-            fs.unlinkSync(filePath)
-            return extractedText
+            const text = ((await parser.getText()).text.replace(/--\s*\d+\s*of\s*\d+\s*--/g, '').trim())
+
+            const extractedText = cleanExtractedText(text)
+
+            const pageCount = parser.doc._pdfInfo.numPages
+            console.log(extractedText);
+
+            const charCount = extractedText.length
+            const wordCount = extractedText.split(/\s+/).filter(Boolean).length
+
+            if (charCount < (THERESOLD_CHAR * pageCount) || wordCount < (THERESOLD_WORD * pageCount)) {
+
+                try {
+                    await pdfToImages(filePath, pageCount)
+                } catch (error) {
+                    console.error(error);
+                    
+                }
+
+            } else {
+
+                embedText(extractedText)
+                fs.unlinkSync(filePath)
+                return extractedText
+            }
+
+            console.log(charCount, wordCount, pageCount);
+
+
+
 
         } else if (mimeType == "application/vnd.ms-excel") {
             const wrokbook = XLSX.readFile(filePath)
