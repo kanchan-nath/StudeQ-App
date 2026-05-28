@@ -1,4 +1,5 @@
 import React, { useRef, useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import BASE_URL from "../lib/api.js";
 import styles from "./styles/Notebook.module.css";
 import ReactMarkdown from "react-markdown";
@@ -53,7 +54,7 @@ const UploadLoader = () => (
 // ── Sidebar chat item ──────────────────────────────────────────────────────────
 const SidebarItem = ({ chat, isActive, onSelect, onDelete, chatTitle }) => {
   const [menuOpen, setMenuOpen] = useState(false);
-  const title = chat.messages[0]?.content || chatTitle;  
+  const title = chat.messages[0]?.content || chatTitle;
   const menuRef = useRef(null);
 
   useEffect(() => {
@@ -102,12 +103,19 @@ const SidebarItem = ({ chat, isActive, onSelect, onDelete, chatTitle }) => {
 
 // ── Main component ─────────────────────────────────────────────────────────────
 const Notebook = () => {
+  // ── Router ─────────────────────────────────────────────────────────────────
+  const { chatId } = useParams();
+  const navigate = useNavigate();
+
   // ── State ──────────────────────────────────────────────────────────────────
   const [inputFile, setInputFile] = useState(null);
   const [dragOver, setDragOver] = useState(false);
   const [loading, setLoading] = useState(false);
   const [inputFileResult, setInputFileResult] = useState({});
-  const [chatRoom, setChatRoom] = useState(false);
+
+  // chatRoom is now derived from URL param — no useState needed
+  const chatRoom = !!chatId;
+
   const [rightSidebarOpen, setRightSidebarOpen] = useState(true);
 
   const [query, setQuery] = useState("");
@@ -120,7 +128,6 @@ const Notebook = () => {
 
   const [allChats, setAllChats] = useState([]);
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [activeChatId, setActiveChatId] = useState(null);
 
   const [toasts, setToasts] = useState([]);
   const [theme, setTheme] = useState("light");
@@ -161,6 +168,16 @@ const Notebook = () => {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [result, loadingSendQuery]);
+
+  // ── Restore state on reload (chatId exists but inputFileResult is empty) ──
+  useEffect(() => {
+    if (!chatId || allChats.length === 0) return;
+    if (inputFileResult?.id) return; // already set
+    const found = allChats.find((c) => (c._id || c.id) === chatId);
+    if (found) {
+      setInputFileResult({ id: found._id, chatRoomKey: found.chatRoomKey });
+    }
+  }, [chatId, allChats]);
 
   // ── File handling ──────────────────────────────────────────────────────────
   const handleChangeFile = (e) => setInputFile(e.target.files[0]);
@@ -215,11 +232,11 @@ const Notebook = () => {
         if (!res.ok) throw new Error("File upload failed.");
         const data = await res.json();
         setInputFileResult(data.data);
-        setActiveChatId(data.data._id);
         setInputFile(null);
-        setChatRoom(true);
         fetchAllChats();
         pushToast("Document uploaded! Chat is ready.");
+        // Navigate to chatroom route — this is what switches the view
+        navigate(`/notebook/${data.data._id}`);
       } catch (err) {
         pushToast(err.message, "error");
       } finally {
@@ -309,7 +326,7 @@ const Notebook = () => {
       if (!res.ok) throw new Error("Failed to load chat history.");
       const data = await res.json();
       console.log(data.data);
-      
+
       setAllChats(data.data || []);
     } catch (err) {
       pushToast(err.message, "error");
@@ -326,11 +343,11 @@ const Notebook = () => {
       if (!res.ok) throw new Error("Delete failed.");
       pushToast("Chat deleted.");
       fetchAllChats();
-      if (activeChatId === chat.id) {
-        setChatRoom(false);
+      // If deleted chat is the currently open one, go back to upload view
+      if (chatId === chat._id) {
+        navigate("/notebook");
         setResult([]);
         setInputFileResult({});
-        setActiveChatId(null);
       }
     } catch (err) {
       pushToast(err.message, "error");
@@ -340,8 +357,7 @@ const Notebook = () => {
   // ── Select chat from sidebar ───────────────────────────────────────────────
   const handleSelectChat = (chat) => {
     setInputFileResult({ id: chat._id, chatRoomKey: chat.chatRoomKey });
-    setActiveChatId(chat._id);
-    setChatRoom(true);
+    navigate(`/notebook/${chat._id}`);
   };
 
   useEffect(() => {
@@ -526,8 +542,8 @@ const Notebook = () => {
                         {isUser ? (
                           <p className={styles.messageContent}>{msg.content}</p>
                         ) : (
-                            <div className={styles.aiContent}>
-                              <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>
+                          <div className={styles.aiContent}>
+                            <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>
                               {msg.content}
                             </ReactMarkdown>
                           </div>
@@ -623,7 +639,7 @@ const Notebook = () => {
                   <SidebarItem
                     key={chat.id || chat._id}
                     chat={chat}
-                    isActive={activeChatId === (chat.id || chat._id)}
+                    isActive={chatId === (chat.id || chat._id)}
                     onSelect={handleSelectChat}
                     onDelete={handleDeleteChat}
                     chatTitle={chatTitle}
