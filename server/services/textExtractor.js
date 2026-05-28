@@ -61,8 +61,8 @@ const textExtractor = async (file) => {
                     await pdfToImages(filePath, pageCount)
 
                     const results = await extract()
-                    console.log(results);
-                    
+                    console.log("Text Extracted from Pdf -> Images");
+
                     embedText(results)
                     fs.unlinkSync(filePath)
                     return results

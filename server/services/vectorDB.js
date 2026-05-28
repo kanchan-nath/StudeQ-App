@@ -7,7 +7,6 @@ import textExtractor from "./textExtractor.js";
 
 const vectorDB = async (file) => {
     const extractedText = await textExtractor(file)
-    console.log("Extracted Txt:",extractedText);
     
     const chunks = await chunking(extractedText)
 
@@ -37,7 +36,7 @@ const vectorDB = async (file) => {
         }
     ))
 
-    console.log("Records:",records);
+    console.log("Records saved:");
     
     await ns.upsert({ records })
     
