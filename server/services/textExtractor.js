@@ -5,7 +5,7 @@ import XLSX from "xlsx"
 import Tesseract from "tesseract.js"
 import chunking from "./chunking.js"
 import embedText from "./embedText.js"
-import extract from "../lib/groq/extractText.js"
+import { extract, extractTextFromImage } from "../lib/groq/extractText.js"
 import pdfToImages from "./pdfToImages.js"
 
 const cleanExtractedText = (text) => {
@@ -50,7 +50,7 @@ const textExtractor = async (file) => {
             const text = ((await parser.getText()).text.replace(/--\s*\d+\s*of\s*\d+\s*--/g, '').trim())
 
             const extractedText = cleanExtractedText(text)
-            
+
             const charCount = extractedText.length
             const wordCount = extractedText.split(/\s+/).filter(Boolean).length
             const pageCount = parser.doc._pdfInfo.numPages
@@ -66,7 +66,7 @@ const textExtractor = async (file) => {
                     embedText(results)
                     fs.unlinkSync(filePath)
                     return results
-                    
+
                 } catch (error) {
                     console.error(error);
                     fs.unlinkSync(filePath)
@@ -89,19 +89,21 @@ const textExtractor = async (file) => {
             fs.unlinkSync(filePath)
             return extractedText
 
-        } else if ((["image/jpeg", "image/png", "image/webp"].includes(mimeType))) {
-            const dataBuffer = fs.readFileSync(filePath)
+        } else if ((["image/jpeg", "image/png", "image/webp", "image/jpg"].includes(mimeType))) {
 
-            const { data } = await Tesseract.recognize(filePath, "eng")
-            const extractedText = data.text
+            // const { data } = await Tesseract.recognize(filePath, "eng")
+            // const extractedText = data.text
+
+            const extractedText = await extractTextFromImage(filePath)
 
             fs.unlinkSync(filePath)
+
             return extractedText
 
         } else if (mimeType == "text/plain") {
             const extractedText = fs.readFileSync(filePath, 'utf8')
 
-            fs.unlinkSync(filePath)
+            fs.unlinkSync(filePath, mimeType)
             return extractedText
         } else {
             throw new ApiError(404, "File not supported")

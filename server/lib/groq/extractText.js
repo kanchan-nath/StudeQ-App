@@ -69,4 +69,41 @@ const extract = async () => {
 
 }
 
-export default extract
+const extractTextFromImage = async(filePath, mimeType)=>{
+    const base64 = fs.readFileSync(filePath).toString("base64")
+
+    try {
+        const response = await groq.chat.completions.create({
+            model:"meta-llama/llama-4-scout-17b-16e-instruct",
+            messages:[
+                {
+                    role:"user",
+                    content:[
+                        {
+                            type:"text",
+                            text:prompt_TextExtraction
+                        },
+                        {
+                            type:"image_url",
+                            image_url:{
+                                url: `data:${mimeType};base64,${base64}`
+                            }
+                        }
+                    ]
+                }
+            ]
+        })
+
+        const data = response.choices[0].message.content
+
+        return data
+    } catch (error) {
+        console.error(error.message)
+    }
+}
+
+export  {
+    
+    extract,
+    extractTextFromImage
+}

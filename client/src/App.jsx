@@ -92,6 +92,10 @@ const App = () => {
             path="/notebook"
             element={<ProtectedRoute component={<Notebook />} />}
           />
+          <Route
+            path="/notebook/:chatId"
+            element={<ProtectedRoute component={<Notebook />} />}
+          />
         </Route>
       </Routes>
     </>
