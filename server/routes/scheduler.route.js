@@ -5,7 +5,10 @@ import {
     getScheduler,
     updateScheduler,
     generatePlan,
-    saveGeneratePlan
+    saveGeneratePlan,
+
+    createExamScheduler,
+    getExamScheduler
 } from "../controllers/scheduler.controller.js"
 const router = Router()
 
@@ -14,9 +17,8 @@ router.route("/scheduler").get(verifyJWT, getScheduler)
 router.route("/scheduler").patch(verifyJWT, updateScheduler)
 router.route("/scheduler/generate-plan").post(verifyJWT, generatePlan)
 router.route("/scheduler/generate-plan/save").post(verifyJWT, saveGeneratePlan)
-
-
-
+router.route("/scheduler/exam-dates").post(verifyJWT, createExamScheduler)
+router.route("/scheduler/exam-dates").get(verifyJWT, getExamScheduler)
 
 
 export default router

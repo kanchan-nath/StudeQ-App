@@ -1,4 +1,4 @@
-import mongoose from "mongoose"
+import mongoose, { mongo } from "mongoose"
 
 const scheduleEntrySchema = new mongoose.Schema({
     userId:{
@@ -36,3 +36,54 @@ const scheduleEntrySchema = new mongoose.Schema({
 }, {timestamps:true})
 
 export const scheduleEntry = mongoose.model("scheduleEntry", scheduleEntrySchema)
+
+const scheduleExamDatesSchema = mongoose.Schema({
+    userId:{
+        type:String,
+        required:true
+    },
+    subjectName:{
+        type: String,
+        required: true
+    },
+    examDate:{
+        type: Date,
+        required: true
+    },
+    examTime:{
+        type: String,
+        required: true
+    },
+    duration:{
+        type:Number,
+    },
+    venue:{
+        type:String,
+    },
+    onlineLink:{
+        type: String
+    },
+    subjectCode:{
+        type:String
+    },
+    notes:{
+        type:String
+    },
+    reminderEnabled:{
+        type: Boolean,
+        default:false
+    },
+    reminderDaysBefore:{
+        type:Number,
+    },
+    status:{
+        type: String,
+        enum:["upcoming", "completed", "cancelled"],
+        default:"upcoming"
+    },
+    createdAt:{
+        type: Date,
+    }
+},{timestamps:true})
+
+export const scheduleExamDates = mongoose.model("scheduleExamDates", scheduleExamDatesSchema)
