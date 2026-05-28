@@ -14,7 +14,8 @@ import {
     getSchedulerExam,
 
     createAssignmentSubmissionScheduler,
-    getAllAssignmentSubmission
+    getAllAssignmentSubmission,
+    getAssignmentSubmission
 } from "../controllers/scheduler.controller.js"
 const router = Router()
 
@@ -32,4 +33,5 @@ router.route("/scheduler/exam-dates/:id").get(verifyJWT, getSchedulerExam)
 
 router.route("/scheduler/assignment-submission").post(verifyJWT, createAssignmentSubmissionScheduler)
 router.route("/scheduler/assignment-submission").get(verifyJWT, getAllAssignmentSubmission)
+router.route("/scheduler/assignment-submission/:id").get(verifyJWT, getAssignmentSubmission)
 export default router

@@ -269,6 +269,20 @@ const getAllAssignmentSubmission = asyncHandler(async(req, res)=>{
     .status(200)
     .json(new ApiResponse(200, data, "All assignment submission fetched"))
 })
+
+const getAssignmentSubmission = asyncHandler(async(req, res)=>{
+    const {id} = req.params
+
+    if(!id){
+        throw new ApiError(400, "id is required")
+    }
+
+    const data = await AssignmentSubmission.find({userId, _id:id})
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, data, "Assignment fetched successfully"))
+})
 export {
     createScheduler,
     getScheduler,
@@ -284,5 +298,6 @@ export {
     getSchedulerExam,
 
     createAssignmentSubmissionScheduler,
-    getAllAssignmentSubmission
+    getAllAssignmentSubmission,
+    getAssignmentSubmission
 }
