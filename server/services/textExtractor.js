@@ -5,7 +5,7 @@ import XLSX from "xlsx"
 import Tesseract from "tesseract.js"
 import chunking from "./chunking.js"
 import embedText from "./embedText.js"
-import { extractText } from "../lib/groq/extractText.js"
+import extract from "../lib/groq/extractText.js"
 import pdfToImages from "./pdfToImages.js"
 
 const cleanExtractedText = (text) => {
@@ -36,34 +36,42 @@ const textExtractor = async (file) => {
     const mimeType = file.mimetype
     const filePath = file.path
 
-    const fileData = fs.readFileSync(filePath)
-    const base64File = fileData.toString('base64')
+    const fileDataBuffer = fs.readFileSync(filePath)
+    const base64File = fileDataBuffer.toString('base64')
+
     const THERESOLD_CHAR = 100
     const THERESOLD_WORD = 70
 
     try {
         if (mimeType == "application/pdf") {
-            const dataBuffer = fs.readFileSync(file.path)
-            const uint8Array = new Uint8Array(dataBuffer)
+            const uint8Array = new Uint8Array(fileDataBuffer)
             const parser = await new PDFParse(uint8Array)
 
             const text = ((await parser.getText()).text.replace(/--\s*\d+\s*of\s*\d+\s*--/g, '').trim())
 
             const extractedText = cleanExtractedText(text)
 
-            const pageCount = parser.doc._pdfInfo.numPages
-            console.log(extractedText);
-
+            // console.log(extractedText);
+            
             const charCount = extractedText.length
             const wordCount = extractedText.split(/\s+/).filter(Boolean).length
+            const pageCount = parser.doc._pdfInfo.numPages
 
             if (charCount < (THERESOLD_CHAR * pageCount) || wordCount < (THERESOLD_WORD * pageCount)) {
 
                 try {
                     await pdfToImages(filePath, pageCount)
+
+                    // console.log(results);
+                    const results = await extract()
+                    console.log(results);
+                    
+                    
                 } catch (error) {
                     console.error(error);
-                    
+                    fs.unlinkSync(filePath)
+                }finally{
+                    // fs.unlinkSync(filePath)
                 }
 
             } else {
@@ -72,11 +80,6 @@ const textExtractor = async (file) => {
                 fs.unlinkSync(filePath)
                 return extractedText
             }
-
-            console.log(charCount, wordCount, pageCount);
-
-
-
 
         } else if (mimeType == "application/vnd.ms-excel") {
             const wrokbook = XLSX.readFile(filePath)

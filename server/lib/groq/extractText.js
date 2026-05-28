@@ -1,37 +1,64 @@
-import openAI from "openai"
+import groq from "./groq.js"
 import dotenv from "dotenv"
+dotenv.config()
 import fs from "fs"
+import path from "path"
 import { prompt_TextExtraction } from "../prompt.js"
 
-const openai = new openAI({
-    apiKey: "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",
-    baseURL: 'https://integrate.api.nvidia.com/v1'
-})
+const extract = async () => {
+    const folder = "/Users/kanchannath/Coding/Spark.E/server/uploads/images"
 
-const extractText = async () => {
+    const files = fs.readdirSync(folder).sort()
+    console.log('files found:', files.length) 
 
-    const base64 = fs.readFileSync("/Users/kanchannath/Coding/Spark.E/server/uploads/images/Page1.png").toString("base64")
+    const results = []
+    const batchSize = 3
 
-    const response = await openai.chat.completions.create({
-        model: "meta/llama-3.2-90b-vision-instruct",
-        messages: [{
-            role: "user",
-            content: [
-                { type: "text", text: prompt_TextExtraction },
-                {
-                    type: "image_url",
-                    image_url: { url: `data:image/png;base64,${base64}` }
-                },
-                
-            ]
-        }]
-    })
+    for (let i = 0; i < files.length; i += batchSize) {
+        const batch = files.slice(i, i + batchSize)
+        console.log(i, files.length);
 
-    console.log(response.choices[0].message.content)
+        const batchResults = await Promise.all(
+            batch.map(async (file) => {
+                console.log(file);
+
+                const imgPath = path.join(folder, file)
+                const base64 = fs.readFileSync(imgPath).toString("base64")
+
+                const dataURI = `data:image/jpeg;base64,${base64}`
+
+                const response = await groq.chat.completions.create({
+                    model: "meta-llama/llama-4-scout-17b-16e-instruct",
+                    messages: [
+                        {
+                            role: "user",
+                            content: [
+                                {
+                                    type: "text",
+                                    text: prompt_TextExtraction
+                                },
+                                {
+                                    type: "image_url",
+                                    image_url: {
+                                        url: `data:image/jpeg;base64,${base64}`
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                })
+                const data = response.choices[0].message.content
+
+                return data
+            })
+        )
+
+        results.push(...batchResults)
+    }
+    const data = results.join('\n')
+    console.log(data)
+    fs.rmSync(folder, { recursive: true, force: true })
+    return data
 }
 
-extractText()
-
-export {
-    extractText
-}
+export default extract

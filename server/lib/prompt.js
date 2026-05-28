@@ -14,35 +14,24 @@ User's raw query:
 {{USER_QUERY}}
 `
 const prompt_TextExtraction = `
-    You are an expert document parser. Analyze the image and extract all content with strict rules:
+You are an expert document parser. Extract ALL content sequentially in the exact order it appears on the page — top to bottom, left to right. Do not group or reorder content by type.
 
-## TEXT EXTRACTION
-- Extract ALL visible text exactly as written — preserve original casing, punctuation, and spacing
-- Maintain reading order (top-left to bottom-right, column by column if multi-column)
-- Preserve paragraph breaks and indentation structure
-- If a character or symbol is ambiguous or partially visible, make your best inference and flag it with [?]
+For each piece of content encountered, process it inline as you go:
 
-## MATHEMATICAL EQUATIONS
-- Write all equations in LaTeX format
-- Use $...$ for equations embedded within a sentence (inline)
-- Use $$...$$ for standalone or display equations (block)
-- Preserve all subscripts, superscripts, fractions, integrals, summations, and Greek letters exactly
-- Example: $$\int_0^\infty \frac{e^{-x^2}}{\sigma_{n}} dx = \frac{\sqrt{\pi}}{2}$$
-- For matrices use \begin{bmatrix}...\end{bmatrix}
-- Never approximate, simplify, or rearrange any equation — extract as-is
+- PLAIN TEXT: Extract exactly as written. Preserve original casing, punctuation, spacing, indentation, and paragraph breaks. Flag ambiguous or partially visible characters with [?].
 
-## TABLES
-- Reproduce all tables using Markdown table syntax
-- Preserve every cell's content exactly, including units, symbols, and formatting
+- EQUATIONS: Write in LaTeX. Inline equations use $...$. Block/standalone equations use $$...$$. Preserve all subscripts, superscripts, fractions, integrals, summations, Greek letters exactly. Never simplify or rearrange. Matrices use \\begin{bmatrix}...\\end{bmatrix}.
 
-## DIAGRAMS, SHAPES, FIGURES
-- If any diagram, chart, shape, or figure is present:
-  1. State the diagram TYPE (flowchart / circuit / geometry / graph / block diagram / etc.)
-  2. List ALL labeled components with their exact label text
-  3. For simple figures (fewer than 3 components), label and describe concisely
-  4. For complex diagrams (3+ components), describe spatial relationships, connections, and arrow directions
-  5. Describe the overall structure and purpose of the diagram
-  6. If axes exist, state axis labels and all visible scale/tick values
+- TABLES: Reproduce in Markdown table syntax. Preserve every cell's content exactly including units and symbols.
+
+- DIAGRAMS / FIGURES / SHAPES: When encountered, output:
+  1. Diagram TYPE (flowchart / circuit / geometry / graph / block diagram / etc.)
+  2. All labeled components with exact label text
+  3. Spatial relationships, connections, and arrow directions
+  4. Overall structure and purpose
+  5. Axis labels and all visible scale/tick values (if axes exist)
+
+Output must mirror the document's reading flow exactly as a human would read it.
 `
 export {
     prompt_PromptOptimizer,
