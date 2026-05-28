@@ -39,8 +39,8 @@ const textExtractor = async (file) => {
     const fileDataBuffer = fs.readFileSync(filePath)
     const base64File = fileDataBuffer.toString('base64')
 
-    const THERESOLD_CHAR = 100
-    const THERESOLD_WORD = 70
+    const THERESOLD_CHAR = 200
+    const THERESOLD_WORD = 50
 
     try {
         if (mimeType == "application/pdf") {
@@ -50,8 +50,6 @@ const textExtractor = async (file) => {
             const text = ((await parser.getText()).text.replace(/--\s*\d+\s*of\s*\d+\s*--/g, '').trim())
 
             const extractedText = cleanExtractedText(text)
-
-            // console.log(extractedText);
             
             const charCount = extractedText.length
             const wordCount = extractedText.split(/\s+/).filter(Boolean).length
@@ -62,16 +60,16 @@ const textExtractor = async (file) => {
                 try {
                     await pdfToImages(filePath, pageCount)
 
-                    // console.log(results);
                     const results = await extract()
                     console.log(results);
                     
+                    embedText(results)
+                    fs.unlinkSync(filePath)
+                    return results
                     
                 } catch (error) {
                     console.error(error);
                     fs.unlinkSync(filePath)
-                }finally{
-                    // fs.unlinkSync(filePath)
                 }
 
             } else {
