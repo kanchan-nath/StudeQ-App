@@ -526,7 +526,7 @@ const Notebook = () => {
                         {isUser ? (
                           <p className={styles.messageContent}>{msg.content}</p>
                         ) : (
-                          <div className={styles.messageContent}>
+                            <div className={styles.aiContent}>
                               <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>
                               {msg.content}
                             </ReactMarkdown>
