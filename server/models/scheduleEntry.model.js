@@ -87,3 +87,37 @@ const scheduleExamDatesSchema = mongoose.Schema({
 },{timestamps:true})
 
 export const scheduleExamDates = mongoose.model("scheduleExamDates", scheduleExamDatesSchema)
+
+const assignmentSubmissionSchema = mongoose.Schema({
+    userId:{
+        type:String,
+        required: true
+    },
+    dueDate:{
+        type: Date,
+        required: true
+    },
+    submittedAt:{
+        type: String,
+    },
+    submissionStatus:{
+        type: String,
+        enum: ["pending", "submitted", "late", "graded"],
+        default: "pending"
+    },
+    feedback:{
+        type: String
+    },
+    allowLateSubmission:{
+        type:Boolean,
+        default:false
+    },
+    linkedAssignmentId:{
+        type:String
+    },
+    createdAt:{
+        type:Date
+    }
+},{timestamps:true})
+
+export const AssignmentSubmission = mongoose.model("AssignmentSubmission", assignmentSubmissionSchema)

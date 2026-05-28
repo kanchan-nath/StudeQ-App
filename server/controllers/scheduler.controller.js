@@ -1,6 +1,10 @@
 import { asyncHandler } from "../utils/asyncHandler.js"
 import { ApiError, ApiResponse } from "../utils/Async.js"
-import {scheduleEntry, scheduleExamDates} from "../models/scheduleEntry.model.js"
+import {
+    scheduleEntry, 
+    scheduleExamDates,
+    AssignmentSubmission
+} from "../models/scheduleEntry.model.js"
 import { generateStudyPlan } from "../lib/groq/generateStudyPlan.js"
 import { StudyPlan } from "../models/studyPlan.js"
 
@@ -108,6 +112,9 @@ const saveGeneratePlan = asyncHandler(async(req, res)=>{
 
 })
 
+// 
+
+
 const createExamScheduler = asyncHandler(async(req, res)=>{
     const { subjectName, examDate, examTime, duration, venue, onlineLink, subjectCode, notes, reminderEnabled, reminderDaysBefore, status,  } = req.body
 
@@ -140,7 +147,7 @@ const createExamScheduler = asyncHandler(async(req, res)=>{
     .json(new ApiResponse(200, data, "Exam date created"))
 })
 
-const getExamScheduler = asyncHandler(async(req, res)=>{
+const getAllExamScheduler = asyncHandler(async(req, res)=>{
     const userId = req.user.id
 
 
@@ -152,12 +159,121 @@ const getExamScheduler = asyncHandler(async(req, res)=>{
     .status(200)
     .json(new ApiResponse(200, data, "All exam dates are fetched "))
 })
+
+const deleteExamScheduler = asyncHandler(async(req,res)=>{
+    const userId = req.user.id
+
+    const {id} = req.params
+
+    if(!id){
+        throw new ApiError(400, "scheduler id is required")
+    }
+
+    const data = await scheduleExamDates.findOneAndDelete(
+        {
+            userId,
+            _id:id
+        }
+    )
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, data, "Exam Scheduler is deleted "))
+})
+
+const updateExamScheduler = asyncHandler(async(req, res)=>{
+    const { subjectName, examDate, examTime, duration, venue, onlineLink, subjectCode, notes, reminderEnabled, reminderDaysBefore, status }= req.body
+
+    const {id} = req.params
+
+    if(!id){
+        throw new ApiError(400, "Scheduler id id required")
+    }
+
+    const objects = { subjectName, examDate, examTime, duration, venue, onlineLink, subjectCode, notes, reminderEnabled, reminderDaysBefore, status }
+
+    const filteredObjects = Object.fromEntries(
+        Object.entries(([key, value])=> value !==undefined)
+    )
+    console.log(filteredObjects);
+
+    if(Object.keys(filteredObjects).length ===0){
+        throw new ApiError(400, "At least one field is required to update")
+    }
+
+    const userId = req.user.id
+
+    const data = await scheduleExamDates.findOneAndUpdate(
+        {
+            _id:id,
+            userId
+        },
+        {
+            $set:filteredObjects
+        }
+    )
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, data, "Exam scheduler updated successfully"))
+
+})
+
+const getSchedulerExam  = asyncHandler(async(req, res)=>{
+    const {id} = req.params
+
+    if(!id){
+        throw new ApiError(400, "Id is required")
+    }
+
+    const data = await scheduleExamDates.find({
+        _id:id,
+        userId
+    })
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, data, "Scheduler exam fetched"))
+})
+
+// 
+
+
+const createAssignmentSubmissionScheduler = asyncHandler(async(req, res)=>{
+    const { dueDate, allowLateSubmission, linkedAssignmentId } = req.body
+
+    if(!dueDate){
+        throw new ApiError(400, "Due date is required")
+    }
+
+    const userId = req.user.id
+
+    const data = await AssignmentSubmission.create({
+        userId,
+        dueDate,
+        allowLateSubmission,
+        linkedAssignmentId
+    })
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, data,"Assignment scheduler created"))
+})
+
+
 export {
     createScheduler,
     getScheduler,
     updateScheduler,
     generatePlan,
     saveGeneratePlan,
+
+
     createExamScheduler,
-    getExamScheduler
+    getAllExamScheduler,
+    deleteExamScheduler,
+    updateExamScheduler,
+    getSchedulerExam,
+
+    createAssignmentSubmissionScheduler
 }
