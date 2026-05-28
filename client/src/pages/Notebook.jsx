@@ -533,7 +533,11 @@ const Notebook = () => {
                       key={msg._id || i}
                       className={`${styles.messageRow} ${isUser ? styles.messageRowUser : styles.messageRowAI}`}
                     >
-                      {!isUser && <div className={styles.aiAvatar}>AI</div>}
+                      {!isUser && (
+                        <div className={styles.aiAvatar}>
+                          <img src="/favicon.svg" alt="AI" width={15} height={15} />
+                        </div>
+                      )}
                       <div
                         className={`${styles.messageBubble} ${isUser ? styles.bubbleUser : styles.bubbleAI} ${editingMessageId === msg._id ? styles.bubbleEditing : ""}`}
                         onMouseEnter={() => isUser && setEditingMessageId(msg._id)}
