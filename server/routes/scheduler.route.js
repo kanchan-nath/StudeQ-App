@@ -16,7 +16,8 @@ import {
     createAssignmentSubmissionScheduler,
     getAllAssignmentSubmission,
     getAssignmentSubmission,
-    deleteAssignmentSubmission
+    deleteAssignmentSubmission,
+    updateAssignmentSubmission
 } from "../controllers/scheduler.controller.js"
 const router = Router()
 
@@ -36,4 +37,5 @@ router.route("/scheduler/assignment-submission").post(verifyJWT, createAssignmen
 router.route("/scheduler/assignment-submission").get(verifyJWT, getAllAssignmentSubmission)
 router.route("/scheduler/assignment-submission/:id").get(verifyJWT, getAssignmentSubmission)
 router.route("/scheduler/assignment-submission/:id").delete(verifyJWT, deleteAssignmentSubmission)
+router.route("/scheduler/assignment-submission/:id").patch(verifyJWT, updateAssignmentSubmission)
 export default router
