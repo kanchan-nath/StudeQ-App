@@ -13,7 +13,11 @@ import {
     updateExamScheduler,
     getSchedulerExam,
 
-    createAssignmentSubmissionScheduler
+    createAssignmentSubmissionScheduler,
+    getAllAssignmentSubmission,
+    getAssignmentSubmission,
+    deleteAssignmentSubmission,
+    updateAssignmentSubmission
 } from "../controllers/scheduler.controller.js"
 const router = Router()
 
@@ -30,5 +34,8 @@ router.route("/scheduler/:id").patch(verifyJWT, updateExamScheduler)
 router.route("/scheduler/exam-dates/:id").get(verifyJWT, getSchedulerExam)
 
 router.route("/scheduler/assignment-submission").post(verifyJWT, createAssignmentSubmissionScheduler)
-
+router.route("/scheduler/assignment-submission").get(verifyJWT, getAllAssignmentSubmission)
+router.route("/scheduler/assignment-submission/:id").get(verifyJWT, getAssignmentSubmission)
+router.route("/scheduler/assignment-submission/:id").delete(verifyJWT, deleteAssignmentSubmission)
+router.route("/scheduler/assignment-submission/:id").patch(verifyJWT, updateAssignmentSubmission)
 export default router

@@ -193,7 +193,7 @@ const updateExamScheduler = asyncHandler(async(req, res)=>{
     const objects = { subjectName, examDate, examTime, duration, venue, onlineLink, subjectCode, notes, reminderEnabled, reminderDaysBefore, status }
 
     const filteredObjects = Object.fromEntries(
-        Object.entries(([key, value])=> value !==undefined)
+        Object.entries(objects).filter(([key, value])=> value !==undefined)
     )
     console.log(filteredObjects);
 
@@ -260,7 +260,89 @@ const createAssignmentSubmissionScheduler = asyncHandler(async(req, res)=>{
     .json(new ApiResponse(200, data,"Assignment scheduler created"))
 })
 
+const getAllAssignmentSubmission = asyncHandler(async(req, res)=>{
+    const userId = req.user.id
 
+    const data = await AssignmentSubmission.find({userId})
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, data, "All assignment submission fetched"))
+})
+
+const getAssignmentSubmission = asyncHandler(async(req, res)=>{
+    const {id} = req.params
+
+    if(!id){
+        throw new ApiError(400, "id is required")
+    }
+
+    const userId = req.user.id
+
+    const data = await AssignmentSubmission.find({userId, _id:id})
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, data, "Assignment fetched successfully"))
+})
+
+const deleteAssignmentSubmission = asyncHandler(async(req, res)=>{
+    const { id } = req.params
+
+    if (!id) {
+        throw new ApiError(400, "id is required")
+    }
+
+    const userId = req.user.id
+    
+    const data = await AssignmentSubmission.findOneAndDelete(
+        {
+            userId,
+            _id:id
+        },
+        
+    )
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, data, "Assignment delted successfully"))
+})
+
+const updateAssignmentSubmission = asyncHandler(async(req, res)=>{
+    const { id } = req.params
+    const { dueDate, submittedAt, submissionStatus, feedback, allowLateSubmission, linkedAssignmentId,  } = req.body
+    
+    if (!id) {
+        throw new ApiError(400, "id is required")
+    }
+
+    const objects = { dueDate, submittedAt, submissionStatus, feedback, allowLateSubmission, linkedAssignmentId }
+
+    const filteredObjects = Object.fromEntries(
+        Object.entries(objects).filter(([key, value])=>value!==undefined)
+    )
+
+    if(Object.keys(filteredObjects).length === 0){
+        throw new ApiError(400, "At least one field is required for update")
+    }
+
+    const userId = req.user.id
+
+    const data = await AssignmentSubmission.findOneAndUpdate(
+        {
+            userId,
+            _id:id
+        },
+        {
+            $set:filteredObjects
+        }
+    )
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, data,'Assignment upadted'))
+
+})
 export {
     createScheduler,
     getScheduler,
@@ -275,5 +357,9 @@ export {
     updateExamScheduler,
     getSchedulerExam,
 
-    createAssignmentSubmissionScheduler
+    createAssignmentSubmissionScheduler,
+    getAllAssignmentSubmission,
+    getAssignmentSubmission,
+    deleteAssignmentSubmission,
+    updateAssignmentSubmission
 }
