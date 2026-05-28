@@ -51,9 +51,9 @@ const UploadLoader = () => (
 );
 
 // ── Sidebar chat item ──────────────────────────────────────────────────────────
-const SidebarItem = ({ chat, isActive, onSelect, onDelete }) => {
+const SidebarItem = ({ chat, isActive, onSelect, onDelete, chatTitle }) => {
   const [menuOpen, setMenuOpen] = useState(false);
-  const title = chat.messages[0]?.content || "Untitled chat";  
+  const title = chat.messages[0]?.content || chatTitle;  
   const menuRef = useRef(null);
 
   useEffect(() => {
@@ -626,6 +626,7 @@ const Notebook = () => {
                     isActive={activeChatId === (chat.id || chat._id)}
                     onSelect={handleSelectChat}
                     onDelete={handleDeleteChat}
+                    chatTitle={chatTitle}
                   />
                 ))}
               </ul>
