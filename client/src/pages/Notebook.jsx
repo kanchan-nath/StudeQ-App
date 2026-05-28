@@ -4,7 +4,9 @@ import styles from "./styles/Notebook.module.css";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
-
+import remarkMath from "remark-math";
+import rehypeKatex from "rehype-katex";
+import "katex/dist/katex.min.css";
 // ── Toast helper ──────────────────────────────────────────────────────────────
 const Toast = ({ toasts, removeToast }) => (
   <div className={styles.toastStack}>
@@ -525,7 +527,7 @@ const Notebook = () => {
                           <p className={styles.messageContent}>{msg.content}</p>
                         ) : (
                           <div className={styles.messageContent}>
-                            <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
+                              <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>
                               {msg.content}
                             </ReactMarkdown>
                           </div>

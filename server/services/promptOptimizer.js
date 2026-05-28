@@ -8,13 +8,10 @@ const openai = new OpenAi({
 })
 
 const promptOptimizer = async (userQuery) => {
-    console.log("Kanchan");
 
-    try {
-        console.log("Checked 1");
-        
+    try {        
         const response = await openai.chat.completions.create({
-            model: "mistralai/mistral-large-3-675b-instruct-2512",
+            model: "meta/llama-3.2-3b-instruct",
             messages: [
                 {
                     "role": "user",
@@ -22,8 +19,9 @@ const promptOptimizer = async (userQuery) => {
                 }
             ],
             
-            temperature: 1,
-            top_p: 0.95,
+            temperature: 0.2,
+            top_p: 0.7,
+            max_tokens: 1024,
             // chat_template_kwargs: { "thinking": true, "reasoning_effort": "high" },
             // stream: true
         })

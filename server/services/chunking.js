@@ -4,8 +4,8 @@ import embedText from "./embedText.js";
 const chunking = async (text) => {
 
     const splitter = new RecursiveCharacterTextSplitter({
-        chunkSize:1000,
-        chunkOverlap:200,
+        chunkSize:300,
+        chunkOverlap:50,
     })
 
     const chunks = await splitter.splitText(text)

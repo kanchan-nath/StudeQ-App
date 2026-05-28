@@ -1,6 +1,6 @@
 import { asyncHandler } from "../utils/asyncHandler.js"
 import { ApiError, ApiResponse } from "../utils/Async.js"
-import { vectorDB, queryDB } from "../services/vectorDB.js"
+import { vectorDB, queryDB } from "../services/vectordb.js"
 import llmCall from "../lib/groq/llmCall.js"
 import { Documents } from "../models/document.model.js"
 import { v4 as uuid4 } from "uuid"

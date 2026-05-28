@@ -5,7 +5,7 @@ import { imageAnalyze } from "../lib/groq/imageAnalyze.js"
 
 const analyze = asyncHandler(async (req, res) => {
     try {
-        const imageFile = req.files?.image?.[0].path
+        const imageFile = req.files?.image[0]?.path
 
         if (!imageFile) {
             throw new ApiError(400, "No image file uploaded")
