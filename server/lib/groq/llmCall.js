@@ -5,7 +5,7 @@ import { promptOptimizer } from "../../services/promptOptimizer.js";
 const llmCall = async (query, topChunks, userId) => {
 
     const optimizedPrompt  = await promptOptimizer(query)
-    const prompt = optimizedPrompt + `Context:${topChunks}`    
+    const prompt = optimizedPrompt.replace("{{CHUNKS}}", topChunks)
     
     const response = await groq.chat.completions.create(
         {
