@@ -277,11 +277,35 @@ const getAssignmentSubmission = asyncHandler(async(req, res)=>{
         throw new ApiError(400, "id is required")
     }
 
+    const userId = req.user.id
+
     const data = await AssignmentSubmission.find({userId, _id:id})
 
     return res
     .status(200)
     .json(new ApiResponse(200, data, "Assignment fetched successfully"))
+})
+
+const deleteAssignmentSubmission = asyncHandler(async(req, res)=>{
+    const { id } = req.params
+
+    if (!id) {
+        throw new ApiError(400, "id is required")
+    }
+
+    const userId = req.user.id
+    
+    const data = await AssignmentSubmission.findOneAndDelete(
+        {
+            userId,
+            _id:id
+        },
+        
+    )
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, data, "Assignment delted successfully"))
 })
 export {
     createScheduler,
@@ -299,5 +323,6 @@ export {
 
     createAssignmentSubmissionScheduler,
     getAllAssignmentSubmission,
-    getAssignmentSubmission
+    getAssignmentSubmission,
+    deleteAssignmentSubmission
 }
