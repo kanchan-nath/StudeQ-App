@@ -58,7 +58,9 @@ const textExtractor = async (file) => {
             if (charCount < (THERESOLD_CHAR * pageCount) || wordCount < (THERESOLD_WORD * pageCount)) {
 
                 try {
-                    await pdfToImages(filePath, pageCount)
+                    const outputDir = "/Users/kanchannath/Coding/Spark.E/server/uploads/images"
+
+                    await pdfToImages(filePath, pageCount, outputDir)
 
                     const results = await extract()
                     console.log("Text Extracted from Pdf -> Images");

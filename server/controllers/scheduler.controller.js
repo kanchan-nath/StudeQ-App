@@ -9,6 +9,9 @@ import {
 } from "../models/scheduleEntry.model.js"
 import { generateStudyPlan } from "../lib/groq/generateStudyPlan.js"
 import { StudyPlan } from "../models/studyPlan.js"
+import pdfToImages from "../services/pdfToImages.js"
+import {PDFParse} from "pdf-parse"
+import fs from "fs"
 
 const createScheduler = asyncHandler(async (req, res) => {
     const { subject, topic, schedulerDate, duration } = req.body
@@ -597,6 +600,34 @@ const updateTimeTable = asyncHandler(async(req, res)=>{
     .json(new ApiResponse(200, ))
 
 })
+
+const uploadFile = asyncHandler(async(req, res)=>{
+    const file = req.files?.file[0]
+
+    if(!file){
+        throw new ApiError(400, "File is required")
+    }
+
+    const mimeType = file?.mimeType
+    const filePath = file?.path
+
+    const outputDir = "/Users/kanchannath/Coding/Spark.E/server/uploads/scheduler"
+
+    const dataBuffer = fs.readFileSync(filePath)
+    const uint8array= new Uint8Array(dataBuffer)
+    const parser = new PDFParse(uint8array)
+
+    await parser.getText()    
+    
+    const totalPages = parser?.doc?._pdfInfo?.numPages
+    console.log("Started", totalPages);
+    
+    await pdfToImages(filePath, totalPages, outputDir)
+    console.log("End");
+
+    fs.unlinkSync(filePath)
+    
+})
 export {
     createScheduler,
     getScheduler,
@@ -627,5 +658,8 @@ export {
     getAllTimeTables,
     getTimeTable,
     deleteTimeTable,
-    updateTimeTable
+    updateTimeTable,
+
+
+    uploadFile
 }

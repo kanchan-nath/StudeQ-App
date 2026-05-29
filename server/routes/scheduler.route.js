@@ -29,8 +29,13 @@ import {
     getAllTimeTables,
     getTimeTable,
     deleteTimeTable,
-    updateTimeTable
+    updateTimeTable,
+
+    uploadFile
+    
 } from "../controllers/scheduler.controller.js"
+import {upload} from "../middlewares/multer.middleware.js"
+
 const router = Router()
 
 router.route("/scheduler").post(verifyJWT, createScheduler)
@@ -62,4 +67,14 @@ router.route("/scheduler/time-table").get(verifyJWT, getAllTimeTables)
 router.route("/scheduler/time-table/:id").get(verifyJWT, getTimeTable)
 router.route("/scheduler/time-table/:id").delete(verifyJWT, deleteTimeTable)
 router.route("/scheduler/time-table/:id").patch(verifyJWT, updateTimeTable)
+
+// 
+router.route("/scheduler/material").post(verifyJWT,
+    upload.fields([
+        {
+            name:"file"
+        }
+    ]),
+    uploadFile
+)
 export default router

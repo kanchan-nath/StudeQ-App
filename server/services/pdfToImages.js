@@ -2,8 +2,8 @@ import fs from "fs"
 import { exec } from "child_process"
 import path from "path"
 
-const pdfToImages = async (filePath, totalPages) => {
-    const outputDir = "/Users/kanchannath/Coding/Spark.E/server/uploads/images"
+const pdfToImages = async (filePath, totalPages, outputDir) => {
+    
     fs.mkdirSync(outputDir, { recursive: true })
     
     return new Promise((resolve, reject) => {
@@ -36,6 +36,5 @@ const pdfToImages = async (filePath, totalPages) => {
         }
     })
 }
-
 
 export default pdfToImages
