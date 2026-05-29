@@ -27,7 +27,8 @@ import {
 
     createTimeTable,
     getAllTimeTables,
-    getTimeTable
+    getTimeTable,
+    deleteTimeTable
 } from "../controllers/scheduler.controller.js"
 const router = Router()
 
@@ -58,5 +59,6 @@ router.route("/scheduler/project-submission/:id").patch(verifyJWT, updateProject
 router.route("/scheduler/time-table").post(verifyJWT, createTimeTable)
 router.route("/scheduler/time-table").get(verifyJWT, getAllTimeTables)
 router.route("/scheduler/time-table/:id").get(verifyJWT, getTimeTable)
+router.route("/scheduler/time-table/:id").delete(verifyJWT, deleteTimeTable)
 
 export default router

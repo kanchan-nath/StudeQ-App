@@ -519,6 +519,30 @@ const getTimeTable = asyncHandler(async(req, res)=>{
     .status(200)
     .json(new ApiResponse(200, data, "Ti,e table fetched"))
 })
+
+const deleteTimeTable = asyncHandler(async(req, res)=>{
+    const {id} = req.params
+
+    if(!id){
+        throw new ApiError(400, "Id is required")
+    }
+
+    const isDataExist = await TimeTable.find({_id:id})
+
+    if (!isDataExist){
+        throw new ApiError(400, "Time table not found")
+    }
+
+    const data = await TimeTable.findOneAndDelete(
+        {
+            _id:id
+        }
+    )
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, "Time table is deleted"))
+})
 export {
     createScheduler,
     getScheduler,
@@ -548,4 +572,5 @@ export {
     createTimeTable,
     getAllTimeTables,
     getTimeTable,
+    deleteTimeTable
 }
