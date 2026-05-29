@@ -501,6 +501,24 @@ const getAllTimeTables = asyncHandler(async (req, res) => {
     .status(200)
     .json(new ApiResponse(200, data, "All time tables fetched"))
 })
+
+const getTimeTable = asyncHandler(async(req, res)=>{
+    const {id} = req.params
+
+    if(!id){
+        throw new ApiError(400, "Id is required")
+    }
+
+    const data = await TimeTable.find(
+        {
+            _id:id
+        }
+    )
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, data, "Ti,e table fetched"))
+})
 export {
     createScheduler,
     getScheduler,
@@ -529,4 +547,5 @@ export {
 
     createTimeTable,
     getAllTimeTables,
+    getTimeTable,
 }

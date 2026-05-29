@@ -26,7 +26,8 @@ import {
     updateProjectSubmission,
 
     createTimeTable,
-    getAllTimeTables
+    getAllTimeTables,
+    getTimeTable
 } from "../controllers/scheduler.controller.js"
 const router = Router()
 
@@ -56,4 +57,6 @@ router.route("/scheduler/project-submission/:id").patch(verifyJWT, updateProject
 // 
 router.route("/scheduler/time-table").post(verifyJWT, createTimeTable)
 router.route("/scheduler/time-table").get(verifyJWT, getAllTimeTables)
+router.route("/scheduler/time-table/:id").get(verifyJWT, getTimeTable)
+
 export default router
