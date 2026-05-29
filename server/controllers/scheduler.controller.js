@@ -4,7 +4,8 @@ import {
     scheduleEntry,
     scheduleExamDates,
     AssignmentSubmission,
-    ProjectSubmission
+    ProjectSubmission,
+    TimeTable
 } from "../models/scheduleEntry.model.js"
 import { generateStudyPlan } from "../lib/groq/generateStudyPlan.js"
 import { StudyPlan } from "../models/studyPlan.js"
@@ -441,7 +442,7 @@ const updateProjectSubmission = asyncHandler(async (req, res) => {
 
     const data = await ProjectSubmission.findOneAndUpdate(
         {
-            _id:id
+            _id: id
         },
         {
             $set: filteredObjects
@@ -449,8 +450,41 @@ const updateProjectSubmission = asyncHandler(async (req, res) => {
     )
 
     return res
+        .status(200)
+        .json(new ApiResponse(200, data, "Project schedule is updated"))
+
+})
+
+const createTimeTable = asyncHandler(async (req, res) => {
+    const { title, topic, startTime, endTime, plannedDuration, isRecurring, recurrencePattern, recurrenceDays, recurrenceEndDate, status, actualDuration, goalDescription, reminderEnabled, reminderMinutesBefore, } = req.body
+
+    if (!title || !topic || !startTime || !endTime || !plannedDuration) {
+        throw new ApiError(400, "These fields are required")
+    }
+
+    const data = await TimeTable.create(
+        {
+            userId,
+            title,
+            topic,
+            startTime,
+            endTime,
+            plannedDuration,
+            isRecurring,
+            recurrencePattern,
+            recurrenceDays,
+            recurrenceEndDate,
+            status,
+            actualDuration,
+            goalDescription,
+            reminderEnabled,
+            reminderMinutesBefore,
+        }
+    )
+
+    return res
     .status(200)
-    .json(new ApiResponse(200, data, "Project schedule is updated"))
+    .json(new ApiResponse(200, data, "Time table created"))
 
 })
 export {
@@ -477,5 +511,8 @@ export {
     getAllProjectSubmission,
     getProjectSubmission,
     deleteProjectSubmission,
-    updateProjectSubmission
+    updateProjectSubmission,
+
+    createTimeTable,
+
 }

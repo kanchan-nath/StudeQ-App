@@ -231,6 +231,12 @@ timeTableSchema.pre("validate", (next) => {
         }
     }
 
+    if(this.reminderEnabled){
+        if (!this.reminderMinutesBefore){
+            this.invalidate("reminderMinutesBefore", "this field is req when reminderEnabled is true")
+        }
+    }
+
     next()
 })
 
