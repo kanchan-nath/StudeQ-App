@@ -218,7 +218,7 @@ const timeTableSchema = mongoose.Schema({
 
 }, { timestamps: true })
 
-timeTableSchema.pre("validate", (next) => {
+timeTableSchema.pre("findOneAndUpdate", function(next){
     if (this.isRecurring) {
         if (!this.recurrencePattern) {
             this.invalidate("recurrencePattern", "required when isRecurring is true")
@@ -240,4 +240,33 @@ timeTableSchema.pre("validate", (next) => {
     next()
 })
 
+/*
+timeTableSchema.pre("findOneAndUpdate", function(next) {
+  // use this.get() to read the incoming update values
+  const isRecurring = this.get("isRecurring");
+  const reminderEnabled = this.get("reminderEnabled");
+  const update = this.getUpdate(); // full update object if needed
+
+  if (isRecurring) {
+    if (!this.get("recurrencePattern")) {
+      return next(new Error("recurrencePattern required when isRecurring is true"));
+    }
+    if (!this.get("recurrenceEndDate")) {
+      return next(new Error("recurrenceEndDate required when isRecurring is true"));
+    }
+    const days = this.get("recurrenceDays");
+    if (!days || days.length === 0) {
+      return next(new Error("recurrenceDays required when isRecurring is true"));
+    }
+  }
+
+  if (reminderEnabled) {
+    if (!this.get("reminderMinutesBefore")) {
+      return next(new Error("reminderMinutesBefore required when reminderEnabled is true"));
+    }
+  }
+
+  next();
+});
+*/
 export const TimeTable = mongoose.model("TimeTable", timeTableSchema)

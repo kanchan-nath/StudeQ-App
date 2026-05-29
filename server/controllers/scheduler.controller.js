@@ -454,6 +454,7 @@ const updateProjectSubmission = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, data, "Project schedule is updated"))
 
 })
+// 
 
 const createTimeTable = asyncHandler(async (req, res) => {
     const { title, topic, startTime, endTime, plannedDuration, isRecurring, recurrencePattern, recurrenceDays, recurrenceEndDate, status, actualDuration, goalDescription, reminderEnabled, reminderMinutesBefore, } = req.body
@@ -543,6 +544,59 @@ const deleteTimeTable = asyncHandler(async(req, res)=>{
     .status(200)
     .json(new ApiResponse(200, "Time table is deleted"))
 })
+
+const updateTimeTable = asyncHandler(async(req, res)=>{
+    const {id} = req.user.id
+
+    if(!id){
+        throw new ApiError(400, "Id is required")
+    }
+
+    const { title, topic, startTime, endTime, plannedDuration, isRecurring, recurrencePattern, recurrenceDays, recurrenceEndDate, status, actualDuration, goalDescription, reminderEnabled, reminderMinutesBefore, } = req.body
+
+    const objects = { title, topic, startTime, endTime, plannedDuration, isRecurring, recurrencePattern, recurrenceDays, recurrenceEndDate, status, actualDuration, goalDescription, reminderEnabled, reminderMinutesBefore, }
+
+    const filteredObjects = Object.fromEntries(
+        Object.entries(objects).filter(([key, value])=>value !==undefined)
+    )
+
+    if(Object.keys(filteredObjects).length === 0){
+        throw new ApiError(400, "Atleast one field need to be updated")
+    }
+
+
+    const userId = req.user.id
+
+    const isDataExist = await TimeTable.findOne(
+        {
+            userId,
+            _id:id
+        }
+    )
+
+    if(!isDataExist){
+        throw new ApiError(400, "Time table not exist")
+    }
+
+    // Object.assign(isDataExist, filteredObjects)
+    // const data = await isDataExist.save()
+
+
+    const data = await TimeTable.findOneAndUpdate(
+        {
+            userId,
+            _id:id
+        },
+        {
+
+            $set:filteredObjects
+        }
+    )
+    return res
+    .status(20)
+    .json(new ApiResponse(200, ))
+
+})
 export {
     createScheduler,
     getScheduler,
@@ -572,5 +626,6 @@ export {
     createTimeTable,
     getAllTimeTables,
     getTimeTable,
-    deleteTimeTable
+    deleteTimeTable,
+    updateTimeTable
 }
