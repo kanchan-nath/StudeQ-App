@@ -483,9 +483,23 @@ const createTimeTable = asyncHandler(async (req, res) => {
     )
 
     return res
-    .status(200)
-    .json(new ApiResponse(200, data, "Time table created"))
+        .status(200)
+        .json(new ApiResponse(200, data, "Time table created"))
 
+})
+
+const getAllTimeTables = asyncHandler(async (req, res) => {
+    const userId = req.user.id
+
+    const data = await TimeTable.find(
+        {
+            userId
+        }
+    )
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, data, "All time tables fetched"))
 })
 export {
     createScheduler,
@@ -514,5 +528,5 @@ export {
     updateProjectSubmission,
 
     createTimeTable,
-
+    getAllTimeTables,
 }
