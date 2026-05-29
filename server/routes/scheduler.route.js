@@ -1,5 +1,5 @@
 import { Router } from "express";
-import {verifyJWT} from "../middlewares/auth.middleware.js"
+import { verifyJWT } from "../middlewares/auth.middleware.js"
 import {
     createScheduler,
     getScheduler,
@@ -17,7 +17,13 @@ import {
     getAllAssignmentSubmission,
     getAssignmentSubmission,
     deleteAssignmentSubmission,
-    updateAssignmentSubmission
+    updateAssignmentSubmission,
+
+    createProjectSubmissionScheduler,
+    getAllProjectSubmission,
+    getProjectSubmission,
+    deleteProjectSubmission,
+    updateProjectSubmission
 } from "../controllers/scheduler.controller.js"
 const router = Router()
 
@@ -38,4 +44,10 @@ router.route("/scheduler/assignment-submission").get(verifyJWT, getAllAssignment
 router.route("/scheduler/assignment-submission/:id").get(verifyJWT, getAssignmentSubmission)
 router.route("/scheduler/assignment-submission/:id").delete(verifyJWT, deleteAssignmentSubmission)
 router.route("/scheduler/assignment-submission/:id").patch(verifyJWT, updateAssignmentSubmission)
+
+router.route("/scheduler/project-submission").post(verifyJWT, createProjectSubmissionScheduler)
+router.route("/scheduler/project-submission").get(verifyJWT, getAllProjectSubmission)
+router.route("/scheduler/project-submission/:id").get(verifyJWT, getProjectSubmission)
+router.route("/scheduler/project-submission/:id").delete(verifyJWT, deleteProjectSubmission)
+router.route("/scheduler/project-submission/:id").patch(verifyJWT, updateProjectSubmission)
 export default router

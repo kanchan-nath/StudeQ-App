@@ -121,3 +121,32 @@ const assignmentSubmissionSchema = mongoose.Schema({
 },{timestamps:true})
 
 export const AssignmentSubmission = mongoose.model("AssignmentSubmission", assignmentSubmissionSchema)
+
+const projectSubmissionSchema = mongoose.Schema({
+    userId:{
+        type:String,
+        required: true
+    },
+    projectTitle:{
+        type:String,
+        required:true
+    },
+    phase:{
+        type: String,
+        enum: ["proposal", "mideval","final"],
+        default:"proposal"
+    },
+    submissionDate:{
+        type: Date,
+        required: true
+    },
+    projectLink:{
+        type:String,
+
+    },
+    createdAt:{
+        type:Date
+    }
+}, {timestamps:true})
+
+export const ProjectSubmission = mongoose.model("ProjectSubmission", projectSubmissionSchema)
