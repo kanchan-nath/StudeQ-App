@@ -1,152 +1,237 @@
 import mongoose, { mongo } from "mongoose"
 
 const scheduleEntrySchema = new mongoose.Schema({
-    userId:{
+    userId: {
         type: String,
-        required:true
+        required: true
     },
-    subject:{
-        type:String,
+    subject: {
+        type: String,
         required: true
 
     },
-    topic:{
-        type:String,
+    topic: {
+        type: String,
         required: true
 
     },
-    schedulerDate:{
+    schedulerDate: {
         type: Date,
         required: true
 
     },
-    duration:{
+    duration: {
         type: Number,
         required: true
 
     },
-    completed:{
-        type:Boolean,
-        default:false
+    completed: {
+        type: Boolean,
+        default: false
 
     },
     createdAt: {
-        type:Date
+        type: Date
     }
-}, {timestamps:true})
+}, { timestamps: true })
 
 export const scheduleEntry = mongoose.model("scheduleEntry", scheduleEntrySchema)
 
 const scheduleExamDatesSchema = mongoose.Schema({
-    userId:{
-        type:String,
-        required:true
-    },
-    subjectName:{
+    userId: {
         type: String,
         required: true
     },
-    examDate:{
+    subjectName: {
+        type: String,
+        required: true
+    },
+    examDate: {
         type: Date,
         required: true
     },
-    examTime:{
+    examTime: {
         type: String,
         required: true
     },
-    duration:{
-        type:Number,
+    duration: {
+        type: Number,
     },
-    venue:{
-        type:String,
+    venue: {
+        type: String,
     },
-    onlineLink:{
+    onlineLink: {
         type: String
     },
-    subjectCode:{
-        type:String
+    subjectCode: {
+        type: String
     },
-    notes:{
-        type:String
+    notes: {
+        type: String
     },
-    reminderEnabled:{
+    reminderEnabled: {
         type: Boolean,
-        default:false
+        default: false
     },
-    reminderDaysBefore:{
-        type:Number,
+    reminderDaysBefore: {
+        type: Number,
     },
-    status:{
+    status: {
         type: String,
-        enum:["upcoming", "completed", "cancelled"],
-        default:"upcoming"
+        enum: ["upcoming", "completed", "cancelled"],
+        default: "upcoming"
     },
-    createdAt:{
+    createdAt: {
         type: Date,
     }
-},{timestamps:true})
+}, { timestamps: true })
 
 export const scheduleExamDates = mongoose.model("scheduleExamDates", scheduleExamDatesSchema)
 
 const assignmentSubmissionSchema = mongoose.Schema({
-    userId:{
-        type:String,
+    userId: {
+        type: String,
         required: true
     },
-    dueDate:{
+    dueDate: {
         type: Date,
         required: true
     },
-    submittedAt:{
+    submittedAt: {
         type: String,
     },
-    submissionStatus:{
+    submissionStatus: {
         type: String,
         enum: ["pending", "submitted", "late", "graded"],
         default: "pending"
     },
-    feedback:{
+    feedback: {
         type: String
     },
-    allowLateSubmission:{
-        type:Boolean,
-        default:false
+    allowLateSubmission: {
+        type: Boolean,
+        default: false
     },
-    linkedAssignmentId:{
-        type:String
+    linkedAssignmentId: {
+        type: String
     },
-    createdAt:{
-        type:Date
+    createdAt: {
+        type: Date
     }
-},{timestamps:true})
+}, { timestamps: true })
 
 export const AssignmentSubmission = mongoose.model("AssignmentSubmission", assignmentSubmissionSchema)
 
 const projectSubmissionSchema = mongoose.Schema({
-    userId:{
-        type:String,
+    userId: {
+        type: String,
         required: true
     },
-    projectTitle:{
-        type:String,
-        required:true
-    },
-    phase:{
+    projectTitle: {
         type: String,
-        enum: ["proposal", "mideval","final"],
-        default:"proposal"
+        required: true
     },
-    submissionDate:{
+    phase: {
+        type: String,
+        enum: ["proposal", "mideval", "final"],
+        default: "proposal"
+    },
+    submissionDate: {
         type: Date,
         required: true
     },
-    projectLink:{
-        type:String,
+    projectLink: {
+        type: String,
 
+    },
+    createdAt: {
+        type: Date
+    }
+}, { timestamps: true })
+
+export const ProjectSubmission = mongoose.model("ProjectSubmission", projectSubmissionSchema)
+
+
+const timeTableSchema = mongoose.Schema({
+    userId: {
+        type: String,
+        required: true
+    },
+    title: {
+        type: String,
+        required: true
+    },
+    topic: {
+        type: String,
+        required: true
+    },
+    startTime: {
+        type: Date,
+        required: true
+    },
+    endTime: {
+        type: Date,
+        required: true
+    },
+    plannedDuration: {
+        type: Number,
+        required: true
+    },
+    isRecurring: {
+        type: Boolean
+    },
+    recurrencePattern: {
+        type: String,
+        enum: ["daily", "weekly", "monthly", "custom"]
+    },
+    recurrenceDays: {
+        type: [String]
+    },
+    recurrenceEndDate: {
+        type: Date
+    },
+    status:{
+        type:String,
+        enum: ["scheduled", " in_progress", "completed", "skipped", "cancelled"],
+        default:"in_progress"
+    },
+    actualDuration:{
+        type:Number
+    },
+    completedAt:{
+        type:Date,
+
+    },
+    goalDescription:{
+        type:String
+    },
+    reminderEnabled:{
+        type:Boolean,
+        default:false
+    },
+    reminderMinutesBefore:{
+        type:Number,
     },
     createdAt:{
         type:Date
     }
-}, {timestamps:true})
 
-export const ProjectSubmission = mongoose.model("ProjectSubmission", projectSubmissionSchema)
+}, { timestamps: true })
+
+timeTableSchema.pre("validate", (next) => {
+    if (this.isRecurring) {
+        if (!this.recurrencePattern) {
+            this.invalidate("recurrencePattern", "required when isRecurring is true")
+        }
+        if (!this.recurrenceEndDate) {
+            this.invalidate("recurrenceEndDate", "required when isRecurring is true")
+        }
+        if (!this.recurrenceDays || this.recurrenceDays.length === 0) {
+            this.invalidate('recurrenceDays', 'required when isRecurring is true')
+        }
+    }
+
+    next()
+})
+
+export const TimeTable = mongoose.model("TimeTable", timeTableSchema)
