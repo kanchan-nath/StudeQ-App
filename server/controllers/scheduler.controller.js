@@ -12,6 +12,7 @@ import { StudyPlan } from "../models/studyPlan.js"
 import pdfToImages from "../services/pdfToImages.js"
 import {PDFParse} from "pdf-parse"
 import fs from "fs"
+import createSchedule from "../lib/groq/createSchedule.js"
 
 const createScheduler = asyncHandler(async (req, res) => {
     const { subject, topic, schedulerDate, duration } = req.body
@@ -624,6 +625,7 @@ const uploadFile = asyncHandler(async(req, res)=>{
     
     await pdfToImages(filePath, totalPages, outputDir)
     console.log("End");
+    const data = await createSchedule(outputDir)
 
     fs.unlinkSync(filePath)
     
