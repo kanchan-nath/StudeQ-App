@@ -15,6 +15,8 @@ import { PDFParse } from "pdf-parse"
 import fs from "fs"
 import createSchedule from "../lib/groq/createSchedule.js"
 import recurringTasks from "../lib/cronJobs/cron.js"
+import icsFileGeneretor from "../services/icsFile.js"
+import mailICSFile from "../services/nodemailer.js"
 
 const createScheduler = asyncHandler(async (req, res) => {
     const { subject, topic, schedulerDate, duration } = req.body
@@ -475,19 +477,19 @@ const createTimeTable = asyncHandler(async (req, res) => {
     const conflict = await TimeTable.findOne(
         {
             userId,
-            startTime:{
+            startTime: {
                 $lt: endTime
             },
-            endTime:{
+            endTime: {
                 $gt: startTime
             }
         }
     )
 
-    if(conflict){
-        throw new ApiError(400,"This slot is already booked ")
+    if (conflict) {
+        throw new ApiError(400, "This slot is already booked ")
     }
-    
+
     const data = await TimeTable.create(
         {
             userId,
@@ -616,7 +618,7 @@ const updateTimeTable = asyncHandler(async (req, res) => {
     if (conflict) {
         throw new ApiError(400, "This slot is already booked ")
     }
-    
+
     const userId = req.user.id
 
     const isDataExist = await TimeTable.findById(
@@ -646,7 +648,7 @@ const updateTimeTable = asyncHandler(async (req, res) => {
 
     if (isRecurring && !data.isRecurring) {
         console.log("Recurrance Run:");
-        
+
         const pattern = data.recurrencePattern
         const days = data.recurrenceDays
         const endDate = data.recurrenceEndDate
@@ -660,7 +662,7 @@ const updateTimeTable = asyncHandler(async (req, res) => {
     }
     return res
         .status(200)
-        .json(new ApiResponse(200,data, "Updated"))
+        .json(new ApiResponse(200, data, "Updated"))
 
 })
 
@@ -775,6 +777,40 @@ const updateToDoList = asyncHandler(async (req, res) => {
 const deleteAllToDoList = asyncHandler(async (req, res) => {
 
 })
+
+const sendICSFile = asyncHandler(async (req, res) => {
+    const { id } = req.params
+
+    if (!id) {
+        throw new ApiError(400, "Id is required")
+    }
+
+    const isDataExist = await TimeTable.findById({ _id: id })
+
+    if (!isDataExist) {
+        throw new ApiError(400, "Time table is not exist.")
+    }
+
+    const folder = "/Users/kanchannath/Coding/Spark.E/server/uploads/icsFiles"
+
+    try {
+        const outputPath = await icsFileGeneretor(isDataExist, folder)
+        const response = await mailICSFile(outputPath)
+        console.log("Response", response);
+
+        fs.rmSync(folder, { recursive: true })
+
+        return res
+            .status(200)
+            .json(new ApiResponse(200, response, "ICS file is generated"))
+    } catch (err) {
+        console.error("ICS generation failed:", err.message)
+        fs.rmSync(folder, { recursive: true, force: true })
+
+    }
+
+
+})
 export {
     createScheduler,
     getScheduler,
@@ -820,5 +856,7 @@ export {
     getToDoList,
     deleteToDoList,
     updateToDoList,
-    deleteAllToDoList
+    deleteAllToDoList,
+
+    sendICSFile
 }

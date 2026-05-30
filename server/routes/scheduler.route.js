@@ -43,7 +43,8 @@ import {
     getToDoList,
     deleteToDoList,
     updateToDoList,
-    deleteAllToDoList
+    deleteAllToDoList,
+    sendICSFile
     
 } from "../controllers/scheduler.controller.js"
 import {upload} from "../middlewares/multer.middleware.js"
@@ -79,6 +80,7 @@ router.route("/scheduler/time-table").get(verifyJWT, getAllTimeTables)
 router.route("/scheduler/time-table/:id").get(verifyJWT, getTimeTable)
 router.route("/scheduler/time-table/:id").delete(verifyJWT, deleteTimeTable)
 router.route("/scheduler/time-table/:id").patch(verifyJWT, updateTimeTable)
+router.route("/scheduler/time-table/:id/ics").get(verifyJWT, sendICSFile)
 
 // 
 router.route("/scheduler/material").post(verifyJWT,
