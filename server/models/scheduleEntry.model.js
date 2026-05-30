@@ -1,4 +1,4 @@
-import mongoose, { mongo } from "mongoose"
+import mongoose, { mongo, Schema } from "mongoose"
 
 const scheduleEntrySchema = new mongoose.Schema({
     userId: {
@@ -269,4 +269,16 @@ timeTableSchema.pre("findOneAndUpdate", function(next) {
   next();
 });
 */
+
+
 export const TimeTable = mongoose.model("TimeTable", timeTableSchema)
+
+const rawScheduleSchema = mongoose.Schema({
+    userId:{
+        type:String,
+        required: true
+    },
+    metaData: Schema.Types.Mixed
+},{timestamps: true})
+
+export const RawSchedule = mongoose.model("RawSchedule", rawScheduleSchema)
