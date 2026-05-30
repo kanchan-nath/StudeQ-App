@@ -1,4 +1,5 @@
 import mongoose, { mongo, Schema } from "mongoose"
+import { userInfo } from "os"
 
 const scheduleEntrySchema = new mongoose.Schema({
     userId: {
@@ -282,3 +283,63 @@ const rawScheduleSchema = mongoose.Schema({
 },{timestamps: true})
 
 export const RawSchedule = mongoose.model("RawSchedule", rawScheduleSchema)
+
+const toDoListSchema = mongoose.Schema({
+    userId:{
+        type:String,
+        required: true
+    },
+    title:{
+        type:String,
+        required: true
+    },
+    status:{
+        type:String,
+        enum:["pending","completed","cancelled"],
+        default:"pending"
+    },
+    priority:{
+        type:String,
+        enum:["low", "medium", "high"],
+        default:"low"
+    },
+    dueDate:{
+        type:Date,
+        required:true
+    },
+    isRecurring:{
+        type:Boolean
+    },
+    recurrencePattern:{
+        type:String,
+        enum: ["daily", "weekly","custom"]
+    },
+    completedAt:{
+        type:Date
+    },
+    reminderEnabled:{
+        type:Boolean
+    },
+    reminderTime:{
+        type:Date
+    },
+    createdAt:{
+        type:Date
+    }
+},{timestamps:true})
+
+toDoListSchema.pre("validate",function(next){
+    if(this.isRecurring){
+        if (!this.recurrencePattern){
+            this.invalidate("recurrencePattern", "required")
+        }
+    }
+
+    if (this.reminderEnabled) {
+        if (!this.reminderTime) {
+            this.invalidate("reminderTime", "required")
+        }
+    }
+})
+
+export const ToDoList = mongoose.model("ToDoList", toDoListSchema)
