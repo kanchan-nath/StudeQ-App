@@ -472,6 +472,22 @@ const createTimeTable = asyncHandler(async (req, res) => {
     const userId = req.user.id
 
 
+    const conflict = await TimeTable.findOne(
+        {
+            userId,
+            startTime:{
+                $lt: endTime
+            },
+            endTime:{
+                $gt: startTime
+            }
+        }
+    )
+
+    if(conflict){
+        throw new ApiError(400,"This slot is already booked ")
+    }
+    
     const data = await TimeTable.create(
         {
             userId,
