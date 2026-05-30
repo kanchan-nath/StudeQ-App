@@ -5,12 +5,13 @@ import {
     scheduleExamDates,
     AssignmentSubmission,
     ProjectSubmission,
-    TimeTable
+    TimeTable,
+    RawSchedule
 } from "../models/scheduleEntry.model.js"
 import { generateStudyPlan } from "../lib/groq/generateStudyPlan.js"
 import { StudyPlan } from "../models/studyPlan.js"
 import pdfToImages from "../services/pdfToImages.js"
-import {PDFParse} from "pdf-parse"
+import { PDFParse} from "pdf-parse"
 import fs from "fs"
 import createSchedule from "../lib/groq/createSchedule.js"
 
@@ -602,6 +603,8 @@ const updateTimeTable = asyncHandler(async(req, res)=>{
 
 })
 
+// 
+
 const uploadFile = asyncHandler(async(req, res)=>{
     const file = req.files?.file[0]
 
@@ -625,9 +628,21 @@ const uploadFile = asyncHandler(async(req, res)=>{
     
     await pdfToImages(filePath, totalPages, outputDir)
     console.log("End");
-    const data = await createSchedule(outputDir)
 
+    const userId = req.user.id
+    const result = await createSchedule(outputDir)
+
+    const data = await RawSchedule.create(
+        {
+            userId,
+            metaData:result
+        }
+    )
     fs.unlinkSync(filePath)
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, data, "Raw Schedule created"))
     
 })
 export {
