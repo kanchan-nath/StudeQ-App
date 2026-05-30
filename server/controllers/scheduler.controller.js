@@ -11,9 +11,10 @@ import {
 import { generateStudyPlan } from "../lib/groq/generateStudyPlan.js"
 import { StudyPlan } from "../models/studyPlan.js"
 import pdfToImages from "../services/pdfToImages.js"
-import { PDFParse} from "pdf-parse"
+import { PDFParse } from "pdf-parse"
 import fs from "fs"
 import createSchedule from "../lib/groq/createSchedule.js"
+import recurringTasks from "../lib/cronJobs/cron.js"
 
 const createScheduler = asyncHandler(async (req, res) => {
     const { subject, topic, schedulerDate, duration } = req.body
@@ -467,10 +468,10 @@ const createTimeTable = asyncHandler(async (req, res) => {
     if (!title || !topic || !startTime || !endTime || !plannedDuration) {
         throw new ApiError(400, "These fields are required")
     }
-    
-    if(isRecurring){
-        
-    }
+
+    const userId = req.user.id
+
+
     const data = await TimeTable.create(
         {
             userId,
@@ -491,6 +492,18 @@ const createTimeTable = asyncHandler(async (req, res) => {
         }
     )
 
+    if (data.isRecurring) {
+        const pattern = data.recurrencePattern
+        const days = data.recurrenceDays
+        const endDate = data.recurrenceEndDate
+        const entryId = data._id
+
+        if (!pattern || !days || !endDate) {
+            throw new ApiError(400, "Fields are required")
+        }
+
+        await recurringTasks(pattern, days, endDate, entryId)
+    }
     return res
         .status(200)
         .json(new ApiResponse(200, data, "Time table created"))
@@ -507,56 +520,56 @@ const getAllTimeTables = asyncHandler(async (req, res) => {
     )
 
     return res
-    .status(200)
-    .json(new ApiResponse(200, data, "All time tables fetched"))
+        .status(200)
+        .json(new ApiResponse(200, data, "All time tables fetched"))
 })
 
-const getTimeTable = asyncHandler(async(req, res)=>{
-    const {id} = req.params
+const getTimeTable = asyncHandler(async (req, res) => {
+    const { id } = req.params
 
-    if(!id){
+    if (!id) {
         throw new ApiError(400, "Id is required")
     }
 
     const data = await TimeTable.find(
         {
-            _id:id
+            _id: id
         }
     )
 
     return res
-    .status(200)
-    .json(new ApiResponse(200, data, "Ti,e table fetched"))
+        .status(200)
+        .json(new ApiResponse(200, data, "Ti,e table fetched"))
 })
 
-const deleteTimeTable = asyncHandler(async(req, res)=>{
-    const {id} = req.params
+const deleteTimeTable = asyncHandler(async (req, res) => {
+    const { id } = req.params
 
-    if(!id){
+    if (!id) {
         throw new ApiError(400, "Id is required")
     }
 
-    const isDataExist = await TimeTable.find({_id:id})
+    const isDataExist = await TimeTable.find({ _id: id })
 
-    if (!isDataExist){
+    if (!isDataExist) {
         throw new ApiError(400, "Time table not found")
     }
 
     const data = await TimeTable.findOneAndDelete(
         {
-            _id:id
+            _id: id
         }
     )
 
     return res
-    .status(200)
-    .json(new ApiResponse(200, "Time table is deleted"))
+        .status(200)
+        .json(new ApiResponse(200, "Time table is deleted"))
 })
 
-const updateTimeTable = asyncHandler(async(req, res)=>{
-    const {id} = req.user.id
+const updateTimeTable = asyncHandler(async (req, res) => {
+    const { id } = req.user.id
 
-    if(!id){
+    if (!id) {
         throw new ApiError(400, "Id is required")
     }
 
@@ -565,10 +578,10 @@ const updateTimeTable = asyncHandler(async(req, res)=>{
     const objects = { title, topic, startTime, endTime, plannedDuration, isRecurring, recurrencePattern, recurrenceDays, recurrenceEndDate, status, actualDuration, goalDescription, reminderEnabled, reminderMinutesBefore, }
 
     const filteredObjects = Object.fromEntries(
-        Object.entries(objects).filter(([key, value])=>value !==undefined)
+        Object.entries(objects).filter(([key, value]) => value !== undefined)
     )
 
-    if(Object.keys(filteredObjects).length === 0){
+    if (Object.keys(filteredObjects).length === 0) {
         throw new ApiError(400, "Atleast one field need to be updated")
     }
 
@@ -578,11 +591,11 @@ const updateTimeTable = asyncHandler(async(req, res)=>{
     const isDataExist = await TimeTable.findOne(
         {
             userId,
-            _id:id
+            _id: id
         }
     )
 
-    if(!isDataExist){
+    if (!isDataExist) {
         throw new ApiError(400, "Time table not exist")
     }
 
@@ -593,25 +606,25 @@ const updateTimeTable = asyncHandler(async(req, res)=>{
     const data = await TimeTable.findOneAndUpdate(
         {
             userId,
-            _id:id
+            _id: id
         },
         {
 
-            $set:filteredObjects
+            $set: filteredObjects
         }
     )
     return res
-    .status(20)
-    .json(new ApiResponse(200, ))
+        .status(20)
+        .json(new ApiResponse(200,))
 
 })
 
 // 
 
-const uploadFile = asyncHandler(async(req, res)=>{
+const uploadFile = asyncHandler(async (req, res) => {
     const file = req.files?.file[0]
 
-    if(!file){
+    if (!file) {
         throw new ApiError(400, "File is required")
     }
 
@@ -621,14 +634,14 @@ const uploadFile = asyncHandler(async(req, res)=>{
     const outputDir = "/Users/kanchannath/Coding/Spark.E/server/uploads/scheduler"
 
     const dataBuffer = fs.readFileSync(filePath)
-    const uint8array= new Uint8Array(dataBuffer)
+    const uint8array = new Uint8Array(dataBuffer)
     const parser = new PDFParse(uint8array)
 
-    await parser.getText()    
-    
+    await parser.getText()
+
     const totalPages = parser?.doc?._pdfInfo?.numPages
     console.log("Started", totalPages);
-    
+
     await pdfToImages(filePath, totalPages, outputDir)
     console.log("End");
 
@@ -638,34 +651,34 @@ const uploadFile = asyncHandler(async(req, res)=>{
     const data = await RawSchedule.create(
         {
             userId,
-            metaData:result
+            metaData: result
         }
     )
     fs.unlinkSync(filePath)
 
     return res
-    .status(200)
-    .json(new ApiResponse(200, data, "Raw Schedule created"))
-    
+        .status(200)
+        .json(new ApiResponse(200, data, "Raw Schedule created"))
+
 })
 
-const getAllRawMaterial = asyncHandler(async(req, res)=>{
+const getAllRawMaterial = asyncHandler(async (req, res) => {
     const userId = req.user.id
 
-    const data = await RawSchedule.find({userId})
+    const data = await RawSchedule.find({ userId })
 
     return res
-    .status(200)
-    .json(new ApiResponse(200, data, "All schedule fetched"))
+        .status(200)
+        .json(new ApiResponse(200, data, "All schedule fetched"))
 })
 
 const getRawMaterial = asyncHandler(async (req, res) => {
-    const {id} = req.params
-    if(!id){
-        throw new ApiError(400 , "Id is required")
+    const { id } = req.params
+    if (!id) {
+        throw new ApiError(400, "Id is required")
     }
     const userId = req.user.id
-    const data = await RawSchedule.find({ userId, _id:id })
+    const data = await RawSchedule.find({ userId, _id: id })
 
     return res
         .status(200)
@@ -685,36 +698,36 @@ const deleteRawMaterial = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, data, "Raw schedule fetched"))
 })
 
-const deleteAllRawMaterial = asyncHandler(async(req, res)=>{
+const deleteAllRawMaterial = asyncHandler(async (req, res) => {
     const userId = req.user.id
 
-    await RawSchedule.deleteMany({userId})
+    await RawSchedule.deleteMany({ userId })
 
     return res
-    .status(200)
-    .json(new ApiResponse(200, {}, "All raw data is deleted"))
+        .status(200)
+        .json(new ApiResponse(200, {}, "All raw data is deleted"))
 })
 
-const createToDoList = asyncHandler(async(req, res)=>{
-
-})
-
-const getAllToDoList = asyncHandler(async(req, res)=>{
-
-})
-const getToDoList = asyncHandler(async(req, res)=>{
+const createToDoList = asyncHandler(async (req, res) => {
 
 })
 
-const deleteToDoList = asyncHandler(async(req, res)=>{
+const getAllToDoList = asyncHandler(async (req, res) => {
+
+})
+const getToDoList = asyncHandler(async (req, res) => {
 
 })
 
-const updateToDoList = asyncHandler(async(req, res)=>{
+const deleteToDoList = asyncHandler(async (req, res) => {
 
 })
 
-const deleteAllToDoList = asyncHandler(async(req, res)=>{
+const updateToDoList = asyncHandler(async (req, res) => {
+
+})
+
+const deleteAllToDoList = asyncHandler(async (req, res) => {
 
 })
 export {

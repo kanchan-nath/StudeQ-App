@@ -193,7 +193,7 @@ const timeTableSchema = mongoose.Schema({
     },
     status:{
         type:String,
-        enum: ["scheduled", " in_progress", "completed", "skipped", "cancelled"],
+        enum: ["scheduled", "in_progress", "completed", "skipped", "cancelled"],
         default:"in_progress"
     },
     actualDuration:{
