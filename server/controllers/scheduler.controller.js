@@ -567,7 +567,7 @@ const deleteTimeTable = asyncHandler(async (req, res) => {
 })
 
 const updateTimeTable = asyncHandler(async (req, res) => {
-    const { id } = req.user.id
+    const { id } = req.params
 
     if (!id) {
         throw new ApiError(400, "Id is required")
@@ -588,9 +588,8 @@ const updateTimeTable = asyncHandler(async (req, res) => {
 
     const userId = req.user.id
 
-    const isDataExist = await TimeTable.findOne(
+    const isDataExist = await TimeTable.findById(
         {
-            userId,
             _id: id
         }
     )
@@ -613,9 +612,24 @@ const updateTimeTable = asyncHandler(async (req, res) => {
             $set: filteredObjects
         }
     )
+
+    if (isRecurring && !data.isRecurring) {
+        console.log("Recurrance Run:");
+        
+        const pattern = data.recurrencePattern
+        const days = data.recurrenceDays
+        const endDate = data.recurrenceEndDate
+        const entryId = data._id
+
+        if (!pattern || !days || !endDate) {
+            throw new ApiError(400, "Fields are required")
+        }
+
+        await recurringTasks(pattern, days, endDate, entryId)
+    }
     return res
-        .status(20)
-        .json(new ApiResponse(200,))
+        .status(200)
+        .json(new ApiResponse(200,data, "Updated"))
 
 })
 

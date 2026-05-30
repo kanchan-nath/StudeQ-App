@@ -219,7 +219,7 @@ const timeTableSchema = mongoose.Schema({
 
 }, { timestamps: true })
 
-timeTableSchema.pre("findOneAndUpdate", function(next){
+timeTableSchema.pre("save", function(next){
     if (this.isRecurring) {
         if (!this.recurrencePattern) {
             this.invalidate("recurrencePattern", "required when isRecurring is true")

@@ -9,7 +9,7 @@ const DAY_MAP = {
 const buildCron = (pattern, days) => {
     switch (pattern) {
         case "daily":
-            return "7 18 * * *"
+            return "39 18 * * *"
         case "weekly":
             const d = days.map((d) => DAY_MAP[d.toLowerCase()]).join(",")
             return `0 0 * * ${d}`
@@ -32,6 +32,8 @@ const recurringTasks = async (pattern, days, endDate, entryId) => {
 
         const existedData = await TimeTable.findById(entryId).lean()  // ← findById, not find
 
+        console.log("Existed Data", existedData);
+        
         if (!existedData) {                    // ← now actually falsy when missing
             job.stop()
             return
@@ -42,8 +44,6 @@ const recurringTasks = async (pattern, days, endDate, entryId) => {
             plannedDuration, status, actualDuration,
             goalDescription, reminderEnabled, reminderMinutesBefore
         } = existedData                        // ← destructure from doc, not array
-
-        console.log("Start");
         
         await TimeTable.create({userId,
             title, topic, startTime, endTime,
@@ -52,7 +52,7 @@ const recurringTasks = async (pattern, days, endDate, entryId) => {
             // createdAt excluded — Mongoose sets it fresh
         })
 
-        console.log("End");
+        console.log("Schedule done");
         
     })
 }
