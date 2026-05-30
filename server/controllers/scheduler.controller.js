@@ -601,7 +601,22 @@ const updateTimeTable = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Atleast one field need to be updated")
     }
 
+    const conflict = await TimeTable.findOne(
+        {
+            userId,
+            startTime: {
+                $lt: endTime
+            },
+            endTime: {
+                $gt: startTime
+            }
+        }
+    )
 
+    if (conflict) {
+        throw new ApiError(400, "This slot is already booked ")
+    }
+    
     const userId = req.user.id
 
     const isDataExist = await TimeTable.findById(
