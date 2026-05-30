@@ -31,7 +31,11 @@ import {
     deleteTimeTable,
     updateTimeTable,
 
-    uploadFile
+    uploadFile,
+    getAllRawMaterial,
+    getRawMaterial,
+    deleteRawMaterial,
+    deleteAllRawMaterial
     
 } from "../controllers/scheduler.controller.js"
 import {upload} from "../middlewares/multer.middleware.js"
@@ -77,4 +81,9 @@ router.route("/scheduler/material").post(verifyJWT,
     ]),
     uploadFile
 )
+router.route("/scheduler/material").get(verifyJWT, getAllRawMaterial)
+router.route("/scheduler/material/:id").get(verifyJWT, getRawMaterial)
+router.route("/scheduler/material/:id").delete(verifyJWT, deleteRawMaterial)
+router.route("/scheduler/material/:id/all").delete(verifyJWT, deleteAllRawMaterial)
+
 export default router

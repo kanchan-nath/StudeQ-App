@@ -645,6 +645,52 @@ const uploadFile = asyncHandler(async(req, res)=>{
     .json(new ApiResponse(200, data, "Raw Schedule created"))
     
 })
+
+const getAllRawMaterial = asyncHandler(async(req, res)=>{
+    const userId = req.user.id
+
+    const data = await RawSchedule.find({userId})
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, data, "All schedule fetched"))
+})
+
+const getRawMaterial = asyncHandler(async (req, res) => {
+    const {id} = req.params
+    if(!id){
+        throw new ApiError(400 , "Id is required")
+    }
+    const userId = req.user.id
+    const data = await RawSchedule.find({ userId, _id:id })
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, data, "Raw schedule fetched"))
+})
+
+const deleteRawMaterial = asyncHandler(async (req, res) => {
+    const { id } = req.params
+    if (!id) {
+        throw new ApiError(400, "Id is required")
+    }
+    const userId = req.user.id
+    const data = await RawSchedule.findOneAndDelete({ userId, _id: id })
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, data, "Raw schedule fetched"))
+})
+
+const deleteAllRawMaterial = asyncHandler(async(req, res)=>{
+    const userId = req.user.id
+
+    await RawSchedule.deleteMany({userId})
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, {}, "All raw data is deleted"))
+})
 export {
     createScheduler,
     getScheduler,
@@ -678,5 +724,9 @@ export {
     updateTimeTable,
 
 
-    uploadFile
+    uploadFile,
+    getAllRawMaterial,
+    getRawMaterial,
+    deleteRawMaterial,
+    deleteAllRawMaterial
 }
