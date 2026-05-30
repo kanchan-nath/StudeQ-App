@@ -691,6 +691,29 @@ const deleteAllRawMaterial = asyncHandler(async(req, res)=>{
     .status(200)
     .json(new ApiResponse(200, {}, "All raw data is deleted"))
 })
+
+const createToDoList = asyncHandler(async(req, res)=>{
+
+})
+
+const getAllToDoList = asyncHandler(async(req, res)=>{
+
+})
+const getToDoList = asyncHandler(async(req, res)=>{
+
+})
+
+const deleteToDoList = asyncHandler(async(req, res)=>{
+
+})
+
+const updateToDoList = asyncHandler(async(req, res)=>{
+
+})
+
+const deleteAllToDoList = asyncHandler(async(req, res)=>{
+    
+})
 export {
     createScheduler,
     getScheduler,
@@ -728,5 +751,13 @@ export {
     getAllRawMaterial,
     getRawMaterial,
     deleteRawMaterial,
-    deleteAllRawMaterial
+    deleteAllRawMaterial,
+
+
+    createToDoList,
+    getAllToDoList,
+    getToDoList,
+    deleteToDoList,
+    updateToDoList,
+    deleteAllToDoList
 }
