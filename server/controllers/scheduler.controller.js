@@ -467,7 +467,10 @@ const createTimeTable = asyncHandler(async (req, res) => {
     if (!title || !topic || !startTime || !endTime || !plannedDuration) {
         throw new ApiError(400, "These fields are required")
     }
-
+    
+    if(isRecurring){
+        
+    }
     const data = await TimeTable.create(
         {
             userId,
@@ -712,7 +715,7 @@ const updateToDoList = asyncHandler(async(req, res)=>{
 })
 
 const deleteAllToDoList = asyncHandler(async(req, res)=>{
-    
+
 })
 export {
     createScheduler,
