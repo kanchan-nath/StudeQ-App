@@ -6,7 +6,8 @@ import {
     AssignmentSubmission,
     ProjectSubmission,
     TimeTable,
-    RawSchedule
+    RawSchedule,
+    ToDoList
 } from "../models/scheduleEntry.model.js"
 import { generateStudyPlan } from "../lib/groq/generateStudyPlan.js"
 import { StudyPlan } from "../models/studyPlan.js"
@@ -407,7 +408,7 @@ const getProjectSubmission = asyncHandler(async (req, res) => {
     return res
         .status(200)
         .json(new ApiResponse(200, data, "Project submission schedule fetched successfully"))
-})  
+})
 
 const deleteProjectSubmission = asyncHandler(async (req, res) => {
     const { id } = req.params
@@ -755,7 +756,29 @@ const deleteAllRawMaterial = asyncHandler(async (req, res) => {
 })
 
 const createToDoList = asyncHandler(async (req, res) => {
+    const { title, status, priority, dueDate, isRecurring, recurrencePattern, reminderEnabled, reminderTime } = req.body
 
+    if (!title || !dueDate) {
+        throw new ApiError(400, "All fields are required")
+    }
+
+    const userId = req.body.id
+
+    const data = await ToDoList.create({
+        userId,
+        title, 
+        status, 
+        priority, 
+        dueDate, 
+        isRecurring, 
+        recurrencePattern, 
+        reminderEnabled, 
+        reminderTime
+    })
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, data, "To Do List created"))
 })
 
 const getAllToDoList = asyncHandler(async (req, res) => {

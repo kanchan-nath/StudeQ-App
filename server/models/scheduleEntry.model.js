@@ -295,13 +295,13 @@ const toDoListSchema = mongoose.Schema({
     },
     status:{
         type:String,
-        enum:["pending","completed","cancelled"],
-        default:"pending"
+        // enum:["pending","completed","cancelled"],
+        // default:"pending"
     },
     priority:{
         type:String,
-        enum:["low", "medium", "high"],
-        default:"low"
+        // enum:["low", "medium", "high"],
+        // default:"low"
     },
     dueDate:{
         type:Date,
@@ -312,7 +312,7 @@ const toDoListSchema = mongoose.Schema({
     },
     recurrencePattern:{
         type:String,
-        enum: ["daily", "weekly","custom"]
+        // enum: ["daily", "weekly","custom"]
     },
     completedAt:{
         type:Date
