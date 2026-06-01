@@ -885,6 +885,27 @@ const deleteAllToDoList = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, data, "All to do list fetched"))
 })
 
+const filterToDoList = asyncHandler(async(req, res)=>{
+    const {input} = req.body
+
+    if(!input){
+        throw new ApiError(400, "FIlter query is required")
+    }
+
+    const userId = req.user.id
+
+    let filter = {}
+    if(input){
+        filter.input = input
+    }
+
+    const data = await ToDoList.find({userId, filter})
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, data, "Filtered apply"))
+})
+
 const sendICSFile = asyncHandler(async (req, res) => {
     const { id } = req.params
 
@@ -964,6 +985,8 @@ export {
     deleteToDoList,
     updateToDoList,
     deleteAllToDoList,
+
+    filterToDoList,
 
     sendICSFile
 }
