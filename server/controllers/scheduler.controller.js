@@ -782,10 +782,32 @@ const createToDoList = asyncHandler(async (req, res) => {
 })
 
 const getAllToDoList = asyncHandler(async (req, res) => {
+    const userId = req.user.id
 
+    const data = await ToDoList.find({userId})
+
+    return res
+    .status(200)
+    .json (new ApiResponse(200, data, "All to do list fetched"))
 })
 const getToDoList = asyncHandler(async (req, res) => {
+    const {id} = req.params
 
+    if(!id){
+        throw new ApiError(400, "Id is required")
+    }
+
+    const userId = req.user.id
+
+    const data = await ToDoList.findById({_id:id})
+
+    if(!data){
+        throw new ApiError(400, "To do list not found")
+    }
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, data, "To do list getched"))
 })
 
 const deleteToDoList = asyncHandler(async (req, res) => {
