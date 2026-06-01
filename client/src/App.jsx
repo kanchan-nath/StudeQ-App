@@ -19,6 +19,7 @@ import Navbar from "../src/components/Navbar.jsx";
 import AppShell from "./components/layouts/AppShell.jsx";
 import Flashcards from "./pages/Flashcards.jsx";
 import Notebook from "./pages/Notebook.jsx";
+import TimeTable from "./pages/TimeTable.jsx";
 
 const App = () => {
   const token = localStorage.getItem("token");
@@ -83,6 +84,11 @@ const App = () => {
           <Route
             path="/scheduler"
             element={<ProtectedRoute component={<Scheduler />} />}
+          />
+
+          <Route
+            path="/time-table"
+            element={<ProtectedRoute component={<TimeTable />} />}
           />
           <Route
             path="/scheduler/generate-plan"
