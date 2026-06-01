@@ -219,27 +219,27 @@ const timeTableSchema = mongoose.Schema({
 
 }, { timestamps: true })
 
-timeTableSchema.pre("save", function(next){
-    if (this.isRecurring) {
-        if (!this.recurrencePattern) {
-            this.invalidate("recurrencePattern", "required when isRecurring is true")
-        }
-        if (!this.recurrenceEndDate) {
-            this.invalidate("recurrenceEndDate", "required when isRecurring is true")
-        }
-        if (!this.recurrenceDays || this.recurrenceDays.length === 0) {
-            this.invalidate('recurrenceDays', 'required when isRecurring is true')
-        }
-    }
+// timeTableSchema.pre("save", function(next){
+//     if (this.isRecurring) {
+//         if (!this.recurrencePattern) {
+//             this.invalidate("recurrencePattern", "required when isRecurring is true")
+//         }
+//         if (!this.recurrenceEndDate) {
+//             this.invalidate("recurrenceEndDate", "required when isRecurring is true")
+//         }
+//         if (!this.recurrenceDays || this.recurrenceDays.length === 0) {
+//             this.invalidate('recurrenceDays', 'required when isRecurring is true')
+//         }
+//     }
 
-    if(this.reminderEnabled){
-        if (!this.reminderMinutesBefore){
-            this.invalidate("reminderMinutesBefore", "this field is req when reminderEnabled is true")
-        }
-    }
+//     if(this.reminderEnabled){
+//         if (!this.reminderMinutesBefore){
+//             this.invalidate("reminderMinutesBefore", "this field is req when reminderEnabled is true")
+//         }
+//     }
 
-    next()
-})
+//     next()
+// })
 
 /*
 timeTableSchema.pre("findOneAndUpdate", function(next) {
