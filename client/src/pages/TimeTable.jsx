@@ -102,6 +102,30 @@ const TimeTable = () => {
 
         }
     }
+
+    const handleClickDelete =async(id)=>{
+        try {
+            const res = await fetch(`${BASE_URL}/api/scheduler/time-table/${id}`, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                }
+            })
+
+            if (!res.ok) {
+                throw Error("Api call failed")
+            }
+
+            const data = await res.json()
+            fetchAllTimeTables()
+            console.log(data.data);
+
+        } catch (error) {
+            console.error(error);
+
+        }
+    }
 useEffect(()=>{
     fetchAllTimeTables()
 },[])
@@ -242,6 +266,7 @@ useEffect(()=>{
                             {allTimeTables.map((item, ind)=>(
                                 <div key={ind}>  
                                     <p>{item._id}</p><button onClick={()=>handleClick(item._id)}>Click</button>
+                                    <button onClick={()=>handleClickDelete(item._id)}>Delete</button>
                                 </div>
                             ))}
                         
