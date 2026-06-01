@@ -13,11 +13,12 @@ import { generateStudyPlan } from "../lib/groq/generateStudyPlan.js"
 import { StudyPlan } from "../models/studyPlan.js"
 import pdfToImages from "../services/pdfToImages.js"
 import { PDFParse } from "pdf-parse"
-import fs from "fs"
+import fs, { rmSync } from "fs"
 import createSchedule from "../lib/groq/createSchedule.js"
 import recurringTasks from "../lib/cronJobs/cron.js"
 import icsFileGeneretor from "../services/icsFile.js"
 import mailICSFile from "../services/nodemailer.js"
+import { userInfo } from "os"
 
 const createScheduler = asyncHandler(async (req, res) => {
     const { subject, topic, schedulerDate, duration } = req.body
@@ -755,6 +756,8 @@ const deleteAllRawMaterial = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, {}, "All raw data is deleted"))
 })
 
+// 
+
 const createToDoList = asyncHandler(async (req, res) => {
     const { title, status, priority, dueDate, isRecurring, recurrencePattern, reminderEnabled, reminderTime } = req.body
 
@@ -833,11 +836,74 @@ const deleteToDoList = asyncHandler(async (req, res) => {
 })
 
 const updateToDoList = asyncHandler(async (req, res) => {
+    const {id} = req.params
 
+    if(!id){
+        throw new ApiError(400, "Id is required")
+    }
+
+    const { title, status, priority, dueDate, isRecurring, recurrencePattern, reminderEnabled, reminderTime } = req.body
+
+    const objects = { title, status, priority, dueDate, isRecurring, recurrencePattern, reminderEnabled, reminderTime }
+
+    const filteredObjects = Object.fromEntries(
+        Object.entries(objects).filter((key, val)=>val!==undefined)
+    )
+
+    if(Object.keys(filteredObjects).length ===0){
+        throw new ApiError(400, "At least one field need to change")
+    }
+
+    const isDataExist = await ToDoList.findById({_id:id})
+
+    if(!isDataExist){
+        throw new ApiError(400,"To do list not found")
+    }
+
+    const data = await ToDoList.findOneAndUpdate(
+        {
+            userId,
+            _id:id
+        },
+        {
+            $set:filteredObjects
+        }
+    )
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, data, "To do list updated"))
 })
 
 const deleteAllToDoList = asyncHandler(async (req, res) => {
+    const userId = req.user.id
 
+    const data = await ToDoList.find({ userId })
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, data, "All to do list fetched"))
+})
+
+const filterToDoList = asyncHandler(async(req, res)=>{
+    const {input} = req.body
+
+    if(!input){
+        throw new ApiError(400, "FIlter query is required")
+    }
+
+    const userId = req.user.id
+
+    let filter = {}
+    if(input){
+        filter.input = input
+    }
+
+    const data = await ToDoList.find({userId, filter})
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, data, "Filtered apply"))
 })
 
 const sendICSFile = asyncHandler(async (req, res) => {
@@ -919,6 +985,8 @@ export {
     deleteToDoList,
     updateToDoList,
     deleteAllToDoList,
+
+    filterToDoList,
 
     sendICSFile
 }
