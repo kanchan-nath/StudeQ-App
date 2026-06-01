@@ -238,7 +238,6 @@ const getSchedulerExam = asyncHandler(async (req, res) => {
 
     const data = await scheduleExamDates.find({
         _id: id,
-        userId
     })
 
     return res
