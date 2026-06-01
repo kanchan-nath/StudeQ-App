@@ -20,6 +20,7 @@ import AppShell from "./components/layouts/AppShell.jsx";
 import Flashcards from "./pages/Flashcards.jsx";
 import Notebook from "./pages/Notebook.jsx";
 import TimeTable from "./pages/TimeTable.jsx";
+import EventScheduling from "./pages/EventScheduling.jsx";
 
 const App = () => {
   const token = localStorage.getItem("token");
@@ -89,6 +90,10 @@ const App = () => {
           <Route
             path="/time-table"
             element={<ProtectedRoute component={<TimeTable />} />}
+          />
+          <Route
+            path="/event-scheduling"
+            element={<ProtectedRoute component={<EventScheduling />} />}
           />
           <Route
             path="/scheduler/generate-plan"

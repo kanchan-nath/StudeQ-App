@@ -132,7 +132,7 @@ const createExamScheduler = asyncHandler(async (req, res) => {
         throw new ApiError(400, "All fields are required")
     }
 
-    const userId = req.use.id
+    const userId = req.user.id
 
     const data = await scheduleExamDates.create({
         userId,
@@ -161,7 +161,7 @@ const getAllExamScheduler = asyncHandler(async (req, res) => {
     const userId = req.user.id
 
 
-    const data = scheduleExamDates.find({
+    const data = await scheduleExamDates.find({
         userId
     })
 
