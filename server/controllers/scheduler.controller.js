@@ -886,7 +886,7 @@ const deleteAllToDoList = asyncHandler(async (req, res) => {
 })
 
 const filterToDoList = asyncHandler(async(req, res)=>{
-    const {input} = req.body
+    const {input} = req.query
 
     if(!input){
         throw new ApiError(400, "FIlter query is required")
@@ -904,6 +904,30 @@ const filterToDoList = asyncHandler(async(req, res)=>{
     return res
     .status(200)
     .json(new ApiResponse(200, data, "Filtered apply"))
+})
+
+const sortToDoList = asyncHandler(async(req, res)=>{
+    const {sortBy} =req.query
+
+    if(!sortBy){
+        throw new ApiError(400, "Sort By is required")
+    }
+
+    // const ALLOWED_SORTS = {
+    //     newest: { createdAt: -1 },
+    //     oldest: { createdAt: 1 },
+    //     az: { title: 1 },
+    //     za: { title: -1 },
+    // }
+    const userId =req.user.id
+
+    const sortOption = sortBy === "priority" ? { priority: -1 } : { createdAt: -1 }
+
+    const data = await ToDoList.find({ userId }).sort(sortOption)
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, data, "Sorted"))
 })
 
 const sendICSFile = asyncHandler(async (req, res) => {
@@ -985,8 +1009,8 @@ export {
     deleteToDoList,
     updateToDoList,
     deleteAllToDoList,
-
     filterToDoList,
+    sortToDoList,
 
     sendICSFile
 }
