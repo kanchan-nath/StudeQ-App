@@ -20,6 +20,24 @@ const Scheduler = () => {
     goalDate: "",
   });
 
+  const [timeTableForm, setTimeTableForm] = useState({
+    title: "",
+    topic: "",
+    startTime: "",
+    endTime: "",
+    plannedDuration: "",
+    isRecurring: "",
+    recurrencePattern: "",
+    recurrenceDays: "",
+    recurrenceEndDate: "",
+    status: "",
+    actualDuration: "",
+    goalDescription: "",
+    eminderEnabled: "",
+    reminderMinutesBefore: "",
+
+  })
+
   const token = localStorage.getItem("token");
 
   const handleChange = (e) => {
@@ -111,6 +129,15 @@ const Scheduler = () => {
       setIsGenerate_AI_Study_Plan(false);
     }
   };
+
+  const handleTimeTableSubmit = async (e) => {
+    e.preventDefault()
+    
+  }
+
+  const handleChangeTimeTable = async (e) => {
+    setTimeTableForm({ ...timeTableForm, [e.target.name]: e.target.value })
+  }
 
   useEffect(() => {
     fetchData();
@@ -211,6 +238,124 @@ const Scheduler = () => {
             />
           </form>
         )}
+      </div>
+
+      <div>
+        <h1>Time tables</h1>
+        <form onSubmit={handleTimeTableSubmit}>
+          <label htmlFor="title">Title</label>
+          <input
+            name="title"
+            type="text"
+            placeholder="Enter title of time table"
+            value={timeTableForm.title}
+            onChange={handleChangeTimeTable}
+            required
+          />
+
+          <label htmlFor="title">topic</label>
+          <input
+            name="topic"
+            type="text"
+            placeholder="Enter topic of time table"
+            value={timeTableForm.topic}
+            onChange={handleChangeTimeTable}
+            required
+          />
+
+          <label htmlFor="title">startTime</label>
+          <input
+            name="startTime"
+            type="date"
+            placeholder="Enter start time of time table"
+            value={timeTableForm.startTime}
+            onChange={handleChangeTimeTable}
+            required
+          />
+
+          <label htmlFor="title">endTime</label>
+          <input
+            name="endTime"
+            type="date"
+            placeholder="Enter end time of time table"
+            value={timeTableForm.endTime}
+            onChange={handleChangeTimeTable}
+            required
+          />
+
+          <label htmlFor="title">isRecurring</label>
+          <input
+            name="isRecurring"
+            type="checkbox"
+            value={timeTableForm.isRecurring}
+            onChange={handleChangeTimeTable}
+          />
+
+          <label htmlFor="title">recurrencePattern</label>
+          <input
+            name="recurrencePattern"
+            type="text"
+            value={timeTableForm.recurrencePattern}
+            onChange={handleChangeTimeTable}
+          />
+
+          <label htmlFor="title">recurrencePattern</label>
+          <input
+            name="recurrencePattern"
+            type="text"
+            value={timeTableForm.recurrencePattern}
+            onChange={handleChangeTimeTable}
+          />
+
+          <label htmlFor="title">recurrenceEndDate</label>
+          <input
+            name="recurrenceEndDate"
+            type="date"
+            value={timeTableForm.recurrenceEndDate}
+            onChange={handleChangeTimeTable}
+          />
+
+          <label htmlFor="title">status</label>
+          <input
+            name="status"
+            type="text"
+            value={timeTableForm.status}
+            onChange={handleChangeTimeTable}
+          />
+
+          <label htmlFor="title">actualDuration</label>
+          <input
+            name="actualDuration"
+            type="number"
+            value={timeTableForm.actualDuration}
+            onChange={handleChangeTimeTable}
+          />
+
+          <label htmlFor="title">goalDescription</label>
+          <input
+            name="goalDescription"
+            type="text"
+            value={timeTableForm.goalDescription}
+            onChange={handleChangeTimeTable}
+          />
+
+          <label htmlFor="title">reminderEnabled</label>
+          <input
+            name="reminderEnabled"
+            type="checkbox"
+            value={timeTableForm.reminderEnabled}
+            onChange={handleChangeTimeTable}
+          />
+
+          <label htmlFor="title">reminderMinutesBefore</label>
+          <input
+            name="reminderMinutesBefore"
+            type="number"
+            value={timeTableForm.reminderMinutesBefore}
+            onChange={handleChangeTimeTable}
+          />
+          <button>Submit</button>
+        </form>
       </div>
     </>
   );

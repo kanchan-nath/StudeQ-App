@@ -1,4 +1,5 @@
-import mongoose, { mongo } from "mongoose"
+import mongoose, { mongo, Schema } from "mongoose"
+import { userInfo } from "os"
 
 const scheduleEntrySchema = new mongoose.Schema({
     userId: {
@@ -182,7 +183,7 @@ const timeTableSchema = mongoose.Schema({
     },
     recurrencePattern: {
         type: String,
-        enum: ["daily", "weekly", "monthly", "custom"]
+        // enum: ["daily", "weekly", "monthly", "custom"]
     },
     recurrenceDays: {
         type: [String]
@@ -192,7 +193,7 @@ const timeTableSchema = mongoose.Schema({
     },
     status:{
         type:String,
-        enum: ["scheduled", " in_progress", "completed", "skipped", "cancelled"],
+        // enum: ["scheduled", "in_progress", "completed", "skipped", "cancelled"],
         default:"in_progress"
     },
     actualDuration:{
@@ -218,27 +219,27 @@ const timeTableSchema = mongoose.Schema({
 
 }, { timestamps: true })
 
-timeTableSchema.pre("findOneAndUpdate", function(next){
-    if (this.isRecurring) {
-        if (!this.recurrencePattern) {
-            this.invalidate("recurrencePattern", "required when isRecurring is true")
-        }
-        if (!this.recurrenceEndDate) {
-            this.invalidate("recurrenceEndDate", "required when isRecurring is true")
-        }
-        if (!this.recurrenceDays || this.recurrenceDays.length === 0) {
-            this.invalidate('recurrenceDays', 'required when isRecurring is true')
-        }
-    }
+// timeTableSchema.pre("save", function(next){
+//     if (this.isRecurring) {
+//         if (!this.recurrencePattern) {
+//             this.invalidate("recurrencePattern", "required when isRecurring is true")
+//         }
+//         if (!this.recurrenceEndDate) {
+//             this.invalidate("recurrenceEndDate", "required when isRecurring is true")
+//         }
+//         if (!this.recurrenceDays || this.recurrenceDays.length === 0) {
+//             this.invalidate('recurrenceDays', 'required when isRecurring is true')
+//         }
+//     }
 
-    if(this.reminderEnabled){
-        if (!this.reminderMinutesBefore){
-            this.invalidate("reminderMinutesBefore", "this field is req when reminderEnabled is true")
-        }
-    }
+//     if(this.reminderEnabled){
+//         if (!this.reminderMinutesBefore){
+//             this.invalidate("reminderMinutesBefore", "this field is req when reminderEnabled is true")
+//         }
+//     }
 
-    next()
-})
+//     next()
+// })
 
 /*
 timeTableSchema.pre("findOneAndUpdate", function(next) {
@@ -269,4 +270,76 @@ timeTableSchema.pre("findOneAndUpdate", function(next) {
   next();
 });
 */
+
+
 export const TimeTable = mongoose.model("TimeTable", timeTableSchema)
+
+const rawScheduleSchema = mongoose.Schema({
+    userId:{
+        type:String,
+        required: true
+    },
+    metaData: Schema.Types.Mixed
+},{timestamps: true})
+
+export const RawSchedule = mongoose.model("RawSchedule", rawScheduleSchema)
+
+const toDoListSchema = mongoose.Schema({
+    userId:{
+        type:String,
+        required: true
+    },
+    title:{
+        type:String,
+        required: true
+    },
+    status:{
+        type:String,
+        enum:["pending","completed","cancelled"],
+        default:"pending"
+    },
+    priority:{
+        type:String,
+        enum:["low", "medium", "high"],
+        default:"low"
+    },
+    dueDate:{
+        type:Date,
+        required:true
+    },
+    isRecurring:{
+        type:Boolean
+    },
+    recurrencePattern:{
+        type:String,
+        enum: ["daily", "weekly","custom"]
+    },
+    completedAt:{
+        type:Date
+    },
+    reminderEnabled:{
+        type:Boolean
+    },
+    reminderTime:{
+        type:Date
+    },
+    createdAt:{
+        type:Date
+    }
+},{timestamps:true})
+
+toDoListSchema.pre("validate",function(next){
+    if(this.isRecurring){
+        if (!this.recurrencePattern){
+            this.invalidate("recurrencePattern", "required")
+        }
+    }
+
+    if (this.reminderEnabled) {
+        if (!this.reminderTime) {
+            this.invalidate("reminderTime", "required")
+        }
+    }
+})
+
+export const ToDoList = mongoose.model("ToDoList", toDoListSchema)

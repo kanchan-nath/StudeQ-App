@@ -38,7 +38,26 @@ For each piece of content encountered, process it inline as you go:
 
 Output must mirror the document's reading flow exactly as a human would read it.
 `
+
+const prompt_createSchedule = `
+   You are a data extraction engine. Extract ALL table data from the image into a JSON array.
+
+RULES:
+1. Detect column headers dynamically from the table.
+2. For each header, generate a short key: take first letter of each word in the header, lowercase. If collision, append next char of the conflicting word to disambiguate.
+   Example: "Chapter Name" → "cn", "Completion Date" → "cd", "Date" → "d", "Faculty Name" → "fn"
+3. Merged cells: if a cell spans multiple rows, copy its value into EVERY row it covers. No row may have null or empty string for any key.
+4. Output a raw JSON array only. No markdown fences. No explanation. No preamble.
+5. Every object in the array must have identical keys.
+6. Preserve exact text from the image, do not paraphrase.
+
+OUTPUT FORMAT:
+[{"key1":"val","key2":"val",...}, ...]
+
+Extract now.
+`
 export {
     prompt_PromptOptimizer,
-    prompt_TextExtraction
+    prompt_TextExtraction,
+    prompt_createSchedule
 }

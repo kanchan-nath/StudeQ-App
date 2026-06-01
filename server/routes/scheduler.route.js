@@ -31,7 +31,20 @@ import {
     deleteTimeTable,
     updateTimeTable,
 
-    uploadFile
+    uploadFile,
+    getAllRawMaterial,
+    getRawMaterial,
+    deleteRawMaterial,
+    deleteAllRawMaterial,
+
+
+    createToDoList,
+    getAllToDoList,
+    getToDoList,
+    deleteToDoList,
+    updateToDoList,
+    deleteAllToDoList,
+    sendICSFile
     
 } from "../controllers/scheduler.controller.js"
 import {upload} from "../middlewares/multer.middleware.js"
@@ -47,7 +60,7 @@ router.route("/scheduler/generate-plan/save").post(verifyJWT, saveGeneratePlan)
 router.route("/scheduler/exam-dates").post(verifyJWT, createExamScheduler)
 router.route("/scheduler/exam-dates").get(verifyJWT, getAllExamScheduler)
 router.route("/scheduler/exam-dates/:id").delete(verifyJWT, deleteExamScheduler)
-router.route("/scheduler/:id").patch(verifyJWT, updateExamScheduler)
+router.route("/scheduler/exam-dates/:id").patch(verifyJWT, updateExamScheduler)
 router.route("/scheduler/exam-dates/:id").get(verifyJWT, getSchedulerExam)
 // 
 router.route("/scheduler/assignment-submission").post(verifyJWT, createAssignmentSubmissionScheduler)
@@ -67,6 +80,7 @@ router.route("/scheduler/time-table").get(verifyJWT, getAllTimeTables)
 router.route("/scheduler/time-table/:id").get(verifyJWT, getTimeTable)
 router.route("/scheduler/time-table/:id").delete(verifyJWT, deleteTimeTable)
 router.route("/scheduler/time-table/:id").patch(verifyJWT, updateTimeTable)
+router.route("/scheduler/time-table/:id/ics").get(verifyJWT, sendICSFile)
 
 // 
 router.route("/scheduler/material").post(verifyJWT,
@@ -77,4 +91,17 @@ router.route("/scheduler/material").post(verifyJWT,
     ]),
     uploadFile
 )
+router.route("/scheduler/material").get(verifyJWT, getAllRawMaterial)
+router.route("/scheduler/material/:id").get(verifyJWT, getRawMaterial)
+router.route("/scheduler/material/:id").delete(verifyJWT, deleteRawMaterial)
+router.route("/scheduler/material/:id/all").delete(verifyJWT, deleteAllRawMaterial)
+
+
+router.route("/scheduler/to-do-list").post(verifyJWT, createToDoList)
+router.route("/scheduler/to-do-list").get(verifyJWT, getAllToDoList)
+router.route("/scheduler/to-do-list/:id").get(verifyJWT, getToDoList)
+router.route("/scheduler/to-do-list/:id").delete(verifyJWT, deleteToDoList)
+router.route("/scheduler/to-do-list/:id").patch(verifyJWT, updateToDoList)
+router.route("/scheduler/to-do-list/:id").delete(verifyJWT, deleteAllToDoList)
+
 export default router
