@@ -53,10 +53,14 @@ controllers/
 helpers/
   generateToken.js
 lib/
+  cronJobs/
+    cron.js
   gemini/
     genAI.js
     summarizer.js
   groq/
+    createSchedule.js
+    extractText.js
     generateStudyPlan.js
     groq.js
     guardianLayer.js
@@ -69,6 +73,7 @@ lib/
     summarizer.js
   mongoClient.js
   prisma.js
+  prompt.js
   socket.js
   websearch.js
 middlewares/
@@ -100,9 +105,14 @@ routes/
 services/
   chunking.js
   embedText.js
+  icsFile.js
+  nodemailer.js
+  pdfToImages.js
+  promptOptimizer.js
   queue.js
+  queueEvents.js
   textExtractor.js
-  vectorDB.js
+  vectordb.js
   worker.js
 src/
   generated/
@@ -121,8 +131,6 @@ src/
     commonInputTypes.ts
     enums.ts
     models.ts
-uploads/
-  .gitkeep
 utils/
   Async.js
   asyncHandler.js
@@ -131,6 +139,7 @@ utils/
 . prettierrc
 .gitignore
 app.js
+BACKLOG.md
 eng.traineddata
 index.js
 package.json
@@ -148,7 +157,7 @@ import { imageAnalyze } from "../lib/groq/imageAnalyze.js"
 
 const analyze = asyncHandler(async (req, res) => {
     try {
-        const imageFile = req.files?.image?.[0].path
+        const imageFile = req.files?.image[0]?.path
 
         if (!imageFile) {
             throw new ApiError(400, "No image file uploaded")
@@ -180,7 +189,7 @@ export {
 <file path="controllers/filesRag.controller.js">
 import { asyncHandler } from "../utils/asyncHandler.js"
 import { ApiError, ApiResponse } from "../utils/Async.js"
-import { vectorDB, queryDB } from "../services/vectorDB.js"
+import { vectorDB, queryDB } from "../services/vectordb.js"
 import llmCall from "../lib/groq/llmCall.js"
 import { Documents } from "../models/document.model.js"
 import { v4 as uuid4 } from "uuid"
@@ -347,18 +356,31 @@ const allChats = asyncHandler(async(req,res)=>{
         {
             userId
         }
-    ).select({ docId: 1, chatRoomKey: 1 })
+    ).select({ docId: 1, chatRoomKey: 1, messages:{$slice: 1} })
 
     return res
     .status(200)
     .json(new ApiResponse(200, data, "All chats fetched successfully"))
+})
+
+const deleteChat = asyncHandler(async(req, res)=>{
+    const {id} = req.params
+
+    const userId = req.user.id
+
+    const data = await ChatRoom.findOneAndDelete({userId, _id:id})
+    
+    return res
+    .status(200)
+    .json(new ApiResponse(200, data, "Vhat deleted"))
 })
 export {
     uploadFile,
     askQuery,
     allChatsMessage,
     updateQuery,
-    allChats
+    allChats,
+    deleteChat
 }
 </file>
 
@@ -382,21 +404,20 @@ const createNote = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Content is required")
     }
 
-    // const result = await summarizeText(content)
-    const result = true // lets say for now llm failed first time to generate
+    const result = await summarizeText(content)
 
-    // const title = await titleExtract(result)
+    const title = await titleExtract(result)
 
-    if (result) {
+    if (!result) {
         // throw new ApiError(400, "Something went wrong, Try again !")
-        const response = await AIResponseQueue(content)        
+        const response = await AIResponseQueue(userId, content)        
         
         return res
         .status(200)
         .json(new ApiResponse(200, {}, "retrying"))
 
     }
-
+    
     const data = await Note.create({
         userId,
         title,
@@ -505,7 +526,8 @@ export {
     getNote,
     deleteNote,
     updateNote,
-    tooglePin
+    tooglePin,
+    titleExtract
 }
 </file>
 
@@ -556,6 +578,7 @@ import { PDFParse } from "pdf-parse"
 import fs from "fs"
 import { pdfToFlashcard } from "../lib/groq/pdfToFlashcard.js"
 import { v4 as uuidv4 } from "uuid" // ✅ ADDED: need this to generate unique quizId on server
+import { Flascards } from "../models/flashcard.model.js"
 
 // ─────────────────────────────────────────────
 // GENERATE QUIZ FROM TEXT (topic + subject)
@@ -793,6 +816,22 @@ const generateQuizFromFiles = asyncHandler(async (req, res) => {
         .json(new ApiResponse(201, quizDoc, "Quiz created from file"))
 })
 
+const getResult = asyncHandler(async(req, res)=>{
+    const {id} = req.params
+    const userId = req.user.id
+
+    if(!id){
+        throw new ApiError(404, "Quiz not found")
+    }
+
+    const data = await Quiz.find({_id:id})
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, data, "All results"))
+
+})
+
 
 const generateFlashcards = asyncHandler(async (req, res) => {
     const { topic, subject, flashcardId } = req.body
@@ -942,6 +981,7 @@ export {
     submitQuizAnswers,
     deleteQuiz,
     generateQuizFromFiles,
+    getResult,
 
     generateFlashcards,
     getFlashcards,
@@ -953,14 +993,28 @@ export {
 <file path="controllers/scheduler.controller.js">
 import { asyncHandler } from "../utils/asyncHandler.js"
 import { ApiError, ApiResponse } from "../utils/Async.js"
-import {scheduleEntry} from "../models/scheduleEntry.model.js"
+import {
+    scheduleEntry,
+    scheduleExamDates,
+    AssignmentSubmission,
+    ProjectSubmission,
+    TimeTable,
+    RawSchedule
+} from "../models/scheduleEntry.model.js"
 import { generateStudyPlan } from "../lib/groq/generateStudyPlan.js"
 import { StudyPlan } from "../models/studyPlan.js"
+import pdfToImages from "../services/pdfToImages.js"
+import { PDFParse } from "pdf-parse"
+import fs from "fs"
+import createSchedule from "../lib/groq/createSchedule.js"
+import recurringTasks from "../lib/cronJobs/cron.js"
+import icsFileGeneretor from "../services/icsFile.js"
+import mailICSFile from "../services/nodemailer.js"
 
-const createScheduler = asyncHandler(async(req, res)=>{
-    const {  subject ,topic, schedulerDate,duration} = req.body
+const createScheduler = asyncHandler(async (req, res) => {
+    const { subject, topic, schedulerDate, duration } = req.body
 
-    if (!subject || !topic || !schedulerDate || !duration){
+    if (!subject || !topic || !schedulerDate || !duration) {
         throw new ApiError(400, "All fields are required")
     }
 
@@ -975,11 +1029,11 @@ const createScheduler = asyncHandler(async(req, res)=>{
     })
 
     return res
-    .status(200)
-    .json(new ApiResponse(200, data, "New scheduler craeted "))
+        .status(200)
+        .json(new ApiResponse(200, data, "New scheduler craeted "))
 })
 
-const getScheduler = asyncHandler(async(req,res)=>{
+const getScheduler = asyncHandler(async (req, res) => {
     const userId = req.user.id
 
     const data = await scheduleEntry.find({
@@ -987,12 +1041,12 @@ const getScheduler = asyncHandler(async(req,res)=>{
     })
 
     return res
-    .status(200)
-    .json(new ApiResponse(200, data, "All scheduler fetched successfully"))
+        .status(200)
+        .json(new ApiResponse(200, data, "All scheduler fetched successfully"))
 })
 
-const updateScheduler = asyncHandler(async(req, res)=>{
-    const {schedulerId} = req.params
+const updateScheduler = asyncHandler(async (req, res) => {
+    const { schedulerId } = req.params
 
     const { subject, topic, schedulerDate, duration, completed } = req.body
 
@@ -1000,7 +1054,7 @@ const updateScheduler = asyncHandler(async(req, res)=>{
 
     const data = await scheduleEntry.findOneAndUpdate(
         {
-            _id:schedulerId,
+            _id: schedulerId,
             userId
         },
         {
@@ -1009,35 +1063,35 @@ const updateScheduler = asyncHandler(async(req, res)=>{
             schedulerDate,
             duration,
             completed
-        },{
-            new : true
-        }
+        }, {
+        new: true
+    }
     )
 
     return res
-    .status(200)
-    .json(new ApiResponse(200, data, "Scheduler updated successfully"))
+        .status(200)
+        .json(new ApiResponse(200, data, "Scheduler updated successfully"))
 
 
 })
 
-const generatePlan = asyncHandler(async(req, res)=>{
+const generatePlan = asyncHandler(async (req, res) => {
     const { subjects, hoursPerDay, goalDate } = req.body
 
-    if(!subjects || !hoursPerDay | !goalDate){
+    if (!subjects || !hoursPerDay | !goalDate) {
         throw new ApiError(400, "All fields are required")
     }
 
-     
+
     const data = await generateStudyPlan(subjects, hoursPerDay, goalDate)
 
     return res
-    .status(200)
-    .json(new ApiResponse(200, data, "Study plan created"))
+        .status(200)
+        .json(new ApiResponse(200, data, "Study plan created"))
 
 })
 
-const saveGeneratePlan = asyncHandler(async(req, res)=>{
+const saveGeneratePlan = asyncHandler(async (req, res) => {
     const { subjects, hoursPerDay, goalDate, generatedPlan } = req.body
 
     const userId = req.user.id
@@ -1056,8 +1110,697 @@ const saveGeneratePlan = asyncHandler(async(req, res)=>{
     })
 
     return res
-    .status(200)
-    .json(new ApiResponse(200, data, "Study plan saved in mognoDB"))
+        .status(200)
+        .json(new ApiResponse(200, data, "Study plan saved in mognoDB"))
+
+})
+
+// 
+
+
+const createExamScheduler = asyncHandler(async (req, res) => {
+    const { subjectName, examDate, examTime, duration, venue, onlineLink, subjectCode, notes, reminderEnabled, reminderDaysBefore, status, } = req.body
+
+    if (!subjectName || !examDate || !examTime) {
+        throw new ApiError(400, "All fields are required")
+    }
+
+    const userId = req.user.id
+
+    const data = await scheduleExamDates.create({
+        userId,
+        subjectName,
+        examDate,
+        examTime,
+        duration: duration || undefined,
+        venue: venue || undefined,
+        onlineLink: onlineLink || undefined,
+        subjectCode: subjectCode || undefined,
+        notes: notes || undefined,
+        reminderEnabled: reminderEnabled,
+        reminderDaysBefore: reminderDaysBefore || undefined,
+        status: status,
+
+
+
+    })
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, data, "Exam date created"))
+})
+
+const getAllExamScheduler = asyncHandler(async (req, res) => {
+    const userId = req.user.id
+
+
+    const data = await scheduleExamDates.find({
+        userId
+    })
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, data, "All exam dates are fetched "))
+})
+
+const deleteExamScheduler = asyncHandler(async (req, res) => {
+    const userId = req.user.id
+
+    const { id } = req.params
+
+    if (!id) {
+        throw new ApiError(400, "scheduler id is required")
+    }
+
+    const data = await scheduleExamDates.findOneAndDelete(
+        {
+            userId,
+            _id: id
+        }
+    )
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, data, "Exam Scheduler is deleted "))
+})
+
+const updateExamScheduler = asyncHandler(async (req, res) => {
+    const { subjectName, examDate, examTime, duration, venue, onlineLink, subjectCode, notes, reminderEnabled, reminderDaysBefore, status } = req.body
+
+    const { id } = req.params
+
+    if (!id) {
+        throw new ApiError(400, "Scheduler id id required")
+    }
+
+    const objects = { subjectName, examDate, examTime, duration, venue, onlineLink, subjectCode, notes, reminderEnabled, reminderDaysBefore, status }
+
+    const filteredObjects = Object.fromEntries(
+        Object.entries(objects).filter(([key, value]) => value !== undefined)
+    )
+    console.log(filteredObjects);
+
+    if (Object.keys(filteredObjects).length === 0) {
+        throw new ApiError(400, "At least one field is required to update")
+    }
+
+    const userId = req.user.id
+
+    const data = await scheduleExamDates.findOneAndUpdate(
+        {
+            _id: id,
+            userId
+        },
+        {
+            $set: filteredObjects
+        }
+    )
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, data, "Exam scheduler updated successfully"))
+
+})
+
+const getSchedulerExam = asyncHandler(async (req, res) => {
+    const { id } = req.params
+
+    if (!id) {
+        throw new ApiError(400, "Id is required")
+    }
+
+    const data = await scheduleExamDates.find({
+        _id: id,
+    })
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, data, "Scheduler exam fetched"))
+})
+
+// 
+
+
+const createAssignmentSubmissionScheduler = asyncHandler(async (req, res) => {
+    const { dueDate, allowLateSubmission, linkedAssignmentId } = req.body
+
+    if (!dueDate) {
+        throw new ApiError(400, "Due date is required")
+    }
+
+    const userId = req.user.id
+
+    const data = await AssignmentSubmission.create({
+        userId,
+        dueDate,
+        allowLateSubmission,
+        linkedAssignmentId
+    })
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, data, "Assignment scheduler created"))
+})
+
+const getAllAssignmentSubmission = asyncHandler(async (req, res) => {
+    const userId = req.user.id
+
+    const data = await AssignmentSubmission.find({ userId })
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, data, "All assignment submission fetched"))
+})
+
+const getAssignmentSubmission = asyncHandler(async (req, res) => {
+    const { id } = req.params
+
+    if (!id) {
+        throw new ApiError(400, "id is required")
+    }
+
+    const userId = req.user.id
+
+    const data = await AssignmentSubmission.find({ userId, _id: id })
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, data, "Assignment fetched successfully"))
+})
+
+const deleteAssignmentSubmission = asyncHandler(async (req, res) => {
+    const { id } = req.params
+
+    if (!id) {
+        throw new ApiError(400, "id is required")
+    }
+
+    const userId = req.user.id
+
+    const data = await AssignmentSubmission.findOneAndDelete(
+        {
+            userId,
+            _id: id
+        },
+
+    )
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, data, "Assignment delted successfully"))
+})
+
+const updateAssignmentSubmission = asyncHandler(async (req, res) => {
+    const { id } = req.params
+    const { dueDate, submittedAt, submissionStatus, feedback, allowLateSubmission, linkedAssignmentId, } = req.body
+
+    if (!id) {
+        throw new ApiError(400, "id is required")
+    }
+
+    const objects = { dueDate, submittedAt, submissionStatus, feedback, allowLateSubmission, linkedAssignmentId }
+
+    const filteredObjects = Object.fromEntries(
+        Object.entries(objects).filter(([key, value]) => value !== undefined)
+    )
+
+    if (Object.keys(filteredObjects).length === 0) {
+        throw new ApiError(400, "At least one field is required for update")
+    }
+
+    const userId = req.user.id
+
+    const data = await AssignmentSubmission.findOneAndUpdate(
+        {
+            userId,
+            _id: id
+        },
+        {
+            $set: filteredObjects
+        }
+    )
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, data, 'Assignment upadted'))
+
+})
+
+// 
+
+const createProjectSubmissionScheduler = asyncHandler(async (req, res) => {
+    const userId = req.user.id
+
+    const { projectTitle, submissionDate, projectLink, phase } = req.body
+
+    if (!projectTitle || !submissionDate) {
+        throw new ApiError(400, "These two fields are required")
+    }
+
+    const data = await ProjectSubmission.create({
+        userId,
+        projectTitle,
+        projectTitle,
+        submissionDate,
+        phase,
+
+    })
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, data, "Project suhbmission scheduler created"))
+})
+
+const getAllProjectSubmission = asyncHandler(async (req, res) => {
+    const userId = req.user.id
+
+    const data = await ProjectSubmission.find({ userId })
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, data, "All project submission schedules fetched sucessfully"))
+})
+
+const getProjectSubmission = asyncHandler(async (req, res) => {
+    const userId = req.user.id
+
+    const { id } = req.params
+
+    if (!id) {
+        throw new ApiError(400, "Id is required")
+    }
+
+    const data = await ProjectSubmission.find(
+        {
+            userId,
+            _id: id
+        }
+    )
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, data, "Project submission schedule fetched successfully"))
+})  
+
+const deleteProjectSubmission = asyncHandler(async (req, res) => {
+    const { id } = req.params
+
+    if (!id) {
+        throw new ApiError(400, "Project schedule not fetched")
+    }
+
+    const userId = req.user.id
+
+    const data = await ProjectSubmission.findOneAndDelete(
+        {
+            userId,
+            _id: id
+        }
+    )
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, data, "Project schedule deleted successfully"))
+})
+
+const updateProjectSubmission = asyncHandler(async (req, res) => {
+    const { id } = req.params
+    if (!id) {
+        throw new ApiError(400, "Project id is required")
+    }
+    const { projectTitle, submissionDate, projectLink, phase } = req.body
+
+    const objects = { projectTitle, submissionDate, projectLink, phase }
+
+    const filteredObjects = Object.fromEntries(
+        Object.entries(([key, value]) => value !== undefined)
+    )
+
+    if (Object.keys(filteredObjects).length === 0) {
+        throw new ApiError(400, "Atleast one field is required")
+    }
+
+    const data = await ProjectSubmission.findOneAndUpdate(
+        {
+            _id: id
+        },
+        {
+            $set: filteredObjects
+        }
+    )
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, data, "Project schedule is updated"))
+
+})
+// 
+
+const createTimeTable = asyncHandler(async (req, res) => {
+    const { title, topic, startTime, endTime, plannedDuration, isRecurring, recurrencePattern, recurrenceDays, recurrenceEndDate, status, actualDuration, goalDescription, reminderEnabled, reminderMinutesBefore, } = req.body
+
+    if (!title || !topic || !startTime || !endTime || !plannedDuration) {
+        throw new ApiError(400, "These fields are required")
+    }
+
+    const userId = req.user.id
+
+
+    const conflict = await TimeTable.findOne(
+        {
+            userId,
+            startTime: {
+                $lt: endTime
+            },
+            endTime: {
+                $gt: startTime
+            }
+        }
+    )
+
+    if (conflict) {
+        throw new ApiError(400, "This slot is already booked ")
+    }
+
+    const data = await TimeTable.create(
+        {
+            userId,
+            title,
+            topic,
+            startTime,
+            endTime,
+            plannedDuration,
+            isRecurring,
+            recurrencePattern,
+            recurrenceDays,
+            recurrenceEndDate,
+            status,
+            actualDuration,
+            goalDescription,
+            reminderEnabled,
+            reminderMinutesBefore,
+        }
+    )
+
+    if (data.isRecurring) {
+        const pattern = data.recurrencePattern
+        const days = data.recurrenceDays
+        const endDate = data.recurrenceEndDate
+        const entryId = data._id
+
+        if (!pattern || !days || !endDate) {
+            throw new ApiError(400, "Fields are required")
+        }
+
+        await recurringTasks(pattern, days, endDate, entryId)
+    }
+    return res
+        .status(200)
+        .json(new ApiResponse(200, data, "Time table created"))
+
+})
+
+const getAllTimeTables = asyncHandler(async (req, res) => {
+    const userId = req.user.id
+
+    const data = await TimeTable.find(
+        {
+            userId
+        }
+    )
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, data, "All time tables fetched"))
+})
+
+const getTimeTable = asyncHandler(async (req, res) => {
+    const { id } = req.params
+
+    if (!id) {
+        throw new ApiError(400, "Id is required")
+    }
+
+    const data = await TimeTable.find(
+        {
+            _id: id
+        }
+    )
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, data, "Ti,e table fetched"))
+})
+
+const deleteTimeTable = asyncHandler(async (req, res) => {
+    const { id } = req.params
+
+    if (!id) {
+        throw new ApiError(400, "Id is required")
+    }
+
+    const isDataExist = await TimeTable.find({ _id: id })
+
+    if (!isDataExist) {
+        throw new ApiError(400, "Time table not found")
+    }
+
+    const data = await TimeTable.findOneAndDelete(
+        {
+            _id: id
+        }
+    )
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, "Time table is deleted"))
+})
+
+const updateTimeTable = asyncHandler(async (req, res) => {
+    const { id } = req.params
+
+    if (!id) {
+        throw new ApiError(400, "Id is required")
+    }
+
+    const { title, topic, startTime, endTime, plannedDuration, isRecurring, recurrencePattern, recurrenceDays, recurrenceEndDate, status, actualDuration, goalDescription, reminderEnabled, reminderMinutesBefore, } = req.body
+
+    const objects = { title, topic, startTime, endTime, plannedDuration, isRecurring, recurrencePattern, recurrenceDays, recurrenceEndDate, status, actualDuration, goalDescription, reminderEnabled, reminderMinutesBefore, }
+
+    const filteredObjects = Object.fromEntries(
+        Object.entries(objects).filter(([key, value]) => value !== undefined)
+    )
+
+    if (Object.keys(filteredObjects).length === 0) {
+        throw new ApiError(400, "Atleast one field need to be updated")
+    }
+
+    const conflict = await TimeTable.findOne(
+        {
+            userId,
+            startTime: {
+                $lt: endTime
+            },
+            endTime: {
+                $gt: startTime
+            }
+        }
+    )
+
+    if (conflict) {
+        throw new ApiError(400, "This slot is already booked ")
+    }
+
+    const userId = req.user.id
+
+    const isDataExist = await TimeTable.findById(
+        {
+            _id: id
+        }
+    )
+
+    if (!isDataExist) {
+        throw new ApiError(400, "Time table not exist")
+    }
+
+    // Object.assign(isDataExist, filteredObjects)
+    // const data = await isDataExist.save()
+
+
+    const data = await TimeTable.findOneAndUpdate(
+        {
+            userId,
+            _id: id
+        },
+        {
+
+            $set: filteredObjects
+        }
+    )
+
+    if (isRecurring && !data.isRecurring) {
+        console.log("Recurrance Run:");
+
+        const pattern = data.recurrencePattern
+        const days = data.recurrenceDays
+        const endDate = data.recurrenceEndDate
+        const entryId = data._id
+
+        if (!pattern || !days || !endDate) {
+            throw new ApiError(400, "Fields are required")
+        }
+
+        await recurringTasks(pattern, days, endDate, entryId)
+    }
+    return res
+        .status(200)
+        .json(new ApiResponse(200, data, "Updated"))
+
+})
+
+// 
+
+const uploadFile = asyncHandler(async (req, res) => {
+    const file = req.files?.file[0]
+
+    if (!file) {
+        throw new ApiError(400, "File is required")
+    }
+
+    const mimeType = file?.mimeType
+    const filePath = file?.path
+
+    const outputDir = "/Users/kanchannath/Coding/Spark.E/server/uploads/scheduler"
+
+    const dataBuffer = fs.readFileSync(filePath)
+    const uint8array = new Uint8Array(dataBuffer)
+    const parser = new PDFParse(uint8array)
+
+    await parser.getText()
+
+    const totalPages = parser?.doc?._pdfInfo?.numPages
+    console.log("Started", totalPages);
+
+    await pdfToImages(filePath, totalPages, outputDir)
+    console.log("End");
+
+    const userId = req.user.id
+    const result = await createSchedule(outputDir)
+
+    const data = await RawSchedule.create(
+        {
+            userId,
+            metaData: result
+        }
+    )
+    fs.unlinkSync(filePath)
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, data, "Raw Schedule created"))
+
+})
+
+const getAllRawMaterial = asyncHandler(async (req, res) => {
+    const userId = req.user.id
+
+    const data = await RawSchedule.find({ userId })
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, data, "All schedule fetched"))
+})
+
+const getRawMaterial = asyncHandler(async (req, res) => {
+    const { id } = req.params
+    if (!id) {
+        throw new ApiError(400, "Id is required")
+    }
+    const userId = req.user.id
+    const data = await RawSchedule.find({ userId, _id: id })
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, data, "Raw schedule fetched"))
+})
+
+const deleteRawMaterial = asyncHandler(async (req, res) => {
+    const { id } = req.params
+    if (!id) {
+        throw new ApiError(400, "Id is required")
+    }
+    const userId = req.user.id
+    const data = await RawSchedule.findOneAndDelete({ userId, _id: id })
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, data, "Raw schedule fetched"))
+})
+
+const deleteAllRawMaterial = asyncHandler(async (req, res) => {
+    const userId = req.user.id
+
+    await RawSchedule.deleteMany({ userId })
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, {}, "All raw data is deleted"))
+})
+
+const createToDoList = asyncHandler(async (req, res) => {
+
+})
+
+const getAllToDoList = asyncHandler(async (req, res) => {
+
+})
+const getToDoList = asyncHandler(async (req, res) => {
+
+})
+
+const deleteToDoList = asyncHandler(async (req, res) => {
+
+})
+
+const updateToDoList = asyncHandler(async (req, res) => {
+
+})
+
+const deleteAllToDoList = asyncHandler(async (req, res) => {
+
+})
+
+const sendICSFile = asyncHandler(async (req, res) => {
+    const { id } = req.params
+
+    if (!id) {
+        throw new ApiError(400, "Id is required")
+    }
+
+    const isDataExist = await TimeTable.findById({ _id: id })
+
+    if (!isDataExist) {
+        throw new ApiError(400, "Time table is not exist.")
+    }
+
+    const folder = "/Users/kanchannath/Coding/Spark.E/server/uploads/icsFiles"
+
+    try {
+        const outputPath = await icsFileGeneretor(isDataExist, folder)
+        const response = await mailICSFile(outputPath)
+        console.log("Response", response);
+
+        fs.rmSync(folder, { recursive: true })
+
+        return res
+            .status(200)
+            .json(new ApiResponse(200, response, "ICS file is generated"))
+    } catch (err) {
+        console.error("ICS generation failed:", err.message)
+        fs.rmSync(folder, { recursive: true, force: true })
+
+    }
+
 
 })
 export {
@@ -1065,7 +1808,49 @@ export {
     getScheduler,
     updateScheduler,
     generatePlan,
-    saveGeneratePlan
+    saveGeneratePlan,
+
+
+    createExamScheduler,
+    getAllExamScheduler,
+    deleteExamScheduler,
+    updateExamScheduler,
+    getSchedulerExam,
+
+    createAssignmentSubmissionScheduler,
+    getAllAssignmentSubmission,
+    getAssignmentSubmission,
+    deleteAssignmentSubmission,
+    updateAssignmentSubmission,
+
+    createProjectSubmissionScheduler,
+    getAllProjectSubmission,
+    getProjectSubmission,
+    deleteProjectSubmission,
+    updateProjectSubmission,
+
+    createTimeTable,
+    getAllTimeTables,
+    getTimeTable,
+    deleteTimeTable,
+    updateTimeTable,
+
+
+    uploadFile,
+    getAllRawMaterial,
+    getRawMaterial,
+    deleteRawMaterial,
+    deleteAllRawMaterial,
+
+
+    createToDoList,
+    getAllToDoList,
+    getToDoList,
+    deleteToDoList,
+    updateToDoList,
+    deleteAllToDoList,
+
+    sendICSFile
 }
 </file>
 
@@ -1401,6 +2186,69 @@ export {
 }
 </file>
 
+<file path="lib/cronJobs/cron.js">
+import { Cron } from "croner"
+import { TimeTable } from "../../models/scheduleEntry.model.js"
+
+const DAY_MAP = {
+    sunday: 0, monday: 1, tuesday: 2, wednesday: 3,
+    thursday: 4, friday: 5, saturday: 6
+}
+
+const buildCron = (pattern, days) => {
+    switch (pattern) {
+        case "daily":
+            return "39 18 * * *"
+        case "weekly":
+            const d = days.map((d) => DAY_MAP[d.toLowerCase()]).join(",")
+            return `0 0 * * ${d}`
+        case "monthly":
+            const day = days.join(",")
+            return `0 0 ${day} * *`          // ← was "0 0 ${day} * * " (6 fields + space)
+        default:
+            throw new Error(`Unknown pattern: ${pattern}`)
+    }
+}
+
+const recurringTasks = async (pattern, days, endDate, entryId) => {
+    const expr = buildCron(pattern, days)
+
+    const job = new Cron(expr, async () => {   // ← async here
+        if (endDate && new Date() > new Date(endDate)) {
+            job.stop()
+            return
+        }
+
+        const existedData = await TimeTable.findById(entryId).lean()  // ← findById, not find
+
+        console.log("Existed Data", existedData);
+        
+        if (!existedData) {                    // ← now actually falsy when missing
+            job.stop()
+            return
+        }
+
+        const {userId,
+            title, topic, startTime, endTime,
+            plannedDuration, status, actualDuration,
+            goalDescription, reminderEnabled, reminderMinutesBefore
+        } = existedData                        // ← destructure from doc, not array
+        
+        await TimeTable.create({userId,
+            title, topic, startTime, endTime,
+            plannedDuration, status, actualDuration,
+            goalDescription, reminderEnabled, reminderMinutesBefore,
+            // createdAt excluded — Mongoose sets it fresh
+        })
+
+        console.log("Schedule done");
+        
+    })
+}
+
+export default recurringTasks
+</file>
+
 <file path="lib/gemini/genAI.js">
 import dotenv from "dotenv"
 import { GoogleGenerativeAI } from "@google/generative-ai"
@@ -1430,6 +2278,186 @@ const summarizeText = async (text) => {
 }
 
 export { summarizeText }
+</file>
+
+<file path="lib/groq/createSchedule.js">
+import groq from "./groq.js"
+import path from "path"
+import fs from "fs"
+import { prompt_createSchedule } from "../prompt.js"
+
+// pipe-delimited text → array of objects
+const parseTable = (raw) => {
+    try {
+        const cleaned = raw.trim().replace(/^```[\w]*\n?/, '').replace(/\n?```$/, '')
+        const parsed = JSON.parse(cleaned)
+        return Array.isArray(parsed) ? parsed : (parsed.data ?? [])
+    } catch {
+        return []
+    }
+}
+
+const createSchedule = async (folder) => {
+    try {
+        const files = fs.readdirSync(folder).sort()
+        const allRows = []
+        const batchSize = 3
+
+        for (let i = 0; i < files.length; i += batchSize) {
+            const batch = files.slice(i, i + batchSize)
+
+            const batchResults = await Promise.all(
+                batch.map(async (file) => {
+                    const imgPath = path.join(folder, file)
+                    const base64 = fs.readFileSync(imgPath).toString("base64")
+
+                    const response = await groq.chat.completions.create({
+                        model: "meta-llama/llama-4-scout-17b-16e-instruct",
+                        messages: [{
+                            role: "user",
+                            content: [
+                                { type: "text", text: prompt_createSchedule },
+                                { type: "image_url", image_url: { url: `data:image/jpeg;base64,${base64}` } }
+                            ]
+                        }],
+                        temperature: 0,        // deterministic = accurate extraction
+                        max_tokens: 8192
+                    })
+
+                    const raw = response.choices[0].message.content
+                    
+                    return parseTable(raw)     // returns array of objects
+                })
+            )
+
+            batchResults.forEach(rows => allRows.push(...rows))
+        }
+
+        fs.rmSync(folder, { recursive: true, force: true })
+        console.log(allRows);
+        
+        return allRows   // clean array of objects → ready for MongoDB .insertMany()
+
+    } catch (error) {
+        console.error("Error:", error.message)
+        fs.rmSync(folder, { recursive: true, force: true })
+        return []
+    }
+}
+
+export default createSchedule
+</file>
+
+<file path="lib/groq/extractText.js">
+import groq from "./groq.js"
+import dotenv from "dotenv"
+dotenv.config()
+import fs from "fs"
+import path from "path"
+import { prompt_TextExtraction } from "../prompt.js"
+
+const extract = async () => {
+    const folder = "/Users/kanchannath/Coding/Spark.E/server/uploads/images"
+    try {
+
+        const files = fs.readdirSync(folder).sort()
+        console.log('files found:', files.length)
+
+        const results = []
+        const batchSize = 3
+
+        for (let i = 0; i < files.length; i += batchSize) {
+            const batch = files.slice(i, i + batchSize)
+            console.log(i, files.length);
+
+            const batchResults = await Promise.all(
+                batch.map(async (file) => {
+                    console.log(file);
+
+                    const imgPath = path.join(folder, file)
+                    const base64 = fs.readFileSync(imgPath).toString("base64")
+
+                    const dataURI = `data:image/jpeg;base64,${base64}`
+
+                    const response = await groq.chat.completions.create({
+                        model: "meta-llama/llama-4-scout-17b-16e-instruct",
+                        messages: [
+                            {
+                                role: "user",
+                                content: [
+                                    {
+                                        type: "text",
+                                        text: prompt_TextExtraction
+                                    },
+                                    {
+                                        type: "image_url",
+                                        image_url: {
+                                            url: `data:image/jpeg;base64,${base64}`
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    })
+                    const data = response.choices[0].message.content
+
+                    return data
+                })
+            )
+
+            results.push(...batchResults)
+        }
+        const data = results.join('\n')
+        console.log(data)
+        fs.rmSync(folder, { recursive: true, force: true })
+        return data
+
+    } catch (error) {
+        console.error(error.message)
+        fs.rmSync(folder, { recursive: true, force: true })
+
+    }
+
+}
+
+const extractTextFromImage = async(filePath, mimeType)=>{
+    const base64 = fs.readFileSync(filePath).toString("base64")
+
+    try {
+        const response = await groq.chat.completions.create({
+            model:"meta-llama/llama-4-scout-17b-16e-instruct",
+            messages:[
+                {
+                    role:"user",
+                    content:[
+                        {
+                            type:"text",
+                            text:prompt_TextExtraction
+                        },
+                        {
+                            type:"image_url",
+                            image_url:{
+                                url: `data:${mimeType};base64,${base64}`
+                            }
+                        }
+                    ]
+                }
+            ]
+        })
+
+        const data = response.choices[0].message.content
+
+        return data
+    } catch (error) {
+        console.error(error.message)
+    }
+}
+
+export  {
+    
+    extract,
+    extractTextFromImage
+}
 </file>
 
 <file path="lib/groq/generateStudyPlan.js">
@@ -1563,18 +2591,13 @@ export {imageAnalyze}
 <file path="lib/groq/llmCall.js">
 import { AIResponse } from "../../models/aiResponse.model.js";
 import groq from "./groq.js";
+import { promptOptimizer } from "../../services/promptOptimizer.js";
 
 const llmCall = async (query, topChunks, userId) => {
 
-    const prompt = `You are a helpful assistant. Answer user questions using ONLY the context provided below.
-If answer not in context, say I don't know based on provided documents.
-Do not use prior knowledge. Be concise and accurate.
-
-Context
-${topChunks}
-
-Question
-${query}`
+    const optimizedPrompt  = await promptOptimizer(query)
+    const prompt = optimizedPrompt.replace("{{CHUNKS}}", topChunks)
+    
     const response = await groq.chat.completions.create(
         {
             model: "llama-3.3-70b-versatile",
@@ -2052,6 +3075,72 @@ const prisma = new PrismaClient({ adapter })
 export default prisma
 </file>
 
+<file path="lib/prompt.js">
+const prompt_PromptOptimizer = `
+    You are an expert prompt engineer. Rewrite the user's raw query into a highly optimized prompt for an LLM.
+
+The optimized prompt you write will later receive context chunks from a vector database.
+Your output MUST include the placeholder {{CHUNKS}} exactly as-is — do not replace or remove it.
+Place it where retrieved context would be most effective (usually before the main task instruction).
+
+Rules:
+- Identify true intent
+- Add missing context, constraints, output format instructions
+- Specify tone, length, structure if needed
+- Remove ambiguity
+- Do NOT answer the query — only rewrite the prompt
+- Keep {{CHUNKS}} as a literal string in your output
+
+Output ONLY the optimized prompt. No explanation. No preamble.
+
+User's raw query:
+{{USER_QUERY}}
+`
+const prompt_TextExtraction = `
+You are an expert document parser. Extract ALL content sequentially in the exact order it appears on the page — top to bottom, left to right. Do not group or reorder content by type.
+
+For each piece of content encountered, process it inline as you go:
+
+- PLAIN TEXT: Extract exactly as written. Preserve original casing, punctuation, spacing, indentation, and paragraph breaks. Flag ambiguous or partially visible characters with [?].
+
+- EQUATIONS: Write in LaTeX. Inline equations use $...$. Block/standalone equations use $$...$$. Preserve all subscripts, superscripts, fractions, integrals, summations, Greek letters exactly. Never simplify or rearrange. Matrices use \\begin{bmatrix}...\\end{bmatrix}.
+
+- TABLES: Reproduce in Markdown table syntax. Preserve every cell's content exactly including units and symbols.
+
+- DIAGRAMS / FIGURES / SHAPES: When encountered, output:
+  1. Diagram TYPE (flowchart / circuit / geometry / graph / block diagram / etc.)
+  2. All labeled components with exact label text
+  3. Spatial relationships, connections, and arrow directions
+  4. Overall structure and purpose
+  5. Axis labels and all visible scale/tick values (if axes exist)
+
+Output must mirror the document's reading flow exactly as a human would read it.
+`
+
+const prompt_createSchedule = `
+   You are a data extraction engine. Extract ALL table data from the image into a JSON array.
+
+RULES:
+1. Detect column headers dynamically from the table.
+2. For each header, generate a short key: take first letter of each word in the header, lowercase. If collision, append next char of the conflicting word to disambiguate.
+   Example: "Chapter Name" → "cn", "Completion Date" → "cd", "Date" → "d", "Faculty Name" → "fn"
+3. Merged cells: if a cell spans multiple rows, copy its value into EVERY row it covers. No row may have null or empty string for any key.
+4. Output a raw JSON array only. No markdown fences. No explanation. No preamble.
+5. Every object in the array must have identical keys.
+6. Preserve exact text from the image, do not paraphrase.
+
+OUTPUT FORMAT:
+[{"key1":"val","key2":"val",...}, ...]
+
+Extract now.
+`
+export {
+    prompt_PromptOptimizer,
+    prompt_TextExtraction,
+    prompt_createSchedule
+}
+</file>
+
 <file path="lib/socket.js">
 import { Server } from "socket.io"
 import { ApiError } from "../utils/Async.js"
@@ -2457,44 +3546,351 @@ export const Quiz = mongoose.model("Quiz", quizSchema)
 </file>
 
 <file path="models/scheduleEntry.model.js">
-import mongoose from "mongoose"
+import mongoose, { mongo, Schema } from "mongoose"
+import { userInfo } from "os"
 
 const scheduleEntrySchema = new mongoose.Schema({
-    userId:{
+    userId: {
         type: String,
-        required:true
+        required: true
     },
-    subject:{
-        type:String,
+    subject: {
+        type: String,
         required: true
 
     },
-    topic:{
-        type:String,
+    topic: {
+        type: String,
         required: true
 
     },
-    schedulerDate:{
+    schedulerDate: {
         type: Date,
         required: true
 
     },
-    duration:{
+    duration: {
         type: Number,
         required: true
 
     },
-    completed:{
-        type:Boolean,
-        default:false
+    completed: {
+        type: Boolean,
+        default: false
 
     },
     createdAt: {
-        type:Date
+        type: Date
     }
-}, {timestamps:true})
+}, { timestamps: true })
 
 export const scheduleEntry = mongoose.model("scheduleEntry", scheduleEntrySchema)
+
+const scheduleExamDatesSchema = mongoose.Schema({
+    userId: {
+        type: String,
+        required: true
+    },
+    subjectName: {
+        type: String,
+        required: true
+    },
+    examDate: {
+        type: Date,
+        required: true
+    },
+    examTime: {
+        type: String,
+        required: true
+    },
+    duration: {
+        type: Number,
+    },
+    venue: {
+        type: String,
+    },
+    onlineLink: {
+        type: String
+    },
+    subjectCode: {
+        type: String
+    },
+    notes: {
+        type: String
+    },
+    reminderEnabled: {
+        type: Boolean,
+        default: false
+    },
+    reminderDaysBefore: {
+        type: Number,
+    },
+    status: {
+        type: String,
+        enum: ["upcoming", "completed", "cancelled"],
+        default: "upcoming"
+    },
+    createdAt: {
+        type: Date,
+    }
+}, { timestamps: true })
+
+export const scheduleExamDates = mongoose.model("scheduleExamDates", scheduleExamDatesSchema)
+
+const assignmentSubmissionSchema = mongoose.Schema({
+    userId: {
+        type: String,
+        required: true
+    },
+    dueDate: {
+        type: Date,
+        required: true
+    },
+    submittedAt: {
+        type: String,
+    },
+    submissionStatus: {
+        type: String,
+        enum: ["pending", "submitted", "late", "graded"],
+        default: "pending"
+    },
+    feedback: {
+        type: String
+    },
+    allowLateSubmission: {
+        type: Boolean,
+        default: false
+    },
+    linkedAssignmentId: {
+        type: String
+    },
+    createdAt: {
+        type: Date
+    }
+}, { timestamps: true })
+
+export const AssignmentSubmission = mongoose.model("AssignmentSubmission", assignmentSubmissionSchema)
+
+const projectSubmissionSchema = mongoose.Schema({
+    userId: {
+        type: String,
+        required: true
+    },
+    projectTitle: {
+        type: String,
+        required: true
+    },
+    phase: {
+        type: String,
+        enum: ["proposal", "mideval", "final"],
+        default: "proposal"
+    },
+    submissionDate: {
+        type: Date,
+        required: true
+    },
+    projectLink: {
+        type: String,
+
+    },
+    createdAt: {
+        type: Date
+    }
+}, { timestamps: true })
+
+export const ProjectSubmission = mongoose.model("ProjectSubmission", projectSubmissionSchema)
+
+
+const timeTableSchema = mongoose.Schema({
+    userId: {
+        type: String,
+        required: true
+    },
+    title: {
+        type: String,
+        required: true
+    },
+    topic: {
+        type: String,
+        required: true
+    },
+    startTime: {
+        type: Date,
+        required: true
+    },
+    endTime: {
+        type: Date,
+        required: true
+    },
+    plannedDuration: {
+        type: Number,
+        required: true
+    },
+    isRecurring: {
+        type: Boolean
+    },
+    recurrencePattern: {
+        type: String,
+        // enum: ["daily", "weekly", "monthly", "custom"]
+    },
+    recurrenceDays: {
+        type: [String]
+    },
+    recurrenceEndDate: {
+        type: Date
+    },
+    status:{
+        type:String,
+        // enum: ["scheduled", "in_progress", "completed", "skipped", "cancelled"],
+        default:"in_progress"
+    },
+    actualDuration:{
+        type:Number
+    },
+    completedAt:{
+        type:Date,
+
+    },
+    goalDescription:{
+        type:String
+    },
+    reminderEnabled:{
+        type:Boolean,
+        default:false
+    },
+    reminderMinutesBefore:{
+        type:Number,
+    },
+    createdAt:{
+        type:Date
+    }
+
+}, { timestamps: true })
+
+// timeTableSchema.pre("save", function(next){
+//     if (this.isRecurring) {
+//         if (!this.recurrencePattern) {
+//             this.invalidate("recurrencePattern", "required when isRecurring is true")
+//         }
+//         if (!this.recurrenceEndDate) {
+//             this.invalidate("recurrenceEndDate", "required when isRecurring is true")
+//         }
+//         if (!this.recurrenceDays || this.recurrenceDays.length === 0) {
+//             this.invalidate('recurrenceDays', 'required when isRecurring is true')
+//         }
+//     }
+
+//     if(this.reminderEnabled){
+//         if (!this.reminderMinutesBefore){
+//             this.invalidate("reminderMinutesBefore", "this field is req when reminderEnabled is true")
+//         }
+//     }
+
+//     next()
+// })
+
+/*
+timeTableSchema.pre("findOneAndUpdate", function(next) {
+  // use this.get() to read the incoming update values
+  const isRecurring = this.get("isRecurring");
+  const reminderEnabled = this.get("reminderEnabled");
+  const update = this.getUpdate(); // full update object if needed
+
+  if (isRecurring) {
+    if (!this.get("recurrencePattern")) {
+      return next(new Error("recurrencePattern required when isRecurring is true"));
+    }
+    if (!this.get("recurrenceEndDate")) {
+      return next(new Error("recurrenceEndDate required when isRecurring is true"));
+    }
+    const days = this.get("recurrenceDays");
+    if (!days || days.length === 0) {
+      return next(new Error("recurrenceDays required when isRecurring is true"));
+    }
+  }
+
+  if (reminderEnabled) {
+    if (!this.get("reminderMinutesBefore")) {
+      return next(new Error("reminderMinutesBefore required when reminderEnabled is true"));
+    }
+  }
+
+  next();
+});
+*/
+
+
+export const TimeTable = mongoose.model("TimeTable", timeTableSchema)
+
+const rawScheduleSchema = mongoose.Schema({
+    userId:{
+        type:String,
+        required: true
+    },
+    metaData: Schema.Types.Mixed
+},{timestamps: true})
+
+export const RawSchedule = mongoose.model("RawSchedule", rawScheduleSchema)
+
+const toDoListSchema = mongoose.Schema({
+    userId:{
+        type:String,
+        required: true
+    },
+    title:{
+        type:String,
+        required: true
+    },
+    status:{
+        type:String,
+        enum:["pending","completed","cancelled"],
+        default:"pending"
+    },
+    priority:{
+        type:String,
+        enum:["low", "medium", "high"],
+        default:"low"
+    },
+    dueDate:{
+        type:Date,
+        required:true
+    },
+    isRecurring:{
+        type:Boolean
+    },
+    recurrencePattern:{
+        type:String,
+        enum: ["daily", "weekly","custom"]
+    },
+    completedAt:{
+        type:Date
+    },
+    reminderEnabled:{
+        type:Boolean
+    },
+    reminderTime:{
+        type:Date
+    },
+    createdAt:{
+        type:Date
+    }
+},{timestamps:true})
+
+toDoListSchema.pre("validate",function(next){
+    if(this.isRecurring){
+        if (!this.recurrencePattern){
+            this.invalidate("recurrencePattern", "required")
+        }
+    }
+
+    if (this.reminderEnabled) {
+        if (!this.reminderTime) {
+            this.invalidate("reminderTime", "required")
+        }
+    }
+})
+
+export const ToDoList = mongoose.model("ToDoList", toDoListSchema)
 </file>
 
 <file path="models/studyPlan.js">
@@ -2641,7 +4037,7 @@ export default router
 import { Router } from "express"
 import { verifyJWT } from "../middlewares/auth.middleware.js"
 import { upload } from "../middlewares/multer.middleware.js"
-import { uploadFile, askQuery, allChatsMessage, updateQuery, allChats } from "../controllers/filesRag.controller.js"
+import { uploadFile, askQuery, allChatsMessage, updateQuery, allChats, deleteChat } from "../controllers/filesRag.controller.js"
 
 const router = Router()
 
@@ -2657,7 +4053,7 @@ router.route("/:id/chat/:chatRoomKey").get(verifyJWT, allChatsMessage)
 router.route("/:id/chat/:chatRoomKey").post(verifyJWT, askQuery)
 router.route("/:id/chat/:chatRoomKey/:chatId").patch(verifyJWT, updateQuery)
 router.route("/chat/all").get(verifyJWT, allChats)
-
+router.route("/:id").delete(verifyJWT, deleteChat)
 
 export default router
 </file>
@@ -2727,6 +4123,7 @@ import {
     submitQuizAnswers,
     deleteQuiz,
     generateQuizFromFiles,
+    getResult,
 
     generateFlashcards,
     getFlashcards,
@@ -2735,7 +4132,7 @@ import {
 
 } from "../controllers/quiz.controller.js"
 import { verifyJWT } from "../middlewares/auth.middleware.js"
-import {upload} from "../middlewares/multer.middleware.js"
+import { upload } from "../middlewares/multer.middleware.js"
 
 const router = Router()
 
@@ -2743,24 +4140,25 @@ router.route("/generate").post(verifyJWT, generateQuiz)
 router.route("/generate/file").post(verifyJWT,
     upload.fields([
         {
-            name:"file"
+            name: "file"
         }
     ]),
     generateQuizFromFiles)
 router.route("/all").get(verifyJWT, getAllQuiz)
-router.route("/:id").get(verifyJWT, getQuizById)
-router.route("/:id/submit").patch(verifyJWT, submitQuizAnswers)
-router.route("/:id").delete(verifyJWT, deleteQuiz)
 
 
 router.route("/flashcards").post(verifyJWT,
-    upload.fields ([
+    upload.fields([
         {
-            name:"pdfFilePath"
+            name: "pdfFilePath"
         }
     ])
-    ,generateFlashcards)
+    , generateFlashcards)
 router.route("/flashcards").get(verifyJWT, getFlashcards)
+router.route("/:id").get(verifyJWT, getQuizById)
+router.route("/:id/submit").patch(verifyJWT, submitQuizAnswers)
+router.route("/:id").delete(verifyJWT, deleteQuiz)
+router.route("/:id/result").get(verifyJWT, getResult)
 router.route("/flashcards/:id").delete(verifyJWT, deleteFlashcards)
 router.route("/flashcards/:id").patch(verifyJWT, addMoreFlashcards)
 
@@ -2770,14 +4168,56 @@ export default router
 
 <file path="routes/scheduler.route.js">
 import { Router } from "express";
-import {verifyJWT} from "../middlewares/auth.middleware.js"
+import { verifyJWT } from "../middlewares/auth.middleware.js"
 import {
     createScheduler,
     getScheduler,
     updateScheduler,
     generatePlan,
-    saveGeneratePlan
+    saveGeneratePlan,
+
+    createExamScheduler,
+    getAllExamScheduler,
+    deleteExamScheduler,
+    updateExamScheduler,
+    getSchedulerExam,
+
+    createAssignmentSubmissionScheduler,
+    getAllAssignmentSubmission,
+    getAssignmentSubmission,
+    deleteAssignmentSubmission,
+    updateAssignmentSubmission,
+
+    createProjectSubmissionScheduler,
+    getAllProjectSubmission,
+    getProjectSubmission,
+    deleteProjectSubmission,
+    updateProjectSubmission,
+
+    createTimeTable,
+    getAllTimeTables,
+    getTimeTable,
+    deleteTimeTable,
+    updateTimeTable,
+
+    uploadFile,
+    getAllRawMaterial,
+    getRawMaterial,
+    deleteRawMaterial,
+    deleteAllRawMaterial,
+
+
+    createToDoList,
+    getAllToDoList,
+    getToDoList,
+    deleteToDoList,
+    updateToDoList,
+    deleteAllToDoList,
+    sendICSFile
+    
 } from "../controllers/scheduler.controller.js"
+import {upload} from "../middlewares/multer.middleware.js"
+
 const router = Router()
 
 router.route("/scheduler").post(verifyJWT, createScheduler)
@@ -2785,10 +4225,53 @@ router.route("/scheduler").get(verifyJWT, getScheduler)
 router.route("/scheduler").patch(verifyJWT, updateScheduler)
 router.route("/scheduler/generate-plan").post(verifyJWT, generatePlan)
 router.route("/scheduler/generate-plan/save").post(verifyJWT, saveGeneratePlan)
+// 
+router.route("/scheduler/exam-dates").post(verifyJWT, createExamScheduler)
+router.route("/scheduler/exam-dates").get(verifyJWT, getAllExamScheduler)
+router.route("/scheduler/exam-dates/:id").delete(verifyJWT, deleteExamScheduler)
+router.route("/scheduler/exam-dates/:id").patch(verifyJWT, updateExamScheduler)
+router.route("/scheduler/exam-dates/:id").get(verifyJWT, getSchedulerExam)
+// 
+router.route("/scheduler/assignment-submission").post(verifyJWT, createAssignmentSubmissionScheduler)
+router.route("/scheduler/assignment-submission").get(verifyJWT, getAllAssignmentSubmission)
+router.route("/scheduler/assignment-submission/:id").get(verifyJWT, getAssignmentSubmission)
+router.route("/scheduler/assignment-submission/:id").delete(verifyJWT, deleteAssignmentSubmission)
+router.route("/scheduler/assignment-submission/:id").patch(verifyJWT, updateAssignmentSubmission)
+// 
+router.route("/scheduler/project-submission").post(verifyJWT, createProjectSubmissionScheduler)
+router.route("/scheduler/project-submission").get(verifyJWT, getAllProjectSubmission)
+router.route("/scheduler/project-submission/:id").get(verifyJWT, getProjectSubmission)
+router.route("/scheduler/project-submission/:id").delete(verifyJWT, deleteProjectSubmission)
+router.route("/scheduler/project-submission/:id").patch(verifyJWT, updateProjectSubmission)
+// 
+router.route("/scheduler/time-table").post(verifyJWT, createTimeTable)
+router.route("/scheduler/time-table").get(verifyJWT, getAllTimeTables)
+router.route("/scheduler/time-table/:id").get(verifyJWT, getTimeTable)
+router.route("/scheduler/time-table/:id").delete(verifyJWT, deleteTimeTable)
+router.route("/scheduler/time-table/:id").patch(verifyJWT, updateTimeTable)
+router.route("/scheduler/time-table/:id/ics").get(verifyJWT, sendICSFile)
+
+// 
+router.route("/scheduler/material").post(verifyJWT,
+    upload.fields([
+        {
+            name:"file"
+        }
+    ]),
+    uploadFile
+)
+router.route("/scheduler/material").get(verifyJWT, getAllRawMaterial)
+router.route("/scheduler/material/:id").get(verifyJWT, getRawMaterial)
+router.route("/scheduler/material/:id").delete(verifyJWT, deleteRawMaterial)
+router.route("/scheduler/material/:id/all").delete(verifyJWT, deleteAllRawMaterial)
 
 
-
-
+router.route("/scheduler/to-do-list").post(verifyJWT, createToDoList)
+router.route("/scheduler/to-do-list").get(verifyJWT, getAllToDoList)
+router.route("/scheduler/to-do-list/:id").get(verifyJWT, getToDoList)
+router.route("/scheduler/to-do-list/:id").delete(verifyJWT, deleteToDoList)
+router.route("/scheduler/to-do-list/:id").patch(verifyJWT, updateToDoList)
+router.route("/scheduler/to-do-list").delete(verifyJWT, deleteAllToDoList)
 
 export default router
 </file>
@@ -2832,8 +4315,8 @@ import embedText from "./embedText.js";
 const chunking = async (text) => {
 
     const splitter = new RecursiveCharacterTextSplitter({
-        chunkSize:1000,
-        chunkOverlap:200,
+        chunkSize:300,
+        chunkOverlap:50,
     })
 
     const chunks = await splitter.splitText(text)
@@ -2863,6 +4346,181 @@ const embedText = async (text) => {
 export default embedText
 </file>
 
+<file path="services/icsFile.js">
+import { createEvent } from "ics"
+import path from "path"
+import fs from "fs"
+
+const icsFileGenerator = (eventObj, folder) => {
+    const toIcsDate = (date) => {
+        const d = new Date(date)
+        return [d.getFullYear(), d.getMonth() + 1, d.getDate(), d.getHours(), d.getMinutes()]
+    }
+
+    const event = {
+        start: toIcsDate(eventObj.startTime),
+        end: toIcsDate(eventObj.endTime),
+        title: eventObj.title,
+        description: eventObj.goalDescription,
+    }
+
+    return new Promise((resolve, reject) => {
+        createEvent(event, (error, value) => {   // was: createEvent(eventObj, ...)
+            if (error) {
+                console.error("Error:", error.message);
+                return reject(error)
+            }
+
+            if (!fs.existsSync(folder)) {
+                fs.mkdirSync(folder, { recursive: true });
+            }
+
+            const outputPath = path.join(folder, 'time-table-event.ics');
+            fs.writeFileSync(outputPath, value);
+            resolve(outputPath)   // now caller gets the path
+        })
+    })
+}
+
+export default icsFileGenerator
+</file>
+
+<file path="services/nodemailer.js">
+import nodemailer from "nodemailer"
+import path from "path"
+
+const mailICSFile = async (outputPath) => {
+
+    const fileName = path.basename(outputPath)
+
+    const transporter = nodemailer.createTransport({
+        host: "smtp.gmail.com",
+        port: 587,
+        secure: false,
+        auth: {
+            user: process.env.NODEMAILER_GMAIL_ACCOUNT,
+            pass: process.env.NODEMAILER_GMAIL_PASS_KEY,
+        }
+    })
+
+    const mailOptions = {
+        from: process.env.NODEMAILER_GMAIL_ACCOUNT,
+        to: "nathkn9339@gmail.com",
+        subject: `Your Time Table event file`,
+        text: `Your time table ICS file attatched to this email`,
+        
+        attachments:[
+            {
+                filename:`${fileName}`,
+                path:`${outputPath}`
+            }
+        ]
+    }
+
+    return new Promise((resolve, reject) => {
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                reject(error)
+            } else {
+                console.log(`Email sent: ${info.response}`)
+                resolve(info.response)
+            }
+        })
+    })
+}
+
+export default mailICSFile
+</file>
+
+<file path="services/pdfToImages.js">
+import fs from "fs"
+import { exec } from "child_process"
+import path from "path"
+
+const pdfToImages = async (filePath, totalPages, outputDir) => {
+    
+    fs.mkdirSync(outputDir, { recursive: true })
+    
+    return new Promise((resolve, reject) => {
+
+        if (!fs.existsSync(outputDir)) {
+            fs.mkdirSync("images", { recursive: true })
+        }
+
+        const imagePaths = []
+        let completed = 0 
+
+        for (let pageIndex = 0; pageIndex < totalPages; pageIndex++) {
+
+            const outputFile = path.join(outputDir, `Page${pageIndex + 1}.jpeg`)
+
+            const command = `convert -density 300 "${filePath}[${pageIndex}]" -quality 90 "${outputFile}"`;
+
+            exec(command, (error, stdout, stderr) => {
+                if (error) {
+                    return reject(`Page ${pageIndex + 1} failed: ${error.message}`);
+                }
+
+                imagePaths.push(outputFile)
+                completed++
+
+                if (completed === totalPages) {
+                    resolve(imagePaths)
+                }
+            })
+        }
+    })
+}
+
+export default pdfToImages
+</file>
+
+<file path="services/promptOptimizer.js">
+import OpenAi from "openai"
+import dotenv from "dotenv"
+import { prompt_PromptOptimizer } from "../lib/prompt.js"
+
+const openai = new OpenAi({
+    apiKey: process.env.NVIDIA_DEEPSEEK_FLASH_API_KEY,
+    baseURL: 'https://integrate.api.nvidia.com/v1'
+})
+
+const promptOptimizer = async (userQuery) => {
+
+    try {        
+        const response = await openai.chat.completions.create({
+            model: "meta/llama-3.2-3b-instruct",
+            messages: [
+                {
+                    "role": "user",
+                    "content": prompt_PromptOptimizer.replace("{{USER_QUERY}}", userQuery)
+                }
+            ],
+            
+            temperature: 0.2,
+            top_p: 0.7,
+            max_tokens: 1024,
+            // chat_template_kwargs: { "thinking": true, "reasoning_effort": "high" },
+            // stream: true
+        })
+        const data = response.choices[0].message.content
+        console.log(data);
+        
+        return data
+    } catch (error) {
+        console.error("ERROR:", error.message);
+
+    }
+
+
+
+}
+
+export{
+    promptOptimizer
+}
+</file>
+
 <file path="services/queue.js">
 import { Queue } from "bullmq"
 
@@ -2871,10 +4529,11 @@ const connection = {
     port: 6379,
 }
 
-const AIResponseQueue = async (jobData) => {
+const AIResponseQueue = async (userId, data) => {
     const queue = new Queue("ai-response-handler", {connection})
     console.log('Queue created:', queue.name);
 
+    const jobData = {userId, data}
     await queue.add("ai-response-handler", jobData,{
         // delay: 5000,
         backoff:{
@@ -2892,29 +4551,135 @@ export {
 }
 </file>
 
+<file path="services/queueEvents.js">
+import { QueueEvents } from "bullmq";
+import { ApiError } from "../utils/Async.js";
+import { titleExtract } from "../controllers/note.controller.js";
+import { Note } from "../models/note.model.js";
+
+const connection = {
+    host:"localhost",
+    port:6379
+}
+const aiQueueEvents = async (userSocketMap, io)=>{
+    const queueEvent = new QueueEvents("ai-response-handler", {connection})
+
+    queueEvent.on("completed", async(event)=>{
+        console.log(`Job Id Finished with ID:`, event.jobId);
+        const { result, userId , content} = event.returnvalue
+
+        const title = titleExtract(result)
+            
+            const responseData = await Note.create({
+                userId,
+                title,
+                content:content,
+                summary: result,
+            })
+
+            if(!responseData){
+                throw new ApiError(404, "Data not saved")
+            }
+        
+        const socketId = userSocketMap.get(userId)        
+
+        if(!socketId){
+            throw new ApiError(404, "Invalid Socket Id")
+        }
+
+        io.to(socketId).emit("ai-response", responseData)
+        
+    })
+}
+
+export {
+    aiQueueEvents
+}
+</file>
+
 <file path="services/textExtractor.js">
-import {ApiError}from "../utils/Async.js"
-import {PDFParse} from "pdf-parse"
+import { ApiError } from "../utils/Async.js"
+import { PDFParse } from "pdf-parse"
 import fs from "fs"
 import XLSX from "xlsx"
 import Tesseract from "tesseract.js"
 import chunking from "./chunking.js"
 import embedText from "./embedText.js"
+import { extract, extractTextFromImage } from "../lib/groq/extractText.js"
+import pdfToImages from "./pdfToImages.js"
+
+const cleanExtractedText = (text) => {
+    return text
+        // page markers
+        .replace(/--\s*\d+\s*of\s*\d+\s*--/g, '')
+        // unicode math symbols
+        .replace(/[²³°±×÷√∑∫∞≤≥≠αβγδεζηθλμπσφψω↑↓→←⟶⟹]/g, '')
+        // filter lines that are mostly math garbage
+        .split('\n')
+        .filter(line => {
+            const tokens = line.trim().split(/\s+/).filter(Boolean)
+            if (tokens.length === 0) return false
+            const realWords = tokens.filter(t => /[a-zA-Z]{3,}/.test(t))
+            // drop line if less than 40% tokens are real words
+            return (realWords.length / tokens.length) > 0.4
+        })
+        .join('\n')
+        // isolated 1-2 char tokens (standalone a b x 2 b2 etc)
+        .replace(/(?<![^\s])[a-zA-Z0-9]{1,2}(?![^\s])/g, '')
+        // collapse multiple spaces/newlines
+        .replace(/\n{3,}/g, '\n\n')
+        .replace(/ {2,}/g, ' ')
+        .trim()
+}
 
 const textExtractor = async (file) => {
     const mimeType = file.mimetype
     const filePath = file.path
 
+    const fileDataBuffer = fs.readFileSync(filePath)
+    const base64File = fileDataBuffer.toString('base64')
+
+    const THERESOLD_CHAR = 200
+    const THERESOLD_WORD = 50
+
     try {
         if (mimeType == "application/pdf") {
-            const dataBuffer = fs.readFileSync(file.path)
-            const uint8Array = new Uint8Array(dataBuffer)
-            const parser = new PDFParse(uint8Array)
-            const extractedText = (await parser.getText()).text
-            
-            embedText(extractedText)
-            fs.unlinkSync(filePath)
-            return extractedText
+            const uint8Array = new Uint8Array(fileDataBuffer)
+            const parser = await new PDFParse(uint8Array)
+
+            const text = ((await parser.getText()).text.replace(/--\s*\d+\s*of\s*\d+\s*--/g, '').trim())
+
+            const extractedText = cleanExtractedText(text)
+
+            const charCount = extractedText.length
+            const wordCount = extractedText.split(/\s+/).filter(Boolean).length
+            const pageCount = parser.doc._pdfInfo.numPages
+
+            if (charCount < (THERESOLD_CHAR * pageCount) || wordCount < (THERESOLD_WORD * pageCount)) {
+
+                try {
+                    const outputDir = "/Users/kanchannath/Coding/Spark.E/server/uploads/images"
+
+                    await pdfToImages(filePath, pageCount, outputDir)
+
+                    const results = await extract()
+                    console.log("Text Extracted from Pdf -> Images");
+
+                    embedText(results)
+                    fs.unlinkSync(filePath)
+                    return results
+
+                } catch (error) {
+                    console.error(error);
+                    fs.unlinkSync(filePath)
+                }
+
+            } else {
+
+                embedText(extractedText)
+                fs.unlinkSync(filePath)
+                return extractedText
+            }
 
         } else if (mimeType == "application/vnd.ms-excel") {
             const wrokbook = XLSX.readFile(filePath)
@@ -2926,19 +4691,21 @@ const textExtractor = async (file) => {
             fs.unlinkSync(filePath)
             return extractedText
 
-        } else if ((["image/jpeg", "image/png", "image/webp"].includes(mimeType))) {
-            const dataBuffer = fs.readFileSync(filePath)
+        } else if ((["image/jpeg", "image/png", "image/webp", "image/jpg"].includes(mimeType))) {
 
-            const { data } = await Tesseract.recognize(filePath, "eng")
-            const extractedText = data.text
+            // const { data } = await Tesseract.recognize(filePath, "eng")
+            // const extractedText = data.text
+
+            const extractedText = await extractTextFromImage(filePath)
 
             fs.unlinkSync(filePath)
+
             return extractedText
 
         } else if (mimeType == "text/plain") {
             const extractedText = fs.readFileSync(filePath, 'utf8')
 
-            fs.unlinkSync(filePath)
+            fs.unlinkSync(filePath, mimeType)
             return extractedText
         } else {
             throw new ApiError(404, "File not supported")
@@ -2949,14 +4716,12 @@ const textExtractor = async (file) => {
         fs.unlinkSync(filePath)
 
     }
-
-    
 }
 
 export default textExtractor
 </file>
 
-<file path="services/vectorDB.js">
+<file path="services/vectordb.js">
 import dotenv from "dotenv"
 dotenv.config()
 import { Pinecone } from "@pinecone-database/pinecone";
@@ -2966,7 +4731,7 @@ import textExtractor from "./textExtractor.js";
 
 const vectorDB = async (file) => {
     const extractedText = await textExtractor(file)
-
+    
     const chunks = await chunking(extractedText)
 
     const pc = new Pinecone(
@@ -2995,6 +4760,8 @@ const vectorDB = async (file) => {
         }
     ))
 
+    console.log("Records saved:");
+    
     await ns.upsert({ records })
     
 }
@@ -3022,6 +4789,8 @@ const queryDB = async(query)=>{
     })
     
     const topChunks = results.matches.map((m)=>(m.metadata.text))
+    console.log("Top chunks:",topChunks);
+    
     return topChunks
 }
 export  {vectorDB, queryDB}
@@ -3030,33 +4799,31 @@ export  {vectorDB, queryDB}
 <file path="services/worker.js">
 import { Worker } from "bullmq";
 import { summarizeText } from "../lib/groq/summarizer.js"
-import { getIO } from "../lib/socket.js";
-
+import { Note } from "../models/note.model.js";
 
 console.log("Worker started, listening on PORT 6379");
 
 const connection = {
-    host:"localhost",
-    port:6379
+    host: "localhost",
+    port: 6379
 }
-const processJob = async (job)=>{
-    const result = await summarizeText(job.data)
+const processJob = async (job) => {
+    const { data, userId } = job.data
+    const result = await summarizeText(data)
 
-   
-
-    return result
+    const content = job.data.data
     
+    return { result, userId,content }
+
 }
 
-const AIResponseQueueWorker = new Worker("ai-response-handler", processJob, {connection})
+const AIResponseQueueWorker = new Worker("ai-response-handler", processJob, { connection })
 
 
 AIResponseQueueWorker.on('active', (job) => {
     console.log(">>> ACTIVE:", job.id);
 })
 AIResponseQueueWorker.on('completed', (job, result) => {
-    const io = getIO()
-    io.to(job.data.userId).emit("ai-response", result)
     console.log(">>>COMPLETED: ", result);
 })
 AIResponseQueueWorker.on('failed', (job, err) => {
@@ -12291,10 +14058,6 @@ export type * from './models/StudyRoom.ts'
 export type * from './commonInputTypes.ts'
 </file>
 
-<file path="uploads/.gitkeep">
-
-</file>
-
 <file path="utils/Async.js">
 class ApiResponse {
     constructor(statusCode, data, message = "Success") {
@@ -12390,7 +14153,8 @@ export {searchImage}
 node_modules
 .env
 /generated/prisma
-
+/uploads/*
+/uploads
 /generated/prisma
 
 /generated/prisma
@@ -12437,6 +14201,31 @@ app.use("/api/documents", filesRagRouter)
 export { app }
 </file>
 
+<file path="BACKLOG.md">
+# Backlog
+
+## Pages
+
+### [Notes.jsx]
+-  feature 1: When paste the text - also paste as copied format to input box.
+-  feature 2:
+
+### [Quiz.jsx]
+- 1. npx prettier --write src/
+
+### [RAG Pipeline]:
+- 1. where the answer come from ref to the doc, mark/highlight
+- 2. store all your prompt in versioned system config files 
+- 3. BM25 and re-ranker encoder 
+- 4. Link: [https://docs.google.com/document/d/1z74i4w0Nv9beVxCrxX_7syCEX6mxFRB7zfuUZ4uMZPE/edit?tab=t.0]
+
+## Ideas Dump
+- raw ideas, no filter
+
+## Rules
+- Nothing enters current version from here without decision.
+</file>
+
 <file path="index.js">
 import { app } from "./app.js"
 import { connectDB } from "./lib/mongoClient.js"
@@ -12444,10 +14233,13 @@ import http from "http"
 import jwt from "jsonwebtoken"
 import { ApiError } from "./utils/Async.js"
 import {initSocket} from "../server/lib/socket.js"
+import { aiQueueEvents } from "../server/services/queueEvents.js"
 
 const server = http.createServer(app)
+const userSocketMap = new Map()
 
 const io = initSocket(server)
+aiQueueEvents(userSocketMap, io)
 
 io.use((socket, next)=>{
     const token = socket.handshake.auth.token
@@ -12467,9 +14259,9 @@ io.on("connection",(socket)=>{
 
     const {userId} = decodedToken
     
-    const userSocketMap = new Map()
 
     userSocketMap.set(userId, socket.id)
+    console.log(userSocketMap);
     
     socket.on("join_room",async(data)=>{
         await socket.join(data.roomId)
@@ -12482,6 +14274,9 @@ io.on("connection",(socket)=>{
         console.log(data.roomId);
         
         io.to(data.roomId).emit("send_message", data)
+    })
+    socket.on("disconnect", () => {
+        userSocketMap.delete(userId)  // cleanup
     })
     
 })
@@ -12527,18 +14322,25 @@ connectDB()
     "@xenova/transformers": "^2.0.1",
     "bcrypt": "^6.0.0",
     "bullmq": "^5.77.1",
+    "child_process": "^1.0.2",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
+    "croner": "^10.0.1",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "groq-sdk": "^1.1.2",
+    "ics": "^3.12.0",
     "ioredis": "^5.10.1",
     "jsonwebtoken": "^9.0.3",
     "langchain": "^1.4.0",
     "mongoose": "^9.6.1",
     "multer": "^2.1.1",
+    "nodemailer": "^8.0.10",
     "nodemon": "^3.1.14",
+    "openai": "^6.39.0",
     "pdf-parse": "^2.4.5",
+    "pdf2pic": "^3.2.0",
+    "pdfjs-dist": "^5.7.284",
     "pg": "^8.20.0",
     "prettier": "^3.8.3",
     "serpapi": "^2.2.1",
