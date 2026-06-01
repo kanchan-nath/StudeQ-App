@@ -102,6 +102,6 @@ router.route("/scheduler/to-do-list").get(verifyJWT, getAllToDoList)
 router.route("/scheduler/to-do-list/:id").get(verifyJWT, getToDoList)
 router.route("/scheduler/to-do-list/:id").delete(verifyJWT, deleteToDoList)
 router.route("/scheduler/to-do-list/:id").patch(verifyJWT, updateToDoList)
-router.route("/scheduler/to-do-list/:id").delete(verifyJWT, deleteAllToDoList)
+router.route("/scheduler/to-do-list").delete(verifyJWT, deleteAllToDoList)
 
 export default router

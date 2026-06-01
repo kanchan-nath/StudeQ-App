@@ -407,7 +407,7 @@ const getProjectSubmission = asyncHandler(async (req, res) => {
     return res
         .status(200)
         .json(new ApiResponse(200, data, "Project submission schedule fetched successfully"))
-})
+})  
 
 const deleteProjectSubmission = asyncHandler(async (req, res) => {
     const { id } = req.params
