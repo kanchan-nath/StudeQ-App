@@ -134,7 +134,7 @@ const projectSubmissionSchema = mongoose.Schema({
     },
     phase: {
         type: String,
-        enum: ["proposal", "mideval", "final"],
+        // enum: ["proposal", "mideval", "final"],
         default: "proposal"
     },
     submissionDate: {
