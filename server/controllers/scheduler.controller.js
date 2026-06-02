@@ -765,7 +765,7 @@ const createToDoList = asyncHandler(async (req, res) => {
         throw new ApiError(400, "All fields are required")
     }
 
-    const userId = req.body.id
+    const userId = req.user.id
 
     const data = await ToDoList.create({
         userId,
@@ -847,7 +847,7 @@ const updateToDoList = asyncHandler(async (req, res) => {
     const objects = { title, status, priority, dueDate, isRecurring, recurrencePattern, reminderEnabled, reminderTime }
 
     const filteredObjects = Object.fromEntries(
-        Object.entries(objects).filter((key, val)=>val!==undefined)
+    Object.entries(objects).filter(([key, val])=>val!==undefined)
     )
 
     if(Object.keys(filteredObjects).length ===0){
@@ -862,7 +862,6 @@ const updateToDoList = asyncHandler(async (req, res) => {
 
     const data = await ToDoList.findOneAndUpdate(
         {
-            userId,
             _id:id
         },
         {
@@ -878,7 +877,7 @@ const updateToDoList = asyncHandler(async (req, res) => {
 const deleteAllToDoList = asyncHandler(async (req, res) => {
     const userId = req.user.id
 
-    const data = await ToDoList.find({ userId })
+    const data = await ToDoList.deleteMany({ userId })
 
     return res
         .status(200)

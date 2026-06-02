@@ -21,6 +21,7 @@ import Flashcards from "./pages/Flashcards.jsx";
 import Notebook from "./pages/Notebook.jsx";
 import TimeTable from "./pages/TimeTable.jsx";
 import EventScheduling from "./pages/EventScheduling.jsx";
+import ToDoList from "./pages/ToDoList.jsx";
 
 const App = () => {
   const token = localStorage.getItem("token");
@@ -108,6 +109,10 @@ const App = () => {
             element={<ProtectedRoute component={<Notebook />} />}
           />
         </Route>
+        <Route
+            path="/notebook/:chatId"
+            element={<ProtectedRoute component={<Notebook />} />}
+          />
       </Routes>
     </>
   );
