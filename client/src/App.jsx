@@ -1,4 +1,5 @@
 import React from "react";
+import "../src/index.css"
 import "./pages/styles/global.css";
 import { Routes, Route } from "react-router-dom";
 import Home from "../src/pages/Home.jsx";
@@ -23,6 +24,7 @@ import TimeTable from "./pages/TimeTable.jsx";
 import EventScheduling from "./pages/EventScheduling.jsx";
 import ToDoList from "./pages/ToDoList.jsx";
 import ExamSchedule from "./pages/ExamSchedule.jsx";
+import ProjectSubmissionScheduler from "./pages/Projectsubmissionscheduler.jsx";
 
 const App = () => {
   const token = localStorage.getItem("token");
@@ -112,6 +114,10 @@ const App = () => {
           <Route
             path="/event-scheduling/exams"
             element={<ProtectedRoute component={<ExamSchedule />} />}
+          />
+          <Route
+            path="/event-scheduling/projects"
+            element={<ProtectedRoute component={<ProjectSubmissionScheduler />} />}
           />
         </Route>
          
