@@ -7,7 +7,7 @@ import BASE_URL from "../lib/api.js"
 
 const NAV_ITEMS = [
     { icon: "ti-layout-dashboard", label: "Dashboard", path: "/dashboard" },
-    { icon: "ti-file-description", label: "Exams", path: "/exams" },
+    { icon: "ti-file-description", label: "Exams", path: "/event-scheduling/exams" },
     { icon: "ti-briefcase", label: "Projects", path: "/projects" },
     { icon: "ti-checklist", label: "Assignments", path: "/assignments" },
     { icon: "ti-calendar", label: "Calendar", path: "/calendar" },
