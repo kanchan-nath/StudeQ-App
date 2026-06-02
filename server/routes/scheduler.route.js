@@ -102,11 +102,11 @@ router.route("/scheduler/material/:id/all").delete(verifyJWT, deleteAllRawMateri
 
 router.route("/scheduler/to-do-list").post(verifyJWT, createToDoList)
 router.route("/scheduler/to-do-list").get(verifyJWT, getAllToDoList)
+router.route("/scheduler/to-do-list/filter").get(verifyJWT, filterToDoList)
+router.route("/scheduler/to-do-list/sort").get(verifyJWT, sortToDoList)
 router.route("/scheduler/to-do-list/:id").get(verifyJWT, getToDoList)
 router.route("/scheduler/to-do-list/:id").delete(verifyJWT, deleteToDoList)
 router.route("/scheduler/to-do-list/:id").patch(verifyJWT, updateToDoList)
-router.route("/scheduler/to-do-list/filter").get(verifyJWT, filterToDoList)
-router.route("/scheduler/to-do-list/sort").get(verifyJWT, sortToDoList)
 router.route("/scheduler/to-do-list").delete(verifyJWT, deleteAllToDoList)
 
 export default router

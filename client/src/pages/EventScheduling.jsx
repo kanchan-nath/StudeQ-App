@@ -1,478 +1,823 @@
-import React, { useEffect, useState } from "react";
-import BASE_URL from "../lib/api.js";
+import React, { useEffect, useRef, useState, useCallback } from "react"
+import { useNavigate } from "react-router-dom"
+import styles from "./styles/EventScheduling.module.css"
+import BASE_URL from "../lib/api.js"
 
-// ─── Exam Scheduler ───────────────────────────────────────────────────────────
+// ─── Constants ────────────────────────────────────────────────────────────────
 
-const ExamScheduler = () => {
-    const [examForm, setExamForm] = useState({
-        subjectName: "", examDate: "", examTime: "", duration: "",
-        venue: "", onlineLink: "", subjectCode: "", notes: "",
-        reminderEnabled: false, reminderDaysBefore: "", status: ""
-    })
-    const [updateForm, setUpdateForm] = useState({ ...examForm })
-    const [allExams, setAllExams] = useState([])
-    const [selectedExam, setSelectedExam] = useState(null)
-    const [updateId, setUpdateId] = useState(null)
-    const token = localStorage.getItem("token")
+const NAV_ITEMS = [
+    { icon: "ti-layout-dashboard", label: "Dashboard", path: "/dashboard" },
+    { icon: "ti-file-description", label: "Exams", path: "/exams" },
+    { icon: "ti-briefcase", label: "Projects", path: "/projects" },
+    { icon: "ti-checklist", label: "Assignments", path: "/assignments" },
+    { icon: "ti-calendar", label: "Calendar", path: "/calendar" },
+    { icon: "ti-settings", label: "Settings", path: "/settings" },
+]
 
-    const handleChange = (e) => {
-        const { name, value, type, checked } = e.target
-        setExamForm({ ...examForm, [name]: type === "checkbox" ? checked : value })
-    }
+const SUBJECT_COLORS = {
+    DS: { base: "#4f6ef7", ramp: ["#1a1f3c", "#232d5c", "#2e3d7f", "#3a4fa3", "#4f6ef7", "#7f9bff", "#b3c3ff"] },
+    Algo: { base: "#7c3aed", ramp: ["#1e1230", "#2d1a4a", "#3d2266", "#522e88", "#7c3aed", "#9f6ef5", "#c8aafa"] },
+    DB: { base: "#10b981", ramp: ["#051f14", "#083024", "#0c4632", "#0e6044", "#10b981", "#34d399", "#6ee7b7"] },
+    OS: { base: "#f59e0b", ramp: ["#2a1b02", "#3d2804", "#574009", "#7a5a10", "#f59e0b", "#fbbf24", "#fde68a"] },
+}
 
-    const handleChangeUpdate = (e) => {
-        const { name, value, type, checked } = e.target
-        setUpdateForm({ ...updateForm, [name]: type === "checkbox" ? checked : value })
-    }
+const DAY_ABBRS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+const MONTH_NAMES = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
 
-    const fetchAll = async () => {
-        try {
-            const res = await fetch(`${BASE_URL}/api/scheduler/exam-dates`, {
-                method: "GET",
-                headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` }
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+
+const getToken = () => localStorage.getItem("token")
+
+const authHeaders = () => ({
+    "Content-Type": "application/json",
+    "Authorization": `Bearer ${getToken()}`
+})
+
+const toDateObj = (str) => {
+    if (!str) return null
+    const d = new Date(str)
+    return isNaN(d.getTime()) ? null : d
+}
+
+const formatTime = (timeStr) => {
+    if (!timeStr) return ""
+    const [h, m] = timeStr.split(":").map(Number)
+    if (isNaN(h)) return timeStr
+    const ampm = h >= 12 ? "PM" : "AM"
+    const hr = h % 12 || 12
+    return `${hr}:${String(m).padStart(2, "0")} ${ampm}`
+}
+
+const getWeekRange = () => {
+    const now = new Date()
+    const day = now.getDay()
+    const monday = new Date(now)
+    monday.setDate(now.getDate() - ((day + 6) % 7))
+    monday.setHours(0, 0, 0, 0)
+    const sunday = new Date(monday)
+    sunday.setDate(monday.getDate() + 6)
+    sunday.setHours(23, 59, 59, 999)
+    return { monday, sunday }
+}
+
+const isSameDay = (a, b) =>
+    a.getFullYear() === b.getFullYear() &&
+    a.getMonth() === b.getMonth() &&
+    a.getDate() === b.getDate()
+
+const getEventStatus = (item, type) => {
+    const now = new Date()
+    const dateStr = type === "exam" ? item.examDate : type === "project" ? item.submissionDate : item.dueDate
+    const d = toDateObj(dateStr)
+    if (!d) return "upcoming"
+    if (item.status === "completed" || item.submissionStatus === "submitted") return "done"
+    if (d < now) return "urgent"
+    const diff = (d - now) / (1000 * 60 * 60 * 24)
+    if (diff <= 2) return "urgent"
+    return type === "exam" ? "class" : "upcoming"
+}
+
+// ─── Sub-components ────────────────────────────────────────────────────────────
+
+const StatCardSkeleton = () => (
+    <div className={`${styles.statCard} ${styles.blue}`} style={{ pointerEvents: "none" }}>
+        <div className={styles.statCardTop}>
+            <div className={`${styles.skeleton} ${styles.skeletonCount}`} style={{ width: 34, height: 34, borderRadius: 6 }} />
+        </div>
+        <div className={`${styles.skeleton} ${styles.skeletonCount}`} />
+        <div className={`${styles.skeleton} ${styles.skeletonText}`} style={{ marginBottom: 8 }} />
+        <div className={`${styles.skeleton} ${styles.skeletonTextSm}`} />
+    </div>
+)
+
+const HeatmapCell = ({ subject, week, value }) => {
+    const [show, setShow] = useState(false)
+    const colorRamp = SUBJECT_COLORS[subject]?.ramp || []
+    const idx = value === 0 ? 0 : Math.min(Math.floor(value * 1.2) + 2, colorRamp.length - 1)
+    const bg = value === 0 ? "var(--bg-surface-3)" : colorRamp[idx]
+
+    return (
+        <div
+            className={styles.heatmapCell}
+            style={{ background: bg }}
+            onMouseEnter={() => setShow(true)}
+            onMouseLeave={() => setShow(false)}
+        >
+            {show && (
+                <div className={styles.tooltip}>
+                    {subject} · W{week + 1} · {value}h
+                </div>
+            )}
+        </div>
+    )
+}
+
+// ─── Donut Chart (Chart.js) ────────────────────────────────────────────────────
+
+const DonutChart = ({ exams, projects, assignments }) => {
+    const canvasRef = useRef(null)
+    const chartRef = useRef(null)
+
+    useEffect(() => {
+        const el = canvasRef.current
+        if (!el) return
+        const loadChart = () => {
+            if (!window.Chart) return
+            if (chartRef.current) chartRef.current.destroy()
+            chartRef.current = new window.Chart(el, {
+                type: "doughnut",
+                data: {
+                    labels: ["Data Struct.", "Algorithms", "Databases", "Op. Systems", "Essays"],
+                    datasets: [{
+                        data: [30, 25, 20, 15, 10],
+                        backgroundColor: ["#4f6ef7", "#7c3aed", "#10b981", "#f59e0b", "#4b5563"],
+                        borderWidth: 0,
+                        hoverOffset: 6,
+                    }]
+                },
+                options: {
+                    cutout: "68%",
+                    responsive: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: (ctx) => ` ${ctx.parsed}% credit hrs`
+                            },
+                            backgroundColor: "#1c2333",
+                            titleColor: "#e6edf3",
+                            bodyColor: "#8b949e",
+                            borderColor: "rgba(48,54,61,0.9)",
+                            borderWidth: 1,
+                        }
+                    }
+                }
             })
-            if (!res.ok) throw Error("Api call failed")
-            const data = await res.json()
-            setAllExams(data.data)
-        } catch (error) { console.error(error) }
-    }
+        }
+        if (window.Chart) {
+            loadChart()
+        } else {
+            const script = document.querySelector('script[src*="chart.js"]')
+            if (script) script.addEventListener("load", loadChart)
+        }
+        return () => { if (chartRef.current) chartRef.current.destroy() }
+    }, [])
 
-    const handleSubmit = async (e) => {
-        e.preventDefault()
-        try {
-            const res = await fetch(`${BASE_URL}/api/scheduler/exam-dates`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
-                body: JSON.stringify(examForm)
-            })
-            if (!res.ok) throw Error("Api call failed")
-            fetchAll()
-        } catch (error) { console.error(error) }
-    }
-
-    const handleView = async (id) => {
-        try {
-            const res = await fetch(`${BASE_URL}/api/scheduler/exam-dates/${id}`, {
-                method: "GET",
-                headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` }
-            })
-            if (!res.ok) throw Error("Api call failed")
-            const data = await res.json()
-            setSelectedExam(data.data)
-        } catch (error) { console.error(error) }
-    }
-
-    const handleDelete = async (id) => {
-        try {
-            const res = await fetch(`${BASE_URL}/api/scheduler/exam-dates/${id}`, {
-                method: "DELETE",
-                headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` }
-            })
-            if (!res.ok) throw Error("Api call failed")
-            fetchAll()
-        } catch (error) { console.error(error) }
-    }
-
-    const handleUpdateSubmit = async (e) => {
-        e.preventDefault()
-        try {
-            const res = await fetch(`${BASE_URL}/api/scheduler/${updateId}`, {
-                method: "PATCH",
-                headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
-                body: JSON.stringify(updateForm)
-            })
-            if (!res.ok) throw Error("Api call failed")
-            setUpdateId(null)
-            fetchAll()
-        } catch (error) { console.error(error) }
-    }
-
-    useEffect(() => { fetchAll() }, [])
+    const legendItems = [
+        { label: "Data Struct.", pct: 30, color: "#4f6ef7" },
+        { label: "Algorithms", pct: 25, color: "#7c3aed" },
+        { label: "Databases", pct: 20, color: "#10b981" },
+        { label: "Op. Systems", pct: 15, color: "#f59e0b" },
+        { label: "Essays", pct: 10, color: "#4b5563" },
+    ]
 
     return (
         <>
-            <h1>Exam Scheduler</h1>
-            <form onSubmit={handleSubmit}>
-                <label>Subject Name</label>
-                <input name="subjectName" type="text" value={examForm.subjectName} onChange={handleChange} required />
-                <label>Exam Date</label>
-                <input name="examDate" type="date" value={examForm.examDate} onChange={handleChange} required />
-                <label>Exam Time</label>
-                <input name="examTime" type="time" value={examForm.examTime} onChange={handleChange} required />
-                <label>Duration</label>
-                <input name="duration" type="number" value={examForm.duration} onChange={handleChange} />
-                <label>Venue</label>
-                <input name="venue" type="text" value={examForm.venue} onChange={handleChange} />
-                <label>Online Link</label>
-                <input name="onlineLink" type="text" value={examForm.onlineLink} onChange={handleChange} />
-                <label>Subject Code</label>
-                <input name="subjectCode" type="text" value={examForm.subjectCode} onChange={handleChange} />
-                <label>Notes</label>
-                <input name="notes" type="text" value={examForm.notes} onChange={handleChange} />
-                <label>Reminder Enabled</label>
-                <input name="reminderEnabled" type="checkbox" checked={examForm.reminderEnabled} onChange={handleChange} />
-                <label>Reminder Days Before</label>
-                <input name="reminderDaysBefore" type="number" value={examForm.reminderDaysBefore} onChange={handleChange} />
-                <label>Status</label>
-                <input name="status" type="text" value={examForm.status} onChange={handleChange} />
-                <button type="submit">Submit</button>
-            </form>
-
-            <div>
-                {allExams.map((item, ind) => (
-                    <div key={ind}>
-                        <p>{item._id}</p>
-                        <p>{item.subjectName}</p>
-                        <button onClick={() => handleView(item._id)}>View</button>
-                        <button onClick={() => { setUpdateId(item._id); setUpdateForm({ subjectName: item.subjectName, examDate: item.examDate, examTime: item.examTime, duration: item.duration, venue: item.venue, onlineLink: item.onlineLink, subjectCode: item.subjectCode, notes: item.notes, reminderEnabled: item.reminderEnabled, reminderDaysBefore: item.reminderDaysBefore, status: item.status }) }}>Edit</button>
-                        <button onClick={() => handleDelete(item._id)}>Delete</button>
-                    </div>
-                ))}
+            <div className={styles.donutWrap}>
+                <canvas ref={canvasRef} width={100} height={100} className={styles.donutCanvas} />
+                <div className={styles.donutLegend}>
+                    {legendItems.map(item => (
+                        <div key={item.label} className={styles.donutLegendItem}>
+                            <span className={styles.donutDot} style={{ background: item.color }} />
+                            <span>{item.label}</span>
+                            <span className={styles.donutPercent}>{item.pct}%</span>
+                        </div>
+                    ))}
+                </div>
             </div>
-
-            {selectedExam && (
-                <div>
-                    <h2>Selected Exam</h2>
-                    <p>{selectedExam[0]?.subjectName}</p>
-                    <p>{selectedExam[0]?.examDate}</p>
-                    <p>{selectedExam[0]?.examTime}</p>
-                    <p>{selectedExam[0]?.venue}</p>
-                    <p>{selectedExam[0]?.status}</p>
-                    <button onClick={() => setSelectedExam(null)}>Close</button>
-                </div>
-            )}
-
-            {updateId && (
-                <div>
-                    <h2>Update Exam</h2>
-                    <form onSubmit={handleUpdateSubmit}>
-                        <label>Subject Name</label>
-                        <input name="subjectName" type="text" value={updateForm.subjectName} onChange={handleChangeUpdate} />
-                        <label>Exam Date</label>
-                        <input name="examDate" type="date" value={updateForm.examDate} onChange={handleChangeUpdate} />
-                        <label>Exam Time</label>
-                        <input name="examTime" type="time" value={updateForm.examTime} onChange={handleChangeUpdate} />
-                        <label>Duration</label>
-                        <input name="duration" type="number" value={updateForm.duration} onChange={handleChangeUpdate} />
-                        <label>Venue</label>
-                        <input name="venue" type="text" value={updateForm.venue} onChange={handleChangeUpdate} />
-                        <label>Online Link</label>
-                        <input name="onlineLink" type="text" value={updateForm.onlineLink} onChange={handleChangeUpdate} />
-                        <label>Subject Code</label>
-                        <input name="subjectCode" type="text" value={updateForm.subjectCode} onChange={handleChangeUpdate} />
-                        <label>Notes</label>
-                        <input name="notes" type="text" value={updateForm.notes} onChange={handleChangeUpdate} />
-                        <label>Reminder Enabled</label>
-                        <input name="reminderEnabled" type="checkbox" checked={updateForm.reminderEnabled} onChange={handleChangeUpdate} />
-                        <label>Reminder Days Before</label>
-                        <input name="reminderDaysBefore" type="number" value={updateForm.reminderDaysBefore} onChange={handleChangeUpdate} />
-                        <label>Status</label>
-                        <input name="status" type="text" value={updateForm.status} onChange={handleChangeUpdate} />
-                        <button type="submit">Update</button>
-                        <button type="button" onClick={() => setUpdateId(null)}>Cancel</button>
-                    </form>
-                </div>
-            )}
+            <p className={styles.chartNote}>Subject load · Credit hrs this sem.</p>
         </>
     )
 }
 
-// ─── Assignment Submission Scheduler ─────────────────────────────────────────
+// ─── Mini Calendar ─────────────────────────────────────────────────────────────
 
-const AssignmentSubmissionScheduler = () => {
-    const [form, setForm] = useState({
-        dueDate: "", allowLateSubmission: false, linkedAssignmentId: ""
-    })
-    const [updateForm, setUpdateForm] = useState({
-        dueDate: "", submittedAt: "", submissionStatus: "", feedback: "",
-        allowLateSubmission: false, linkedAssignmentId: ""
-    })
-    const [allAssignments, setAllAssignments] = useState([])
-    const [selectedAssignment, setSelectedAssignment] = useState(null)
-    const [updateId, setUpdateId] = useState(null)
-    const token = localStorage.getItem("token")
+const MiniCalendar = ({ exams, projects, assignments }) => {
+    const today = new Date()
+    const [viewYear, setViewYear] = useState(today.getFullYear())
+    const [viewMonth, setViewMonth] = useState(today.getMonth())
 
-    const handleChange = (e) => {
-        const { name, value, type, checked } = e.target
-        setForm({ ...form, [name]: type === "checkbox" ? checked : value })
+    const prevMonth = () => {
+        if (viewMonth === 0) { setViewMonth(11); setViewYear(y => y - 1) }
+        else setViewMonth(m => m - 1)
     }
 
-    const handleChangeUpdate = (e) => {
-        const { name, value, type, checked } = e.target
-        setUpdateForm({ ...updateForm, [name]: type === "checkbox" ? checked : value })
+    const nextMonth = () => {
+        if (viewMonth === 11) { setViewMonth(0); setViewYear(y => y + 1) }
+        else setViewMonth(m => m + 1)
     }
 
-    const fetchAll = async () => {
-        try {
-            const res = await fetch(`${BASE_URL}/api/scheduler/assignment-submission`, {
-                method: "GET",
-                headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` }
-            })
-            if (!res.ok) throw Error("Api call failed")
-            const data = await res.json()
-            setAllAssignments(data.data)
-        } catch (error) { console.error(error) }
+    const firstDay = new Date(viewYear, viewMonth, 1).getDay()
+    const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate()
+    const cells = []
+
+    const examDates = exams.map(e => toDateObj(e.examDate)).filter(Boolean)
+    const projectDates = projects.map(p => toDateObj(p.submissionDate)).filter(Boolean)
+    const assignmentDates = assignments.map(a => toDateObj(a.dueDate)).filter(Boolean)
+
+    const getDotsForDay = (d) => {
+        const dots = []
+        if (examDates.some(e => isSameDay(e, d))) dots.push("exam")
+        if (projectDates.some(p => isSameDay(p, d))) dots.push("due")
+        if (assignmentDates.some(a => isSameDay(a, d))) dots.push("done")
+        return dots
     }
 
-    const handleSubmit = async (e) => {
-        e.preventDefault()
-        try {
-            const res = await fetch(`${BASE_URL}/api/scheduler/assignment-submission`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
-                body: JSON.stringify(form)
-            })
-            if (!res.ok) throw Error("Api call failed")
-            fetchAll()
-        } catch (error) { console.error(error) }
+    // prev month padding
+    const prevDays = new Date(viewYear, viewMonth, 0).getDate()
+    for (let i = firstDay - 1; i >= 0; i--) {
+        cells.push({ day: prevDays - i, current: false })
+    }
+    for (let d = 1; d <= daysInMonth; d++) {
+        cells.push({ day: d, current: true })
+    }
+    const remaining = 42 - cells.length
+    for (let d = 1; d <= remaining; d++) {
+        cells.push({ day: d, current: false })
     }
 
-    const handleView = async (id) => {
-        try {
-            const res = await fetch(`${BASE_URL}/api/scheduler/assignment-submission/${id}`, {
-                method: "GET",
-                headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` }
-            })
-            if (!res.ok) throw Error("Api call failed")
-            const data = await res.json()
-            setSelectedAssignment(data.data)
-        } catch (error) { console.error(error) }
-    }
+    return (
+        <div className={styles.calendarWrap}>
+            <div className={styles.calendarNav}>
+                <button className={styles.calNavBtn} onClick={prevMonth} aria-label="Previous month">‹</button>
+                <span className={styles.calMonthLabel}>{MONTH_NAMES[viewMonth]} {viewYear}</span>
+                <button className={styles.calNavBtn} onClick={nextMonth} aria-label="Next month">›</button>
+            </div>
+            <div className={styles.calGrid}>
+                {DAY_ABBRS.map(d => (
+                    <div key={d} className={styles.calDayHeader}>{d[0]}</div>
+                ))}
+                {cells.map((cell, i) => {
+                    const date = cell.current ? new Date(viewYear, viewMonth, cell.day) : null
+                    const isToday = date && isSameDay(date, today)
+                    const dots = date ? getDotsForDay(date) : []
+                    return (
+                        <div
+                            key={i}
+                            className={[
+                                styles.calCell,
+                                !cell.current ? styles.otherMonth : "",
+                                isToday ? styles.today : ""
+                            ].join(" ")}
+                        >
+                            <span>{cell.day}</span>
+                            {dots.length > 0 && !isToday && (
+                                <div className={styles.calDots}>
+                                    {dots.slice(0, 3).map((t, j) => (
+                                        <span key={j} className={`${styles.calDot} ${styles[t]}`} />
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    )
+                })}
+            </div>
+            <div className={styles.calLegend}>
+                <div className={styles.calLegendItem}>
+                    <span className={`${styles.calDot} ${styles.exam}`} />
+                    Exam
+                </div>
+                <div className={styles.calLegendItem}>
+                    <span className={`${styles.calDot} ${styles.due}`} />
+                    Due
+                </div>
+                <div className={styles.calLegendItem}>
+                    <span className={`${styles.calDot} ${styles.done}`} />
+                    Done
+                </div>
+            </div>
+        </div>
+    )
+}
 
-    const handleDelete = async (id) => {
-        try {
-            const res = await fetch(`${BASE_URL}/api/scheduler/assignment-submission/${id}`, {
-                method: "DELETE",
-                headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` }
-            })
-            if (!res.ok) throw Error("Api call failed")
-            fetchAll()
-        } catch (error) { console.error(error) }
-    }
+// ─── Heatmap Placeholder (TODO: wire to study session API) ────────────────────
 
-    const handleUpdateSubmit = async (e) => {
-        e.preventDefault()
-        try {
-            const res = await fetch(`${BASE_URL}/api/scheduler/assignment-submission/${updateId}`, {
-                method: "PATCH",
-                headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
-                body: JSON.stringify(updateForm)
-            })
-            if (!res.ok) throw Error("Api call failed")
-            setUpdateId(null)
-            fetchAll()
-        } catch (error) { console.error(error) }
-    }
+const HEATMAP_DATA = {
+    DS: [2, 3, 4, 2, 3],
+    Algo: [1, 2, 3, 4, 2],
+    DB: [3, 1, 2, 3, 1],
+    OS: [0, 2, 1, 2, 3],
+}
 
-    useEffect(() => { fetchAll() }, [])
+const StudyHeatmap = () => (
+    <div className={styles.heatmapWrap}>
+        <div className={styles.heatmapWeekHeaders}>
+            {["W1", "W2", "W3", "W4", "W5"].map(w => (
+                <div key={w} className={styles.heatmapWeekLabel}>{w}</div>
+            ))}
+        </div>
+        {Object.entries(HEATMAP_DATA).map(([subject, weeks]) => (
+            <div key={subject} className={styles.heatmapRow}>
+                <span className={styles.heatmapLabel}>{subject}</span>
+                <div className={styles.heatmapCells}>
+                    {weeks.map((val, wi) => (
+                        <HeatmapCell key={wi} subject={subject} week={wi} value={val} />
+                    ))}
+                </div>
+            </div>
+        ))}
+        {/* TODO: Replace HEATMAP_DATA with GET /api/study-sessions/heatmap once endpoint is ready */}
+    </div>
+)
+
+// ─── Priority + Streak Placeholder (TODO: wire to AI + streak API) ────────────
+
+const PriorityStreak = ({ exams }) => {
+    // Derive top priority from nearest upcoming exam
+    // TODO: Replace with GET /api/ai/suggested-task once endpoint is ready
+    const now = new Date()
+    const upcoming = exams
+        .map(e => ({ ...e, d: toDateObj(e.examDate) }))
+        .filter(e => e.d && e.d > now)
+        .sort((a, b) => a.d - b.d)
+    const top = upcoming[0] || null
+    const daysLeft = top ? Math.ceil((top.d - now) / (1000 * 60 * 60 * 24)) : null
+
+    // TODO: Replace with GET /api/study-sessions/streak once endpoint is ready
+    const mockStreak = [true, true, true, false, true, false, false]
+    const streakCount = 3
 
     return (
         <>
-            <h1>Assignment Submission Scheduler</h1>
-            <form onSubmit={handleSubmit}>
-                <label>Due Date</label>
-                <input name="dueDate" type="date" value={form.dueDate} onChange={handleChange} required />
-                <label>Allow Late Submission</label>
-                <input name="allowLateSubmission" type="checkbox" checked={form.allowLateSubmission} onChange={handleChange} />
-                <label>Linked Assignment ID</label>
-                <input name="linkedAssignmentId" type="text" value={form.linkedAssignmentId} onChange={handleChange} />
-                <button type="submit">Submit</button>
-            </form>
-
-            <div>
-                {allAssignments.map((item, ind) => (
-                    <div key={ind}>
-                        <p>{item._id}</p>
-                        <p>{item.dueDate}</p>
-                        <button onClick={() => handleView(item._id)}>View</button>
-                        <button onClick={() => { setUpdateId(item._id); setUpdateForm({ dueDate: item.dueDate, submittedAt: item.submittedAt, submissionStatus: item.submissionStatus, feedback: item.feedback, allowLateSubmission: item.allowLateSubmission, linkedAssignmentId: item.linkedAssignmentId }) }}>Edit</button>
-                        <button onClick={() => handleDelete(item._id)}>Delete</button>
-                    </div>
-                ))}
+            <div className={styles.priorityCard}>
+                <div className={styles.priorityCardHeader}>
+                    <span className={styles.urgencyChip}>⚡ High</span>
+                    <span className={styles.aiBadge}>AI suggested</span>
+                </div>
+                {top ? (
+                    <>
+                        <p className={styles.priorityDeadline}>
+                            {daysLeft === 1 ? "Due tomorrow" : daysLeft ? `${daysLeft} days left` : "Due soon"}
+                        </p>
+                        <p className={styles.priorityName}>{top.subjectName || "Exam Prep"}</p>
+                        <p className={styles.priorityDesc}>
+                            {top.venue ? `${top.venue} · ` : ""}{top.subjectCode || "Revise key topics before exam"}
+                        </p>
+                    </>
+                ) : (
+                    <>
+                        <p className={styles.priorityDeadline}>No upcoming exams</p>
+                        <p className={styles.priorityName}>Stay ahead</p>
+                        <p className={styles.priorityDesc}>Review your weakest subject today.</p>
+                    </>
+                )}
+                <div className={styles.progressBar}>
+                    <div className={styles.progressFill} style={{ width: "42%" }} />
+                    {/* TODO: Wire progress to real session data */}
+                </div>
             </div>
 
-            {selectedAssignment && (
-                <div>
-                    <h2>Selected Assignment</h2>
-                    <p>{selectedAssignment[0]?.dueDate}</p>
-                    <p>{selectedAssignment[0]?.submissionStatus}</p>
-                    <p>{selectedAssignment[0]?.feedback}</p>
-                    <button onClick={() => setSelectedAssignment(null)}>Close</button>
+            <div className={styles.streakSection}>
+                <div className={styles.streakHeader}>
+                    <div>
+                        <span className={styles.streakCount}>{streakCount}</span>
+                        <span className={styles.streakLabel}> day streak</span>
+                    </div>
+                    <span className={styles.streakMotivation}>Keep it up!</span>
                 </div>
-            )}
-
-            {updateId && (
-                <div>
-                    <h2>Update Assignment</h2>
-                    <form onSubmit={handleUpdateSubmit}>
-                        <label>Due Date</label>
-                        <input name="dueDate" type="date" value={updateForm.dueDate} onChange={handleChangeUpdate} />
-                        <label>Submitted At</label>
-                        <input name="submittedAt" type="date" value={updateForm.submittedAt} onChange={handleChangeUpdate} />
-                        <label>Submission Status</label>
-                        <input name="submissionStatus" type="text" value={updateForm.submissionStatus} onChange={handleChangeUpdate} />
-                        <label>Feedback</label>
-                        <input name="feedback" type="text" value={updateForm.feedback} onChange={handleChangeUpdate} />
-                        <label>Allow Late Submission</label>
-                        <input name="allowLateSubmission" type="checkbox" checked={updateForm.allowLateSubmission} onChange={handleChangeUpdate} />
-                        <label>Linked Assignment ID</label>
-                        <input name="linkedAssignmentId" type="text" value={updateForm.linkedAssignmentId} onChange={handleChangeUpdate} />
-                        <button type="submit">Update</button>
-                        <button type="button" onClick={() => setUpdateId(null)}>Cancel</button>
-                    </form>
+                <div className={styles.streakDays}>
+                    {["M", "T", "W", "T", "F", "S", "S"].map((d, i) => (
+                        <div key={i} className={styles.streakDay}>
+                            <span className={styles.streakDayLabel}>{d}</span>
+                            <div className={`${styles.streakPill} ${mockStreak[i] ? styles.studied : ""}`} />
+                        </div>
+                    ))}
                 </div>
-            )}
+            </div>
         </>
     )
 }
 
-// ─── Project Submission Scheduler ────────────────────────────────────────────
-
-const ProjectSubmissionScheduler = () => {
-    const [form, setForm] = useState({
-        projectTitle: "", submissionDate: "", projectLink: "", phase: ""
-    })
-    const [updateForm, setUpdateForm] = useState({ ...form })
-    const [allProjects, setAllProjects] = useState([])
-    const [selectedProject, setSelectedProject] = useState(null)
-    const [updateId, setUpdateId] = useState(null)
-    const token = localStorage.getItem("token")
-
-    const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value })
-    const handleChangeUpdate = (e) => setUpdateForm({ ...updateForm, [e.target.name]: e.target.value })
-
-    const fetchAll = async () => {
-        try {
-            const res = await fetch(`${BASE_URL}/api/scheduler/project-submission`, {
-                method: "GET",
-                headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` }
-            })
-            if (!res.ok) throw Error("Api call failed")
-            const data = await res.json()
-            setAllProjects(data.data)
-        } catch (error) { console.error(error) }
-    }
-
-    const handleSubmit = async (e) => {
-        e.preventDefault()
-        try {
-            const res = await fetch(`${BASE_URL}/api/scheduler/project-submission`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
-                body: JSON.stringify(form)
-            })
-            if (!res.ok) throw Error("Api call failed")
-            fetchAll()
-        } catch (error) { console.error(error) }
-    }
-
-    const handleView = async (id) => {
-        try {
-            const res = await fetch(`${BASE_URL}/api/scheduler/project-submission/${id}`, {
-                method: "GET",
-                headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` }
-            })
-            if (!res.ok) throw Error("Api call failed")
-            const data = await res.json()
-            setSelectedProject(data.data)
-        } catch (error) { console.error(error) }
-    }
-
-    const handleDelete = async (id) => {
-        try {
-            const res = await fetch(`${BASE_URL}/api/scheduler/project-submission/${id}`, {
-                method: "DELETE",
-                headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` }
-            })
-            if (!res.ok) throw Error("Api call failed")
-            fetchAll()
-        } catch (error) { console.error(error) }
-    }
-
-    const handleUpdateSubmit = async (e) => {
-        e.preventDefault()
-        try {
-            const res = await fetch(`${BASE_URL}/api/scheduler/project-submission/${updateId}`, {
-                method: "PATCH",
-                headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
-                body: JSON.stringify(updateForm)
-            })
-            if (!res.ok) throw Error("Api call failed")
-            setUpdateId(null)
-            fetchAll()
-        } catch (error) { console.error(error) }
-    }
-
-    useEffect(() => { fetchAll() }, [])
-
-    return (
-        <>
-            <h1>Project Submission Scheduler</h1>
-            <form onSubmit={handleSubmit}>
-                <label>Project Title</label>
-                <input name="projectTitle" type="text" value={form.projectTitle} onChange={handleChange} required />
-                <label>Submission Date</label>
-                <input name="submissionDate" type="date" value={form.submissionDate} onChange={handleChange} required />
-                <label>Project Link</label>
-                <input name="projectLink" type="text" value={form.projectLink} onChange={handleChange} />
-                <label>Phase</label>
-                <input name="phase" type="text" value={form.phase} onChange={handleChange} />
-                <button type="submit">Submit</button>
-            </form>
-
-            <div>
-                {allProjects.map((item, ind) => (
-                    <div key={ind}>
-                        <p>{item._id}</p>
-                        <p>{item.projectTitle}</p>
-                        <button onClick={() => handleView(item._id)}>View</button>
-                        <button onClick={() => { setUpdateId(item._id); setUpdateForm({ projectTitle: item.projectTitle, submissionDate: item.submissionDate, projectLink: item.projectLink, phase: item.phase }) }}>Edit</button>
-                        <button onClick={() => handleDelete(item._id)}>Delete</button>
-                    </div>
-                ))}
-            </div>
-
-            {selectedProject && (
-                <div>
-                    <h2>Selected Project</h2>
-                    <p>{selectedProject[0]?.projectTitle}</p>
-                    <p>{selectedProject[0]?.submissionDate}</p>
-                    <p>{selectedProject[0]?.phase}</p>
-                    <button onClick={() => setSelectedProject(null)}>Close</button>
-                </div>
-            )}
-
-            {updateId && (
-                <div>
-                    <h2>Update Project</h2>
-                    <form onSubmit={handleUpdateSubmit}>
-                        <label>Project Title</label>
-                        <input name="projectTitle" type="text" value={updateForm.projectTitle} onChange={handleChangeUpdate} />
-                        <label>Submission Date</label>
-                        <input name="submissionDate" type="date" value={updateForm.submissionDate} onChange={handleChangeUpdate} />
-                        <label>Project Link</label>
-                        <input name="projectLink" type="text" value={updateForm.projectLink} onChange={handleChangeUpdate} />
-                        <label>Phase</label>
-                        <input name="phase" type="text" value={updateForm.phase} onChange={handleChangeUpdate} />
-                        <button type="submit">Update</button>
-                        <button type="button" onClick={() => setUpdateId(null)}>Cancel</button>
-                    </form>
-                </div>
-            )}
-        </>
-    )
-}
-
-// ─── Default Export ───────────────────────────────────────────────────────────
+// ─── Main Dashboard ────────────────────────────────────────────────────────────
 
 const EventScheduling = () => {
+    const navigate = useNavigate()
+
+    const [exams, setExams] = useState([])
+    const [assignments, setAssignments] = useState([])
+    const [projects, setProjects] = useState([])
+    const [loading, setLoading] = useState(true)
+    const [activeNav, setActiveNav] = useState("/event-scheduling")
+
+    const fetchAll = useCallback(async () => {
+        setLoading(true)
+        try {
+            const [eRes, aRes, pRes] = await Promise.all([
+                fetch(`${BASE_URL}/api/scheduler/exam-dates`, { headers: authHeaders() }),
+                fetch(`${BASE_URL}/api/scheduler/assignment-submission`, { headers: authHeaders() }),
+                fetch(`${BASE_URL}/api/scheduler/project-submission`, { headers: authHeaders() }),
+            ])
+            const [eData, aData, pData] = await Promise.all([
+                eRes.ok ? eRes.json() : { data: [] },
+                aRes.ok ? aRes.json() : { data: [] },
+                pRes.ok ? pRes.json() : { data: [] },
+            ])
+            setExams(eData.data || [])
+            setAssignments(aData.data || [])
+            setProjects(pData.data || [])
+        } catch (err) {
+            console.error("Dashboard fetch error:", err)
+        } finally {
+            setLoading(false)
+        }
+    }, [])
+
+    useEffect(() => { fetchAll() }, [fetchAll])
+
+    // ── Derived stats ──────────────────────────────────────────────────────────
+    const now = new Date()
+
+    const upcomingExams = exams.filter(e => {
+        const d = toDateObj(e.examDate)
+        return d && d > now && e.status !== "completed"
+    })
+
+    const nextExamDays = (() => {
+        const sorted = [...upcomingExams].sort((a, b) => toDateObj(a.examDate) - toDateObj(b.examDate))
+        if (!sorted.length) return null
+        return Math.ceil((toDateObj(sorted[0].examDate) - now) / (1000 * 60 * 60 * 24))
+    })()
+
+    const pendingProjects = projects.filter(p => p.phase !== "submitted" && p.phase !== "completed")
+    const projectsDueThisWeek = projects.filter(p => {
+        const d = toDateObj(p.submissionDate)
+        const { monday, sunday } = getWeekRange()
+        return d && d >= monday && d <= sunday
+    })
+
+    const dueAssignments = assignments.filter(a => {
+        const d = toDateObj(a.dueDate)
+        return d && a.submissionStatus !== "submitted"
+    })
+    const overdueAssignments = dueAssignments.filter(a => toDateObj(a.dueDate) < now)
+
+    const completedAssignments = assignments.filter(a => a.submissionStatus === "submitted")
+    const completedThisWeek = completedAssignments.filter(a => {
+        const d = toDateObj(a.submittedAt)
+        const { monday, sunday } = getWeekRange()
+        return d && d >= monday && d <= sunday
+    })
+
+    // ── Week schedule: merge all 3 sources, filter current week ───────────────
+    const { monday, sunday } = getWeekRange()
+
+    const scheduleItems = [
+        ...exams.map(e => ({
+            date: toDateObj(e.examDate),
+            name: e.subjectName,
+            meta: `${formatTime(e.examTime)}${e.venue ? " · " + e.venue : ""}${e.duration ? " · " + e.duration + " min" : ""}`,
+            status: getEventStatus(e, "exam"),
+            type: "exam",
+        })),
+        ...projects.map(p => ({
+            date: toDateObj(p.submissionDate),
+            name: p.projectTitle,
+            meta: `${p.phase ? "Phase: " + p.phase : "Submission deadline"}`,
+            status: getEventStatus(p, "project"),
+            type: "project",
+        })),
+        ...assignments.map(a => ({
+            date: toDateObj(a.dueDate),
+            name: `Assignment due`,
+            meta: `Due ${a.dueDate ? new Date(a.dueDate).toLocaleDateString() : ""}${a.allowLateSubmission ? " · Late ok" : ""}`,
+            status: getEventStatus(a, "assignment"),
+            type: "assignment",
+        })),
+    ]
+        .filter(item => item.date && item.date >= monday && item.date <= sunday)
+        .sort((a, b) => a.date - b.date)
+        .slice(0, 7)
+
+    // ── Activity table: all items sorted by date desc ─────────────────────────
+    const activityRows = [
+        ...exams.map(e => ({
+            subject: e.subjectName,
+            type: "Exam",
+            date: e.examDate,
+            status: getEventStatus(e, "exam"),
+            id: e._id,
+            route: `/exams`,
+        })),
+        ...projects.map(p => ({
+            subject: p.projectTitle,
+            type: "Project",
+            date: p.submissionDate,
+            status: getEventStatus(p, "project"),
+            id: p._id,
+            route: `/projects`,
+        })),
+        ...assignments.map(a => ({
+            subject: "Assignment",
+            type: "Assignment",
+            date: a.dueDate,
+            status: getEventStatus(a, "assignment"),
+            id: a._id,
+            route: `/assignments`,
+        })),
+    ]
+        .filter(r => r.date)
+        .sort((a, b) => new Date(b.date) - new Date(a.date))
+        .slice(0, 8)
+
+    const statusBadgeClass = (s) => {
+        if (s === "urgent") return styles.badge + " " + styles.urgent
+        if (s === "done") return styles.badge + " " + styles.done
+        if (s === "class") return styles.badge + " " + styles.class
+        return styles.badge + " " + styles.upcoming
+    }
+
+    const statusLabel = (s) => {
+        if (s === "urgent") return "Urgent"
+        if (s === "done") return "Done"
+        if (s === "class") return "Exam"
+        return "Upcoming"
+    }
+
+    const handleExport = () => {
+        const rows = [
+            ["Subject", "Type", "Date", "Status"],
+            ...activityRows.map(r => [r.subject, r.type, r.date, r.status])
+        ]
+        const csv = rows.map(r => r.join(",")).join("\n")
+        const blob = new Blob([csv], { type: "text/csv" })
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement("a")
+        a.href = url; a.download = "activity.csv"; a.click()
+        URL.revokeObjectURL(url)
+    }
+
     return (
         <>
-            <ExamScheduler />
-            <AssignmentSubmissionScheduler />
-            <ProjectSubmissionScheduler />
+            {/* Inject Chart.js once */}
+            <script
+                src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"
+                async
+            />
+
+            <div className={styles.shell}>
+                {/* ── Sidebar ── */}
+                <aside className={styles.sidebar}>
+                    <div className={styles.sidebarLogo}>
+                        <div className={styles.logoMark}>
+                            <div className={styles.logoIcon}>S</div>
+                            <div className={styles.logoText}>
+                                <span className={styles.logoTitle}>Scholaris</span>
+                                <span className={styles.logoSub}>Academic Suite</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <nav className={styles.sidebarNav}>
+                        {NAV_ITEMS.map(item => (
+                            <button
+                                key={item.path}
+                                className={`${styles.navItem} ${activeNav === item.path || (item.path === "/dashboard" && activeNav === "/event-scheduling") ? styles.active : ""}`}
+                                onClick={() => { setActiveNav(item.path); navigate(item.path) }}
+                            >
+                                <span className={styles.navIcon}>
+                                    <i className={`ti ${item.icon}`} aria-hidden="true" />
+                                </span>
+                                {item.label}
+                            </button>
+                        ))}
+                    </nav>
+
+                    {/* User card — TODO: replace with /api/auth/me data */}
+                    <div className={styles.sidebarUser}>
+                        <div className={styles.userAvatar}>ST</div>
+                        <div className={styles.userInfo}>
+                            <span className={styles.userName}>Student</span>
+                            <span className={styles.userRole}>CS Major</span>
+                        </div>
+                    </div>
+                </aside>
+
+                {/* ── Main ── */}
+                <main className={styles.main}>
+                    <div className={styles.pageHeader}>
+                        <h1 className={styles.pageTitle}>Dashboard</h1>
+                        <p className={styles.pageSubtitle}>
+                            {now.toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}
+                        </p>
+                    </div>
+
+                    {/* ── Stat Cards ── */}
+                    <div className={styles.statsGrid}>
+                        {loading ? (
+                            <>
+                                <StatCardSkeleton />
+                                <StatCardSkeleton />
+                                <StatCardSkeleton />
+                                <StatCardSkeleton />
+                            </>
+                        ) : (
+                            <>
+                                <div
+                                    className={`${styles.statCard} ${styles.blue}`}
+                                    onClick={() => navigate("/exams?filter=upcoming")}
+                                    role="link"
+                                    tabIndex={0}
+                                    onKeyDown={e => e.key === "Enter" && navigate("/exams?filter=upcoming")}
+                                >
+                                    <div className={styles.statCardTop}>
+                                        <div className={`${styles.statIconBlock} ${styles.blue}`}>
+                                            <i className="ti ti-file-description" aria-hidden="true" />
+                                        </div>
+                                        <i className={`ti ti-arrow-up-right ${styles.statArrow}`} aria-hidden="true" />
+                                    </div>
+                                    <div className={styles.statCount}>{upcomingExams.length}</div>
+                                    <div className={styles.statLabel}>Upcoming Exams</div>
+                                    <div className={`${styles.statHint} ${styles.blue}`}>
+                                        {nextExamDays !== null ? `Next in ${nextExamDays} day${nextExamDays !== 1 ? "s" : ""}` : "No upcoming exams"}
+                                    </div>
+                                </div>
+
+                                <div
+                                    className={`${styles.statCard} ${styles.amber}`}
+                                    onClick={() => navigate("/projects?filter=pending-submission")}
+                                    role="link"
+                                    tabIndex={0}
+                                    onKeyDown={e => e.key === "Enter" && navigate("/projects?filter=pending-submission")}
+                                >
+                                    <div className={styles.statCardTop}>
+                                        <div className={`${styles.statIconBlock} ${styles.amber}`}>
+                                            <i className="ti ti-briefcase" aria-hidden="true" />
+                                        </div>
+                                        <i className={`ti ti-arrow-up-right ${styles.statArrow}`} aria-hidden="true" />
+                                    </div>
+                                    <div className={styles.statCount}>{pendingProjects.length}</div>
+                                    <div className={styles.statLabel}>Pending Submissions</div>
+                                    <div className={`${styles.statHint} ${styles.amber}`}>
+                                        {projectsDueThisWeek.length > 0 ? `${projectsDueThisWeek.length} due this week` : "None this week"}
+                                    </div>
+                                </div>
+
+                                <div
+                                    className={`${styles.statCard} ${styles.red}`}
+                                    onClick={() => navigate("/assignments?filter=due")}
+                                    role="link"
+                                    tabIndex={0}
+                                    onKeyDown={e => e.key === "Enter" && navigate("/assignments?filter=due")}
+                                >
+                                    <div className={styles.statCardTop}>
+                                        <div className={`${styles.statIconBlock} ${styles.red}`}>
+                                            <i className="ti ti-clock" aria-hidden="true" />
+                                        </div>
+                                        <i className={`ti ti-arrow-up-right ${styles.statArrow}`} aria-hidden="true" />
+                                    </div>
+                                    <div className={styles.statCount}>{dueAssignments.length}</div>
+                                    <div className={styles.statLabel}>Due Assignments</div>
+                                    <div className={`${styles.statHint} ${styles.red}`}>
+                                        {overdueAssignments.length > 0 ? `${overdueAssignments.length} overdue` : "None overdue"}
+                                    </div>
+                                </div>
+
+                                <div
+                                    className={`${styles.statCard} ${styles.green}`}
+                                    onClick={() => navigate("/assignments?filter=completed")}
+                                    role="link"
+                                    tabIndex={0}
+                                    onKeyDown={e => e.key === "Enter" && navigate("/assignments?filter=completed")}
+                                >
+                                    <div className={styles.statCardTop}>
+                                        <div className={`${styles.statIconBlock} ${styles.green}`}>
+                                            <i className="ti ti-circle-check" aria-hidden="true" />
+                                        </div>
+                                        <i className={`ti ti-arrow-up-right ${styles.statArrow}`} aria-hidden="true" />
+                                    </div>
+                                    <div className={styles.statCount}>{completedAssignments.length}</div>
+                                    <div className={styles.statLabel}>Completed</div>
+                                    <div className={`${styles.statHint} ${styles.green}`}>
+                                        {completedThisWeek.length > 0 ? `+${completedThisWeek.length} this week` : "Keep going!"}
+                                    </div>
+                                </div>
+                            </>
+                        )}
+                    </div>
+
+                    {/* ── Schedule + Calendar ── */}
+                    <div className={styles.midSection}>
+                        <div className={styles.panel}>
+                            <div className={styles.panelHeader}>
+                                <h2 className={styles.panelTitle}>This week's schedule</h2>
+                                <button className={styles.viewAll} onClick={() => navigate("/calendar")}>
+                                    View all <i className="ti ti-arrow-right" aria-hidden="true" />
+                                </button>
+                            </div>
+                            <div className={styles.scheduleList}>
+                                {loading ? (
+                                    <div className={styles.emptyState}>Loading schedule…</div>
+                                ) : scheduleItems.length === 0 ? (
+                                    <div className={styles.emptyState}>No events this week</div>
+                                ) : (
+                                    scheduleItems.map((item, i) => (
+                                        <div key={i} className={styles.scheduleRow}>
+                                            <div className={styles.scheduleDay}>
+                                                <span className={styles.scheduleDayAbbr}>{DAY_ABBRS[item.date.getDay()]}</span>
+                                                <span className={styles.scheduleDayNum}>{item.date.getDate()}</span>
+                                            </div>
+                                            <div className={`${styles.scheduleBar} ${styles[item.status]}`} />
+                                            <div className={styles.scheduleInfo}>
+                                                <div className={styles.scheduleName}>{item.name}</div>
+                                                <div className={styles.scheduleMeta}>{item.meta}</div>
+                                            </div>
+                                            <span className={statusBadgeClass(item.status)}>{statusLabel(item.status)}</span>
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+                        </div>
+
+                        <div className={styles.panel}>
+                            <div className={styles.panelHeader}>
+                                <h2 className={styles.panelTitle}>Calendar</h2>
+                            </div>
+                            <MiniCalendar exams={exams} projects={projects} assignments={assignments} />
+                        </div>
+                    </div>
+
+                    {/* ── Focus Insights ── */}
+                    <div className={styles.insightsGrid}>
+                        <div className={styles.panel}>
+                            <div className={styles.panelHeader}>
+                                <h2 className={styles.panelTitle}>Study heatmap</h2>
+                            </div>
+                            <div style={{ padding: "12px 16px" }}>
+                                <StudyHeatmap />
+                            </div>
+                        </div>
+
+                        <div className={styles.panel}>
+                            <div className={styles.panelHeader}>
+                                <h2 className={styles.panelTitle}>Subject load</h2>
+                            </div>
+                            <div style={{ padding: "12px 16px" }}>
+                                <DonutChart exams={exams} projects={projects} assignments={assignments} />
+                            </div>
+                        </div>
+
+                        <div className={styles.panel}>
+                            <div className={styles.panelHeader}>
+                                <h2 className={styles.panelTitle}>Priority & streak</h2>
+                            </div>
+                            <div style={{ padding: "12px 16px" }}>
+                                <PriorityStreak exams={exams} />
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* ── Recent Activity ── */}
+                    <div className={`${styles.panel} ${styles.activityPanel}`}>
+                        <div className={styles.activityHeader}>
+                            <h2 className={styles.panelTitle}>Recent activity</h2>
+                            <button className={styles.exportBtn} onClick={handleExport}>
+                                <i className="ti ti-download" aria-hidden="true" />
+                                Export
+                            </button>
+                        </div>
+                        {loading ? (
+                            <div className={styles.emptyState}>Loading activity…</div>
+                        ) : activityRows.length === 0 ? (
+                            <div className={styles.emptyState}>No recent activity</div>
+                        ) : (
+                            <table className={styles.activityTable}>
+                                <thead>
+                                    <tr>
+                                        <th>Subject</th>
+                                        <th>Type</th>
+                                        <th>Date</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {activityRows.map((row, i) => (
+                                        <tr key={i}>
+                                            <td className={styles.tdSubject}>{row.subject}</td>
+                                            <td>{row.type}</td>
+                                            <td>
+                                                {row.date
+                                                    ? new Date(row.date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+                                                    : "—"}
+                                            </td>
+                                            <td>
+                                                <span className={statusBadgeClass(row.status)}>{statusLabel(row.status)}</span>
+                                            </td>
+                                            <td>
+                                                <button className={styles.actionLink} onClick={() => navigate(row.route)}>
+                                                    {row.status === "done" ? "Review" : "Open"}
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        )}
+                    </div>
+                </main>
+            </div>
         </>
     )
 }
 
-export default EventScheduling;
+export default EventScheduling

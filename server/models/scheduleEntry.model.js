@@ -340,6 +340,8 @@ toDoListSchema.pre("validate",function(next){
             this.invalidate("reminderTime", "required")
         }
     }
+
+    next()
 })
 
 export const ToDoList = mongoose.model("ToDoList", toDoListSchema)
