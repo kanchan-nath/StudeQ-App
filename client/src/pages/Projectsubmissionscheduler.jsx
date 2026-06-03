@@ -3,7 +3,7 @@ import BASE_URL from "../lib/api.js";
 import styles from "./styles/ProjectSubmissions.module.css";
 import {
     CalendarDays, Check, ChevronRight, ClipboardList,
-    Clock, Layers, LayoutGrid, List, MoreHorizontal, Plus,
+    Clock, Layers, LayoutGrid, List, MoreHorizontal, Plus, Star
 } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -39,10 +39,10 @@ const daysLeft = (iso) => {
 const dateLabel = (item) => {
     const phase = item.phase;
     const diff = daysLeft(item.submissionDate);
-    if (phase === "Graded") return { icon: "⏱", text: `Graded ${formatDate(item.submissionDate)}`, cls: styles.dateGreen };
+    if (phase === "Graded") return { icon: <Clock size={12} />, text: `Graded ${formatDate(item.submissionDate)}`, cls: styles.dateGreen };
     if (phase === "Submitted") return { icon: "⏱", text: `Submitted ${formatDate(item.submissionDate)}`, cls: styles.dateBlue };
     if (diff === null) return null;
-    if (diff < 0) return { icon: "🔴", text: `Overdue · ${formatDate(item.submissionDate)}`, cls: styles.dateRed };
+    if (diff < 0) return { icon: <Clock size={12} />, text: `Overdue · ${formatDate(item.submissionDate)}`, cls: styles.dateRed };
     return { icon: "⏱", text: `Due in ${diff} day${diff !== 1 ? "s" : ""}`, cls: styles.dateOrange };
 };
 
@@ -139,10 +139,10 @@ const NewProjectModal = ({ onClose, onSave, defaultPhase }) => {
                     </div>
 
                     <div className={styles.modalFooter}>
-                        <button type="button" className={styles.btnCancel} onClick={onClose}>Cancel</button>
-                        <button type="submit" className={styles.btnSave} disabled={loading}>
-                            {loading ? "Saving…" : "✓ Add Project"}
-                        </button>
+                        <Button variant="outline" onClick={onClose}>Cancel</Button>
+                        <Button onClick={submit} disabled={loading}>
+                            <Check size={14} /> {loading ? "Saving…" : "Add Project"}
+                        </Button>
                     </div>
                 </form>
             </div>
@@ -190,7 +190,7 @@ const DetailPanel = ({ project, onClose, onDelete, onEdit }) => {
                     <div className={styles.detailSection}>
                         <div className={styles.detailSectionTitle}>Deadline</div>
                         <div className={styles.detailDeadline}>
-                            <span className={styles.detailDeadlineIcon}>📅</span>
+                            <span className={styles.detailDeadlineIcon}><CalendarDays size={16} /></span>
                             <span>{project.submissionDate ? new Date(project.submissionDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", hour: "2-digit", minute: "2-digit" }) : "—"}</span>
                             {badge && <span className={styles.daysLeftBadge}>{badge}</span>}
                         </div>
@@ -211,8 +211,10 @@ const DetailPanel = ({ project, onClose, onDelete, onEdit }) => {
                     </div>
 
                     <div className={styles.detailActions}>
-                        <button className={styles.btnSubmitProject} onClick={() => setEditMode(true)}>✏ Edit Details</button>
-                        <button className={styles.btnDeleteProject} onClick={() => onDelete(project._id)}>🗑 Delete</button>
+                        <button className={styles.btnSubmitProject} onClick={() => setEditMode(true)}><ClipboardList size={14} /> Edit Details</button>
+                        <Button variant="destructive" onClick={() => onDelete(project._id)}>
+                            Delete
+                        </Button>
                     </div>
                 </>
             ) : (
@@ -242,7 +244,7 @@ const DetailPanel = ({ project, onClose, onDelete, onEdit }) => {
                     </div>
                     <div className={styles.detailActions}>
                         <button className={styles.btnSubmitProject} onClick={saveEdit} disabled={saving}>
-                            {saving ? "Saving…" : "Save Changes"}
+                            {saving ? "Saving…" : <><Check size={14} /> Save Changes</>}
                         </button>
                         <button className={styles.btnCancel} onClick={() => setEditMode(false)}>Cancel</button>
                     </div>
@@ -260,35 +262,43 @@ const ProjectCard = ({ item, onView, isActive }) => {
     const ini = initials(item.projectTitle);
 
     return (
-        <div
+        <Card
             className={`${styles.card} ${isActive ? styles.cardActive : ""}`}
             onClick={() => onView(item._id)}
         >
-            <div className={styles.cardTitle}>{item.projectTitle}</div>
-            {item.phase && <span className={styles.cardCourse}>{item.phase}</span>}
+            <CardContent className={styles.cardContent}>
+                <div className={styles.cardTitle}>{item.projectTitle}</div>
+                {item.phase && <span className={styles.cardCourse}><Badge variant="secondary" className={styles.cardCourse}>{item.phase}</Badge></span>}
 
-            <div className={styles.cardAvatars}>
-                <div className={styles.avatar} style={{ background: bg }}>{ini}</div>
-            </div>
-
-            {dl && (
-                <div className={`${styles.cardDate} ${dl.cls}`}>
-                    <span>{dl.icon}</span>
-                    <span>{dl.text}</span>
+                <div className={styles.cardAvatars}>
+                    <Avatar className={styles.avatar}>
+                        <AvatarFallback style={{ background: bg, color: "#fff", fontSize: 10 }}>
+                            {ini}
+                        </AvatarFallback>
+                    </Avatar>
                 </div>
-            )}
 
-            <div className={styles.progressBar}>
-                <div
-                    className={`${styles.progressFill} ${PHASE_META[item.phase]?.bar || styles.barPurple}`}
-                    style={{ width: item.phase === "Graded" ? "100%" : item.phase === "Submitted" ? "75%" : item.phase === "In Progress" ? "50%" : "15%" }}
-                />
-            </div>
+                {dl && (
+                    <div className={`${styles.cardDate} ${dl.cls}`}>
+                        <span>{dl.icon}</span>
+                        <span>{dl.text}</span>
+                    </div>
+                )}
 
-            {item.projectLink && (
-                <span className={styles.cardBadge}>🔗 Link</span>
-            )}
-        </div>
+                <div className={styles.progressBar}>
+                    <div
+                        className={`${styles.progressFill} ${PHASE_META[item.phase]?.bar || styles.barPurple}`}
+                        style={{ width: item.phase === "Graded" ? "100%" : item.phase === "Submitted" ? "75%" : item.phase === "In Progress" ? "50%" : "15%" }}
+                    />
+                </div>
+
+                {item.projectLink && (
+                    <span className={styles.cardBadge}>🔗 Link</span>
+                )}
+
+
+            </CardContent>
+        </Card>
     );
 };
 
@@ -305,7 +315,7 @@ const KanbanColumn = ({ phase, items, onView, activeId, onAddCard }) => {
                     <span className={styles.columnTitle}>{phase}</span>
                     <span className={styles.columnCount}>{items.length}</span>
                 </div>
-                <button className={styles.columnMenu}>···</button>
+                <button className={styles.columnMenu}><MoreHorizontal size={16} /></button>
             </div>
 
             <div className={styles.cards}>
@@ -320,7 +330,7 @@ const KanbanColumn = ({ phase, items, onView, activeId, onAddCard }) => {
             </div>
 
             <button className={styles.addCard} onClick={() => onAddCard(phase)}>
-                + Drop or add a card
+                <Plus size={13} />Drop or add a card
             </button>
         </div>
     );
@@ -336,7 +346,7 @@ const ViewToggle = ({ view, setView }) => (
                 className={`${styles.viewBtn} ${view === v ? styles.viewBtnActive : ""}`}
                 onClick={() => setView(v)}
             >
-                {v === "List" ? "☰" : v === "Kanban" ? "⊞" : "📅"} {v}
+                {v === "List" ? <List size={14} /> : v === "Kanban" ? <LayoutGrid size={14} /> : <CalendarDays size={14} />} {v}
             </button>
         ))}
     </div>
@@ -472,7 +482,7 @@ const ProjectSubmissionScheduler = () => {
                     <div className={styles.topRight}>
                         <ViewToggle view={view} setView={setView} />
                         <button className={styles.btnNew} onClick={() => { setModalPhase("Not Started"); setShowModal(true); }}>
-                            + New Project
+                            <Plus size={15} /> New Project
                         </button>
                     </div>
                 </div>
