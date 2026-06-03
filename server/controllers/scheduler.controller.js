@@ -321,7 +321,7 @@ const deleteAssignmentSubmission = asyncHandler(async (req, res) => {
 
 const updateAssignmentSubmission = asyncHandler(async (req, res) => {
     const { id } = req.params
-    const { dueDate, submittedAt, submissionStatus, feedback, allowLateSubmission, linkedAssignmentId, } = req.body
+    const { dueDate, submittedAt, submissionStatus, feedback, allowLateSubmission, linkedAssignmentId } = req.body
 
     if (!id) {
         throw new ApiError(400, "id is required")

@@ -103,7 +103,7 @@ const assignmentSubmissionSchema = mongoose.Schema({
     },
     submissionStatus: {
         type: String,
-        enum: ["pending", "submitted", "late", "graded"],
+        // enum: ["pending", "submitted", "late", "graded"],
         default: "pending"
     },
     feedback: {
