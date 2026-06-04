@@ -1,33 +1,21 @@
 import { getJson } from "serpapi"
 
-const googleSearch = async (query) => {
+const searchAPI = async (query) => {
     try {
-        const response = await getJson("google", {
-            api_key:"1ce583c86438f47c48be67baf82a6306ad7b829883838feee53a4d791785da2c", 
+        const googleResponse = await getJson("google", {
+            api_key: process.env.SERP_API_KEY,
             q: query
 
         });
-
-
-        return response
-        
-    } catch (error) {
-        console.error("Error:", error.message);
-
-    }
-}
-
-const youtubeSearch = async (query) => {
-    try {
-        const response = await getJson({
+        const youtubeResponse = await getJson({
             engine: "youtube",
             search_query: query,
-            api_key: "1ce583c86438f47c48be67baf82a6306ad7b829883838feee53a4d791785da2c",
-            hl: "en", 
-            gl: "us"  
+            api_key: process.env.SERP_API_KEY,
+            hl: "en",
+            gl: "us"
         });
 
-        return response
+        return { googleResponse, youtubeResponse }
 
     } catch (error) {
         console.error("Error:", error.message);
@@ -35,7 +23,4 @@ const youtubeSearch = async (query) => {
     }
 }
 
-export {
-    googleSearch,
-    youtubeSearch
-}
+export default searchAPI
