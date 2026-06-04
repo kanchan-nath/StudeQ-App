@@ -3,7 +3,7 @@ import { ApiError, ApiResponse } from "../utils/Async.js"
 import searchAPI from "../lib/searchAPI.js"
 
 const search = asyncHandler(async (req, res) => {
-    const { query } = req.query
+    const { query, filter, sort } = req.query
 
     if (!query) {
         throw new ApiError(400, "Query is required")
