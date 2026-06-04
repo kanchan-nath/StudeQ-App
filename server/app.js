@@ -19,6 +19,7 @@ import imageAnalysisRouter from "../server/routes/imageAnalysis.route.js"
 import pdfAnalysisRouter from "./routes/pdfAnalysis.route.js"
 import schedulerRouter from "./routes/scheduler.route.js"
 import filesRagRouter from "../server/routes/filesRag.route.js"
+import searchAPIRouter from "../server/routes/searchAPI.route.js"
 
 app.use("/api/auth", registerRoute)
 app.use("/api/user", userRoute)
@@ -30,5 +31,5 @@ app.use("/api/image", imageAnalysisRouter)
 app.use("/api/pdf", pdfAnalysisRouter)
 app.use("/api", schedulerRouter)
 app.use("/api/documents", filesRagRouter)
-
+app.use("/api", searchAPIRouter)
 export { app }
