@@ -1,19 +1,20 @@
-FROM node:22-alpine AS builder
+FROM node:22-slim
 
-RUN apk add --no-cache \
+RUN apt-get update && apt-get install -y \
     graphicsmagick \
     ghostscript \
     python3 \
     make \
-    g++
+    g++ \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
 COPY package*.json ./
 COPY prisma ./prisma/
 
-RUN npm install
-RUN npx prisma generate
+RUN npm install --legacy-peer-deps
+RUN DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy" npx prisma generate
 
 COPY . .
 

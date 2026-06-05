@@ -3,8 +3,8 @@ import { connectDB } from "./lib/mongoClient.js"
 import http from "http"
 import jwt from "jsonwebtoken"
 import { ApiError } from "./utils/Async.js"
-import {initSocket} from "../server/lib/socket.js"
-import { aiQueueEvents } from "../server/services/queueEvents.js"
+import { initSocket } from "./lib/socket.js"
+import { aiQueueEvents } from "./services/queueEvents.js"
 
 const server = http.createServer(app)
 const userSocketMap = new Map()

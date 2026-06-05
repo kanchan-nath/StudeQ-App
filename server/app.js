@@ -9,17 +9,17 @@ app.use(express.urlencoded({ extended: true, limit: "16kb" }))
 app.use(cookieParser());
 app.use(cors())
 
-import registerRoute from "../server/routes/auth.route.js"
-import userRoute from "../server/routes/auth.route.js"
+import registerRoute from "./routes/auth.route.js"
+import userRoute from "./routes/auth.route.js"
 import noteRoute from "./routes/note.route.js"
-import tutorRouter from "../server/routes/tutor.route.js"
-import quizRouter from "../server/routes/quiz.route.js"
-import studyRoomRouter from "../server/routes/studyroom.route.js"
-import imageAnalysisRouter from "../server/routes/imageAnalysis.route.js"
+import tutorRouter from "./routes/tutor.route.js"
+import quizRouter from "./routes/quiz.route.js"
+import studyRoomRouter from "./routes/studyRoom.route.js"
+import imageAnalysisRouter from "./routes/imageAnalysis.route.js"
 import pdfAnalysisRouter from "./routes/pdfAnalysis.route.js"
 import schedulerRouter from "./routes/scheduler.route.js"
-import filesRagRouter from "../server/routes/filesRag.route.js"
-import searchAPIRouter from "../server/routes/searchAPI.route.js"
+import filesRagRouter from "./routes/filesRag.route.js"
+import searchAPIRouter from "./routes/searchAPI.route.js"
 
 app.use("/api/auth", registerRoute)
 app.use("/api/user", userRoute)
