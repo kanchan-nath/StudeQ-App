@@ -47,6 +47,7 @@ controllers/
   pdfAnalyze.controller.js
   quiz.controller.js
   scheduler.controller.js
+  searchAPI.controller.js
   studyroom.controller.js
   tutor.controller.js
   user.controller.js
@@ -74,6 +75,7 @@ lib/
   mongoClient.js
   prisma.js
   prompt.js
+  searchAPI.js
   socket.js
   websearch.js
 middlewares/
@@ -100,6 +102,7 @@ routes/
   pdfAnalysis.route.js
   quiz.route.js
   scheduler.route.js
+  searchAPI.route.js
   studyRoom.route.js
   tutor.route.js
 services/
@@ -140,6 +143,7 @@ utils/
 .gitignore
 app.js
 BACKLOG.md
+Dockerfile
 eng.traineddata
 index.js
 package.json
@@ -999,17 +1003,19 @@ import {
     AssignmentSubmission,
     ProjectSubmission,
     TimeTable,
-    RawSchedule
+    RawSchedule,
+    ToDoList
 } from "../models/scheduleEntry.model.js"
 import { generateStudyPlan } from "../lib/groq/generateStudyPlan.js"
 import { StudyPlan } from "../models/studyPlan.js"
 import pdfToImages from "../services/pdfToImages.js"
 import { PDFParse } from "pdf-parse"
-import fs from "fs"
+import fs, { rmSync } from "fs"
 import createSchedule from "../lib/groq/createSchedule.js"
 import recurringTasks from "../lib/cronJobs/cron.js"
 import icsFileGeneretor from "../services/icsFile.js"
 import mailICSFile from "../services/nodemailer.js"
+import { userInfo } from "os"
 
 const createScheduler = asyncHandler(async (req, res) => {
     const { subject, topic, schedulerDate, duration } = req.body
@@ -1312,7 +1318,7 @@ const deleteAssignmentSubmission = asyncHandler(async (req, res) => {
 
 const updateAssignmentSubmission = asyncHandler(async (req, res) => {
     const { id } = req.params
-    const { dueDate, submittedAt, submissionStatus, feedback, allowLateSubmission, linkedAssignmentId, } = req.body
+    const { dueDate, submittedAt, submissionStatus, feedback, allowLateSubmission, linkedAssignmentId } = req.body
 
     if (!id) {
         throw new ApiError(400, "id is required")
@@ -1400,7 +1406,7 @@ const getProjectSubmission = asyncHandler(async (req, res) => {
     return res
         .status(200)
         .json(new ApiResponse(200, data, "Project submission schedule fetched successfully"))
-})  
+})
 
 const deleteProjectSubmission = asyncHandler(async (req, res) => {
     const { id } = req.params
@@ -1747,27 +1753,177 @@ const deleteAllRawMaterial = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, {}, "All raw data is deleted"))
 })
 
-const createToDoList = asyncHandler(async (req, res) => {
+// 
 
+const createToDoList = asyncHandler(async (req, res) => {
+    const { title, status, priority, dueDate, isRecurring, recurrencePattern, reminderEnabled, reminderTime } = req.body
+
+    if (!title || !dueDate) {
+        throw new ApiError(400, "All fields are required")
+    }
+
+    const userId = req.user.id
+
+    const data = await ToDoList.create({
+        userId,
+        title, 
+        status, 
+        priority, 
+        dueDate, 
+        isRecurring, 
+        recurrencePattern, 
+        reminderEnabled, 
+        reminderTime
+    })
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, data, "To Do List created"))
 })
 
 const getAllToDoList = asyncHandler(async (req, res) => {
+    const userId = req.user.id
 
+    const data = await ToDoList.find({userId})
+
+    return res
+    .status(200)
+    .json (new ApiResponse(200, data, "All to do list fetched"))
 })
 const getToDoList = asyncHandler(async (req, res) => {
+    const {id} = req.params
 
+    if(!id){
+        throw new ApiError(400, "Id is required")
+    }
+
+    const userId = req.user.id
+
+    const data = await ToDoList.findById({_id:id})
+
+    if(!data){
+        throw new ApiError(400, "To do list not found")
+    }
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, data, "To do list getched"))
 })
 
 const deleteToDoList = asyncHandler(async (req, res) => {
+    const { id } = req.params
 
+    if (!id) {
+        throw new ApiError(400, "Id is required")
+    }
+
+    const userId = req.user.id
+
+    const isDataExist = await ToDoList.findById({ _id: id })
+
+    if (!isDataExist) {
+        throw new ApiError(400, "To do list not found")
+    }
+
+    const data = await ToDoList.findOneAndDelete({userId, _id:id})
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, data, "To do list getched"))
 })
 
 const updateToDoList = asyncHandler(async (req, res) => {
+    const {id} = req.params
 
+    if(!id){
+        throw new ApiError(400, "Id is required")
+    }
+
+    const { title, status, priority, dueDate, isRecurring, recurrencePattern, reminderEnabled, reminderTime } = req.body
+
+    const objects = { title, status, priority, dueDate, isRecurring, recurrencePattern, reminderEnabled, reminderTime }
+
+    const filteredObjects = Object.fromEntries(
+    Object.entries(objects).filter(([key, val])=>val!==undefined)
+    )
+
+    if(Object.keys(filteredObjects).length ===0){
+        throw new ApiError(400, "At least one field need to change")
+    }
+
+    const isDataExist = await ToDoList.findById({_id:id})
+
+    if(!isDataExist){
+        throw new ApiError(400,"To do list not found")
+    }
+
+    const data = await ToDoList.findOneAndUpdate(
+        {
+            _id:id
+        },
+        {
+            $set:filteredObjects
+        }
+    )
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, data, "To do list updated"))
 })
 
 const deleteAllToDoList = asyncHandler(async (req, res) => {
+    const userId = req.user.id
 
+    const data = await ToDoList.deleteMany({ userId })
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, data, "All to do list fetched"))
+})
+
+const filterToDoList = asyncHandler(async(req, res)=>{
+    const {input} = req.query
+
+    if(!input){
+        throw new ApiError(400, "FIlter query is required")
+    }
+
+    const userId = req.user.id
+
+    let filter = {}
+    if(input){
+        filter.input = input
+    }
+
+    const data = await ToDoList.find({userId, filter})
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, data, "Filtered apply"))
+})
+
+const sortToDoList = asyncHandler(async(req, res)=>{
+    const {sortBy} =req.query
+
+    if(!sortBy){
+        throw new ApiError(400, "Sort By is required")
+    }
+
+    // const ALLOWED_SORTS = {
+    //     newest: { createdAt: -1 },
+    //     oldest: { createdAt: 1 },
+    //     az: { title: 1 },
+    //     za: { title: -1 },
+    // }
+    const userId =req.user.id
+
+    const sortOption = sortBy === "priority" ? { priority: -1 } : { createdAt: -1 }
+
+    const data = await ToDoList.find({ userId }).sort(sortOption)
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, data, "Sorted"))
 })
 
 const sendICSFile = asyncHandler(async (req, res) => {
@@ -1849,8 +2005,34 @@ export {
     deleteToDoList,
     updateToDoList,
     deleteAllToDoList,
+    filterToDoList,
+    sortToDoList,
 
     sendICSFile
+}
+</file>
+
+<file path="controllers/searchAPI.controller.js">
+import { asyncHandler } from "../utils/asyncHandler.js"
+import { ApiError, ApiResponse } from "../utils/Async.js"
+import searchAPI from "../lib/searchAPI.js"
+
+const search = asyncHandler(async (req, res) => {
+    const { query, filter, sort } = req.query
+
+    if (!query) {
+        throw new ApiError(400, "Query is required")
+    }
+    const { googleResponse, youtubeResponse } = await searchAPI(query)
+    const data = { googleResponse, youtubeResponse }
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, data, "Searched results"))
+})
+
+export {
+    search
 }
 </file>
 
@@ -3141,6 +3323,35 @@ export {
 }
 </file>
 
+<file path="lib/searchAPI.js">
+import { getJson } from "serpapi"
+
+const searchAPI = async (query) => {
+    try {
+        const googleResponse = await getJson("google", {
+            api_key: process.env.SERP_API_KEY,
+            q: query
+
+        });
+        const youtubeResponse = await getJson({
+            engine: "youtube",
+            search_query: query,
+            api_key: process.env.SERP_API_KEY,
+            hl: "en",
+            gl: "us"
+        });
+
+        return { googleResponse, youtubeResponse }
+
+    } catch (error) {
+        console.error("Error:", error.message);
+
+    }
+}
+
+export default searchAPI
+</file>
+
 <file path="lib/socket.js">
 import { Server } from "socket.io"
 import { ApiError } from "../utils/Async.js"
@@ -3651,7 +3862,7 @@ const assignmentSubmissionSchema = mongoose.Schema({
     },
     submissionStatus: {
         type: String,
-        enum: ["pending", "submitted", "late", "graded"],
+        // enum: ["pending", "submitted", "late", "graded"],
         default: "pending"
     },
     feedback: {
@@ -3682,7 +3893,7 @@ const projectSubmissionSchema = mongoose.Schema({
     },
     phase: {
         type: String,
-        enum: ["proposal", "mideval", "final"],
+        // enum: ["proposal", "mideval", "final"],
         default: "proposal"
     },
     submissionDate: {
@@ -3843,13 +4054,13 @@ const toDoListSchema = mongoose.Schema({
     },
     status:{
         type:String,
-        enum:["pending","completed","cancelled"],
-        default:"pending"
+        // enum:["pending","completed","cancelled"],
+        // default:"pending"
     },
     priority:{
         type:String,
-        enum:["low", "medium", "high"],
-        default:"low"
+        // enum:["low", "medium", "high"],
+        // default:"low"
     },
     dueDate:{
         type:Date,
@@ -3860,7 +4071,7 @@ const toDoListSchema = mongoose.Schema({
     },
     recurrencePattern:{
         type:String,
-        enum: ["daily", "weekly","custom"]
+        // enum: ["daily", "weekly","custom"]
     },
     completedAt:{
         type:Date
@@ -3888,6 +4099,8 @@ toDoListSchema.pre("validate",function(next){
             this.invalidate("reminderTime", "required")
         }
     }
+
+    next()
 })
 
 export const ToDoList = mongoose.model("ToDoList", toDoListSchema)
@@ -3959,7 +4172,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "postgresql",
 }
 
 model User {
@@ -4213,6 +4426,9 @@ import {
     deleteToDoList,
     updateToDoList,
     deleteAllToDoList,
+    filterToDoList,
+    sortToDoList,
+
     sendICSFile
     
 } from "../controllers/scheduler.controller.js"
@@ -4268,10 +4484,24 @@ router.route("/scheduler/material/:id/all").delete(verifyJWT, deleteAllRawMateri
 
 router.route("/scheduler/to-do-list").post(verifyJWT, createToDoList)
 router.route("/scheduler/to-do-list").get(verifyJWT, getAllToDoList)
+router.route("/scheduler/to-do-list/filter").get(verifyJWT, filterToDoList)
+router.route("/scheduler/to-do-list/sort").get(verifyJWT, sortToDoList)
 router.route("/scheduler/to-do-list/:id").get(verifyJWT, getToDoList)
 router.route("/scheduler/to-do-list/:id").delete(verifyJWT, deleteToDoList)
 router.route("/scheduler/to-do-list/:id").patch(verifyJWT, updateToDoList)
 router.route("/scheduler/to-do-list").delete(verifyJWT, deleteAllToDoList)
+
+export default router
+</file>
+
+<file path="routes/searchAPI.route.js">
+import { Router } from "express"
+import { verifyJWT } from "../middlewares/auth.middleware.js"
+import {search} from "../controllers/searchAPI.controller.js"
+
+const router = Router()
+
+router.route("/search").get(verifyJWT, search)
 
 export default router
 </file>
@@ -14186,6 +14416,7 @@ import imageAnalysisRouter from "../server/routes/imageAnalysis.route.js"
 import pdfAnalysisRouter from "./routes/pdfAnalysis.route.js"
 import schedulerRouter from "./routes/scheduler.route.js"
 import filesRagRouter from "../server/routes/filesRag.route.js"
+import searchAPIRouter from "../server/routes/searchAPI.route.js"
 
 app.use("/api/auth", registerRoute)
 app.use("/api/user", userRoute)
@@ -14197,7 +14428,7 @@ app.use("/api/image", imageAnalysisRouter)
 app.use("/api/pdf", pdfAnalysisRouter)
 app.use("/api", schedulerRouter)
 app.use("/api/documents", filesRagRouter)
-
+app.use("/api", searchAPIRouter)
 export { app }
 </file>
 
@@ -14303,7 +14534,8 @@ connectDB()
   "main": "index.js",
   "scripts": {
     "dev": "nodemon index.js",
-    "dev-worker": "nodemon services/worker.js"
+    "dev-worker": "nodemon services/worker.js",
+    "start": "node index.js"
   },
   "keywords": [],
   "author": "KANCHAN NATH",
