@@ -26,6 +26,7 @@ import ToDoList from "./pages/ToDoList.jsx";
 import ExamSchedule from "./pages/ExamSchedule.jsx";
 import ProjectSubmissionScheduler from "./pages/Projectsubmissionscheduler.jsx";
 import Assignments from "./pages/Assignments.jsx";
+import SearchResults from "./pages/Searchresults.jsx";
 
 const App = () => {
   const token = localStorage.getItem("token");
@@ -123,6 +124,10 @@ const App = () => {
           <Route
             path="/event-scheduling/assignments"
             element={<ProtectedRoute component={<Assignments />} />}
+          />
+          <Route
+            path="/search"
+            element={<ProtectedRoute component={<SearchResults />} />}
           />
         </Route>
          
