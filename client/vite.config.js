@@ -16,4 +16,9 @@ export default defineConfig({
       usePolling: true,
     },
   },
+  test: {                          // ← ADD THIS
+    environment: 'jsdom',
+    setupFiles: ['./src/test/setup.js'],
+    globals: true,
+  },
 })
