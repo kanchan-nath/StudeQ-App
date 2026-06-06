@@ -1,6 +1,26 @@
 /* ─── Flashcards.module.css ─────────────────────────────────────────────── */
 
+/* ─── Flashcards.module.css ─────────────────────────────────────────────── */
+
+/* ── Non-theme vars (layout, radii, fonts, transitions) stay in :root ── */
 :root {
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+
+  --sidebar-width: 220px;
+  --headbar-height: 60px;
+
+  --font-body: "DM Sans", "Nunito", system-ui, sans-serif;
+  --font-display: "DM Sans", sans-serif;
+
+  --transition-fast: 0.18s ease;
+  --transition-mid: 0.3s ease;
+}
+
+/* ── LIGHT theme ── */
+[data-theme="light"] {
   --bg-page: #f0f2f8;
   --bg-card: #ffffff;
   --bg-sidebar: #ffffff;
@@ -20,53 +40,49 @@
 
   --border: #e2e8f0;
   --border-card: #e8eaf0;
-  --shadow-sm:
-    0 1px 3px rgba(99, 102, 241, 0.07), 0 1px 2px rgba(0, 0, 0, 0.04);
-  --shadow-md:
-    0 4px 16px rgba(99, 102, 241, 0.1), 0 2px 8px rgba(0, 0, 0, 0.06);
-  --shadow-card:
-    0 8px 32px rgba(99, 102, 241, 0.1), 0 2px 8px rgba(0, 0, 0, 0.05);
-  --shadow-hover:
-    0 16px 48px rgba(99, 102, 241, 0.18), 0 4px 16px rgba(0, 0, 0, 0.08);
 
-  --radius-sm: 8px;
-  --radius-md: 14px;
-  --radius-lg: 20px;
-  --radius-xl: 28px;
-
-  --sidebar-width: 220px;
-  --headbar-height: 60px;
-
-  --font-body: "DM Sans", "Nunito", system-ui, sans-serif;
-  --font-display: "DM Sans", sans-serif;
-
-  --transition-fast: 0.18s ease;
-  --transition-mid: 0.3s ease;
+  --shadow-sm: 0 1px 3px rgba(99, 102, 241, 0.07), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 16px rgba(99, 102, 241, 0.1), 0 2px 8px rgba(0, 0, 0, 0.06);
+  --shadow-card: 0 8px 32px rgba(99, 102, 241, 0.1), 0 2px 8px rgba(0, 0, 0, 0.05);
+  --shadow-hover: 0 16px 48px rgba(99, 102, 241, 0.18), 0 4px 16px rgba(0, 0, 0, 0.08);
 }
 
+/* ── DARK theme — aligned with global.css --theme-* tokens ── */
 [data-theme="dark"] {
-  --bg-page: #0f172a;
-  --bg-card: #1e293b;
-  --bg-sidebar: #1e293b;
-  --bg-headbar: #1e293b;
-  --bg-tile: #1e293b;
-  --bg-input: #0f172a;
-  --bg-dropdown: #1e293b;
-  --text-primary: #f1f5f9;
-  --text-secondary: #94a3b8;
-  --text-muted: #64748b;
-  --text-label: #cbd5e1;
-  --accent: #818cf8;
-  --accent-light: #1e1b4b;
-  --accent-hover: #6366f1;
-  --border: #334155;
-  --border-card: #334155;
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
-  --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.4);
-  --shadow-hover: 0 16px 48px rgba(0, 0, 0, 0.5);
-}
+  /* Backgrounds */
+  --bg-page: #0a0c14;
+  /* matches --theme-bg */
+  --bg-card: #1c1c1f;
+  /* matches --theme-surface */
+  --bg-sidebar: #1c1c1f;
+  --bg-headbar: #1c1c1f;
+  --bg-tile: #1c1c1f;
+  --bg-input: #13141f;
+  /* matches --theme-bg-secondary */
+  --bg-dropdown: #242428;
+  /* matches --theme-surface-2 */
 
+  /* Text — aligned with global --theme-text */
+  --text-primary: #f0f0f0;
+  --text-secondary: #8a8a9a;
+  --text-muted: #5a5a6a;
+  --text-label: #a0a0b0;
+
+  /* Accent */
+  --accent: #818cf8;
+  --accent-light: rgba(129, 140, 248, 0.12);
+  --accent-hover: #6366f1;
+
+  /* Borders — aligned with global --theme-border */
+  --border: rgba(255, 255, 255, 0.08);
+  --border-card: rgba(255, 255, 255, 0.06);
+
+  /* Shadows — heavier on dark */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.45);
+  --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.5);
+  --shadow-hover: 0 16px 48px rgba(0, 0, 0, 0.6);
+}
 /* ── App Shell ───────────────────────────────────────────────────────────── */
 /* height:100% fills AppShell main-content slot exactly; overflow:hidden kills page scroll */
 
