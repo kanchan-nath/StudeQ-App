@@ -16,7 +16,7 @@ import {
   Home01Icon,
 } from "hugeicons-react";
 
-const QUICK_ACTIONS = [
+export const QUICK_ACTIONS = [
   { label: "Upload Material", icon: Upload01Icon, to: "/notes" },
   { label: "Create Quiz", icon: Quiz04Icon, to: "/quiz" },
   { label: "Chat with AI", icon: Chat01Icon, to: "/tutor" },
