@@ -7,7 +7,7 @@
 
 /* ── APP SHELL / DASHBOARD TOKENS ─────────────────────────── */
 :root {
-  --clr-bg: rgba(10, 12, 20, 1);
+  --clr-bg: var(--theme-bg);
   --clr-surface: #ffffff;
   --clr-border: #e2e8f0;
   --clr-primary: #3b5bdb;
@@ -161,12 +161,13 @@ ol {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #e2e8f0;
+  background: var(--theme-border);
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+/* hover */
+  background: var(--theme-text-muted);
 }
 
 /* ── REDUCED MOTION ────────────────────────────────────────── */
