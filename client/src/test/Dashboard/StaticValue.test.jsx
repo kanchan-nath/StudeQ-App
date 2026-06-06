@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest"
-import { NAV_ITEMS, QUICK_ACTIONS } from "../../pages/Dashboard"
+import { NAV_ITEMS, QUICK_ACTIONS, FEATURE_CARDS } from "../../pages/Dashboard"
 
 // describe("Quick Action", () => {
 //     it("has 6 length",()=>{
@@ -55,3 +55,63 @@ import { NAV_ITEMS, QUICK_ACTIONS } from "../../pages/Dashboard"
 //         })
 //     })
 // })
+
+// describe("FEATURE_CARDS", () => {
+//   it("contains 6 cards", () => {
+//     expect(FEATURE_CARDS).toHaveLength(6);
+//   });
+
+//   it("every card has a title", () => {
+//     FEATURE_CARDS.forEach((card) => {
+//       expect(card.title).toBeDefined();
+//       expect(typeof card.title).toBe("string");
+//     });
+//   });
+
+//   it("every card has a description", () => {
+//     FEATURE_CARDS.forEach((card) => {
+//       expect(card.desc).toBeDefined();
+//       expect(typeof card.desc).toBe("string");
+//     });
+//   });
+
+//   it("every card has a CTA", () => {
+//     FEATURE_CARDS.forEach((card) => {
+//       expect(card.cta).toBeDefined();
+//       expect(typeof card.cta).toBe("string");
+//     });
+//   });
+
+//   it("every card has a route", () => {
+//     FEATURE_CARDS.forEach((card) => {
+//       expect(card.to).toBeDefined();
+//       expect(card.to).toMatch(/^\//);
+//     });
+//   });
+
+//   it("every card has a colorClass", () => {
+//     FEATURE_CARDS.forEach((card) => {
+//       expect(card.colorClass).toBeDefined();
+//       expect(typeof card.colorClass).toBe("string");
+//     });
+//   });
+
+//   it("every card has an icon", () => {
+//     FEATURE_CARDS.forEach((card) => {
+//       expect(card.icon).toBeDefined();
+//     });
+//   });
+
+//   it("all titles are unique", () => {
+//     const titles = FEATURE_CARDS.map((card) => card.title);
+
+//     expect(new Set(titles).size).toBe(titles.length);
+//   });
+
+//   it("all routes are unique", () => {
+//     const routes = FEATURE_CARDS.map((card) => card.to);
+
+//     expect(new Set(routes).size).toBe(routes.length);
+//   });
+// });
+

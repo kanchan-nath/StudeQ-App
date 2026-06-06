@@ -37,7 +37,7 @@ export const NAV_ITEMS = [
   { id: "scheduler", icon: Calendar01Icon, label: "Scheduler", to: "/scheduler" },
 ];
 
-const FEATURE_CARDS = [
+export const FEATURE_CARDS = [
   {
     icon: Cards01Icon,
     colorClass: "blue",
