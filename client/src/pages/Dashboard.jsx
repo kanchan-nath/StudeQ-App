@@ -188,7 +188,7 @@ const Dashboard = () => {
 
   const initials = userData?.name
     ? userData.name.split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase()
-    : "U";
+    : "YOU";
 
   const today = new Date().toLocaleDateString("en-US", {
     weekday: "short", day: "2-digit", month: "short", year: "numeric",
@@ -214,7 +214,7 @@ const Dashboard = () => {
               ) : (
                 <h1 className={styles.welcomeHeading}>
                   Welcome back,{" "}
-                  <span className={styles.welcomeName}>{userData.name}</span>
+                  <span className={styles.welcomeName}>{(userData.name.toUpperCase())}</span>
                 </h1>
               )}
             </div>
@@ -446,7 +446,7 @@ const Dashboard = () => {
                   </>
                 ) : (
                   <>
-                    <h2 className={styles.profileName}>{userData.name}</h2>
+                    <h2 className={styles.profileName}>{(userData.name.toUpperCase())}</h2>
                     <p className={styles.profileEmail}>{userData.email}</p>
                   </>
                 )}
@@ -496,7 +496,7 @@ const Dashboard = () => {
             {FEATURE_CARDS.map(({ icon: Icon, colorClass, title, desc, cta, to }) => (
               <article key={to} className={styles.featureCard} role="listitem">
                 <div className={`${styles.featureIcon} ${styles[`featureIcon--${colorClass}`]}`} aria-hidden="true">
-                  <Icon size={20} color="white" />
+                  <Icon size={20} />
                 </div>
                 <h3 className={styles.featureTitle}>{title}</h3>
                 <p className={styles.featureDesc}>{desc}</p>
