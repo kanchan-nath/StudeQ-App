@@ -713,7 +713,6 @@ const Notes = () => {
   return (
     <div
       className={styles["notes-page"]}
-      data-theme="light"
       style={{
         gridTemplateColumns: sidebarOpen
           ? `1fr var(--n-sidebar-w)`

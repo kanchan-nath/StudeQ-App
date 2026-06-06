@@ -60,7 +60,9 @@ const NAV_AI = [
 ];
 
 const AppShell = ({ userName = "" }) => {
-  const [isDark, setIsDark] = useState(false);
+  const [isDark, setIsDark] = useState(() => {
+    return (localStorage.getItem("sparke-theme") ?? "dark") === "dark";
+  });
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -87,8 +89,11 @@ const AppShell = ({ userName = "" }) => {
     navigate("/login");
   };
   useEffect(() => {
-    document.documentElement.setAttribute("data-theme", isDark ? "dark" : "light");
+    const theme = isDark ? "dark" : "light";
+    document.documentElement.setAttribute("data-theme", theme);
+    localStorage.setItem("sparke-theme", theme);
   }, [isDark]);
+  
   return (
     <div
       className={`${styles["app-shell"]}${panelOpen ? ` ${styles["app-shell--panel-open"]}` : ""}`}
