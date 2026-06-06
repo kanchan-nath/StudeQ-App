@@ -1,8 +1,10 @@
 /* notes.module.css — Notes page (scoped) */
 
 /* ── NOTES-SPECIFIC CSS VARS (keep here, --n- prefix = no conflict) ── */
-[data-theme="light"],
-.root {
+/* notes.module.css — Notes page (scoped) */
+
+/* ── NOTES-SPECIFIC CSS VARS (--n- prefix) ── */
+[data-theme="light"] {
   --n-bg: #f0f2f8;
   --n-surface: #ffffff;
   --n-surface-raised: #f8faff;
@@ -31,25 +33,30 @@
   --n-r-xl: 24px;
   --n-r-full: 9999px;
   --n-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
-  --n-shadow-card:
-    0 4px 20px rgba(59, 91, 219, 0.08), 0 1px 4px rgba(0, 0, 0, 0.05);
-  --n-shadow-lift:
-    0 8px 32px rgba(59, 91, 219, 0.14), 0 2px 8px rgba(0, 0, 0, 0.06);
+  --n-shadow-card: 0 4px 20px rgba(59, 91, 219, 0.08), 0 1px 4px rgba(0, 0, 0, 0.05);
+  --n-shadow-lift: 0 8px 32px rgba(59, 91, 219, 0.14), 0 2px 8px rgba(0, 0, 0, 0.06);
   --n-t-fast: 150ms ease;
   --n-t-base: 220ms ease;
   --n-t-slow: 380ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 [data-theme="dark"] {
-  --n-bg: #0d1117;
-  --n-surface: #161b27;
-  --n-surface-raised: #1e2535;
-  --n-border: #2a3347;
-  --n-border-subtle: #1e2535;
+  /* Backgrounds — aligned with global --theme-bg / --theme-surface */
+  --n-bg: #0a0c14;
+  --n-surface: #1c1c1f;
+  --n-surface-raised: #242428;
+
+  /* Borders — aligned with global --theme-border */
+  --n-border: rgba(255, 255, 255, 0.08);
+  --n-border-subtle: rgba(255, 255, 255, 0.04);
+
+  /* Primary — slightly softened blue for dark bg */
   --n-primary: #6b8eff;
   --n-primary-dark: #4f6fe0;
   --n-primary-light: rgba(107, 142, 255, 0.12);
   --n-primary-glow: rgba(107, 142, 255, 0.2);
+
+  /* Accent / status */
   --n-accent: #34d399;
   --n-accent-light: rgba(52, 211, 153, 0.12);
   --n-purple: #a78bfa;
@@ -58,13 +65,17 @@
   --n-danger-light: rgba(248, 113, 113, 0.12);
   --n-warning: #fb923c;
   --n-pin: #fbbf24;
-  --n-text-primary: #e8edf5;
-  --n-text-secondary: #94a3b8;
-  --n-text-muted: #4a5568;
-  --n-text-inverse: #0d1117;
-  --n-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
-  --n-shadow-card: 0 4px 24px rgba(0, 0, 0, 0.35);
-  --n-shadow-lift: 0 8px 40px rgba(0, 0, 0, 0.5);
+
+  /* Text — aligned with global --theme-text / --theme-text-secondary */
+  --n-text-primary: #f0f0f0;
+  --n-text-secondary: #8a8a9a;
+  --n-text-muted: #5a5a6a;
+  --n-text-inverse: #0a0c14;
+
+  /* Shadows — heavier on dark */
+  --n-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --n-shadow-card: 0 4px 24px rgba(0, 0, 0, 0.45);
+  --n-shadow-lift: 0 8px 40px rgba(0, 0, 0, 0.6);
 }
 
 /* ── PAGE LAYOUT ─────────────────────────────────────────────── */
