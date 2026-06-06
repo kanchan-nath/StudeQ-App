@@ -25,7 +25,7 @@ export const QUICK_ACTIONS = [
   { label: "PDF Analysis", icon: Pdf02Icon, to: "/pdf-analysis" },
 ];
 
-const NAV_ITEMS = [
+export const NAV_ITEMS = [
   { id: "home", icon: Home01Icon, label: "Dashboard", to: "/" },
   { id: "notes", icon: Upload01Icon, label: "Upload Material", to: "/notes" },
   { id: "quiz", icon: Quiz04Icon, label: "Create Quiz", to: "/quiz" },
@@ -37,7 +37,7 @@ const NAV_ITEMS = [
   { id: "scheduler", icon: Calendar01Icon, label: "Scheduler", to: "/scheduler" },
 ];
 
-const FEATURE_CARDS = [
+export const FEATURE_CARDS = [
   {
     icon: Cards01Icon,
     colorClass: "blue",
