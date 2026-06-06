@@ -16,11 +16,6 @@ import {
   Home01Icon,
 } from "hugeicons-react";
 
-// ── useState declarations ──────────────────────────────────────────────────
-// const [activeNav, setActiveNav] = useState("home");
-// const [userData, setUserData] = useState({ name: "", email: "", grade: "" });
-// const [userLoading, setUserLoading] = useState(true);
-
 const QUICK_ACTIONS = [
   { label: "Upload Material", icon: Upload01Icon, to: "/notes" },
   { label: "Create Quiz", icon: Quiz04Icon, to: "/quiz" },
@@ -93,16 +88,31 @@ const FEATURE_CARDS = [
   },
 ];
 
+// ── Default values (shown when backend returns null/undefined or fetch not yet done) ──
+const DEFAULT_USER = { name: "", email: "", grade: "" };
+const DEFAULT_QUIZ = { total: 0, lastScore: 0, avgScore: 0 };
+const DEFAULT_FLASH = { total: 0, dueToday: 0 };
+const DEFAULT_SCHEDULE = [];                              // empty → "No sessions" message
+const DEFAULT_PROFILE = { streak: 0, xp: 0, level: 1, xpPercent: 0, xpNextLevel: 2 };
+
 const Dashboard = () => {
   const [activeNav, setActiveNav] = useState("home");
-  const [userData, setUserData] = useState({ name: "", email: "", grade: "" });
+  const [userData, setUserData] = useState(DEFAULT_USER);
   const [userLoading, setUserLoading] = useState(true);
+
+  // ── Dynamic data states ──────────────────────────────────────────────────
+  const [quizStats, setQuizStats] = useState(DEFAULT_QUIZ);
+  const [flashcardStats, setFlashcardStats] = useState(DEFAULT_FLASH);
+  const [scheduleItems, setScheduleItems] = useState(DEFAULT_SCHEDULE);
+  const [profileStats, setProfileStats] = useState(DEFAULT_PROFILE);
+
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
 
   useEffect(() => {
     const fetchData = async () => {
       try {
+        // ── User info (active) ───────────────────────────────────────────
         const res = await fetch(`${BASE_URL}/api/user/userinfo`, {
           method: "GET",
           headers: {
@@ -113,16 +123,60 @@ const Dashboard = () => {
         if (!res.ok) throw new Error(`Request failed: ${res.status}`);
         const data = await res.json();
         setUserData({
-          name: data.data.name,
-          email: data.data.email,
-          grade: data.data.grade,
+          name: data?.data?.name ?? "",
+          email: data?.data?.email ?? "",
+          grade: data?.data?.grade ?? "",
         });
+
+        // ── Quiz stats (uncomment when route ready) ──────────────────────
+        // const quizRes  = await fetch(`${BASE_URL}/api/quiz/stats`, {
+        //   headers: { Authorization: `Bearer ${token}` },
+        // });
+        // const quizData = await quizRes.json();
+        // setQuizStats({
+        //   total:     quizData?.data?.total     ?? DEFAULT_QUIZ.total,
+        //   lastScore: quizData?.data?.lastScore ?? DEFAULT_QUIZ.lastScore,
+        //   avgScore:  quizData?.data?.avgScore  ?? DEFAULT_QUIZ.avgScore,
+        // });
+
+        // ── Flashcard stats (uncomment when route ready) ─────────────────
+        // const flashRes  = await fetch(`${BASE_URL}/api/flashcards/stats`, {
+        //   headers: { Authorization: `Bearer ${token}` },
+        // });
+        // const flashData = await flashRes.json();
+        // setFlashcardStats({
+        //   total:    flashData?.data?.total    ?? DEFAULT_FLASH.total,
+        //   dueToday: flashData?.data?.dueToday ?? DEFAULT_FLASH.dueToday,
+        // });
+
+        // ── Today's schedule (uncomment when route ready) ────────────────
+        // Expected shape: [{ title: string, time: string, color: "Purple"|"Amber"|"Blue"|... }]
+        // const schedRes  = await fetch(`${BASE_URL}/api/schedule/today`, {
+        //   headers: { Authorization: `Bearer ${token}` },
+        // });
+        // const schedData = await schedRes.json();
+        // setScheduleItems(schedData?.data ?? DEFAULT_SCHEDULE);
+
+        // ── Profile / gamification stats (uncomment when route ready) ────
+        // const profileRes  = await fetch(`${BASE_URL}/api/user/stats`, {
+        //   headers: { Authorization: `Bearer ${token}` },
+        // });
+        // const profileData = await profileRes.json();
+        // setProfileStats({
+        //   streak:     profileData?.data?.streak     ?? DEFAULT_PROFILE.streak,
+        //   xp:         profileData?.data?.xp         ?? DEFAULT_PROFILE.xp,
+        //   level:      profileData?.data?.level      ?? DEFAULT_PROFILE.level,
+        //   xpPercent:  profileData?.data?.xpPercent  ?? DEFAULT_PROFILE.xpPercent,
+        //   xpNextLevel:profileData?.data?.xpNextLevel?? DEFAULT_PROFILE.xpNextLevel,
+        // });
+
       } catch (err) {
         console.error(err);
       } finally {
         setUserLoading(false);
       }
     };
+
     fetchData();
   }, []);
 
@@ -231,25 +285,37 @@ const Dashboard = () => {
                   <p className={styles.cardSubtitle}>Auto-generate quizzes from your notes</p>
                 </div>
               </div>
-              <span className={styles.quizBadge}>12 quizzes</span>
+              <span className={styles.quizBadge}>
+                {quizStats.total} {quizStats.total === 1 ? "quiz" : "quizzes"}
+              </span>
             </div>
             <div className={styles.quizStats}>
               <div className={styles.statBox}>
                 <div className={styles.statBoxRow}>
                   <span className={styles.statLabel}>Last Score</span>
-                  <span className={`${styles.statValue} ${styles.statValueGreen}`}>87%</span>
+                  <span className={`${styles.statValue} ${styles.statValueGreen}`}>
+                    {quizStats.lastScore}%
+                  </span>
                 </div>
                 <div className={styles.progressTrack}>
-                  <div className={`${styles.progressBar} ${styles.progressBarGreen}`} style={{ width: "87%" }} />
+                  <div
+                    className={`${styles.progressBar} ${styles.progressBarGreen}`}
+                    style={{ width: `${quizStats.lastScore}%` }}
+                  />
                 </div>
               </div>
               <div className={styles.statBox}>
                 <div className={styles.statBoxRow}>
                   <span className={styles.statLabel}>Avg Score</span>
-                  <span className={`${styles.statValue} ${styles.statValuePurple}`}>74%</span>
+                  <span className={`${styles.statValue} ${styles.statValuePurple}`}>
+                    {quizStats.avgScore}%
+                  </span>
                 </div>
                 <div className={styles.progressTrack}>
-                  <div className={`${styles.progressBar} ${styles.progressBarPurple}`} style={{ width: "74%" }} />
+                  <div
+                    className={`${styles.progressBar} ${styles.progressBarPurple}`}
+                    style={{ width: `${quizStats.avgScore}%` }}
+                  />
                 </div>
               </div>
               <Link to="/quiz" className={styles.cardCta}>
@@ -272,12 +338,14 @@ const Dashboard = () => {
             </div>
             <div className={styles.flashStats}>
               <div className={styles.flashStat}>
-                <span className={`${styles.flashNum} ${styles.flashNumGreen}`}>248</span>
+                <span className={`${styles.flashNum} ${styles.flashNumGreen}`}>
+                  {flashcardStats.total}
+                </span>
                 <span className={styles.flashLabel}>Cards</span>
               </div>
               <div className={styles.flashDivider} aria-hidden="true" />
               <div className={styles.flashStat}>
-                <span className={styles.flashNum}>32</span>
+                <span className={styles.flashNum}>{flashcardStats.dueToday}</span>
                 <span className={styles.flashLabel}>Due Today</span>
               </div>
               <Link to="/flashcards" className={`${styles.cardCta} ${styles.cardCtaGreen} ${styles.flashCta}`}>
@@ -299,16 +367,24 @@ const Dashboard = () => {
               </div>
             </div>
             <ul className={styles.scheduleList}>
-              <li className={styles.scheduleItem}>
-                <span className={`${styles.scheduleDot} ${styles.scheduleDotPurple}`} aria-hidden="true" />
-                <span className={styles.scheduleTitle}>Biology — Chapter 7</span>
-                <time className={styles.scheduleTime}>2:00 PM</time>
-              </li>
-              <li className={styles.scheduleItem}>
-                <span className={`${styles.scheduleDot} ${styles.scheduleDotAmber}`} aria-hidden="true" />
-                <span className={styles.scheduleTitle}>Math Practice Set</span>
-                <time className={styles.scheduleTime}>4:30 PM</time>
-              </li>
+              {scheduleItems.length === 0 ? (
+                <li className={styles.scheduleItem}>
+                  <span className={styles.scheduleTitle} style={{ opacity: 0.5 }}>
+                    No sessions scheduled today
+                  </span>
+                </li>
+              ) : (
+                scheduleItems.map((item, i) => (
+                  <li key={i} className={styles.scheduleItem}>
+                    <span
+                      className={`${styles.scheduleDot} ${styles[`scheduleDot${item.color ?? "Purple"}`]}`}
+                      aria-hidden="true"
+                    />
+                    <span className={styles.scheduleTitle}>{item.title}</span>
+                    <time className={styles.scheduleTime}>{item.time}</time>
+                  </li>
+                ))
+              )}
             </ul>
             <Link to="/scheduler" className={`${styles.cardCta} ${styles.cardCtaAmber}`}>
               View Schedule <span aria-hidden="true">→</span>
@@ -382,24 +458,30 @@ const Dashboard = () => {
             <div className={styles.profileStats}>
               <div className={styles.profileStat}>
                 <span className={styles.profileStatLabel}>Grade</span>
-                <span className={styles.profileStatValue}>{userLoading ? "—" : userData.grade}</span>
+                <span className={styles.profileStatValue}>
+                  {userLoading ? "—" : (userData.grade || "—")}
+                </span>
               </div>
               <div className={styles.profileStat}>
                 <span className={styles.profileStatLabel}>Streak</span>
-                <span className={`${styles.profileStatValue} ${styles.profileStatValuePurple}`}>14 days 🔥</span>
+                <span className={`${styles.profileStatValue} ${styles.profileStatValuePurple}`}>
+                  {profileStats.streak > 0 ? `${profileStats.streak} days 🔥` : "—"}
+                </span>
               </div>
               <div className={styles.profileStat}>
                 <span className={styles.profileStatLabel}>XP</span>
-                <span className={`${styles.profileStatValue} ${styles.profileStatValueAmber}`}>4,820</span>
+                <span className={`${styles.profileStatValue} ${styles.profileStatValueAmber}`}>
+                  {profileStats.xp > 0 ? profileStats.xp.toLocaleString() : "—"}
+                </span>
               </div>
             </div>
 
             <div className={styles.xpTrack}>
-              <div className={styles.xpBar} style={{ width: "68%" }} />
+              <div className={styles.xpBar} style={{ width: `${profileStats.xpPercent}%` }} />
             </div>
             <div className={styles.xpLabels}>
-              <span>Level 12</span>
-              <span>68% to Level 13</span>
+              <span>Level {profileStats.level}</span>
+              <span>{profileStats.xpPercent}% to Level {profileStats.xpNextLevel}</span>
             </div>
           </article>
         </div>
