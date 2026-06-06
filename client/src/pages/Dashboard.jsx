@@ -210,7 +210,7 @@ const Dashboard = () => {
             <div>
               <p className={styles.sessionLabel}>Active Session</p>
               {userLoading ? (
-                <div className={styles.skeletonHeading} aria-hidden="true" />
+                <div className={styles.skeletonHeading} aria-hidden="true" data-testid="skeleton-heading" />
               ) : (
                 <h1 className={styles.welcomeHeading}>
                   Welcome back,{" "}
