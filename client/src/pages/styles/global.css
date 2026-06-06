@@ -121,9 +121,10 @@ html {
 
 body {
   font-family: var(--font-body);
-  background: rgba(10, 10, 15, 0.95);
-  color: var(--clr-text-primary);
+  background: var(--theme-bg);
+  color: var(--theme-text);
   line-height: 1.6;
+  transition: background 0.3s ease, color 0.3s ease;
 }
 
 a {
@@ -176,4 +177,75 @@ ol {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+/* ================================================================
+   THEME SYSTEM — append this block to the END of global.css
+   Works via data-theme="dark" | data-theme="light" on <html>
+   ================================================================ */
+
+/* ── DARK (default — matches existing site) ───────────────── */
+:root,
+[data-theme="dark"] {
+  --theme-bg: rgba(10, 12, 20, 1);
+  --theme-bg-secondary: #13141f;
+  --theme-surface: #1c1c1f;
+  --theme-surface-2: #242428;
+  --theme-border: rgba(255, 255, 255, 0.08);
+  --theme-border-hover: rgba(255, 255, 255, 0.16);
+  --theme-text: #f0f0f0;
+  --theme-text-secondary: #8a8a9a;
+  --theme-text-muted: #5a5a6a;
+  --theme-accent: #ffd166;
+  --theme-accent-dim: rgba(255, 209, 102, 0.12);
+  --theme-accent-glow: rgba(255, 209, 102, 0.25);
+  --theme-purple: #7c5ff5;
+  --theme-purple-light: #c084fc;
+  --theme-purple-dim: rgba(124, 95, 245, 0.15);
+  --theme-green: #22c55e;
+  --theme-red: #ef4444;
+  --theme-card-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+  --theme-navbar-bg: rgba(255, 255, 255, 0.04);
+  --theme-navbar-blur: blur(12px);
+  --theme-input-bg: rgba(255, 255, 255, 0.05);
+  --theme-input-border: rgba(255, 255, 255, 0.12);
+
+  /* Toggle button appearance */
+  --toggle-track-bg: rgba(255, 255, 255, 0.1);
+  --toggle-track-border: rgba(255, 255, 255, 0.15);
+  --toggle-thumb-bg: #1c1c2e;
+  --toggle-accent: #7c5ff5;
+}
+
+/* ── LIGHT ────────────────────────────────────────────────── */
+[data-theme="light"] {
+  --theme-bg: #f7f8fc;
+  --theme-bg-secondary: #eef0f6;
+  --theme-surface: #ffffff;
+  --theme-surface-2: #f0f2f8;
+  --theme-border: rgba(0, 0, 0, 0.08);
+  --theme-border-hover: rgba(0, 0, 0, 0.16);
+  --theme-text: #0d0e14;
+  --theme-text-secondary: #4a4a5a;
+  --theme-text-muted: #8a8a9a;
+  --theme-accent: #c49a00;
+  /* darkened yellow for light bg contrast */
+  --theme-accent-dim: rgba(196, 154, 0, 0.1);
+  --theme-accent-glow: rgba(196, 154, 0, 0.2);
+  --theme-purple: #5b3fd4;
+  --theme-purple-light: #7c5ff5;
+  --theme-purple-dim: rgba(91, 63, 212, 0.12);
+  --theme-green: #16a34a;
+  --theme-red: #dc2626;
+  --theme-card-shadow: 0 2px 16px rgba(0, 0, 0, 0.08);
+  --theme-navbar-bg: rgba(255, 255, 255, 0.85);
+  --theme-navbar-blur: blur(16px);
+  --theme-input-bg: #ffffff;
+  --theme-input-border: rgba(0, 0, 0, 0.12);
+
+  /* Toggle button appearance */
+  --toggle-track-bg: #e2e4ef;
+  --toggle-track-border: #c8cadc;
+  --toggle-thumb-bg: #ffffff;
+  --toggle-accent: #5b3fd4;
 }
