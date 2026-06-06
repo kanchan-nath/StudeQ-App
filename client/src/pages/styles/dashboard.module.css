@@ -4,30 +4,6 @@
    Theme switching: data-theme="dark"|"light" on <html>
    ============================================================ */
 
-/* ── Local aliases — map global tokens to readable names ──── */
-/* These are NOT :root declarations — just comments for clarity.
-   Every var() below resolves from global.css at runtime.
-
-   --theme-bg            → page background
-   --theme-surface       → sidebar / elevated surface
-   --theme-surface-2     → card backgrounds
-   --theme-border        → subtle borders
-   --theme-border-hover  → hover borders
-   --theme-text          → primary text
-   --theme-text-secondary→ secondary text
-   --theme-text-muted    → muted / label text
-   --theme-purple        → primary accent (purple)
-   --theme-purple-dim    → dim purple bg
-   --theme-accent        → amber/gold accent
-   --theme-accent-dim    → dim amber bg
-   --theme-green         → green accent
-   --theme-red           → red accent
-   --theme-card-shadow   → card drop shadow
-   --font-display        → heading font (Sora)
-   --font-body           → body font (DM Sans)
-   --r-sm/md/lg/xl/full  → radius scale (from global.css)
-*/
-
 /* ── Shell ───────────────────────────────────────────────── */
 .appShell {
   display: flex;
@@ -66,7 +42,6 @@
   justify-content: center;
   margin-bottom: 20px;
   flex-shrink: 0;
-  box-shadow: 0 0 20px var(--theme-purple-dim);
 }
 
 .sidebarNav {
@@ -91,11 +66,11 @@
 
 .navBtn:hover {
   color: var(--theme-text);
-  background: var(--theme-border);
+  background: var(--theme-surface-2);
 }
 
 .navBtnActive {
-  background: var(--theme-purple-dim);
+  background: var(--theme-surface-2);
   color: var(--theme-purple);
 }
 
@@ -116,7 +91,7 @@
 
 .logoutBtn:hover {
   color: var(--theme-red);
-  background: rgba(239, 68, 68, 0.12);
+  background: var(--theme-surface-2);
 }
 
 /* ── Main ────────────────────────────────────────────────── */
@@ -128,7 +103,7 @@
   display: flex;
   flex-direction: column;
   gap: 22px;
-  background: radial-gradient(ellipse at 60% 0%, var(--theme-purple-dim) 0%, transparent 65%);
+  background: var(--theme-bg);
   overflow-y: auto;
 }
 
@@ -305,7 +280,6 @@
 .stripBtnPrimary {
   background: var(--theme-purple);
   color: #fff;
-  box-shadow: 0 4px 14px var(--theme-purple-dim);
 }
 
 .stripBtnSecondary {
@@ -342,11 +316,9 @@
   box-shadow: var(--theme-card-shadow);
 }
 
+/* cardGlow kept in DOM but no visual effect */
 .cardGlow {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  border-radius: inherit;
+  display: none;
 }
 
 /* ── Tutor card — col 1, rows 1-2 ───────────────────────── */
@@ -355,18 +327,10 @@
   grid-row: 1 / 3;
 }
 
-.cardTutor .cardGlow {
-  background: radial-gradient(ellipse at top left, var(--theme-purple-dim), transparent 70%);
-}
-
 /* ── Quiz card — col 2-3, row 1 ─────────────────────────── */
 .cardQuiz {
   grid-column: 2 / 4;
   grid-row: 1;
-}
-
-.cardQuiz .cardGlow {
-  background: radial-gradient(ellipse at top right, rgba(59, 139, 255, 0.07), transparent 70%);
 }
 
 /* ── Flashcard — col 2, row 2 ───────────────────────────── */
@@ -375,35 +339,15 @@
   grid-row: 2;
 }
 
-.cardFlash .cardGlow {
-  background: radial-gradient(ellipse at bottom left, rgba(34, 197, 94, 0.07), transparent 70%);
-}
-
 /* ── Scheduler — col 3, row 2 ───────────────────────────── */
 .cardScheduler {
   grid-column: 3;
   grid-row: 2;
 }
 
-.cardScheduler .cardGlow {
-  background: radial-gradient(ellipse at top right, var(--theme-accent-dim), transparent 70%);
-}
-
-/* ── Image / PDF / Profile — row 3 ──────────────────────── */
-.cardImage .cardGlow {
-  background: radial-gradient(ellipse at top left, rgba(214, 63, 168, 0.07), transparent 70%);
-}
-
-.cardPdf .cardGlow {
-  background: radial-gradient(ellipse at top right, rgba(239, 68, 68, 0.07), transparent 70%);
-}
-
+/* ── Profile card ────────────────────────────────────────── */
 .cardProfile {
-  border-color: var(--theme-purple-dim);
-}
-
-.cardProfile .cardGlow {
-  background: radial-gradient(ellipse at bottom right, var(--theme-purple-dim), transparent 70%);
+  border-color: var(--theme-border);
 }
 
 /* ── Card shared components ──────────────────────────────── */
@@ -414,7 +358,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--theme-border);
+  background: var(--theme-surface);
   flex-shrink: 0;
 }
 
@@ -467,8 +411,8 @@
   font-family: var(--font-display);
   font-size: 10px;
   color: var(--theme-purple);
-  background: var(--theme-purple-dim);
-  border: 1px solid var(--theme-purple-dim);
+  background: var(--theme-surface);
+  border: 1px solid var(--theme-border);
   border-radius: var(--r-full);
   padding: 3px 10px;
   width: fit-content;
@@ -540,12 +484,12 @@
 }
 
 .chatAvatarBot {
-  background: var(--theme-purple-dim);
+  background: var(--theme-surface);
   color: var(--theme-purple);
 }
 
 .chatAvatarUser {
-  background: var(--theme-border);
+  background: var(--theme-surface);
   color: var(--theme-text-secondary);
 }
 
@@ -565,8 +509,8 @@
   font-family: var(--font-display);
   font-size: 11px;
   color: var(--clr-teal, #0ea5e9);
-  background: rgba(14, 165, 233, 0.12);
-  border: 1px solid rgba(14, 165, 233, 0.25);
+  background: var(--theme-surface);
+  border: 1px solid var(--theme-border);
   border-radius: var(--r-full);
   padding: 4px 12px;
   white-space: nowrap;
@@ -615,7 +559,7 @@
 
 .progressTrack {
   height: 5px;
-  background: var(--theme-border);
+  background: var(--theme-surface);
   border-radius: var(--r-full);
   overflow: hidden;
 }
@@ -740,7 +684,6 @@
   font-weight: 700;
   color: #fff;
   flex-shrink: 0;
-  box-shadow: 0 0 16px var(--theme-purple-dim);
 }
 
 .profileName {
@@ -798,7 +741,7 @@
 
 .xpTrack {
   height: 5px;
-  background: var(--theme-border);
+  background: var(--theme-surface);
   border-radius: var(--r-full);
   overflow: hidden;
 }
@@ -878,29 +821,28 @@
   justify-content: center;
 }
 
-/* Icon bg — using global accent vars where possible */
 .featureIcon--blue {
-  background: rgba(59, 139, 255, 0.14);
+  background: var(--theme-surface);
 }
 
 .featureIcon--purple {
-  background: var(--theme-purple-dim);
+  background: var(--theme-surface);
 }
 
 .featureIcon--teal {
-  background: rgba(14, 165, 233, 0.14);
+  background: var(--theme-surface);
 }
 
 .featureIcon--orange {
-  background: var(--theme-accent-dim);
+  background: var(--theme-surface);
 }
 
 .featureIcon--pink {
-  background: rgba(236, 72, 153, 0.14);
+  background: var(--theme-surface);
 }
 
 .featureIcon--green {
-  background: rgba(34, 197, 94, 0.14);
+  background: var(--theme-surface);
 }
 
 .featureTitle {
