@@ -2,7 +2,7 @@
 
 /* ── NOTES-SPECIFIC CSS VARS (keep here, --n- prefix = no conflict) ── */
 [data-theme="light"],
-:root {
+.root {
   --n-bg: #f0f2f8;
   --n-surface: #ffffff;
   --n-surface-raised: #f8faff;
