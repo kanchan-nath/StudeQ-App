@@ -21,9 +21,7 @@ describe('Dashboard welcome heading', () => {
         render(<MemoryRouter><Dashboard /></MemoryRouter>)
 
         expect(screen.getByTestId('skeleton-heading')).toBeInTheDocument()
-        expect(
-            screen.queryByRole('heading', { name: /welcome back/i })
-        ).not.toBeInTheDocument()
+        expect(screen.queryByTestId('welcome-heading')).not.toBeInTheDocument()
     })
 
     it('shows welcome heading after fetch resolves', async () => {
@@ -40,8 +38,8 @@ describe('Dashboard welcome heading', () => {
 
         await waitFor(() => {
             expect(
-                screen.getByRole('heading', { name: /welcome back/i })
-            ).toBeInTheDocument()
+                screen.queryByTestId('welcome-heading'))
+                .toBeInTheDocument()
         })
 
         expect(screen.getByText(/JOHN DOE/)).toBeInTheDocument()

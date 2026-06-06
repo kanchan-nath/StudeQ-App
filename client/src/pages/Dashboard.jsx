@@ -180,12 +180,6 @@ const Dashboard = () => {
     fetchData();
   }, []);
 
-  const handleLogout = (e) => {
-    e.preventDefault();
-    localStorage.removeItem("token");
-    navigate("/login");
-  };
-
   const initials = userData?.name
     ? userData.name.split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase()
     : "YOU";
@@ -212,7 +206,7 @@ const Dashboard = () => {
               {userLoading ? (
                 <div className={styles.skeletonHeading} aria-hidden="true" data-testid="skeleton-heading" />
               ) : (
-                <h1 className={styles.welcomeHeading}>
+                <h1 data-testid="welcome-heading" className={styles.welcomeHeading}>
                   Welcome back,{" "}
                   <span className={styles.welcomeName}>{(userData.name.toUpperCase())}</span>
                 </h1>
