@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { jwtDecode } from "jwt-decode";
+import { Link, useNavigate } from "react-router-dom";
 import BASE_URL from "../lib/api.js";
-import { useNavigate, Link } from "react-router-dom";
-import styles from "../pages/styles/dashboard.module.css";
+import styles from "./styles/Dashboard.module.css";
 import {
   Upload01Icon,
   Quiz04Icon,
@@ -13,265 +12,417 @@ import {
   Cards01Icon,
   CpuChargeIcon,
   Calendar01Icon,
+  Logout01Icon,
+  Home01Icon,
 } from "hugeicons-react";
+
+// ── useState declarations ──────────────────────────────────────────────────
+// const [activeNav, setActiveNav] = useState("home");
+// const [userData, setUserData] = useState({ name: "", email: "", grade: "" });
+// const [userLoading, setUserLoading] = useState(true);
+
+const QUICK_ACTIONS = [
+  { label: "Upload Material", icon: Upload01Icon, to: "/notes" },
+  { label: "Create Quiz", icon: Quiz04Icon, to: "/quiz" },
+  { label: "Chat with AI", icon: Chat01Icon, to: "/tutor" },
+  { label: "Study Room", icon: MeetingRoomIcon, to: "/studyroom" },
+  { label: "Image Analysis", icon: Image01Icon, to: "/image-analysis" },
+  { label: "PDF Analysis", icon: Pdf02Icon, to: "/pdf-analysis" },
+];
+
+const NAV_ITEMS = [
+  { id: "home", icon: Home01Icon, label: "Dashboard", to: "/" },
+  { id: "notes", icon: Upload01Icon, label: "Upload Material", to: "/notes" },
+  { id: "quiz", icon: Quiz04Icon, label: "Create Quiz", to: "/quiz" },
+  { id: "tutor", icon: Chat01Icon, label: "AI Tutor Chat", to: "/tutor" },
+  { id: "studyroom", icon: MeetingRoomIcon, label: "Study Room", to: "/studyroom" },
+  { id: "image-analysis", icon: Image01Icon, label: "Image Analysis", to: "/image-analysis" },
+  { id: "pdf-analysis", icon: Pdf02Icon, label: "PDF Analysis", to: "/pdf-analysis" },
+  { id: "flashcards", icon: Cards01Icon, label: "Flashcards", to: "/flashcards" },
+  { id: "scheduler", icon: Calendar01Icon, label: "Scheduler", to: "/scheduler" },
+];
+
+const FEATURE_CARDS = [
+  {
+    icon: Cards01Icon,
+    colorClass: "blue",
+    title: "Flashcard Practice",
+    desc: "Reinforce what you know with smart flashcard sessions built from your uploaded notes.",
+    cta: "Start practicing",
+    to: "/flashcards",
+  },
+  {
+    icon: Quiz04Icon,
+    colorClass: "purple",
+    title: "Generate a Quiz",
+    desc: "Turn any material into an instant quiz. Get real-time feedback on every answer.",
+    cta: "Create quiz",
+    to: "/quiz",
+  },
+  {
+    icon: Image01Icon,
+    colorClass: "teal",
+    title: "Analyze an Image",
+    desc: "Drop a diagram, chart, or handwritten page — get a full AI-powered explanation.",
+    cta: "Analyze image",
+    to: "/image-analysis",
+  },
+  {
+    icon: Pdf02Icon,
+    colorClass: "orange",
+    title: "Break Down a PDF",
+    desc: "Upload any PDF and extract key concepts, summaries, and quiz questions in seconds.",
+    cta: "Analyze PDF",
+    to: "/pdf-analysis",
+  },
+  {
+    icon: CpuChargeIcon,
+    colorClass: "pink",
+    title: "AI Tutor Session",
+    desc: "Ask anything. Your personal AI tutor walks you through tough concepts step by step.",
+    cta: "Start session",
+    to: "/tutor",
+  },
+  {
+    icon: Calendar01Icon,
+    colorClass: "green",
+    title: "Plan Your Week",
+    desc: "Build a smart study schedule around your exams, deadlines, and learning goals.",
+    cta: "Open scheduler",
+    to: "/scheduler",
+  },
+];
 
 const Dashboard = () => {
   const [activeNav, setActiveNav] = useState("home");
+  const [userData, setUserData] = useState({ name: "", email: "", grade: "" });
+  const [userLoading, setUserLoading] = useState(true);
   const navigate = useNavigate();
-
-  const [userData, setUserData] = useState({
-    name: "",
-    email: "",
-    grade: "",
-  });
   const token = localStorage.getItem("token");
 
   useEffect(() => {
     const fetchData = async () => {
-      const res = await fetch(`${BASE_URL}/api/user/userinfo`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (!res.ok) {
-        throw new Error(`Request failed: ${res.status}`);
+      try {
+        const res = await fetch(`${BASE_URL}/api/user/userinfo`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        if (!res.ok) throw new Error(`Request failed: ${res.status}`);
+        const data = await res.json();
+        setUserData({
+          name: data.data.name,
+          email: data.data.email,
+          grade: data.data.grade,
+        });
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setUserLoading(false);
       }
-
-      const data = await res.json();
-      setUserData({
-        ...userData,
-        name: data.data.name,
-        email: data.data.email,
-        grade: data.data.grade,
-      });
     };
-
     fetchData();
   }, []);
 
-  const handleSubmitLogout = (e) => {
+  const handleLogout = (e) => {
     e.preventDefault();
     localStorage.removeItem("token");
     navigate("/login");
   };
 
-  const QUICK_ACTIONS = [
-    { label: "Upload Material", icon: Upload01Icon, to: "/notes" },
-    { label: "Create Quiz", icon: Quiz04Icon, to: "/quiz" },
-    { label: "Chat with AI", icon: Chat01Icon, to: "/tutor" },
-    { label: "Study Room", icon: MeetingRoomIcon, to: "/studyroom" },
-    { label: "Image Analysis", icon: Image01Icon, to: "/image-analysis" },
-    { label: "PDF Analysis", icon: Pdf02Icon, to: "/pdf-analysis" },
-  ];
-
-  const FEATURE_CARDS = [
-    {
-      icon: Cards01Icon,
-      colorClass: "blue",
-      title: "Flashcard Practice",
-      desc: "Reinforce what you know with smart flashcard sessions built from your uploaded notes.",
-      cta: "Start practicing",
-      to: "/studyroom",
-    },
-    {
-      icon: Quiz04Icon,
-      colorClass: "purple",
-      title: "Generate a Quiz",
-      desc: "Turn any material into an instant quiz. Get real-time feedback on every answer.",
-      cta: "Create quiz",
-      to: "/quiz",
-    },
-    {
-      icon: Image01Icon,
-      colorClass: "teal",
-      title: "Analyze an Image",
-      desc: "Drop a diagram, chart, or handwritten page — get a full AI-powered explanation.",
-      cta: "Analyze image",
-      to: "/image-analysis",
-    },
-    {
-      icon: Pdf02Icon,
-      colorClass: "orange",
-      title: "Break Down a PDF",
-      desc: "Upload any PDF and extract key concepts, summaries, and quiz questions in seconds.",
-      cta: "Analyze PDF",
-      to: "/pdf-analysis",
-    },
-    {
-      icon: CpuChargeIcon,
-      colorClass: "pink",
-      title: "AI Tutor Session",
-      desc: "Ask anything. Your personal AI tutor walks you through tough concepts step by step.",
-      cta: "Start session",
-      to: "/tutor",
-    },
-    {
-      icon: Calendar01Icon,
-      colorClass: "green",
-      title: "Plan Your Week",
-      desc: "Build a smart study schedule around your exams, deadlines, and learning goals.",
-      cta: "Open scheduler",
-      to: "/scheduler",
-    },
-  ];
-
   const initials = userData?.name
-    ? userData.name
-        .split(" ")
-        .map((w) => w[0])
-        .join("")
-        .slice(0, 2)
-        .toUpperCase()
+    ? userData.name.split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase()
     : "U";
 
+  const today = new Date().toLocaleDateString("en-US", {
+    weekday: "short", day: "2-digit", month: "short", year: "numeric",
+  });
+
   return (
-    <div className={styles["app-shell"]}>
-      <main
-        className={styles["main-content"]}
-        role="main"
-        aria-label="Dashboard content"
-      >
-        {/* Greeting banner */}
-        <section
-          className={styles["greeting-banner"]}
-          aria-label="Welcome banner"
-        >
-          <div
-            className={styles["greeting-banner__avatar"]}
-            aria-hidden="true"
-          >
-            👋
+    <div className={styles.appShell}>
+
+      {/* ── Main ── */}
+      <main className={styles.main} role="main" aria-label="Dashboard content">
+
+        {/* Header */}
+        <header className={styles.topBar}>
+          <div className={styles.sessionIndicator}>
+            <span className={styles.pulseDot} aria-hidden="true">
+              <span className={styles.pulseDotRing} />
+              <span className={styles.pulseDotCore} />
+            </span>
+            <div>
+              <p className={styles.sessionLabel}>Active Session</p>
+              {userLoading ? (
+                <div className={styles.skeletonHeading} aria-hidden="true" />
+              ) : (
+                <h1 className={styles.welcomeHeading}>
+                  Welcome back,{" "}
+                  <span className={styles.welcomeName}>{userData.name}</span>
+                </h1>
+              )}
+            </div>
           </div>
-          <div className={styles["greeting-banner__text"]}>
-            <h1>Welcome back, {userData?.name}!</h1>
-            <p>
-              Ready to pick up where you left off?{" "}
-              <strong>Upload a new document</strong> or jump into a{" "}
-              <Link to="/studyroom">
-                <strong>Study Room</strong>
-              </Link>{" "}
-              session.
+          <time className={styles.dateChip} dateTime={new Date().toISOString()}>
+            <Calendar01Icon size={14} />
+            {today}
+          </time>
+        </header>
+
+        {/* Quick actions strip */}
+        <section className={styles.quickStrip} aria-label="Quick actions">
+          {QUICK_ACTIONS.map(({ label, icon: Icon, to }) => (
+            <Link
+              key={to}
+              to={to}
+              className={`${styles.stripBtn} ${label === "Upload Material" ? styles.stripBtnPrimary : styles.stripBtnSecondary}`}
+            >
+              <Icon size={14} />
+              {label}
+            </Link>
+          ))}
+        </section>
+
+        {/* Dashboard grid */}
+        <div className={styles.dashGrid}>
+
+          {/* AI Tutor — tall card */}
+          <article className={`${styles.card} ${styles.cardTutor}`}>
+            <div className={styles.cardGlow} aria-hidden="true" />
+            <div className={styles.cardIconWrap}>
+              <Chat01Icon size={18} color="var(--accent-purple)" />
+            </div>
+            <h2 className={styles.cardTitle}>AI Tutor Chat</h2>
+            <p className={styles.cardDesc}>
+              Get instant answers, explanations, and guided problem-solving from your personal AI tutor — available 24/7.
             </p>
-          </div>
-        </section>
-
-        {/* Quick actions */}
-        <section
-          className={styles["quick-actions"]}
-          aria-labelledby="quick-actions-heading"
-        >
-          <div className={styles["section-header"]}>
-            <div>
-              <h2 id="quick-actions-heading">Quick Actions</h2>
-              <p>Jump straight into any tool</p>
-            </div>
-          </div>
-
-          <div
-            className={styles["quick-actions__grid"]}
-            role="list"
-          >
-            {QUICK_ACTIONS.map(({ label, icon: Icon, to }) => (
-              <Link
-                key={to}
-                to={to}
-                className={styles["quick-action-card"]}
-                role="listitem"
-              >
-                <div
-                  className={styles["quick-action-card__icon"]}
-                  aria-hidden="true"
-                >
-                  <Icon color="white" />
+            <div className={styles.chatPreview}>
+              <div className={styles.chatBubble}>
+                <div className={`${styles.chatAvatar} ${styles.chatAvatarBot}`}>
+                  <CpuChargeIcon size={10} color="var(--accent-purple)" />
                 </div>
-                {label}
-              </Link>
-            ))}
-          </div>
-        </section>
-
-        {/* Profile details */}
-        <section
-          className={styles["profile-section"]}
-          aria-labelledby="profile-heading"
-        >
-          <div className={styles["section-header"]}>
-            <div>
-              <h2 id="profile-heading">Your Profile</h2>
-              <p>Your account details at a glance</p>
-            </div>
-          </div>
-
-          <div className={styles["profile-card"]}>
-            <div className={styles["profile-card__info"]}>
-              <p className={styles["profile-card__label"]}>Account Info</p>
-              <div className={styles["profile-card__rows"]}>
-                <div className={styles["profile-card__row"]}>
-                  <span className={styles["profile-card__row-key"]}>Name</span>
-                  <span className={styles["profile-card__row-val"]}>
-                    {userData?.name}
-                  </span>
+                <p className={styles.chatText}>"Explain the Krebs cycle in simple terms..."</p>
+              </div>
+              <div className={styles.chatBubble}>
+                <div className={`${styles.chatAvatar} ${styles.chatAvatarUser}`}>
+                  <span>{initials[0]}</span>
                 </div>
-                <div className={styles["profile-card__row"]}>
-                  <span className={styles["profile-card__row-key"]}>Grade</span>
-                  <span className={styles["profile-card__row-val"]}>
-                    {userData?.grade}
-                  </span>
-                </div>
-                <div className={styles["profile-card__row"]}>
-                  <span className={styles["profile-card__row-key"]}>Email</span>
-                  <span className={styles["profile-card__row-val"]}>
-                    {userData?.email}
-                  </span>
-                </div>
+                <p className={`${styles.chatText} ${styles.chatTextUser}`}>"Sure! The Krebs cycle is a series of..."</p>
               </div>
             </div>
-          </div>
-        </section>
+            <div className={styles.cardBadge}>GPT-4o Powered</div>
+            <Link to="/tutor" className={styles.cardCta}>
+              Open Chat <span aria-hidden="true">→</span>
+            </Link>
+          </article>
 
-        {/* Feature / activity cards */}
-        <section
-          className={styles["feature-section"]}
-          aria-labelledby="explore-heading"
-        >
-          <div className={styles["section-header"]}>
-            <div>
-              <h2 id="explore-heading">Explore Your Tools</h2>
-              <p>Everything you need to learn smarter, not harder</p>
+          {/* Quiz card */}
+          <article className={`${styles.card} ${styles.cardQuiz}`}>
+            <div className={styles.cardGlow} aria-hidden="true" />
+            <div className={styles.cardRowHeader}>
+              <div className={styles.cardIconGroup}>
+                <div className={styles.cardIconWrap}>
+                  <Quiz04Icon size={18} color="var(--accent-blue)" />
+                </div>
+                <div>
+                  <h2 className={styles.cardTitleSm}>Create Quiz</h2>
+                  <p className={styles.cardSubtitle}>Auto-generate quizzes from your notes</p>
+                </div>
+              </div>
+              <span className={styles.quizBadge}>12 quizzes</span>
             </div>
-          </div>
+            <div className={styles.quizStats}>
+              <div className={styles.statBox}>
+                <div className={styles.statBoxRow}>
+                  <span className={styles.statLabel}>Last Score</span>
+                  <span className={`${styles.statValue} ${styles.statValueGreen}`}>87%</span>
+                </div>
+                <div className={styles.progressTrack}>
+                  <div className={`${styles.progressBar} ${styles.progressBarGreen}`} style={{ width: "87%" }} />
+                </div>
+              </div>
+              <div className={styles.statBox}>
+                <div className={styles.statBoxRow}>
+                  <span className={styles.statLabel}>Avg Score</span>
+                  <span className={`${styles.statValue} ${styles.statValuePurple}`}>74%</span>
+                </div>
+                <div className={styles.progressTrack}>
+                  <div className={`${styles.progressBar} ${styles.progressBarPurple}`} style={{ width: "74%" }} />
+                </div>
+              </div>
+              <Link to="/quiz" className={styles.cardCta}>
+                New Quiz <span aria-hidden="true">→</span>
+              </Link>
+            </div>
+          </article>
 
-          <div
-            className={styles["feature-cards-grid"]}
-            role="list"
-          >
-            {FEATURE_CARDS.map(
-              ({ icon: Icon, colorClass, title, desc, cta, to }) => (
-                <article
-                  key={to}
-                  className={styles["feature-card"]}
-                  role="listitem"
-                >
-                  <div
-                    className={`${styles["feature-card__icon"]} ${styles[`feature-card__icon--${colorClass}`]}`}
-                    aria-hidden="true"
-                  >
-                    <Icon color="white" />
-                  </div>
-                  <h3 className={styles["feature-card__title"]}>{title}</h3>
-                  <p className={styles["feature-card__desc"]}>{desc}</p>
-                  <Link
-                    to={to}
-                    className={styles["feature-card__cta"]}
-                  >
-                    {cta}
-                  </Link>
-                </article>
-              ),
-            )}
+          {/* Flashcards card */}
+          <article className={`${styles.card} ${styles.cardFlash}`}>
+            <div className={styles.cardGlow} aria-hidden="true" />
+            <div className={styles.cardIconGroup}>
+              <div className={styles.cardIconWrap}>
+                <Cards01Icon size={18} color="var(--accent-green)" />
+              </div>
+              <div>
+                <h2 className={styles.cardTitleSm}>Flashcards</h2>
+                <p className={styles.cardSubtitle}>Spaced repetition learning</p>
+              </div>
+            </div>
+            <div className={styles.flashStats}>
+              <div className={styles.flashStat}>
+                <span className={`${styles.flashNum} ${styles.flashNumGreen}`}>248</span>
+                <span className={styles.flashLabel}>Cards</span>
+              </div>
+              <div className={styles.flashDivider} aria-hidden="true" />
+              <div className={styles.flashStat}>
+                <span className={styles.flashNum}>32</span>
+                <span className={styles.flashLabel}>Due Today</span>
+              </div>
+              <Link to="/flashcards" className={`${styles.cardCta} ${styles.cardCtaGreen} ${styles.flashCta}`}>
+                Study <span aria-hidden="true">→</span>
+              </Link>
+            </div>
+          </article>
+
+          {/* Scheduler card */}
+          <article className={`${styles.card} ${styles.cardScheduler}`}>
+            <div className={styles.cardGlow} aria-hidden="true" />
+            <div className={styles.cardIconGroup}>
+              <div className={styles.cardIconWrap}>
+                <Calendar01Icon size={18} color="var(--accent-amber)" />
+              </div>
+              <div>
+                <h2 className={styles.cardTitleSm}>Scheduler</h2>
+                <p className={styles.cardSubtitle}>Plan your study sessions</p>
+              </div>
+            </div>
+            <ul className={styles.scheduleList}>
+              <li className={styles.scheduleItem}>
+                <span className={`${styles.scheduleDot} ${styles.scheduleDotPurple}`} aria-hidden="true" />
+                <span className={styles.scheduleTitle}>Biology — Chapter 7</span>
+                <time className={styles.scheduleTime}>2:00 PM</time>
+              </li>
+              <li className={styles.scheduleItem}>
+                <span className={`${styles.scheduleDot} ${styles.scheduleDotAmber}`} aria-hidden="true" />
+                <span className={styles.scheduleTitle}>Math Practice Set</span>
+                <time className={styles.scheduleTime}>4:30 PM</time>
+              </li>
+            </ul>
+            <Link to="/scheduler" className={`${styles.cardCta} ${styles.cardCtaAmber}`}>
+              View Schedule <span aria-hidden="true">→</span>
+            </Link>
+          </article>
+
+          {/* Image Analysis card */}
+          <article className={`${styles.card} ${styles.cardImage}`}>
+            <div className={styles.cardGlow} aria-hidden="true" />
+            <div className={styles.cardIconGroup}>
+              <div className={styles.cardIconWrap}>
+                <Image01Icon size={18} color="var(--accent-pink)" />
+              </div>
+              <div>
+                <h2 className={styles.cardTitleSm}>Image Analysis</h2>
+                <p className={styles.cardSubtitle}>Extract insights from diagrams</p>
+              </div>
+            </div>
+            <p className={styles.cardDesc}>
+              Upload charts, diagrams, or handwritten notes and let AI decode them instantly.
+            </p>
+            <Link to="/image-analysis" className={`${styles.cardCta} ${styles.cardCtaPink}`}>
+              Analyze Image <span aria-hidden="true">→</span>
+            </Link>
+          </article>
+
+          {/* PDF Analysis card */}
+          <article className={`${styles.card} ${styles.cardPdf}`}>
+            <div className={styles.cardGlow} aria-hidden="true" />
+            <div className={styles.cardIconGroup}>
+              <div className={styles.cardIconWrap}>
+                <Pdf02Icon size={18} color="var(--accent-red)" />
+              </div>
+              <div>
+                <h2 className={styles.cardTitleSm}>PDF Analysis</h2>
+                <p className={styles.cardSubtitle}>Deep-dive into documents</p>
+              </div>
+            </div>
+            <p className={styles.cardDesc}>
+              Upload any PDF and get summaries, key points, and Q&amp;A from the content automatically.
+            </p>
+            <Link to="/pdf-analysis" className={`${styles.cardCta} ${styles.cardCtaRed}`}>
+              Analyze PDF <span aria-hidden="true">→</span>
+            </Link>
+          </article>
+
+          {/* Profile card */}
+          <article className={`${styles.card} ${styles.cardProfile}`}>
+            <div className={styles.cardGlow} aria-hidden="true" />
+            <div className={styles.profileTop}>
+              <div className={styles.profileAvatar} aria-hidden="true">
+                {userLoading ? "…" : initials}
+              </div>
+              <div>
+                {userLoading ? (
+                  <>
+                    <div className={styles.skeletonLine} />
+                    <div className={`${styles.skeletonLine} ${styles.skeletonLineSm}`} />
+                  </>
+                ) : (
+                  <>
+                    <h2 className={styles.profileName}>{userData.name}</h2>
+                    <p className={styles.profileEmail}>{userData.email}</p>
+                  </>
+                )}
+              </div>
+            </div>
+
+            <div className={styles.profileDivider} />
+
+            <div className={styles.profileStats}>
+              <div className={styles.profileStat}>
+                <span className={styles.profileStatLabel}>Grade</span>
+                <span className={styles.profileStatValue}>{userLoading ? "—" : userData.grade}</span>
+              </div>
+              <div className={styles.profileStat}>
+                <span className={styles.profileStatLabel}>Streak</span>
+                <span className={`${styles.profileStatValue} ${styles.profileStatValuePurple}`}>14 days 🔥</span>
+              </div>
+              <div className={styles.profileStat}>
+                <span className={styles.profileStatLabel}>XP</span>
+                <span className={`${styles.profileStatValue} ${styles.profileStatValueAmber}`}>4,820</span>
+              </div>
+            </div>
+
+            <div className={styles.xpTrack}>
+              <div className={styles.xpBar} style={{ width: "68%" }} />
+            </div>
+            <div className={styles.xpLabels}>
+              <span>Level 12</span>
+              <span>68% to Level 13</span>
+            </div>
+          </article>
+        </div>
+
+        {/* Feature cards */}
+        <section className={styles.featureSection} aria-labelledby="explore-heading">
+          <div className={styles.sectionHeader}>
+            <h2 id="explore-heading" className={styles.sectionTitle}>Explore Your Tools</h2>
+            <p className={styles.sectionSub}>Everything you need to learn smarter, not harder</p>
+          </div>
+          <div className={styles.featureGrid} role="list">
+            {FEATURE_CARDS.map(({ icon: Icon, colorClass, title, desc, cta, to }) => (
+              <article key={to} className={styles.featureCard} role="listitem">
+                <div className={`${styles.featureIcon} ${styles[`featureIcon--${colorClass}`]}`} aria-hidden="true">
+                  <Icon size={20} color="white" />
+                </div>
+                <h3 className={styles.featureTitle}>{title}</h3>
+                <p className={styles.featureDesc}>{desc}</p>
+                <Link to={to} className={`${styles.featureCta} ${styles[`featureCta--${colorClass}`]}`}>
+                  {cta}
+                </Link>
+              </article>
+            ))}
           </div>
         </section>
       </main>

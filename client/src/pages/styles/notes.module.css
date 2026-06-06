@@ -1,81 +1,54 @@
 /* notes.module.css — Notes page (scoped) */
+/* Colors now sourced from global.css --theme-* vars */
 
-/* ── NOTES-SPECIFIC CSS VARS (keep here, --n- prefix = no conflict) ── */
-/* notes.module.css — Notes page (scoped) */
+/* ── NOTES-SPECIFIC CSS VARS ─────────────────────────────────── */
+/* --n-* aliases map to --theme-* so dark/light toggle works via  */
+/* data-theme on <html>. No more local [data-theme] overrides.    */
+/* Shadows, radii, timing, layout vars remain hardcoded here.     */
 
-/* ── NOTES-SPECIFIC CSS VARS (--n- prefix) ── */
-[data-theme="light"] {
-  --n-bg: #f0f2f8;
-  --n-surface: #ffffff;
-  --n-surface-raised: #f8faff;
-  --n-border: #e2e8f0;
-  --n-border-subtle: #eef2f8;
-  --n-primary: #3b5bdb;
-  --n-primary-dark: #2f4ac4;
-  --n-primary-light: #eef2ff;
-  --n-primary-glow: rgba(59, 91, 219, 0.15);
-  --n-accent: #22c55e;
-  --n-accent-light: #dcfce7;
-  --n-purple: #7c3aed;
-  --n-teal: #0ea5e9;
-  --n-danger: #ef4444;
-  --n-danger-light: #fef2f2;
-  --n-warning: #f97316;
-  --n-pin: #f59e0b;
-  --n-text-primary: #0f172a;
-  --n-text-secondary: #475569;
-  --n-text-muted: #94a3b8;
-  --n-text-inverse: #ffffff;
+.notes-page,
+.notes-page * {
+  /* ── color aliases ── */
+  --n-bg: var(--theme-bg);
+  --n-surface: var(--theme-surface);
+  --n-surface-raised: var(--theme-surface-2);
+  --n-border: var(--theme-border);
+  --n-border-subtle: var(--theme-border);
+
+  --n-primary: var(--theme-purple);
+  --n-primary-dark: var(--theme-purple-light);
+  /* lighter shade = hover on dark, still works light */
+  --n-primary-light: var(--theme-purple-dim);
+  --n-primary-glow: var(--theme-accent-glow);
+
+  --n-accent: var(--theme-green);
+  --n-accent-light: var(--theme-accent-dim);
+
+  --n-purple: var(--theme-purple);
+  --n-teal: var(--theme-purple-light);
+  --n-danger: var(--theme-red);
+  --n-danger-light: rgba(239, 68, 68, 0.1);
+  --n-warning: var(--theme-accent);
+  --n-pin: var(--theme-accent);
+
+  --n-text-primary: var(--theme-text);
+  --n-text-secondary: var(--theme-text-secondary);
+  --n-text-muted: var(--theme-text-muted);
+  --n-text-inverse: var(--theme-bg);
+
+  /* ── layout / shape / motion (unchanged) ── */
   --n-sidebar-w: 260px;
   --n-r-sm: 6px;
   --n-r-md: 12px;
   --n-r-lg: 16px;
   --n-r-xl: 24px;
   --n-r-full: 9999px;
-  --n-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
-  --n-shadow-card: 0 4px 20px rgba(59, 91, 219, 0.08), 0 1px 4px rgba(0, 0, 0, 0.05);
-  --n-shadow-lift: 0 8px 32px rgba(59, 91, 219, 0.14), 0 2px 8px rgba(0, 0, 0, 0.06);
+  --n-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.08);
+  --n-shadow-card: 0 4px 20px rgba(0, 0, 0, 0.18), 0 1px 4px rgba(0, 0, 0, 0.1);
+  --n-shadow-lift: 0 8px 32px rgba(0, 0, 0, 0.28), 0 2px 8px rgba(0, 0, 0, 0.12);
   --n-t-fast: 150ms ease;
   --n-t-base: 220ms ease;
   --n-t-slow: 380ms cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-[data-theme="dark"] {
-  /* Backgrounds — aligned with global --theme-bg / --theme-surface */
-  --n-bg: #0a0c14;
-  --n-surface: #1c1c1f;
-  --n-surface-raised: #242428;
-
-  /* Borders — aligned with global --theme-border */
-  --n-border: rgba(255, 255, 255, 0.08);
-  --n-border-subtle: rgba(255, 255, 255, 0.04);
-
-  /* Primary — slightly softened blue for dark bg */
-  --n-primary: #6b8eff;
-  --n-primary-dark: #4f6fe0;
-  --n-primary-light: rgba(107, 142, 255, 0.12);
-  --n-primary-glow: rgba(107, 142, 255, 0.2);
-
-  /* Accent / status */
-  --n-accent: #34d399;
-  --n-accent-light: rgba(52, 211, 153, 0.12);
-  --n-purple: #a78bfa;
-  --n-teal: #38bdf8;
-  --n-danger: #f87171;
-  --n-danger-light: rgba(248, 113, 113, 0.12);
-  --n-warning: #fb923c;
-  --n-pin: #fbbf24;
-
-  /* Text — aligned with global --theme-text / --theme-text-secondary */
-  --n-text-primary: #f0f0f0;
-  --n-text-secondary: #8a8a9a;
-  --n-text-muted: #5a5a6a;
-  --n-text-inverse: #0a0c14;
-
-  /* Shadows — heavier on dark */
-  --n-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
-  --n-shadow-card: 0 4px 24px rgba(0, 0, 0, 0.45);
-  --n-shadow-lift: 0 8px 40px rgba(0, 0, 0, 0.6);
 }
 
 /* ── PAGE LAYOUT ─────────────────────────────────────────────── */
@@ -87,7 +60,7 @@
   overflow: hidden;
   background: var(--n-bg);
   animation: fadeIn var(--n-t-slow) both;
-  transition: grid-template-columns var(--n-t-base);
+  transition: grid-template-columns var(--n-t-base), background var(--t-slow);
 }
 
 @keyframes fadeIn {
@@ -112,10 +85,6 @@
 }
 
 .notes-sidebar {
-  /* grid-column: 2; */
-  /* grid-row: 1; */
-  /* width: 220px; */
-  /* transition: width var(--n-t-base), opacity var(--n-t-base); */
   background: var(--n-surface);
   border-left: 1px solid var(--n-border);
   display: flex;
@@ -123,15 +92,8 @@
   overflow-y: auto;
   overflow-x: hidden;
   gap: 0;
+  transition: background var(--t-slow), border-color var(--t-slow);
 }
-
-/* .notes-sidebar--collapsed {
-    width: 0;
-    opacity: 0;
-    pointer-events: none;
-    border-left: none;
-    overflow: hidden;
-} */
 
 .sidebar-toggle {
   width: 28px;
@@ -148,7 +110,8 @@
   flex-shrink: 0;
   transition:
     background var(--n-t-fast),
-    color var(--n-t-fast);
+    color var(--n-t-fast),
+    border-color var(--t-slow);
   position: static;
   transform: none;
 }
@@ -192,6 +155,7 @@
   top: 0;
   background: var(--n-surface);
   z-index: 2;
+  transition: background var(--t-slow), border-color var(--t-slow);
 }
 
 .notes-sidebar__title {
@@ -351,6 +315,7 @@
   overflow-x: hidden;
   background: var(--n-bg);
   position: relative;
+  transition: background var(--t-slow);
 }
 
 .notes-main::-webkit-scrollbar {
@@ -422,7 +387,7 @@
   width: 72px;
   height: 72px;
   border-radius: var(--n-r-xl);
-  background: linear-gradient(135deg, var(--n-primary), var(--n-purple));
+  background: linear-gradient(135deg, var(--n-primary), var(--theme-purple-light));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -431,19 +396,20 @@
 }
 
 @keyframes pulse {
+
   0%,
   100% {
     box-shadow: 0 8px 32px var(--n-primary-glow);
   }
 
   50% {
-    box-shadow: 0 12px 40px rgba(124, 58, 237, 0.3);
+    box-shadow: 0 12px 40px var(--theme-purple-dim);
   }
 }
 
 .welcome-panel__sparkle {
   font-size: 2rem;
-  color: #fff;
+  color: var(--theme-text);
 }
 
 .welcome-panel__heading {
@@ -482,7 +448,8 @@
   transition:
     box-shadow var(--n-t-base),
     transform var(--n-t-base),
-    border-color var(--n-t-base);
+    border-color var(--n-t-base),
+    background var(--t-slow);
 }
 
 .welcome-feature:hover {
@@ -518,8 +485,8 @@
   align-items: center;
   gap: 10px;
   padding: 13px 28px;
-  background: linear-gradient(135deg, var(--n-primary), var(--n-purple));
-  color: #fff;
+  background: linear-gradient(135deg, var(--n-primary), var(--theme-purple-light));
+  color: var(--theme-text);
   font-family: var(--font-display);
   font-size: 0.9rem;
   font-weight: 700;
@@ -560,7 +527,7 @@
   border-radius: var(--n-r-xl);
   box-shadow: var(--n-shadow-card);
   overflow: hidden;
-  transition: box-shadow var(--n-t-base);
+  transition: box-shadow var(--n-t-base), background var(--t-slow), border-color var(--t-slow);
 }
 
 .note-input-card:focus-within {
@@ -574,6 +541,7 @@
   justify-content: space-between;
   padding: 18px 20px 14px;
   border-bottom: 1px solid var(--n-border-subtle);
+  transition: border-color var(--t-slow);
 }
 
 .note-input-card__label {
@@ -594,7 +562,8 @@
   border: 1px solid var(--n-border);
   transition:
     background var(--n-t-fast),
-    color var(--n-t-fast);
+    color var(--n-t-fast),
+    border-color var(--t-slow);
 }
 
 .note-input-card__cancel:hover {
@@ -632,6 +601,7 @@
   padding: 12px 16px;
   border-top: 1px solid var(--n-border-subtle);
   background: var(--n-surface-raised);
+  transition: background var(--t-slow), border-color var(--t-slow);
 }
 
 .note-input-card__hint {
@@ -645,7 +615,7 @@
   gap: 8px;
   padding: 10px 22px;
   background: var(--n-primary);
-  color: #fff;
+  color: var(--theme-text);
   font-family: var(--font-display);
   font-size: 0.84rem;
   font-weight: 700;
@@ -694,6 +664,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
+  transition: border-color var(--t-slow);
 }
 
 .sum-h1::before {
@@ -701,19 +672,18 @@
   display: inline-block;
   width: 4px;
   height: 18px;
-  background: linear-gradient(135deg, var(--n-primary), var(--n-purple));
+  background: linear-gradient(135deg, var(--n-primary), var(--theme-purple-light));
   border-radius: 99px;
   flex-shrink: 0;
 }
 
 .sum-h2 {
   font-family: var(--font-display);
-  font-size: 1rem;
+  font-size: 0.78rem;
   font-weight: 700;
   color: var(--n-primary);
   letter-spacing: 0.02em;
   text-transform: uppercase;
-  font-size: 0.78rem;
   margin: 16px 0 4px;
   display: flex;
   align-items: center;
@@ -768,7 +738,7 @@
 
 .sum-list li:hover {
   background: var(--n-primary-light);
-  border-color: var(--n-purple);
+  border-color: var(--theme-purple-light);
 }
 
 .sum-list li p {
@@ -786,6 +756,7 @@
   margin-bottom: 28px;
   padding-bottom: 24px;
   border-bottom: 1px solid var(--n-border);
+  transition: border-color var(--t-slow);
 }
 
 .note-doc__meta {
@@ -807,13 +778,13 @@
   letter-spacing: 0.07em;
   text-transform: uppercase;
   border-radius: var(--n-r-full);
-  border: 1px solid rgba(59, 91, 219, 0.15);
+  border: 1px solid var(--theme-border);
 }
 
 .note-doc__badge--pinned {
-  background: rgba(245, 158, 11, 0.1);
+  background: var(--theme-accent-dim);
   color: var(--n-pin);
-  border-color: rgba(245, 158, 11, 0.2);
+  border-color: var(--theme-border-hover);
 }
 
 .note-doc__title {
@@ -846,7 +817,8 @@
     background var(--n-t-fast),
     color var(--n-t-fast),
     transform var(--n-t-fast),
-    box-shadow var(--n-t-fast);
+    box-shadow var(--n-t-fast),
+    border-color var(--t-slow);
   white-space: nowrap;
 }
 
@@ -872,7 +844,7 @@
 
 .note-doc__btn--primary {
   background: var(--n-primary);
-  color: #fff;
+  color: var(--theme-text);
   box-shadow: 0 2px 8px var(--n-primary-glow);
 }
 
@@ -889,7 +861,7 @@
 
 .note-doc__btn--danger:hover {
   background: var(--n-danger);
-  color: #fff;
+  color: var(--theme-bg);
   border-color: var(--n-danger);
 }
 
@@ -905,7 +877,7 @@
   border-radius: var(--n-r-xl);
   padding: 24px 28px;
   box-shadow: var(--n-shadow-sm);
-  transition: box-shadow var(--n-t-base);
+  transition: box-shadow var(--n-t-base), background var(--t-slow), border-color var(--t-slow);
 }
 
 .note-doc__section:hover {
@@ -1001,9 +973,10 @@
   max-width: 340px;
 }
 
+/* rgba overlays work in both themes without needing separate overrides */
 .toast--success {
-  background: var(--n-accent-light);
-  color: #166534;
+  background: rgba(34, 197, 94, 0.12);
+  color: var(--theme-green);
   border: 1px solid rgba(34, 197, 94, 0.25);
 }
 
@@ -1011,11 +984,6 @@
   background: var(--n-danger-light);
   color: var(--n-danger);
   border: 1px solid rgba(239, 68, 68, 0.25);
-}
-
-[data-theme="dark"] .toast--success {
-  color: var(--n-accent);
-  border-color: rgba(52, 211, 153, 0.25);
 }
 
 .toast__icon {
@@ -1047,7 +1015,7 @@
   width: 14px;
   height: 14px;
   border: 2px solid rgba(255, 255, 255, 0.35);
-  border-top-color: #fff;
+  border-top-color: var(--theme-text);
   border-radius: 50%;
   animation: spin 0.65s linear infinite;
   flex-shrink: 0;
@@ -1056,7 +1024,7 @@
 .spinner--sm {
   width: 12px;
   height: 12px;
-  border-color: rgba(100, 116, 139, 0.25);
+  border-color: var(--theme-border);
   border-top-color: var(--n-text-muted);
 }
 
@@ -1093,7 +1061,7 @@
 
 /* ── RESPONSIVE ──────────────────────────────────────────────── */
 @media (max-width: 900px) {
-  :root {
+  .notes-page {
     --n-sidebar-w: 220px;
   }
 
