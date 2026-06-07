@@ -36,14 +36,15 @@ export const LLMMarkdown = ({ content }) => {
     </ReactMarkdown>
   );
 };
+
 /* ─── tiny toast helper ─────────────────────────────────────── */
-const Toast = ({ message, type = "success", onClose }) => (
+export const Toast = ({ message, type = "success", onClose }) => (
   <div
     className={`${styles.toast} ${styles[`toast--${type}`]}`}
     role="alert"
   >
     <span className={styles["toast__icon"]}>
-      {type === "success" ? "✦" : "✕"}
+      {type === "success" ? "✦" : "x"}
     </span>
     <span className={styles["toast__msg"]}>{message}</span>
     <button
