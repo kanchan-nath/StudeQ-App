@@ -1,14 +1,13 @@
 /// <reference types="vitest/globals" />
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
-import { MemoryRouter } from 'react-router-dom'
 import { Toast } from '../../pages/Notes'
-import {userEvent} from "@testing-library/user-event"
+import userEvent from "@testing-library/user-event"
 describe("Toast",()=>{
     it("renders message text", ()=>{
         const onCloseMock = vi.fn()
 
-        render(<Toast message="Hello World" type='Success' onClose={onCloseMock}/>)
+        render(<Toast message="Hello World" type='success' onClose={onCloseMock}/>)
 
         expect(screen.getByText("Hello World")).toBeInTheDocument()
     })
