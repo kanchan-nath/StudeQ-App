@@ -1,8 +1,8 @@
 /// <reference types="vitest/globals" />
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
-import { Toast } from '../../pages/Notes'
 import userEvent from "@testing-library/user-event"
+import { Toast } from '../../pages/Notes'
 describe("Toast",()=>{
     it("renders message text", ()=>{
         const onCloseMock = vi.fn()
