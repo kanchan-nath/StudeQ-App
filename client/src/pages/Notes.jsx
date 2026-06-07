@@ -58,7 +58,7 @@ export const Toast = ({ message, type = "success", onClose }) => (
 );
 
 /* ─── welcome/landing panel ─────────────────────────────────── */
-const WelcomePanel = ({ onStart }) => (
+export const WelcomePanel = ({ onStart }) => (
   <section
     className={styles["welcome-panel"]}
     aria-label="Welcome screen"
@@ -78,29 +78,29 @@ const WelcomePanel = ({ onStart }) => (
         structured summary with key insights in seconds.
       </p>
 
-      <div className={styles["welcome-panel__features"]}>
-        <div className={styles["welcome-feature"]}>
+      <div className={styles["welcome-panel__features"]} data-testid= "welcome-card">
+        <div className={styles["welcome-feature"]} data-testid="welcome-card1">
           <span className={styles["welcome-feature__icon"]}>📋</span>
           <div>
             <strong>Smart Summaries</strong>
             <p>AI condenses long content into crisp, readable notes</p>
           </div>
         </div>
-        <div className={styles["welcome-feature"]}>
+        <div className={styles["welcome-feature"]} data-testid="welcome-card2">
           <span className={styles["welcome-feature__icon"]}>🔑</span>
           <div>
             <strong>Key Point Extraction</strong>
             <p>Never miss the important bits — surfaced automatically</p>
           </div>
         </div>
-        <div className={styles["welcome-feature"]}>
+        <div className={styles["welcome-feature"]} data-testid="welcome-card3">
           <span className={styles["welcome-feature__icon"]}>📥</span>
           <div>
             <strong>Export Anywhere</strong>
             <p>Copy to clipboard or download as PDF instantly</p>
           </div>
         </div>
-        <div className={styles["welcome-feature"]}>
+        <div className={styles["welcome-feature"]} data-testid="welcome-card4">
           <span className={styles["welcome-feature__icon"]}>📌</span>
           <div>
             <strong>Pin & Organise</strong>
