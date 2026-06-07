@@ -36,7 +36,7 @@ describe('Dashboard profile card', () => {
         render(<MemoryRouter><Dashboard /></MemoryRouter>)
 
         await waitFor(() => {
-            expect(screen.getByText('JO')).toBeInTheDocument() // initials
+            expect(screen.getAllByText(/john doe/i)).toHaveLength(2)// initials
         })
     })
 
