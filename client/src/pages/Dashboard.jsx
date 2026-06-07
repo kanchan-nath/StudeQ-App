@@ -260,7 +260,7 @@ const Dashboard = () => {
                 <p className={`${styles.chatText} ${styles.chatTextUser}`}>"Sure! The Krebs cycle is a series of..."</p>
               </div>
             </div>
-            <div className={styles.cardBadge}>GPT-4o Powered</div>
+            <div className={styles.cardBadge}>Multi LLM Powered</div>
             <Link to="/tutor" className={styles.cardCta}>
               Open Chat <span aria-hidden="true">→</span>
             </Link>
