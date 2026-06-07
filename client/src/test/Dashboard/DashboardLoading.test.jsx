@@ -37,13 +37,14 @@ describe('Dashboard welcome heading', () => {
         render(<MemoryRouter><Dashboard /></MemoryRouter>)
 
         await waitFor(() => {
+            screen.debug()
             expect(
-                screen.queryByTestId('welcome-heading'))
+                screen.getByTestId('welcome-heading'))
                 .toBeInTheDocument()
+            expect(screen.getAllByText(/john doe/i)).toHaveLength(2)
+            expect(screen.queryByTestId('skeleton-heading')).not.toBeInTheDocument()
         })
 
-        expect(screen.getByText(/JOHN DOE/)).toBeInTheDocument()
-        expect(screen.queryByTestId('skeleton-heading')).not.toBeInTheDocument()
     })
 
     it('shows skeleton when fetch fails', async () => {
@@ -53,8 +54,6 @@ describe('Dashboard welcome heading', () => {
 
         render(<MemoryRouter><Dashboard /></MemoryRouter>)
 
-        // fetch fails → catch block → finally sets loading false
-        // but userData stays DEFAULT_USER (empty name)
         await waitFor(() => {
             expect(screen.queryByTestId('skeleton-heading')).not.toBeInTheDocument()
         })
