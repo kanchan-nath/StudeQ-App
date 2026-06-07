@@ -8,7 +8,7 @@ import rehypeRaw from "rehype-raw";
 import html2canvas from "html2canvas";
 import { getSocket, connectSocket } from "../lib/socket.js";
 
-const LLMMarkdown = ({ content }) => {
+export const LLMMarkdown = ({ content }) => {
   return (
     <ReactMarkdown
       remarkPlugins={[remarkGfm]}
