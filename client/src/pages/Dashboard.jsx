@@ -30,11 +30,36 @@ export const NAV_ITEMS = [
   { id: "notes", icon: Upload01Icon, label: "Upload Material", to: "/notes" },
   { id: "quiz", icon: Quiz04Icon, label: "Create Quiz", to: "/quiz" },
   { id: "tutor", icon: Chat01Icon, label: "AI Tutor Chat", to: "/tutor" },
-  { id: "studyroom", icon: MeetingRoomIcon, label: "Study Room", to: "/studyroom" },
-  { id: "image-analysis", icon: Image01Icon, label: "Image Analysis", to: "/image-analysis" },
-  { id: "pdf-analysis", icon: Pdf02Icon, label: "PDF Analysis", to: "/pdf-analysis" },
-  { id: "flashcards", icon: Cards01Icon, label: "Flashcards", to: "/flashcards" },
-  { id: "scheduler", icon: Calendar01Icon, label: "Scheduler", to: "/scheduler" },
+  {
+    id: "studyroom",
+    icon: MeetingRoomIcon,
+    label: "Study Room",
+    to: "/studyroom",
+  },
+  {
+    id: "image-analysis",
+    icon: Image01Icon,
+    label: "Image Analysis",
+    to: "/image-analysis",
+  },
+  {
+    id: "pdf-analysis",
+    icon: Pdf02Icon,
+    label: "PDF Analysis",
+    to: "/pdf-analysis",
+  },
+  {
+    id: "flashcards",
+    icon: Cards01Icon,
+    label: "Flashcards",
+    to: "/flashcards",
+  },
+  {
+    id: "scheduler",
+    icon: Calendar01Icon,
+    label: "Scheduler",
+    to: "/scheduler",
+  },
 ];
 
 export const FEATURE_CARDS = [
@@ -92,8 +117,14 @@ export const FEATURE_CARDS = [
 const DEFAULT_USER = { name: "", email: "", grade: "" };
 const DEFAULT_QUIZ = { total: 0, lastScore: 0, avgScore: 0 };
 const DEFAULT_FLASH = { total: 0, dueToday: 0 };
-const DEFAULT_SCHEDULE = [];                              // empty → "No sessions" message
-const DEFAULT_PROFILE = { streak: 0, xp: 0, level: 1, xpPercent: 0, xpNextLevel: 2 };
+const DEFAULT_SCHEDULE = []; // empty → "No sessions" message
+const DEFAULT_PROFILE = {
+  streak: 0,
+  xp: 0,
+  level: 1,
+  xpPercent: 0,
+  xpNextLevel: 2,
+};
 
 const Dashboard = () => {
   const [activeNav, setActiveNav] = useState("home");
@@ -169,7 +200,6 @@ const Dashboard = () => {
         //   xpPercent:  profileData?.data?.xpPercent  ?? DEFAULT_PROFILE.xpPercent,
         //   xpNextLevel:profileData?.data?.xpNextLevel?? DEFAULT_PROFILE.xpNextLevel,
         // });
-
       } catch (err) {
         console.error(err);
       } finally {
@@ -181,46 +211,74 @@ const Dashboard = () => {
   }, []);
 
   const initials = userData?.name
-    ? userData.name.split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase()
+    ? userData.name
+        .split(" ")
+        .map((w) => w[0])
+        .join("")
+        .slice(0, 2)
+        .toUpperCase()
     : "YOU";
 
   const today = new Date().toLocaleDateString("en-US", {
-    weekday: "short", day: "2-digit", month: "short", year: "numeric",
+    weekday: "short",
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
   });
 
   return (
     <div className={styles.appShell}>
-
       {/* ── Main ── */}
-      <main className={styles.main} role="main" aria-label="Dashboard content">
-
+      <main
+        className={styles.main}
+        role="main"
+        aria-label="Dashboard content"
+      >
         {/* Header */}
         <header className={styles.topBar}>
           <div className={styles.sessionIndicator}>
-            <span className={styles.pulseDot} aria-hidden="true">
+            <span
+              className={styles.pulseDot}
+              aria-hidden="true"
+            >
               <span className={styles.pulseDotRing} />
               <span className={styles.pulseDotCore} />
             </span>
             <div>
               <p className={styles.sessionLabel}>Active Session</p>
               {userLoading ? (
-                <div className={styles.skeletonHeading} aria-hidden="true" data-testid="skeleton-heading" />
+                <div
+                  className={styles.skeletonHeading}
+                  aria-hidden="true"
+                  data-testid="skeleton-heading"
+                />
               ) : (
-                <h1 data-testid="welcome-heading" className={styles.welcomeHeading}>
+                <h1
+                  data-testid="welcome-heading"
+                  className={styles.welcomeHeading}
+                >
                   Welcome back,{" "}
-                  <span className={styles.welcomeName}>{(userData.name.toUpperCase())}</span>
+                  <span className={styles.welcomeName}>
+                    {userData.name.toUpperCase()}
+                  </span>
                 </h1>
               )}
             </div>
           </div>
-          <time className={styles.dateChip} dateTime={new Date().toISOString()}>
+          <time
+            className={styles.dateChip}
+            dateTime={new Date().toISOString()}
+          >
             <Calendar01Icon size={14} />
             {today}
           </time>
         </header>
 
         {/* Quick actions strip */}
-        <section className={styles.quickStrip} aria-label="Quick actions">
+        <section
+          className={styles.quickStrip}
+          aria-label="Quick actions"
+        >
           {QUICK_ACTIONS.map(({ label, icon: Icon, to }) => (
             <Link
               key={to}
@@ -235,48 +293,74 @@ const Dashboard = () => {
 
         {/* Dashboard grid */}
         <div className={styles.dashGrid}>
-
           {/* AI Tutor — tall card */}
           <article className={`${styles.card} ${styles.cardTutor}`}>
-            <div className={styles.cardGlow} aria-hidden="true" />
+            <div
+              className={styles.cardGlow}
+              aria-hidden="true"
+            />
             <div className={styles.cardIconWrap}>
-              <Chat01Icon size={18} color="var(--accent-purple)" />
+              <Chat01Icon
+                size={18}
+                color="var(--accent-purple)"
+              />
             </div>
             <h2 className={styles.cardTitle}>AI Tutor Chat</h2>
             <p className={styles.cardDesc}>
-              Get instant answers, explanations, and guided problem-solving from your personal AI tutor — available 24/7.
+              Get instant answers, explanations, and guided problem-solving from
+              your personal AI tutor — available 24/7.
             </p>
             <div className={styles.chatPreview}>
               <div className={styles.chatBubble}>
                 <div className={`${styles.chatAvatar} ${styles.chatAvatarBot}`}>
-                  <CpuChargeIcon size={10} color="var(--accent-purple)" />
+                  <CpuChargeIcon
+                    size={10}
+                    color="var(--accent-purple)"
+                  />
                 </div>
-                <p className={styles.chatText}>"Explain the Krebs cycle in simple terms..."</p>
+                <p className={styles.chatText}>
+                  "Explain the Krebs cycle in simple terms..."
+                </p>
               </div>
               <div className={styles.chatBubble}>
-                <div className={`${styles.chatAvatar} ${styles.chatAvatarUser}`}>
+                <div
+                  className={`${styles.chatAvatar} ${styles.chatAvatarUser}`}
+                >
                   <span>{initials[0]}</span>
                 </div>
-                <p className={`${styles.chatText} ${styles.chatTextUser}`}>"Sure! The Krebs cycle is a series of..."</p>
+                <p className={`${styles.chatText} ${styles.chatTextUser}`}>
+                  "Sure! The Krebs cycle is a series of..."
+                </p>
               </div>
             </div>
             <div className={styles.cardBadge}>Multi LLM Powered</div>
-            <Link to="/tutor" className={styles.cardCta}>
+            <Link
+              to="/tutor"
+              className={styles.cardCta}
+            >
               Open Chat <span aria-hidden="true">→</span>
             </Link>
           </article>
 
           {/* Quiz card */}
           <article className={`${styles.card} ${styles.cardQuiz}`}>
-            <div className={styles.cardGlow} aria-hidden="true" />
+            <div
+              className={styles.cardGlow}
+              aria-hidden="true"
+            />
             <div className={styles.cardRowHeader}>
               <div className={styles.cardIconGroup}>
                 <div className={styles.cardIconWrap}>
-                  <Quiz04Icon size={18} color="var(--accent-blue)" />
+                  <Quiz04Icon
+                    size={18}
+                    color="var(--accent-blue)"
+                  />
                 </div>
                 <div>
                   <h2 className={styles.cardTitleSm}>Create Quiz</h2>
-                  <p className={styles.cardSubtitle}>Auto-generate quizzes from your notes</p>
+                  <p className={styles.cardSubtitle}>
+                    Auto-generate quizzes from your notes
+                  </p>
                 </div>
               </div>
               <span className={styles.quizBadge}>
@@ -287,7 +371,9 @@ const Dashboard = () => {
               <div className={styles.statBox}>
                 <div className={styles.statBoxRow}>
                   <span className={styles.statLabel}>Last Score</span>
-                  <span className={`${styles.statValue} ${styles.statValueGreen}`}>
+                  <span
+                    className={`${styles.statValue} ${styles.statValueGreen}`}
+                  >
                     {quizStats.lastScore}%
                   </span>
                 </div>
@@ -301,7 +387,9 @@ const Dashboard = () => {
               <div className={styles.statBox}>
                 <div className={styles.statBoxRow}>
                   <span className={styles.statLabel}>Avg Score</span>
-                  <span className={`${styles.statValue} ${styles.statValuePurple}`}>
+                  <span
+                    className={`${styles.statValue} ${styles.statValuePurple}`}
+                  >
                     {quizStats.avgScore}%
                   </span>
                 </div>
@@ -312,7 +400,10 @@ const Dashboard = () => {
                   />
                 </div>
               </div>
-              <Link to="/quiz" className={styles.cardCta}>
+              <Link
+                to="/quiz"
+                className={styles.cardCta}
+              >
                 New Quiz <span aria-hidden="true">→</span>
               </Link>
             </div>
@@ -320,14 +411,22 @@ const Dashboard = () => {
 
           {/* Flashcards card */}
           <article className={`${styles.card} ${styles.cardFlash}`}>
-            <div className={styles.cardGlow} aria-hidden="true" />
+            <div
+              className={styles.cardGlow}
+              aria-hidden="true"
+            />
             <div className={styles.cardIconGroup}>
               <div className={styles.cardIconWrap}>
-                <Cards01Icon size={18} color="var(--accent-green)" />
+                <Cards01Icon
+                  size={18}
+                  color="var(--accent-green)"
+                />
               </div>
               <div>
                 <h2 className={styles.cardTitleSm}>Flashcards</h2>
-                <p className={styles.cardSubtitle}>Spaced repetition learning</p>
+                <p className={styles.cardSubtitle}>
+                  Spaced repetition learning
+                </p>
               </div>
             </div>
             <div className={styles.flashStats}>
@@ -337,12 +436,20 @@ const Dashboard = () => {
                 </span>
                 <span className={styles.flashLabel}>Cards</span>
               </div>
-              <div className={styles.flashDivider} aria-hidden="true" />
+              <div
+                className={styles.flashDivider}
+                aria-hidden="true"
+              />
               <div className={styles.flashStat}>
-                <span className={styles.flashNum}>{flashcardStats.dueToday}</span>
+                <span className={styles.flashNum}>
+                  {flashcardStats.dueToday}
+                </span>
                 <span className={styles.flashLabel}>Due Today</span>
               </div>
-              <Link to="/flashcards" className={`${styles.cardCta} ${styles.cardCtaGreen} ${styles.flashCta}`}>
+              <Link
+                to="/flashcards"
+                className={`${styles.cardCta} ${styles.cardCtaGreen} ${styles.flashCta}`}
+              >
                 Study <span aria-hidden="true">→</span>
               </Link>
             </div>
@@ -350,10 +457,16 @@ const Dashboard = () => {
 
           {/* Scheduler card */}
           <article className={`${styles.card} ${styles.cardScheduler}`}>
-            <div className={styles.cardGlow} aria-hidden="true" />
+            <div
+              className={styles.cardGlow}
+              aria-hidden="true"
+            />
             <div className={styles.cardIconGroup}>
               <div className={styles.cardIconWrap}>
-                <Calendar01Icon size={18} color="var(--accent-amber)" />
+                <Calendar01Icon
+                  size={18}
+                  color="var(--accent-amber)"
+                />
               </div>
               <div>
                 <h2 className={styles.cardTitleSm}>Scheduler</h2>
@@ -363,13 +476,19 @@ const Dashboard = () => {
             <ul className={styles.scheduleList}>
               {scheduleItems.length === 0 ? (
                 <li className={styles.scheduleItem}>
-                  <span className={styles.scheduleTitle} style={{ opacity: 0.5 }}>
+                  <span
+                    className={styles.scheduleTitle}
+                    style={{ opacity: 0.5 }}
+                  >
                     No sessions scheduled today
                   </span>
                 </li>
               ) : (
                 scheduleItems.map((item, i) => (
-                  <li key={i} className={styles.scheduleItem}>
+                  <li
+                    key={i}
+                    className={styles.scheduleItem}
+                  >
                     <span
                       className={`${styles.scheduleDot} ${styles[`scheduleDot${item.color ?? "Purple"}`]}`}
                       aria-hidden="true"
@@ -380,37 +499,58 @@ const Dashboard = () => {
                 ))
               )}
             </ul>
-            <Link to="/scheduler" className={`${styles.cardCta} ${styles.cardCtaAmber}`}>
+            <Link
+              to="/scheduler"
+              className={`${styles.cardCta} ${styles.cardCtaAmber}`}
+            >
               View Schedule <span aria-hidden="true">→</span>
             </Link>
           </article>
 
           {/* Image Analysis card */}
           <article className={`${styles.card} ${styles.cardImage}`}>
-            <div className={styles.cardGlow} aria-hidden="true" />
+            <div
+              className={styles.cardGlow}
+              aria-hidden="true"
+            />
             <div className={styles.cardIconGroup}>
               <div className={styles.cardIconWrap}>
-                <Image01Icon size={18} color="var(--accent-pink)" />
+                <Image01Icon
+                  size={18}
+                  color="var(--accent-pink)"
+                />
               </div>
               <div>
                 <h2 className={styles.cardTitleSm}>Image Analysis</h2>
-                <p className={styles.cardSubtitle}>Extract insights from diagrams</p>
+                <p className={styles.cardSubtitle}>
+                  Extract insights from diagrams
+                </p>
               </div>
             </div>
             <p className={styles.cardDesc}>
-              Upload charts, diagrams, or handwritten notes and let AI decode them instantly.
+              Upload charts, diagrams, or handwritten notes and let AI decode
+              them instantly.
             </p>
-            <Link to="/image-analysis" className={`${styles.cardCta} ${styles.cardCtaPink}`}>
+            <Link
+              to="/image-analysis"
+              className={`${styles.cardCta} ${styles.cardCtaPink}`}
+            >
               Analyze Image <span aria-hidden="true">→</span>
             </Link>
           </article>
 
           {/* PDF Analysis card */}
           <article className={`${styles.card} ${styles.cardPdf}`}>
-            <div className={styles.cardGlow} aria-hidden="true" />
+            <div
+              className={styles.cardGlow}
+              aria-hidden="true"
+            />
             <div className={styles.cardIconGroup}>
               <div className={styles.cardIconWrap}>
-                <Pdf02Icon size={18} color="var(--accent-red)" />
+                <Pdf02Icon
+                  size={18}
+                  color="var(--accent-red)"
+                />
               </div>
               <div>
                 <h2 className={styles.cardTitleSm}>PDF Analysis</h2>
@@ -418,29 +558,43 @@ const Dashboard = () => {
               </div>
             </div>
             <p className={styles.cardDesc}>
-              Upload any PDF and get summaries, key points, and Q&amp;A from the content automatically.
+              Upload any PDF and get summaries, key points, and Q&amp;A from the
+              content automatically.
             </p>
-            <Link to="/pdf-analysis" className={`${styles.cardCta} ${styles.cardCtaRed}`}>
+            <Link
+              to="/pdf-analysis"
+              className={`${styles.cardCta} ${styles.cardCtaRed}`}
+            >
               Analyze PDF <span aria-hidden="true">→</span>
             </Link>
           </article>
 
           {/* Profile card */}
           <article className={`${styles.card} ${styles.cardProfile}`}>
-            <div className={styles.cardGlow} aria-hidden="true" />
+            <div
+              className={styles.cardGlow}
+              aria-hidden="true"
+            />
             <div className={styles.profileTop}>
-              <div className={styles.profileAvatar} aria-hidden="true">
+              <div
+                className={styles.profileAvatar}
+                aria-hidden="true"
+              >
                 {userLoading ? "…" : initials}
               </div>
               <div>
                 {userLoading ? (
                   <>
                     <div className={styles.skeletonLine} />
-                    <div className={`${styles.skeletonLine} ${styles.skeletonLineSm}`} />
+                    <div
+                      className={`${styles.skeletonLine} ${styles.skeletonLineSm}`}
+                    />
                   </>
                 ) : (
                   <>
-                    <h2 className={styles.profileName}>{(userData.name.toUpperCase())}</h2>
+                    <h2 className={styles.profileName}>
+                      {userData.name.toUpperCase()}
+                    </h2>
                     <p className={styles.profileEmail}>{userData.email}</p>
                   </>
                 )}
@@ -453,52 +607,88 @@ const Dashboard = () => {
               <div className={styles.profileStat}>
                 <span className={styles.profileStatLabel}>Grade</span>
                 <span className={styles.profileStatValue}>
-                  {userLoading ? "—" : (userData.grade || "—")}
+                  {userLoading ? "—" : userData.grade || "—"}
                 </span>
               </div>
               <div className={styles.profileStat}>
                 <span className={styles.profileStatLabel}>Streak</span>
-                <span className={`${styles.profileStatValue} ${styles.profileStatValuePurple}`}>
-                  {profileStats.streak > 0 ? `${profileStats.streak} days 🔥` : "—"}
+                <span
+                  className={`${styles.profileStatValue} ${styles.profileStatValuePurple}`}
+                >
+                  {profileStats.streak > 0
+                    ? `${profileStats.streak} days 🔥`
+                    : "—"}
                 </span>
               </div>
               <div className={styles.profileStat}>
                 <span className={styles.profileStatLabel}>XP</span>
-                <span className={`${styles.profileStatValue} ${styles.profileStatValueAmber}`}>
+                <span
+                  className={`${styles.profileStatValue} ${styles.profileStatValueAmber}`}
+                >
                   {profileStats.xp > 0 ? profileStats.xp.toLocaleString() : "—"}
                 </span>
               </div>
             </div>
 
             <div className={styles.xpTrack}>
-              <div className={styles.xpBar} style={{ width: `${profileStats.xpPercent}%` }} />
+              <div
+                className={styles.xpBar}
+                style={{ width: `${profileStats.xpPercent}%` }}
+              />
             </div>
             <div className={styles.xpLabels}>
               <span>Level {profileStats.level}</span>
-              <span>{profileStats.xpPercent}% to Level {profileStats.xpNextLevel}</span>
+              <span>
+                {profileStats.xpPercent}% to Level {profileStats.xpNextLevel}
+              </span>
             </div>
           </article>
         </div>
 
         {/* Feature cards */}
-        <section className={styles.featureSection} aria-labelledby="explore-heading">
+        <section
+          className={styles.featureSection}
+          aria-labelledby="explore-heading"
+        >
           <div className={styles.sectionHeader}>
-            <h2 id="explore-heading" className={styles.sectionTitle}>Explore Your Tools</h2>
-            <p className={styles.sectionSub}>Everything you need to learn smarter, not harder</p>
+            <h2
+              id="explore-heading"
+              className={styles.sectionTitle}
+            >
+              Explore Your Tools
+            </h2>
+            <p className={styles.sectionSub}>
+              Everything you need to learn smarter, not harder
+            </p>
           </div>
-          <div className={styles.featureGrid} role="list">
-            {FEATURE_CARDS.map(({ icon: Icon, colorClass, title, desc, cta, to }) => (
-              <article key={to} className={styles.featureCard} role="listitem">
-                <div className={`${styles.featureIcon} ${styles[`featureIcon--${colorClass}`]}`} aria-hidden="true">
-                  <Icon size={20} />
-                </div>
-                <h3 className={styles.featureTitle}>{title}</h3>
-                <p className={styles.featureDesc}>{desc}</p>
-                <Link to={to} className={`${styles.featureCta} ${styles[`featureCta--${colorClass}`]}`}>
-                  {cta}
-                </Link>
-              </article>
-            ))}
+          <div
+            className={styles.featureGrid}
+            role="list"
+          >
+            {FEATURE_CARDS.map(
+              ({ icon: Icon, colorClass, title, desc, cta, to }) => (
+                <article
+                  key={to}
+                  className={styles.featureCard}
+                  role="listitem"
+                >
+                  <div
+                    className={`${styles.featureIcon} ${styles[`featureIcon--${colorClass}`]}`}
+                    aria-hidden="true"
+                  >
+                    <Icon size={20} />
+                  </div>
+                  <h3 className={styles.featureTitle}>{title}</h3>
+                  <p className={styles.featureDesc}>{desc}</p>
+                  <Link
+                    to={to}
+                    className={`${styles.featureCta} ${styles[`featureCta--${colorClass}`]}`}
+                  >
+                    {cta}
+                  </Link>
+                </article>
+              ),
+            )}
           </div>
         </section>
       </main>
