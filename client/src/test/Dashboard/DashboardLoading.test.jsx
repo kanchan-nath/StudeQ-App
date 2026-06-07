@@ -37,7 +37,6 @@ describe('Dashboard welcome heading', () => {
         render(<MemoryRouter><Dashboard /></MemoryRouter>)
 
         await waitFor(() => {
-            screen.debug()
             expect(
                 screen.getByTestId('welcome-heading'))
                 .toBeInTheDocument()
