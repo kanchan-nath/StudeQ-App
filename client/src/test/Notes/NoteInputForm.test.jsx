@@ -38,5 +38,14 @@ describe('NoteInputForm', () => {
         expect(screen.queryByRole("button", { name: /cancel editing/i })).not.toBeInTheDocument()
     })
 
-    
+    it("textarea shows placeholder when empty", () => {
+        const textarea = screen.getByRole("textbox", { name: /content to summarise/i })
+        expect(textarea).toHaveAttribute("placeholder", "Paste your lecture notes, article, or any text here…")
+    })
+
+    it("shows character count when content is not empty", () => {
+        cleanup()
+        render(<NoteInputForm content="Hello World" onChange={onChangeMock} onSubmit={onSubmitMock} loading={false} editId={null} onCancelEdit={onCancelEditMock} inputRef={null} />)
+        expect(screen.getByText("11 characters")).toBeInTheDocument()
+    })
 })
