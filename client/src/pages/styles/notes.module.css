@@ -2,13 +2,8 @@
 /* Colors now sourced from global.css --theme-* vars */
 
 /* ── NOTES-SPECIFIC CSS VARS ─────────────────────────────────── */
-/* --n-* aliases map to --theme-* so dark/light toggle works via  */
-/* data-theme on <html>. No more local [data-theme] overrides.    */
-/* Shadows, radii, timing, layout vars remain hardcoded here.     */
-
 .notes-page,
 .notes-page * {
-  /* ── color aliases ── */
   --n-bg: var(--theme-bg);
   --n-surface: var(--theme-surface);
   --n-surface-raised: var(--theme-surface-2);
@@ -17,7 +12,6 @@
 
   --n-primary: var(--theme-purple);
   --n-primary-dark: var(--theme-purple-light);
-  /* lighter shade = hover on dark, still works light */
   --n-primary-light: var(--theme-purple-dim);
   --n-primary-glow: var(--theme-accent-glow);
 
@@ -36,8 +30,7 @@
   --n-text-muted: var(--theme-text-muted);
   --n-text-inverse: var(--theme-bg);
 
-  /* ── layout / shape / motion (unchanged) ── */
-  --n-sidebar-w: 260px;
+  --n-sidebar-w: 300px;
   --n-r-sm: 6px;
   --n-r-md: 12px;
   --n-r-lg: 16px;
@@ -52,15 +45,15 @@
 }
 
 /* ── PAGE LAYOUT ─────────────────────────────────────────────── */
+/* CHANGED: flex row instead of grid — matches Quiz's homeWrapper */
 .notes-page {
-  display: grid;
-  grid-template-columns: 1fr var(--n-sidebar-w);
-  grid-template-rows: 1fr;
+  display: flex;
+  flex-direction: row;
   height: 100%;
   overflow: hidden;
   background: var(--n-bg);
   animation: fadeIn var(--n-t-slow) both;
-  transition: grid-template-columns var(--n-t-base), background var(--t-slow);
+  transition: background var(--t-slow);
 }
 
 @keyframes fadeIn {
@@ -75,211 +68,11 @@
   }
 }
 
-/* ── NOTES SIDEBAR (RIGHT) ───────────────────────────────────── */
-.sidebar-wrapper {
-  grid-column: 2;
-  /* force right column */
-  grid-row: 1;
-  position: relative;
-  height: 100%;
-  background: var(--n-surface);
-  border-left: 1px solid var(--n-border);
-  display: flex;
-  flex-direction: row;
-  transition: width var(--n-t-slow), background var(--n-t-slow), border-color var(--n-t-slow);
-  flex-shrink: 0;
-  overflow: hidden;
-}
-
-.sidebar-wrapper--open {
-  width: var(--n-sidebar-w);
-  /* uses your --n-sidebar-w: 260px */
-}
-
-.sidebar-wrapper--closed {
-  width: 36px;
-}
-
-/* also push main to column 1 */
-/* add to your main content wrapper class: */
-/* grid-column: 1; grid-row: 1; */
-
-.sidebar-toggle {
-  position: absolute;
-  left: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 36px;
-  height: 48px;
-  background: var(--n-surface-raised);
-  border: 1px solid var(--n-border);
-  border-left: none;
-  border-radius: 0 8px 8px 0;
-  cursor: pointer;
-  font-size: 14px;
-  color: var(--n-text-secondary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 10;
-  transition: background var(--n-t-base), color var(--n-t-base), border-color var(--n-t-slow);
-}
-
-.sidebar-toggle:hover {
-  background: var(--n-primary-light);
-  color: var(--n-primary);
-}
-
-/* ── ASIDE ─────────────────────────────────────────────────────── */
-.notes-sidebar {
-  padding: 24px 16px 24px 48px;
-  width: 100%;
-  height: 100%;
-  overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: var(--n-border) var(--n-surface-raised);
-  box-sizing: border-box;
-}
-
-.notes-sidebar::-webkit-scrollbar {
-  width: 4px;
-}
-
-.notes-sidebar::-webkit-scrollbar-track {
-  background: var(--n-surface-raised);
-}
-
-.notes-sidebar::-webkit-scrollbar-thumb {
-  background: var(--n-border);
-  border-radius: 999px;
-}
-
-.notes-sidebar::-webkit-scrollbar-thumb:hover {
-  background: var(--n-text-muted);
-}
-
-.notes-sidebar__header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 16px;
-}
-
-.notes-sidebar__title {
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--n-text-primary);
-}
-
-.notes-sidebar__new-btn {
-  width: 26px;
-  height: 26px;
-  border: none;
-  background: transparent;
-  color: var(--n-text-muted);
-  font-size: 18px;
-  cursor: pointer;
-  border-radius: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background var(--n-t-base), color var(--n-t-base);
-}
-
-.notes-sidebar__new-btn:hover {
-  background: var(--n-primary-light);
-  color: var(--n-primary);
-}
-
-.notes-sidebar__loading {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 13px;
-  color: var(--n-text-muted);
-}
-
-.notes-sidebar__error {
-  font-size: 13px;
-  color: var(--n-danger);
-  margin: 0;
-}
-
-.notes-sidebar__empty {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  padding: 24px 0;
-  font-size: 13px;
-  color: var(--n-text-muted);
-  text-align: center;
-}
-
-.notes-sidebar__empty p {
-  margin: 0;
-  line-height: 1.5;
-}
-
-.notes-sidebar__group {
-  margin-bottom: 8px;
-}
-
-.notes-sidebar__group-label {
-  display: block;
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--n-text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  margin-bottom: 6px;
-  padding: 0 2px;
-}
-
-.notes-sidebar__item {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 14px;
-  border: 1.5px solid var(--n-border);
-  border-radius: var(--n-r-sm);
-  margin-bottom: 10px;
-  cursor: pointer;
-  background: var(--n-surface-raised);
-  text-align: left;
-  transition: background var(--n-t-base), border-color var(--n-t-base);
-  color: var(--n-text-primary);
-}
-
-.notes-sidebar__item:hover {
-  border-color: var(--n-primary);
-  background: var(--n-primary-light);
-}
-
-.notes-sidebar__item.active {
-  border-color: var(--n-primary);
-  background: var(--n-primary-light);
-}
-
-.notes-sidebar__item-icon {
-  font-size: 14px;
-  flex-shrink: 0;
-}
-
-.notes-sidebar__item-title {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--n-text-primary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
 /* ── MAIN PANEL (LEFT) ───────────────────────────────────────── */
+/* CHANGED: flex:1 instead of grid-column — fills remaining space */
 .notes-main {
-  grid-column: 1;
-  grid-row: 1;
+  flex: 1;
+  min-width: 0;
   overflow-y: auto;
   overflow-x: hidden;
   background: var(--n-bg);
@@ -300,6 +93,175 @@
   border-radius: var(--n-r-full);
 }
 
+/* ── NOTES SIDEBAR (RIGHT) ───────────────────────────────────── */
+/* CHANGED: mirrors Quiz's .historySidebar exactly               */
+/* position: relative (not fixed), flex-shrink:0, overflow:hidden */
+.sidebar {
+  position: relative;
+  height: 100%;
+  background: var(--n-surface);
+  border-left: 1px solid var(--n-border);
+  display: flex;
+  flex-direction: row;
+  transition: width var(--t-slow), background var(--t-slow), border-color var(--t-slow);
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+/* CHANGED: width classes instead of fixed/absolute positioning  */
+.sidebarOpen {
+  width: 300px;
+}
+
+.sidebarClosed {
+  width: 36px;
+}
+
+/* CHANGED: absolute + vertically centered — mirrors Quiz exactly */
+.sidebarToggleBtn {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 36px;
+  height: 48px;
+  background: var(--n-surface-raised);
+  border: 1px solid var(--n-border);
+  border-left: none;
+  border-radius: 0 8px 8px 0;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--n-text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  transition: background var(--n-t-base), color var(--n-t-base), border-color var(--t-slow);
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.sidebarToggleBtn:hover {
+  background: var(--n-primary-light);
+  color: var(--n-primary);
+}
+
+/* CHANGED: padding-left:48px to clear the absolute toggle btn  */
+.sidebarContent {
+  padding: 24px 16px 24px 48px;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--n-border) var(--n-surface-raised);
+}
+
+.sidebarContent::-webkit-scrollbar {
+  width: 4px;
+}
+
+.sidebarContent::-webkit-scrollbar-track {
+  background: var(--n-surface-raised);
+}
+
+.sidebarContent::-webkit-scrollbar-thumb {
+  background: var(--n-border);
+  border-radius: 999px;
+}
+
+.sidebarContent::-webkit-scrollbar-thumb:hover {
+  background: var(--n-text-muted);
+}
+
+/* ── SIDEBAR INTERNALS ───────────────────────────────────────── */
+.sidebarHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.sidebarTitle {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--n-text-primary);
+  margin: 0;
+}
+
+.sidebarNewBtn {
+  width: 26px;
+  height: 26px;
+  border: 1px solid var(--n-border);
+  border-radius: 6px;
+  background: var(--n-surface-raised);
+  color: var(--n-text-secondary);
+  font-size: 18px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background var(--n-t-base), color var(--n-t-base), border-color var(--n-t-base);
+}
+
+.sidebarNewBtn:hover {
+  background: var(--n-primary);
+  color: var(--theme-text);
+  border-color: var(--n-primary);
+}
+
+.sidebarGroupLabel {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--n-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 14px 0 8px;
+}
+
+.sidebarEmpty {
+  font-size: 13px;
+  color: var(--n-text-muted);
+  margin: 0;
+}
+
+/* CHANGED: matches Quiz's .sidebarItem exactly */
+.sidebarItem {
+  padding: 12px 14px;
+  border: 1.5px solid var(--n-border);
+  border-radius: 8px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  background: var(--n-surface-raised);
+  transition: background var(--n-t-base), border-color var(--n-t-base);
+}
+
+.sidebarItem:hover {
+  border-color: var(--n-primary-dark);
+  background: var(--n-primary-light);
+}
+
+.sidebarItemActive {
+  border-color: var(--n-primary) !important;
+  background: var(--n-primary-light) !important;
+}
+
+.sidebarItemTitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--n-text-primary);
+  margin-bottom: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sidebarItemMeta {
+  font-size: 11px;
+  color: var(--n-text-muted);
+}
+
+/* ── ERROR ───────────────────────────────────────────────────── */
 .notes-error {
   position: fixed;
   bottom: 24px;
@@ -614,7 +576,6 @@
 }
 
 /* ── NOTE DOCUMENT ───────────────────────────────────────────── */
-/* ── STYLED SUMMARY BODY ─────────────────────────────────────── */
 .sum-body {
   display: flex;
   flex-direction: column;
@@ -942,7 +903,6 @@
   max-width: 340px;
 }
 
-/* rgba overlays work in both themes without needing separate overrides */
 .toast--success {
   background: rgba(34, 197, 94, 0.12);
   color: var(--theme-green);
@@ -1030,10 +990,6 @@
 
 /* ── RESPONSIVE ──────────────────────────────────────────────── */
 @media (max-width: 900px) {
-  .notes-page {
-    --n-sidebar-w: 220px;
-  }
-
   .note-doc {
     padding: 28px 20px 48px;
   }
@@ -1047,30 +1003,15 @@
   }
 }
 
+@media (max-width: 768px) {
+
+  /* Hide sidebar on mobile, same as Quiz's .splitRight */
+  .sidebar {
+    display: none;
+  }
+}
+
 @media (max-width: 640px) {
-  .notes-page {
-    grid-template-columns: 1fr;
-    grid-template-rows: 1fr auto;
-    height: auto;
-    min-height: 100%;
-    overflow: visible;
-  }
-
-  .notes-main {
-    grid-column: 1;
-    grid-row: 1;
-    overflow-y: visible;
-    min-height: calc(100dvh - 256px);
-  }
-
-  .notes-sidebar {
-    grid-column: 1;
-    grid-row: 2;
-    border-left: none;
-    border-top: 1px solid var(--n-border);
-    max-height: 200px;
-  }
-
   .note-doc {
     padding: 20px 16px 48px;
   }

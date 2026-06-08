@@ -12,7 +12,7 @@ export const LLMMarkdown = ({ content }) => {
   return (
     <ReactMarkdown
       remarkPlugins={[remarkGfm]}
-      rehypePlugins={[rehypeRaw]} // enables raw HTML like <u> and <mark>
+      rehypePlugins={[rehypeRaw]}
       components={{
         mark({ children }) {
           return (
@@ -134,28 +134,19 @@ export const StyledSummary = ({ content }) => {
 
     if (line.startsWith("### ")) {
       elements.push(
-        <h4
-          key={i}
-          className={styles["sum-h3"]}
-        >
+        <h4 key={i} className={styles["sum-h3"]}>
           {line.slice(4)}
         </h4>,
       );
     } else if (line.startsWith("## ")) {
       elements.push(
-        <h3
-          key={i}
-          className={styles["sum-h2"]}
-        >
+        <h3 key={i} className={styles["sum-h2"]}>
           {line.slice(3)}
         </h3>,
       );
     } else if (line.startsWith("# ")) {
       elements.push(
-        <h2
-          key={i}
-          className={styles["sum-h1"]}
-        >
+        <h2 key={i} className={styles["sum-h1"]}>
           {line.slice(2)}
         </h2>,
       );
@@ -173,20 +164,14 @@ export const StyledSummary = ({ content }) => {
         i++;
       }
       elements.push(
-        <ul
-          key={`ul-${i}`}
-          className={styles["sum-list"]}
-        >
+        <ul key={`ul-${i}`} className={styles["sum-list"]}>
           {bullets}
         </ul>,
       );
       continue;
     } else {
       elements.push(
-        <div
-          key={i}
-          className={styles["sum-para"]}
-        >
+        <div key={i} className={styles["sum-para"]}>
           <LLMMarkdown content={line} />
         </div>,
       );
@@ -196,6 +181,7 @@ export const StyledSummary = ({ content }) => {
 
   return <div className={styles["sum-body"]}>{elements}</div>;
 };
+
 /* ─── single note document view ─────────────────────────────── */
 export const NoteDocument = ({
   note,
@@ -275,10 +261,7 @@ export const NoteDocument = ({
       <div className={styles["note-doc__body"]}>
         <section className={styles["note-doc__section"]}>
           <h2 className={styles["note-doc__section-title"]}>
-            <span
-              className={styles["note-doc__section-icon"]}
-              aria-hidden="true"
-            >
+            <span className={styles["note-doc__section-icon"]} aria-hidden="true">
               ≡
             </span>
             Summary
@@ -291,20 +274,14 @@ export const NoteDocument = ({
         {keyPoints.length > 0 && (
           <section className={styles["note-doc__section"]}>
             <h2 className={styles["note-doc__section-title"]}>
-              <span
-                className={styles["note-doc__section-icon"]}
-                aria-hidden="true"
-              >
+              <span className={styles["note-doc__section-icon"]} aria-hidden="true">
                 ◆
               </span>
               Key Points
             </h2>
             <ul className={styles["note-doc__keypoints"]}>
               {keyPoints.map((pt, i) => (
-                <li
-                  key={i}
-                  className={styles["note-doc__keypoint"]}
-                >
+                <li key={i} className={styles["note-doc__keypoint"]}>
                   <span
                     className={styles["note-doc__keypoint-num"]}
                     aria-hidden="true"
@@ -348,10 +325,7 @@ export const NoteInputForm = ({
           </button>
         )}
       </div>
-      <form
-        onSubmit={onSubmit}
-        className={styles["note-input-card__form"]}
-      >
+      <form onSubmit={onSubmit} className={styles["note-input-card__form"]}>
         <textarea
           ref={inputRef}
           name="content"
@@ -377,10 +351,7 @@ export const NoteInputForm = ({
           >
             {loading ? (
               <>
-                <span
-                  className={styles.spinner}
-                  aria-hidden="true"
-                />
+                <span className={styles.spinner} aria-hidden="true" />
                 Summarising…
               </>
             ) : editId ? (
@@ -414,7 +385,8 @@ const Notes = () => {
   const [generatedIds, setGeneratedIds] = useState(new Set());
   const [toast, setToast] = useState(null);
   const [panelView, setPanelView] = useState("welcome");
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  // ── CHANGED: default false so sidebar starts closed, matches Quiz ──
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const noteDocRef = useRef(null);
 
   const inputRef = useRef(null);
@@ -562,27 +534,25 @@ const Notes = () => {
       const stripMarkdown = (text) => {
         if (!text) return "";
         return text
-          .replace(/#{1,6}\s+/g, "") // headings
-          .replace(/\*\*(.*?)\*\*/g, "$1") // bold
-          .replace(/\*(.*?)\*/g, "$1") // italic
-          .replace(/__(.*?)__/g, "$1") // bold alt
-          .replace(/_(.*?)_/g, "$1") // italic alt
-          .replace(/~~(.*?)~~/g, "$1") // strikethrough
-          .replace(/`{1,3}[^`]*`{1,3}/g, "") // code
-          .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1") // links → label only
-          .replace(/^[-*+]\s+/gm, "• ") // bullets → •
-          .replace(/^\d+\.\s+/gm, "") // numbered lists
-          .replace(/^>\s+/gm, "") // blockquotes
-          .replace(/---+/g, "") // hr
-          .replace(/<[^>]+>/g, "") // html tags
-          .replace(/\n{3,}/g, "\n\n") // excess newlines
+          .replace(/#{1,6}\s+/g, "")
+          .replace(/\*\*(.*?)\*\*/g, "$1")
+          .replace(/\*(.*?)\*/g, "$1")
+          .replace(/__(.*?)__/g, "$1")
+          .replace(/_(.*?)_/g, "$1")
+          .replace(/~~(.*?)~~/g, "$1")
+          .replace(/`{1,3}[^`]*`{1,3}/g, "")
+          .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
+          .replace(/^[-*+]\s+/gm, "• ")
+          .replace(/^\d+\.\s+/gm, "")
+          .replace(/^>\s+/gm, "")
+          .replace(/---+/g, "")
+          .replace(/<[^>]+>/g, "")
+          .replace(/\n{3,}/g, "\n\n")
           .trim();
       };
 
       const keyPointsText = Array.isArray(note.keyPoints)
-        ? note.keyPoints
-          .map((pt, i) => `${i + 1}. ${stripMarkdown(pt)}`)
-          .join("\n")
+        ? note.keyPoints.map((pt, i) => `${i + 1}. ${stripMarkdown(pt)}`).join("\n")
         : stripMarkdown(note.keyPoints);
 
       const text = [
@@ -626,29 +596,17 @@ const Notes = () => {
         format: "a4",
       });
 
-      const pageWidth = pdf.internal.pageSize.getWidth(); // 210mm
-      const pageHeight = pdf.internal.pageSize.getHeight(); // 297mm
-
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
       const imgWidthPx = canvas.width;
       const imgHeightPx = canvas.height;
-
-      // scale image to fit page width
       const ratio = pageWidth / imgWidthPx;
       const imgHeightMm = imgHeightPx * ratio;
 
       let yOffset = 0;
-
-      // paginate if content taller than one page
       while (yOffset < imgHeightMm) {
         if (yOffset > 0) pdf.addPage();
-        pdf.addImage(
-          imgData,
-          "PNG",
-          0,
-          -yOffset, // shift up for each page
-          pageWidth,
-          imgHeightMm,
-        );
+        pdf.addImage(imgData, "PNG", 0, -yOffset, pageWidth, imgHeightMm);
         yOffset += pageHeight;
       }
 
@@ -662,7 +620,6 @@ const Notes = () => {
 
   const tooglePin = async (note) => {
     const newPinned = !note.isPinned;
-
     try {
       const res = await fetch(`${BASE_URL}/api/notes/${note._id}/pin`, {
         method: "PATCH",
@@ -673,7 +630,6 @@ const Notes = () => {
         body: JSON.stringify({ newPinned }),
       });
       if (!res.ok) throw new Error(res.statusText);
-      const result = await res.json();
       showToast(newPinned ? "Note pinned!" : "Note unpinned");
       if (summaryData && summaryData._id === note._id) {
         setSummaryData((prev) => ({ ...prev, isPinned: newPinned }));
@@ -712,14 +668,8 @@ const Notes = () => {
   const unpinnedNotes = notes.filter((n) => !n.isPinned);
 
   return (
-    <div
-      className={styles["notes-page"]}
-      style={{
-        gridTemplateColumns: sidebarOpen
-          ? `1fr var(--n-sidebar-w)`
-          : "1fr 18px",
-      }}
-    >
+    // ── CHANGED: removed inline style, now pure CSS flex (matches Quiz homeWrapper) ──
+    <div className={styles["notes-page"]}>
       {toast && (
         <Toast
           message={toast.message}
@@ -727,114 +677,6 @@ const Notes = () => {
           onClose={() => setToast(null)}
         />
       )}
-
-      {/* ── NOTES SIDEBAR ── */}
-
-      {/* ── NOTES SIDEBAR ── */}
-      <div
-        className={`${styles["sidebar-wrapper"]} ${sidebarOpen ? styles["sidebar-wrapper--open"] : styles["sidebar-wrapper--closed"]
-          }`}
-      >
-        <button
-          className={styles["sidebar-toggle"]}
-          onClick={() => setSidebarOpen((prev) => !prev)}
-          aria-label={sidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
-        >
-          {sidebarOpen ? "→" : "←"}
-        </button>
-
-        {sidebarOpen && (
-          <aside
-            className={styles["notes-sidebar"]}
-            aria-label="Saved notes"
-          >
-            <div className={styles["notes-sidebar__header"]}>
-              <span className={styles["notes-sidebar__title"]}>Your Notes</span>
-              <button
-                className={styles["notes-sidebar__new-btn"]}
-                onClick={handleNewNote}
-                aria-label="Create new note"
-                title="New note"
-              >
-                +
-              </button>
-            </div>
-
-            {fetching && (
-              <div className={styles["notes-sidebar__loading"]} aria-live="polite">
-                <span
-                  className={`${styles.spinner} ${styles["spinner--sm"]}`}
-                  aria-hidden="true"
-                />
-                Loading…
-              </div>
-            )}
-
-            {fetchError && (
-              <p className={styles["notes-sidebar__error"]} role="alert">
-                {fetchError}
-              </p>
-            )}
-
-            {!fetching && notes.length === 0 && (
-              <div className={styles["notes-sidebar__empty"]}>
-                <span aria-hidden="true">📝</span>
-                <p>
-                  No notes yet.
-                  <br />
-                  Create your first one!
-                </p>
-              </div>
-            )}
-
-            {pinnedNotes.length > 0 && (
-              <div className={styles["notes-sidebar__group"]}>
-                <span className={styles["notes-sidebar__group-label"]}>📌 Pinned</span>
-                {pinnedNotes.map((note) => (
-                  <button
-                    key={note._id}
-                    className={`${styles["notes-sidebar__item"]}${activeNoteId === note._id ? ` ${styles.active}` : ""
-                      }`}
-                    onClick={() => handleSidebarNoteClick(note)}
-                    aria-current={activeNoteId === note._id ? "true" : undefined}
-                  >
-                    <span className={styles["notes-sidebar__item-icon"]} aria-hidden="true">
-                      📄
-                    </span>
-                    <span className={styles["notes-sidebar__item-title"]}>
-                      {note.title.replace(/\*\*/g, "")}
-                    </span>
-                  </button>
-                ))}
-              </div>
-            )}
-
-            {unpinnedNotes.length > 0 && (
-              <div className={styles["notes-sidebar__group"]}>
-                {pinnedNotes.length > 0 && (
-                  <span className={styles["notes-sidebar__group-label"]}>All Notes</span>
-                )}
-                {unpinnedNotes.map((note) => (
-                  <button
-                    key={note._id}
-                    className={`${styles["notes-sidebar__item"]}${activeNoteId === note._id ? ` ${styles.active}` : ""
-                      }`}
-                    onClick={() => handleSidebarNoteClick(note)}
-                    aria-current={activeNoteId === note._id ? "true" : undefined}
-                  >
-                    <span className={styles["notes-sidebar__item-icon"]} aria-hidden="true">
-                      📄
-                    </span>
-                    <span className={styles["notes-sidebar__item-title"]}>
-                      {note.title}
-                    </span>
-                  </button>
-                ))}
-              </div>
-            )}
-          </aside>
-        )}
-      </div>
 
       {/* ── MAIN PANEL ── */}
       <main
@@ -872,20 +714,102 @@ const Notes = () => {
         )}
 
         {error && (
-          <div
-            className={styles["notes-error"]}
-            role="alert"
-          >
+          <div className={styles["notes-error"]} role="alert">
             <span>⚠ {error}</span>
-            <button
-              onClick={() => setError("")}
-              aria-label="Dismiss error"
-            >
+            <button onClick={() => setError("")} aria-label="Dismiss error">
               ✕
             </button>
           </div>
         )}
       </main>
+
+      {/* ── NOTES SIDEBAR (RIGHT) ── */}
+      {/* ── CHANGED: mirrors Quiz's historySidebar exactly ── */}
+      <div
+        className={`${styles.sidebar} ${sidebarOpen ? styles.sidebarOpen : styles.sidebarClosed}`}
+      >
+        {/* Toggle button — absolute, vertically centered, same as Quiz */}
+        <button
+          className={styles.sidebarToggleBtn}
+          onClick={() => setSidebarOpen((prev) => !prev)}
+          aria-label={sidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
+        >
+          {sidebarOpen ? "→" : "←"}
+        </button>
+
+        {/* Content — only render when open, same as Quiz */}
+        {sidebarOpen && (
+          <div className={styles.sidebarContent} aria-label="Saved notes">
+            <div className={styles.sidebarHeader}>
+              <h3 className={styles.sidebarTitle}>📝 Your Notes</h3>
+              <button
+                className={styles.sidebarNewBtn}
+                onClick={handleNewNote}
+                aria-label="Create new note"
+                title="New note"
+              >
+                +
+              </button>
+            </div>
+
+            {fetching && (
+              <p className={styles.sidebarEmpty}>Loading…</p>
+            )}
+
+            {fetchError && (
+              <p className={styles.sidebarEmpty} role="alert">
+                {fetchError}
+              </p>
+            )}
+
+            {!fetching && notes.length === 0 && (
+              <p className={styles.sidebarEmpty}>No notes yet.</p>
+            )}
+
+            {pinnedNotes.length > 0 && (
+              <>
+                <p className={styles.sidebarGroupLabel}>📌 Pinned</p>
+                {pinnedNotes.map((note) => (
+                  <div
+                    key={note._id}
+                    className={`${styles.sidebarItem} ${activeNoteId === note._id ? styles.sidebarItemActive : ""}`}
+                    onClick={() => handleSidebarNoteClick(note)}
+                  >
+                    <div className={styles.sidebarItemTitle}>
+                      {note.title.replace(/\*\*/g, "")}
+                    </div>
+                    <div className={styles.sidebarItemMeta}>
+                      {new Date(note.createdAt).toLocaleDateString()}
+                    </div>
+                  </div>
+                ))}
+              </>
+            )}
+
+            {unpinnedNotes.length > 0 && (
+              <>
+                {pinnedNotes.length > 0 && (
+                  <p className={styles.sidebarGroupLabel}>All Notes</p>
+                )}
+                {unpinnedNotes.map((note) => (
+                  <div
+                    key={note._id}
+                    className={`${styles.sidebarItem} ${activeNoteId === note._id ? styles.sidebarItemActive : ""}`}
+                    onClick={() => handleSidebarNoteClick(note)}
+                  >
+                    <div className={styles.sidebarItemTitle}>
+                      {note.title.replace(/\*\*/g, "")}
+                    </div>
+                    <div className={styles.sidebarItemMeta}>
+                      {new Date(note.createdAt).toLocaleDateString()}
+                    </div>
+                  </div>
+                ))}
+              </>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
