@@ -120,7 +120,7 @@ export const WelcomePanel = ({ onStart }) => (
   </section>
 );
 
-const StyledSummary = ({ content }) => {
+export const StyledSummary = ({ content }) => {
   const lines = content.split("\n");
   const elements = [];
   let i = 0;
@@ -730,118 +730,110 @@ const Notes = () => {
 
       {/* ── NOTES SIDEBAR ── */}
 
-      <div className={styles["sidebar-wrapper"]}>
+      {/* ── NOTES SIDEBAR ── */}
+      <div
+        className={`${styles["sidebar-wrapper"]} ${sidebarOpen ? styles["sidebar-wrapper--open"] : styles["sidebar-wrapper--closed"]
+          }`}
+      >
         <button
           className={styles["sidebar-toggle"]}
           onClick={() => setSidebarOpen((prev) => !prev)}
           aria-label={sidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
         >
-          {sidebarOpen ? ">" : "<"}
+          {sidebarOpen ? "→" : "←"}
         </button>
 
-        <aside
-          className={styles["notes-sidebar"]}
-          aria-label="Saved notes"
-        >
-          <div className={styles["notes-sidebar__header"]}>
-            <span className={styles["notes-sidebar__title"]}>Your Notes</span>
-            <button
-              className={styles["notes-sidebar__new-btn"]}
-              onClick={handleNewNote}
-              aria-label="Create new note"
-              title="New note"
-            >
-              +
-            </button>
-          </div>
-
-          {fetching && (
-            <div
-              className={styles["notes-sidebar__loading"]}
-              aria-live="polite"
-            >
-              <span
-                className={`${styles.spinner} ${styles["spinner--sm"]}`}
-                aria-hidden="true"
-              />
-              Loading…
+        {sidebarOpen && (
+          <aside
+            className={styles["notes-sidebar"]}
+            aria-label="Saved notes"
+          >
+            <div className={styles["notes-sidebar__header"]}>
+              <span className={styles["notes-sidebar__title"]}>Your Notes</span>
+              <button
+                className={styles["notes-sidebar__new-btn"]}
+                onClick={handleNewNote}
+                aria-label="Create new note"
+                title="New note"
+              >
+                +
+              </button>
             </div>
-          )}
 
-          {fetchError && (
-            <p
-              className={styles["notes-sidebar__error"]}
-              role="alert"
-            >
-              {fetchError}
-            </p>
-          )}
+            {fetching && (
+              <div className={styles["notes-sidebar__loading"]} aria-live="polite">
+                <span
+                  className={`${styles.spinner} ${styles["spinner--sm"]}`}
+                  aria-hidden="true"
+                />
+                Loading…
+              </div>
+            )}
 
-          {!fetching && notes.length === 0 && (
-            <div className={styles["notes-sidebar__empty"]}>
-              <span aria-hidden="true">📝</span>
-              <p>
-                No notes yet.
-                <br />
-                Create your first one!
+            {fetchError && (
+              <p className={styles["notes-sidebar__error"]} role="alert">
+                {fetchError}
               </p>
-            </div>
-          )}
+            )}
 
-          {pinnedNotes.length > 0 && (
-            <div className={styles["notes-sidebar__group"]}>
-              <span className={styles["notes-sidebar__group-label"]}>
-                📌 Pinned
-              </span>
-              {pinnedNotes.map((note) => (
-                <button
-                  key={note._id}
-                  className={`${styles["notes-sidebar__item"]}${activeNoteId === note._id ? ` ${styles.active}` : ""}`}
-                  onClick={() => handleSidebarNoteClick(note)}
-                  aria-current={activeNoteId === note._id ? "true" : undefined}
-                >
-                  <span
-                    className={styles["notes-sidebar__item-icon"]}
-                    aria-hidden="true"
-                  >
-                    📄
-                  </span>
-                  <span className={styles["notes-sidebar__item-title"]}>
-                    {note.title.replace(/\*\*/g, "")}
-                  </span>
-                </button>
-              ))}
-            </div>
-          )}
+            {!fetching && notes.length === 0 && (
+              <div className={styles["notes-sidebar__empty"]}>
+                <span aria-hidden="true">📝</span>
+                <p>
+                  No notes yet.
+                  <br />
+                  Create your first one!
+                </p>
+              </div>
+            )}
 
-          {unpinnedNotes.length > 0 && (
-            <div className={styles["notes-sidebar__group"]}>
-              {pinnedNotes.length > 0 && (
-                <span className={styles["notes-sidebar__group-label"]}>
-                  All Notes
-                </span>
-              )}
-              {unpinnedNotes.map((note) => (
-                <button
-                  key={note._id}
-                  className={`${styles["notes-sidebar__item"]}${activeNoteId === note._id ? ` ${styles.active}` : ""}`}
-                  onClick={() => handleSidebarNoteClick(note)}
-                  aria-current={activeNoteId === note._id ? "true" : undefined}
-                >
-                  <span
-                    className={styles["notes-sidebar__item-icon"]}
-                    aria-hidden="true"
+            {pinnedNotes.length > 0 && (
+              <div className={styles["notes-sidebar__group"]}>
+                <span className={styles["notes-sidebar__group-label"]}>📌 Pinned</span>
+                {pinnedNotes.map((note) => (
+                  <button
+                    key={note._id}
+                    className={`${styles["notes-sidebar__item"]}${activeNoteId === note._id ? ` ${styles.active}` : ""
+                      }`}
+                    onClick={() => handleSidebarNoteClick(note)}
+                    aria-current={activeNoteId === note._id ? "true" : undefined}
                   >
-                    📄
-                  </span>
-                  <span className={styles["notes-sidebar__item-title"]}>
-                    {note.title}
-                  </span>
-                </button>
-              ))}
-            </div>
-          )}
-        </aside>
+                    <span className={styles["notes-sidebar__item-icon"]} aria-hidden="true">
+                      📄
+                    </span>
+                    <span className={styles["notes-sidebar__item-title"]}>
+                      {note.title.replace(/\*\*/g, "")}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {unpinnedNotes.length > 0 && (
+              <div className={styles["notes-sidebar__group"]}>
+                {pinnedNotes.length > 0 && (
+                  <span className={styles["notes-sidebar__group-label"]}>All Notes</span>
+                )}
+                {unpinnedNotes.map((note) => (
+                  <button
+                    key={note._id}
+                    className={`${styles["notes-sidebar__item"]}${activeNoteId === note._id ? ` ${styles.active}` : ""
+                      }`}
+                    onClick={() => handleSidebarNoteClick(note)}
+                    aria-current={activeNoteId === note._id ? "true" : undefined}
+                  >
+                    <span className={styles["notes-sidebar__item-icon"]} aria-hidden="true">
+                      📄
+                    </span>
+                    <span className={styles["notes-sidebar__item-title"]}>
+                      {note.title}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </aside>
+        )}
       </div>
 
       {/* ── MAIN PANEL ── */}
