@@ -115,4 +115,20 @@ describe("StyledSummary", () => {
         expect(screen.queryByRole("list")).not.toBeInTheDocument()
         expect(screen.queryByText(/.+/)).not.toBeInTheDocument()
     })
+
+    it("groups consecutive bullet lines into single ul", ()=>{
+        const { container } = render(<StyledSummary content={
+            `
+                - Naruto
+                - Bleach
+                - One Piece
+            `
+        }/>)
+
+        const list = screen.getAllByRole("list")
+        const items = screen.getAllByRole("listitem")
+
+        expect(list).toHaveLength(1)
+        expect(items).toHaveLength(3);
+    })
 })
