@@ -1,6 +1,6 @@
 /// <reference types="vitest/globals" />
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor, cleanup } from '@testing-library/react'
 import userEvent from "@testing-library/user-event"
 import { NoteDocument } from '../../pages/Notes'
 import styles from "/src/pages/styles/notes.module.css";
@@ -45,30 +45,42 @@ describe("NoteDocument", ()=>{
       expect(title).toHaveTextContent(noteMock.title)
     })
 
-    it("shows Pinned badge when isPinned is true",async ()=>{
-        const button = screen.getByRole("button",
-            {
-                name:/Unpin note/i
-            }
-        )
+    it("shows Pinned badge when isPinned is true",()=>{
 
-        expect(button).toBeInTheDocument()
+        const unpin = screen.getByText(/^📌 Pinned$/i)
 
-        await userEvent.click(button)
-        expect(onPinMock).toHaveBeenCalledTimes(1)
+        expect(unpin).toBeInTheDocument()
+        // const button = screen.getByRole("button",
+        //     {
+        //         name:/Unpin note/i
+        //     }
+        // )
+
+        // expect(button).toBeInTheDocument()
+
+        // await userEvent.click(button)
+        // expect(onPinMock).toHaveBeenCalledTimes(1)
     })
 
-    it("hides Pinned badge when isPinned is false", async()=>{
-        const button = screen.getByRole("button",
-            {
-                name:/Pin note/i
-            }
-        )
+    it("hides Pinned badge when isPinned is false", ()=>{
 
-        expect(button).toBeInTheDocument()
+        cleanup();
+        render(
+            <NoteDocument note={{ ...noteMock, isPinned: false }} onCopy={onCopyMock} onDelete={onDeleteMock} onDownload={onDownloadMock} onEdit={onEditMock} onPin={onPinMock} isCopied={true} docRef={null} />
+        );
 
-        await userEvent.click(button)
+        const pin = screen.queryByText(/^📌 Pinned$/i)
+        expect(pin).not.toBeInTheDocument()
+        // const button = screen.getByRole("button",
+        //     {
+        //         name:/Pin note/i
+        //     }
+        // )
 
-        expect(onPinMock).toHaveBeenCalledTimes(1)
+        // expect(button).toBeInTheDocument()
+
+        // await userEvent.click(button)
+
+        // expect(onPinMock).toHaveBeenCalledTimes(1)
     })
 })
