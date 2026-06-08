@@ -48,4 +48,14 @@ describe('NoteInputForm', () => {
         render(<NoteInputForm content="Hello World" onChange={onChangeMock} onSubmit={onSubmitMock} loading={false} editId={null} onCancelEdit={onCancelEditMock} inputRef={null} />)
         expect(screen.getByText("11 characters")).toBeInTheDocument()
     })
+
+    it("shows tip text when content is empty", () => {
+        expect(screen.getByText("Tip: longer text = richer summary")).toBeInTheDocument()
+    })
+
+    it("shows spinner and 'Summarising…' text when loading", () => {
+        cleanup()
+        render(<NoteInputForm content="" onChange={onChangeMock} onSubmit={onSubmitMock} loading={true} editId={null} onCancelEdit={onCancelEditMock} inputRef={null} />)
+        expect(screen.getByRole("button", { name: /summarising/i })).toHaveTextContent("Summarising…")
+    })
 })
