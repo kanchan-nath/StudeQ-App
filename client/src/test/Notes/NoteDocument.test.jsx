@@ -156,4 +156,12 @@ describe("NoteDocument", ()=>{
         expect(onDownloadMock).toHaveBeenCalledTimes(1)
         expect(onDownloadMock).toHaveBeenCalledWith({ ...noteMock, isPinned: true })
     })
+
+    it("calls onEdit with note when Edit button clicked", async () => {
+        const button = screen.getByRole("button", { name: /edit note/i })
+        await userEvent.click(button)
+        expect(onEditMock).toHaveBeenCalledTimes(1)
+        expect(onEditMock).toHaveBeenCalledWith({ ...noteMock, isPinned: true })
+    })
+
 })
