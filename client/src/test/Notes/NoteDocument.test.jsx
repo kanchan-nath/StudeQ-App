@@ -130,4 +130,9 @@ describe("NoteDocument", ()=>{
         )
         expect(screen.queryByText(/key points/i)).not.toBeInTheDocument()
     })
+
+    it("pads key point numbers with leading zero", () => {
+        expect(screen.getByText("01")).toBeInTheDocument()
+        expect(screen.getByText("02")).toBeInTheDocument()
+    })
 })
