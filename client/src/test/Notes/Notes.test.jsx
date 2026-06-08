@@ -209,3 +209,23 @@ describe('Notes — edit flow', () => {
     })
 })
 
+describe('Notes — toast', () => {
+    beforeEach(async () => {
+        global.fetch = vi.fn().mockResolvedValue({ ok: true, json: async () => ({ data: [] }) })
+        render(<Notes />)
+        await waitFor(() => expect(global.fetch).toHaveBeenCalled())
+    })
+
+    it('toast renders when toast state is set', async () => {
+        await act(async () => { socketHandlers['ai-response'](aiNote) })
+        await waitFor(() => expect(screen.getByText('Note created!')).toBeInTheDocument())
+    })
+
+    it('clicking toast close button clears toast', async () => {
+        await act(async () => { socketHandlers['ai-response'](aiNote) })
+        await waitFor(() => expect(screen.getByText('Note created!')).toBeInTheDocument())
+        // TODO: adjust close button selector to match your Toast component
+        await userEvent.click(screen.getByRole('button', { name: /dismiss/i }))
+        await waitFor(() => expect(screen.queryByText('Note created!')).not.toBeInTheDocument())
+    })
+})
