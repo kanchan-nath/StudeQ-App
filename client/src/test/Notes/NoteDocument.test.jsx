@@ -50,16 +50,7 @@ describe("NoteDocument", ()=>{
         const unpin = screen.getByText(/^📌 Pinned$/i)
 
         expect(unpin).toBeInTheDocument()
-        // const button = screen.getByRole("button",
-        //     {
-        //         name:/Unpin note/i
-        //     }
-        // )
-
-        // expect(button).toBeInTheDocument()
-
-        // await userEvent.click(button)
-        // expect(onPinMock).toHaveBeenCalledTimes(1)
+        
     })
 
     it("hides Pinned badge when isPinned is false", ()=>{
@@ -82,5 +73,20 @@ describe("NoteDocument", ()=>{
         // await userEvent.click(button)
 
         // expect(onPinMock).toHaveBeenCalledTimes(1)
+    })
+
+    it("shows Unpin button text when note is pinned", async()=>{
+        const button = screen.getByRole("button",
+            {
+                name: /Unpin note/i
+            }
+        )
+
+        expect(button).toBeInTheDocument()
+        expect(button).toHaveTextContent("📌 Unpin")
+
+        await userEvent.click(button)
+
+        expect(onPinMock).toHaveBeenCalledTimes(1)
     })
 })
