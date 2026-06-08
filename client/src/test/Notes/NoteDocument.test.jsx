@@ -62,17 +62,7 @@ describe("NoteDocument", ()=>{
 
         const pin = screen.queryByText(/^📌 Pinned$/i)
         expect(pin).not.toBeInTheDocument()
-        // const button = screen.getByRole("button",
-        //     {
-        //         name:/Pin note/i
-        //     }
-        // )
-
-        // expect(button).toBeInTheDocument()
-
-        // await userEvent.click(button)
-
-        // expect(onPinMock).toHaveBeenCalledTimes(1)
+        
     })
 
     it("shows Unpin button text when note is pinned", async()=>{
@@ -85,6 +75,25 @@ describe("NoteDocument", ()=>{
         expect(button).toBeInTheDocument()
         expect(button).toHaveTextContent("📌 Unpin")
 
+        await userEvent.click(button)
+
+        expect(onPinMock).toHaveBeenCalledTimes(1)
+    })
+
+    it("shows Pin button text when note is not pinned",async()=>{
+        cleanup()
+
+        render(
+            <NoteDocument note={{ ...noteMock, isPinned: false }} onCopy={onCopyMock} onDelete={onDeleteMock} onDownload={onDownloadMock} onEdit={onEditMock} onPin={onPinMock} isCopied={true} docRef={null} />
+        );
+        const button = screen.getByRole("button",
+            {
+                name: /Pin note/i
+            }
+        )
+
+        expect(button).toBeInTheDocument()
+        expect(button).toHaveTextContent("📌 Pin")
         await userEvent.click(button)
 
         expect(onPinMock).toHaveBeenCalledTimes(1)
