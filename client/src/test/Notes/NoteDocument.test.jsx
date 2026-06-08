@@ -108,4 +108,18 @@ describe("NoteDocument", ()=>{
         const heading = screen.getByRole("heading", { level: 2, name: "Summary" })
         expect(heading).toBeInTheDocument()
     })
+
+    it("renders Key Points list when keyPoints is array", () => {
+        expect(screen.getByText("Hooks are functions")).toBeInTheDocument()
+        expect(screen.getByText("State triggers re-renders")).toBeInTheDocument()
+    })
+
+    it("renders Key Points list when keyPoints is newline-separated string", () => {
+        cleanup()
+        render(
+            <NoteDocument note={{ ...noteMock, keyPoints: "Hooks are functions\nState triggers re-renders" }} onCopy={onCopyMock} onDelete={onDeleteMock} onDownload={onDownloadMock} onEdit={onEditMock} onPin={onPinMock} isCopied={false} docRef={null} />
+        )
+        expect(screen.getByText("Hooks are functions")).toBeInTheDocument()
+        expect(screen.getByText("State triggers re-renders")).toBeInTheDocument()
+    })
 })
