@@ -78,29 +78,44 @@ export const WelcomePanel = ({ onStart }) => (
         structured summary with key insights in seconds.
       </p>
 
-      <div className={styles["welcome-panel__features"]} data-testid="welcome-card">
-        <div className={styles["welcome-feature"]} data-testid="welcome-card1">
+      <div
+        className={styles["welcome-panel__features"]}
+        data-testid="welcome-card"
+      >
+        <div
+          className={styles["welcome-feature"]}
+          data-testid="welcome-card1"
+        >
           <span className={styles["welcome-feature__icon"]}>📋</span>
           <div>
             <strong>Smart Summaries</strong>
             <p>AI condenses long content into crisp, readable notes</p>
           </div>
         </div>
-        <div className={styles["welcome-feature"]} data-testid="welcome-card2">
+        <div
+          className={styles["welcome-feature"]}
+          data-testid="welcome-card2"
+        >
           <span className={styles["welcome-feature__icon"]}>🔑</span>
           <div>
             <strong>Key Point Extraction</strong>
             <p>Never miss the important bits — surfaced automatically</p>
           </div>
         </div>
-        <div className={styles["welcome-feature"]} data-testid="welcome-card3">
+        <div
+          className={styles["welcome-feature"]}
+          data-testid="welcome-card3"
+        >
           <span className={styles["welcome-feature__icon"]}>📥</span>
           <div>
             <strong>Export Anywhere</strong>
             <p>Copy to clipboard or download as PDF instantly</p>
           </div>
         </div>
-        <div className={styles["welcome-feature"]} data-testid="welcome-card4">
+        <div
+          className={styles["welcome-feature"]}
+          data-testid="welcome-card4"
+        >
           <span className={styles["welcome-feature__icon"]}>📌</span>
           <div>
             <strong>Pin & Organise</strong>
@@ -134,19 +149,28 @@ export const StyledSummary = ({ content }) => {
 
     if (line.startsWith("### ")) {
       elements.push(
-        <h4 key={i} className={styles["sum-h3"]}>
+        <h4
+          key={i}
+          className={styles["sum-h3"]}
+        >
           {line.slice(4)}
         </h4>,
       );
     } else if (line.startsWith("## ")) {
       elements.push(
-        <h3 key={i} className={styles["sum-h2"]}>
+        <h3
+          key={i}
+          className={styles["sum-h2"]}
+        >
           {line.slice(3)}
         </h3>,
       );
     } else if (line.startsWith("# ")) {
       elements.push(
-        <h2 key={i} className={styles["sum-h1"]}>
+        <h2
+          key={i}
+          className={styles["sum-h1"]}
+        >
           {line.slice(2)}
         </h2>,
       );
@@ -164,14 +188,20 @@ export const StyledSummary = ({ content }) => {
         i++;
       }
       elements.push(
-        <ul key={`ul-${i}`} className={styles["sum-list"]}>
+        <ul
+          key={`ul-${i}`}
+          className={styles["sum-list"]}
+        >
           {bullets}
         </ul>,
       );
       continue;
     } else {
       elements.push(
-        <div key={i} className={styles["sum-para"]}>
+        <div
+          key={i}
+          className={styles["sum-para"]}
+        >
           <LLMMarkdown content={line} />
         </div>,
       );
@@ -261,7 +291,10 @@ export const NoteDocument = ({
       <div className={styles["note-doc__body"]}>
         <section className={styles["note-doc__section"]}>
           <h2 className={styles["note-doc__section-title"]}>
-            <span className={styles["note-doc__section-icon"]} aria-hidden="true">
+            <span
+              className={styles["note-doc__section-icon"]}
+              aria-hidden="true"
+            >
               ≡
             </span>
             Summary
@@ -274,14 +307,20 @@ export const NoteDocument = ({
         {keyPoints.length > 0 && (
           <section className={styles["note-doc__section"]}>
             <h2 className={styles["note-doc__section-title"]}>
-              <span className={styles["note-doc__section-icon"]} aria-hidden="true">
+              <span
+                className={styles["note-doc__section-icon"]}
+                aria-hidden="true"
+              >
                 ◆
               </span>
               Key Points
             </h2>
             <ul className={styles["note-doc__keypoints"]}>
               {keyPoints.map((pt, i) => (
-                <li key={i} className={styles["note-doc__keypoint"]}>
+                <li
+                  key={i}
+                  className={styles["note-doc__keypoint"]}
+                >
                   <span
                     className={styles["note-doc__keypoint-num"]}
                     aria-hidden="true"
@@ -325,7 +364,10 @@ export const NoteInputForm = ({
           </button>
         )}
       </div>
-      <form onSubmit={onSubmit} className={styles["note-input-card__form"]}>
+      <form
+        onSubmit={onSubmit}
+        className={styles["note-input-card__form"]}
+      >
         <textarea
           ref={inputRef}
           name="content"
@@ -351,7 +393,10 @@ export const NoteInputForm = ({
           >
             {loading ? (
               <>
-                <span className={styles.spinner} aria-hidden="true" />
+                <span
+                  className={styles.spinner}
+                  aria-hidden="true"
+                />
                 Summarising…
               </>
             ) : editId ? (
@@ -552,7 +597,9 @@ const Notes = () => {
       };
 
       const keyPointsText = Array.isArray(note.keyPoints)
-        ? note.keyPoints.map((pt, i) => `${i + 1}. ${stripMarkdown(pt)}`).join("\n")
+        ? note.keyPoints
+            .map((pt, i) => `${i + 1}. ${stripMarkdown(pt)}`)
+            .join("\n")
         : stripMarkdown(note.keyPoints);
 
       const text = [
@@ -714,9 +761,15 @@ const Notes = () => {
         )}
 
         {error && (
-          <div className={styles["notes-error"]} role="alert">
+          <div
+            className={styles["notes-error"]}
+            role="alert"
+          >
             <span>⚠ {error}</span>
-            <button onClick={() => setError("")} aria-label="Dismiss error">
+            <button
+              onClick={() => setError("")}
+              aria-label="Dismiss error"
+            >
               ✕
             </button>
           </div>
@@ -739,7 +792,10 @@ const Notes = () => {
 
         {/* Content — only render when open, same as Quiz */}
         {sidebarOpen && (
-          <div className={styles.sidebarContent} aria-label="Saved notes">
+          <div
+            className={styles.sidebarContent}
+            aria-label="Saved notes"
+          >
             <div className={styles.sidebarHeader}>
               <h3 className={styles.sidebarTitle}>📝 Your Notes</h3>
               <button
@@ -752,12 +808,13 @@ const Notes = () => {
               </button>
             </div>
 
-            {fetching && (
-              <p className={styles.sidebarEmpty}>Loading…</p>
-            )}
+            {fetching && <p className={styles.sidebarEmpty}>Loading…</p>}
 
             {fetchError && (
-              <p className={styles.sidebarEmpty} role="alert">
+              <p
+                className={styles.sidebarEmpty}
+                role="alert"
+              >
                 {fetchError}
               </p>
             )}
