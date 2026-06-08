@@ -33,4 +33,10 @@ describe('NoteInputForm', () => {
         render(<NoteInputForm content="" onChange={onChangeMock} onSubmit={onSubmitMock} loading={false} editId="abc123" onCancelEdit={onCancelEditMock} inputRef={null} />)
         expect(screen.getByRole("button", { name: /cancel editing/i })).toBeInTheDocument()
     })
+
+    it("hides Cancel button when no editId", () => {
+        expect(screen.queryByRole("button", { name: /cancel editing/i })).not.toBeInTheDocument()
+    })
+
+    
 })
