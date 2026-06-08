@@ -58,4 +58,10 @@ describe('NoteInputForm', () => {
         render(<NoteInputForm content="" onChange={onChangeMock} onSubmit={onSubmitMock} loading={true} editId={null} onCancelEdit={onCancelEditMock} inputRef={null} />)
         expect(screen.getByRole("button", { name: /summarising/i })).toHaveTextContent("Summarising…")
     })
+
+    it("shows '✦ Update Note' on submit button when editId set", () => {
+        cleanup()
+        render(<NoteInputForm content="" onChange={onChangeMock} onSubmit={onSubmitMock} loading={false} editId="abc123" onCancelEdit={onCancelEditMock} inputRef={null} />)
+        expect(screen.getByRole("button", { name: /update note/i })).toHaveTextContent("✦ Update Note")
+    })
 })
