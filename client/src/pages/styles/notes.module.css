@@ -76,30 +76,34 @@
 }
 
 /* ── NOTES SIDEBAR (RIGHT) ───────────────────────────────────── */
-/* MODIFIED */
 .sidebar-wrapper {
+  grid-column: 2;
+  /* force right column */
+  grid-row: 1;
   position: relative;
+  height: 100%;
+  background: var(--n-surface);
+  border-left: 1px solid var(--n-border);
   display: flex;
   flex-direction: row;
-  grid-column: 2;
-  grid-row: 1;
-  overflow: hidden;
+  transition: width var(--n-t-slow), background var(--n-t-slow), border-color var(--n-t-slow);
   flex-shrink: 0;
-  border-left: 1px solid var(--n-border);
-  /* moved from notes-sidebar */
-  transition: width var(--t-slow), border-color var(--t-slow);
+  overflow: hidden;
 }
 
-/* NEW */
 .sidebar-wrapper--open {
-  width: 260px;
+  width: var(--n-sidebar-w);
+  /* uses your --n-sidebar-w: 260px */
 }
 
 .sidebar-wrapper--closed {
   width: 36px;
 }
 
-/* MODIFIED */
+/* also push main to column 1 */
+/* add to your main content wrapper class: */
+/* grid-column: 1; grid-row: 1; */
+
 .sidebar-toggle {
   position: absolute;
   left: 0;
@@ -107,22 +111,18 @@
   transform: translateY(-50%);
   width: 36px;
   height: 48px;
-  background: var(--n-surface);
+  background: var(--n-surface-raised);
   border: 1px solid var(--n-border);
   border-left: none;
-  border-radius: 0 var(--n-r-sm) var(--n-r-sm) 0;
-  color: var(--n-primary);
-  font-size: 0.85rem;
+  border-radius: 0 8px 8px 0;
   cursor: pointer;
+  font-size: 14px;
+  color: var(--n-text-secondary);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 10;
-  flex-shrink: 0;
-  transition:
-    background var(--n-t-fast),
-    color var(--n-t-fast),
-    border-color var(--t-slow);
+  transition: background var(--n-t-base), color var(--n-t-base), border-color var(--n-t-slow);
 }
 
 .sidebar-toggle:hover {
@@ -130,18 +130,150 @@
   color: var(--n-primary);
 }
 
-/* MODIFIED — removed border-left, added width + padding-left */
+/* ── ASIDE ─────────────────────────────────────────────────────── */
 .notes-sidebar {
-  background: var(--n-surface);
+  padding: 24px 16px 24px 48px;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--n-border) var(--n-surface-raised);
+  box-sizing: border-box;
+}
+
+.notes-sidebar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.notes-sidebar::-webkit-scrollbar-track {
+  background: var(--n-surface-raised);
+}
+
+.notes-sidebar::-webkit-scrollbar-thumb {
+  background: var(--n-border);
+  border-radius: 999px;
+}
+
+.notes-sidebar::-webkit-scrollbar-thumb:hover {
+  background: var(--n-text-muted);
+}
+
+.notes-sidebar__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.notes-sidebar__title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--n-text-primary);
+}
+
+.notes-sidebar__new-btn {
+  width: 26px;
+  height: 26px;
+  border: none;
+  background: transparent;
+  color: var(--n-text-muted);
+  font-size: 18px;
+  cursor: pointer;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--n-t-base), color var(--n-t-base);
+}
+
+.notes-sidebar__new-btn:hover {
+  background: var(--n-primary-light);
+  color: var(--n-primary);
+}
+
+.notes-sidebar__loading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--n-text-muted);
+}
+
+.notes-sidebar__error {
+  font-size: 13px;
+  color: var(--n-danger);
+  margin: 0;
+}
+
+.notes-sidebar__empty {
   display: flex;
   flex-direction: column;
-  overflow-y: auto;
-  overflow-x: hidden;
-  gap: 0;
+  align-items: center;
+  gap: 8px;
+  padding: 24px 0;
+  font-size: 13px;
+  color: var(--n-text-muted);
+  text-align: center;
+}
+
+.notes-sidebar__empty p {
+  margin: 0;
+  line-height: 1.5;
+}
+
+.notes-sidebar__group {
+  margin-bottom: 8px;
+}
+
+.notes-sidebar__group-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--n-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 6px;
+  padding: 0 2px;
+}
+
+.notes-sidebar__item {
   width: 100%;
-  padding-left: 36px;
-  /* clears the toggle button */
-  transition: background var(--t-slow);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 14px;
+  border: 1.5px solid var(--n-border);
+  border-radius: var(--n-r-sm);
+  margin-bottom: 10px;
+  cursor: pointer;
+  background: var(--n-surface-raised);
+  text-align: left;
+  transition: background var(--n-t-base), border-color var(--n-t-base);
+  color: var(--n-text-primary);
+}
+
+.notes-sidebar__item:hover {
+  border-color: var(--n-primary);
+  background: var(--n-primary-light);
+}
+
+.notes-sidebar__item.active {
+  border-color: var(--n-primary);
+  background: var(--n-primary-light);
+}
+
+.notes-sidebar__item-icon {
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.notes-sidebar__item-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--n-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* ── MAIN PANEL (LEFT) ───────────────────────────────────────── */
