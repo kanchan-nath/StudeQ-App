@@ -150,5 +150,10 @@ describe("NoteDocument", ()=>{
         expect(onCopyMock).toHaveBeenCalledWith({ ...noteMock, isPinned: true })
     })
 
-    
+    it("calls onDownload with note when PDF button clicked", async () => {
+        const button = screen.getByRole("button", { name: /download pdf/i })
+        await userEvent.click(button)
+        expect(onDownloadMock).toHaveBeenCalledTimes(1)
+        expect(onDownloadMock).toHaveBeenCalledWith({ ...noteMock, isPinned: true })
+    })
 })
