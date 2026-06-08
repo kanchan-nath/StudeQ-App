@@ -103,4 +103,9 @@ describe("NoteDocument", ()=>{
         const copyBtn = screen.getByRole("button", { name: /copy note/i })
         expect(copyBtn).toHaveTextContent("✓ Copied")
     })
+
+    it("renders Summary section", () => {
+        const heading = screen.getByRole("heading", { level: 2, name: "Summary" })
+        expect(heading).toBeInTheDocument()
+    })
 })
