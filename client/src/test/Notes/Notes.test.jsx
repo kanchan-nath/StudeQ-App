@@ -75,4 +75,9 @@ describe("Notes — panel view switching", ()=>{
         await userEvent.click(screen.getByRole('button', { name: /Create your first note/i }))
         expect(screen.getByRole('textbox', { name: /content to summarise/i })).toBeInTheDocument()
     })
+
+    it('renders NoteDocument when panelView is "note" and activeNote exists', async () => {
+        await act(async () => { socketHandlers['ai-response'](aiNote) })
+        await waitFor(() => expect(screen.getByRole('article')).toBeInTheDocument())
+    })
 })
