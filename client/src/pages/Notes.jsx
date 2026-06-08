@@ -78,7 +78,7 @@ export const WelcomePanel = ({ onStart }) => (
         structured summary with key insights in seconds.
       </p>
 
-      <div className={styles["welcome-panel__features"]} data-testid= "welcome-card">
+      <div className={styles["welcome-panel__features"]} data-testid="welcome-card">
         <div className={styles["welcome-feature"]} data-testid="welcome-card1">
           <span className={styles["welcome-feature__icon"]}>📋</span>
           <div>
@@ -121,7 +121,7 @@ export const WelcomePanel = ({ onStart }) => (
 );
 
 export const StyledSummary = ({ content }) => {
-  const lines = content.split("\n");
+  const lines = (content ?? "").split("\n");
   const elements = [];
   let i = 0;
 
@@ -581,8 +581,8 @@ const Notes = () => {
 
       const keyPointsText = Array.isArray(note.keyPoints)
         ? note.keyPoints
-            .map((pt, i) => `${i + 1}. ${stripMarkdown(pt)}`)
-            .join("\n")
+          .map((pt, i) => `${i + 1}. ${stripMarkdown(pt)}`)
+          .join("\n")
         : stripMarkdown(note.keyPoints);
 
       const text = [
