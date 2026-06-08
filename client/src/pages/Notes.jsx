@@ -120,7 +120,7 @@ export const WelcomePanel = ({ onStart }) => (
   </section>
 );
 
-const StyledSummary = ({ content }) => {
+export const StyledSummary = ({ content }) => {
   const lines = content.split("\n");
   const elements = [];
   let i = 0;

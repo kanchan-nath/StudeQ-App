@@ -2,15 +2,92 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from "@testing-library/user-event"
-import { Toast, WelcomePanel } from '../../pages/Notes'
+import {StyledSummary } from '../../pages/Notes'
 
 describe("StyledSummary",()=>{
-    const onStartMock = vi.fn()
 
-    beforeEach(()=>{
-        onStartMock.mockClear()
-        render(<WelcomePanel onStart={onStartMock} />)
+    it("renders h2 for # heading",()=>{
+        render(<StyledSummary content="# Hello World!" />)
+
+        const h2 = screen.getByRole("heading",
+            {
+                level:2,
+                name:"Hello World!"
+            }
+        )
+
+        expect(h2).toBeInTheDocument()
     })
 
-    it("")
+    it("renders h3 for # heading", () => {
+        render(<StyledSummary content="## Hello World!" />)
+
+        const h3 = screen.getByRole("heading",
+            {
+                level: 3,
+                name: "Hello World!"
+            }
+        )
+
+        expect(h3).toBeInTheDocument()
+    })
+
+    it("renders h4 for # heading", () => {
+        render(<StyledSummary content="### Hello World!" />)
+
+        const h4 = screen.getByRole("heading",
+            {
+                level: 4,
+                name: "Hello World!"
+            }
+        )
+
+        expect(h4).toBeInTheDocument()
+    })
+
+    it("renders ul and li for - bullet lines",()=>{
+        render(<StyledSummary content=
+            {
+                `
+                 - Bleach
+                 - Naruto
+                 - One Piece
+                `
+            } />)
+
+        const list = screen.getByRole("list")
+
+        expect(list).toBeInTheDocument()
+
+        const listitems = screen.getAllByRole("listitem")
+
+        expect(listitems).toHaveLength(3)
+        expect(listitems[0]).toHaveTextContent("Bleach")
+        expect(listitems[1]).toHaveTextContent("Naruto")
+        expect(listitems[2]).toHaveTextContent("One Piece")
+
+    })
+
+    it("renders ul and li for * bullet lines", () => {
+        render(<StyledSummary content=
+            {
+                `
+                 * Bleach
+                 * Naruto
+                 * One Piece
+                `
+            } />)
+
+        const list = screen.getByRole("list")
+
+        expect(list).toBeInTheDocument()
+
+        const listitems = screen.getAllByRole("listitem")
+
+        expect(listitems).toHaveLength(3)
+        expect(listitems[0]).toHaveTextContent("Bleach")
+        expect(listitems[1]).toHaveTextContent("Naruto")
+        expect(listitems[2]).toHaveTextContent("One Piece")
+
+    })
 })
