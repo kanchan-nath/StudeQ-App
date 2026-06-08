@@ -22,4 +22,15 @@ describe('NoteInputForm', () => {
         expect(screen.getByText("✦ New Note")).toBeInTheDocument()
     })
 
+    it("renders '✎ Edit Note Content' label when editId provided", () => {
+        cleanup()
+        render(<NoteInputForm content="" onChange={onChangeMock} onSubmit={onSubmitMock} loading={false} editId="abc123" onCancelEdit={onCancelEditMock} inputRef={null} />)
+        expect(screen.getByText("✎ Edit Note Content")).toBeInTheDocument()
+    })
+
+    it("shows Cancel button when editId provided", () => {
+        cleanup()
+        render(<NoteInputForm content="" onChange={onChangeMock} onSubmit={onSubmitMock} loading={false} editId="abc123" onCancelEdit={onCancelEditMock} inputRef={null} />)
+        expect(screen.getByRole("button", { name: /cancel editing/i })).toBeInTheDocument()
+    })
 })
