@@ -86,5 +86,17 @@ describe("Notes — panel view switching", ()=>{
         expect(screen.getByRole('textbox', { name: /content to summarise/i })).toBeInTheDocument()
     })
 
-    
+
+})
+
+describe('Notes — sidebar', () => {
+    beforeEach(async () => {
+        global.fetch = vi.fn().mockResolvedValue({ ok: true, json: async () => ({ data: [pinnedNote, unpinnedNote] }) })
+        render(<Notes />)
+        await waitFor(() => expect(screen.getByText('Pinned Note')).toBeInTheDocument())
+    })
+
+    it('renders "Your Notes" title', () => {
+        expect(screen.getByText('Your Notes')).toBeInTheDocument()
+    })
 })
