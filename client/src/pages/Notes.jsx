@@ -197,7 +197,7 @@ export const StyledSummary = ({ content }) => {
   return <div className={styles["sum-body"]}>{elements}</div>;
 };
 /* ─── single note document view ─────────────────────────────── */
-const NoteDocument = ({
+export const NoteDocument = ({
   note,
   onEdit,
   onDelete,
