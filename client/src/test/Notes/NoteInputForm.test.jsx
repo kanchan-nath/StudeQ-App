@@ -74,4 +74,25 @@ describe('NoteInputForm', () => {
         await userEvent.type(textarea, "a")
         expect(onChangeMock).toHaveBeenCalled()
     })
+
+    it("calls onSubmit when form is submitted", async () => {
+        cleanup()
+        render(<NoteInputForm content="some content" onChange={onChangeMock} onSubmit={onSubmitMock} loading={false} editId={null} onCancelEdit={onCancelEditMock} inputRef={null} />)
+        await userEvent.click(screen.getByRole("button", { name: /summarise & save/i }))
+        expect(onSubmitMock).toHaveBeenCalledTimes(1)
+    })
+
+    it("calls onCancelEdit when Cancel button clicked", async () => {
+        cleanup()
+        render(<NoteInputForm content="" onChange={onChangeMock} onSubmit={onSubmitMock} loading={false} editId="abc123" onCancelEdit={onCancelEditMock} inputRef={null} />)
+        await userEvent.click(screen.getByRole("button", { name: /cancel editing/i }))
+        expect(onCancelEditMock).toHaveBeenCalledTimes(1)
+    })
+
+    it("textarea is focused via inputRef", () => {
+        cleanup()
+        const inputRef = createRef()
+        render(<NoteInputForm content="" onChange={onChangeMock} onSubmit={onSubmitMock} loading={false} editId={null} onCancelEdit={onCancelEditMock} inputRef={inputRef} />)
+        expect(inputRef.current).toBeInstanceOf(HTMLTextAreaElement)
+    })
 })
