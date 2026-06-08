@@ -168,3 +168,27 @@ describe('Notes — new note flow', () => {
         expect(screen.queryByRole('textbox', { name: /content to summarise/i })).not.toBeInTheDocument()
     })
 })
+
+describe('Notes — edit flow', () => {
+    beforeEach(async () => {
+        global.fetch = vi.fn().mockResolvedValue({ ok: true, json: async () => ({ data: [] }) })
+        render(<Notes />)
+        await waitFor(() => expect(global.fetch).toHaveBeenCalled())
+        await act(async () => { socketHandlers['ai-response'](aiNote) })
+        await waitFor(() => expect(screen.getByRole('article')).toBeInTheDocument())
+    })
+
+    it('handleSubmitEdit sets editId and switches to form view', async () => {
+        await userEvent.click(screen.getByRole('button', { name: /edit note/i }))
+        expect(screen.getByRole('textbox', { name: /content to summarise/i })).toBeInTheDocument()
+        expect(screen.getByText('✎ Edit Note Content')).toBeInTheDocument()
+    })
+
+    it('handleCancelEdit clears editId and content', async () => {
+        await userEvent.click(screen.getByRole('button', { name: /edit note/i }))
+        expect(screen.getByRole('textbox', { name: /content to summarise/i })).toHaveValue(aiNote.summary)
+        await userEvent.click(screen.getByRole('button', { name: /cancel editing/i }))
+        expect(screen.queryByText('✎ Edit Note Content')).not.toBeInTheDocument()
+    })
+})
+
