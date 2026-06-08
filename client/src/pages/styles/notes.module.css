@@ -45,7 +45,6 @@
 }
 
 /* ── PAGE LAYOUT ─────────────────────────────────────────────── */
-/* CHANGED: flex row instead of grid — matches Quiz's homeWrapper */
 .notes-page {
   display: flex;
   flex-direction: row;
@@ -69,7 +68,6 @@
 }
 
 /* ── MAIN PANEL (LEFT) ───────────────────────────────────────── */
-/* CHANGED: flex:1 instead of grid-column — fills remaining space */
 .notes-main {
   flex: 1;
   min-width: 0;
@@ -93,9 +91,12 @@
   border-radius: var(--n-r-full);
 }
 
+/* ── MOBILE TOPBAR (hidden on desktop) ───────────────────────── */
+.mobile-topbar {
+  display: none;
+}
+
 /* ── NOTES SIDEBAR (RIGHT) ───────────────────────────────────── */
-/* CHANGED: mirrors Quiz's .historySidebar exactly               */
-/* position: relative (not fixed), flex-shrink:0, overflow:hidden */
 .sidebar {
   position: relative;
   height: 100%;
@@ -108,7 +109,6 @@
   overflow: hidden;
 }
 
-/* CHANGED: width classes instead of fixed/absolute positioning  */
 .sidebarOpen {
   width: 300px;
 }
@@ -117,7 +117,6 @@
   width: 36px;
 }
 
-/* CHANGED: absolute + vertically centered — mirrors Quiz exactly */
 .sidebarToggleBtn {
   position: absolute;
   left: 0;
@@ -146,7 +145,6 @@
   color: var(--n-primary);
 }
 
-/* CHANGED: padding-left:48px to clear the absolute toggle btn  */
 .sidebarContent {
   padding: 24px 16px 24px 48px;
   width: 100%;
@@ -171,6 +169,11 @@
 
 .sidebarContent::-webkit-scrollbar-thumb:hover {
   background: var(--n-text-muted);
+}
+
+/* ── MOBILE SIDEBAR OVERLAY (drawer) ─────────────────────────── */
+.sidebarOverlay {
+  display: none;
 }
 
 /* ── SIDEBAR INTERNALS ───────────────────────────────────────── */
@@ -225,7 +228,6 @@
   margin: 0;
 }
 
-/* CHANGED: matches Quiz's .sidebarItem exactly */
 .sidebarItem {
   padding: 12px 14px;
   border: 1.5px solid var(--n-border);
@@ -694,6 +696,7 @@
   align-items: center;
   gap: 8px;
   margin-bottom: 12px;
+  flex-wrap: wrap;
 }
 
 .note-doc__badge {
@@ -1005,9 +1008,120 @@
 
 @media (max-width: 768px) {
 
-  /* Hide sidebar on mobile, same as Quiz's .splitRight */
+  /* Sidebar becomes a fixed drawer overlay on mobile */
   .sidebar {
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100%;
+    width: 85vw !important;
+    max-width: 320px;
+    z-index: 300;
+    border-left: 1px solid var(--n-border);
+    box-shadow: -8px 0 32px rgba(0, 0, 0, 0.35);
+    transform: translateX(100%);
+    transition: transform var(--n-t-slow), background var(--t-slow), border-color var(--t-slow);
+    display: flex;
+  }
+
+  /* When open on mobile — JS should toggle this class */
+  .sidebar.sidebarMobileOpen {
+    transform: translateX(0);
+  }
+
+  /* Hide the collapse toggle on mobile — whole drawer is controlled by topbar btn */
+  .sidebarToggleBtn {
     display: none;
+  }
+
+  /* Sidebar content full width, no left padding offset needed */
+  .sidebarContent {
+    padding: 24px 16px;
+    width: 100%;
+  }
+
+  /* Backdrop overlay */
+  .sidebarOverlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    z-index: 299;
+    backdrop-filter: blur(2px);
+    animation: fadeIn 0.2s ease both;
+  }
+
+  /* Mobile topbar — shown only on mobile */
+  .mobile-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    background: var(--n-surface);
+    border-bottom: 1px solid var(--n-border);
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    transition: background var(--t-slow), border-color var(--t-slow);
+  }
+
+  .mobile-topbar__title {
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--n-text-primary);
+    letter-spacing: -0.01em;
+  }
+
+  .mobile-topbar__right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .mobile-topbar__btn {
+    width: 36px;
+    height: 36px;
+    border-radius: var(--n-r-md);
+    border: 1px solid var(--n-border);
+    background: var(--n-surface-raised);
+    color: var(--n-text-secondary);
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background var(--n-t-base), color var(--n-t-base), border-color var(--n-t-base);
+  }
+
+  .mobile-topbar__btn:hover,
+  .mobile-topbar__btn:active {
+    background: var(--n-primary-light);
+    color: var(--n-primary);
+    border-color: var(--n-primary);
+  }
+
+  /* Sidebar close btn inside drawer header */
+  .sidebarCloseBtn {
+    display: flex;
+    width: 28px;
+    height: 28px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    border: 1px solid var(--n-border);
+    background: var(--n-surface-raised);
+    color: var(--n-text-muted);
+    font-size: 14px;
+    cursor: pointer;
+    transition: background var(--n-t-fast), color var(--n-t-fast);
+    flex-shrink: 0;
+  }
+
+  .sidebarCloseBtn:hover {
+    background: var(--n-danger-light);
+    color: var(--n-danger);
+    border-color: var(--n-danger);
   }
 }
 
@@ -1033,6 +1147,16 @@
     padding: 18px 16px;
   }
 
+  .note-doc__keypoint {
+    gap: 10px;
+    padding: 10px 12px;
+  }
+
+  .note-doc__keypoint-num {
+    min-width: 24px;
+    font-size: 0.65rem;
+  }
+
   .welcome-panel {
     padding: 32px 16px;
   }
@@ -1047,7 +1171,28 @@
   }
 
   .note-input-wrap {
-    padding: 20px 16px;
+    padding: 16px 12px;
+  }
+
+  .note-input-card {
+    border-radius: var(--n-r-lg);
+  }
+
+  .note-input-card__footer {
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 10px 14px;
+  }
+
+  .note-input-card__hint {
+    width: 100%;
+    order: 2;
+  }
+
+  .note-input-card__submit {
+    order: 1;
+    width: 100%;
+    justify-content: center;
   }
 
   .toast {
@@ -1055,5 +1200,18 @@
     right: 12px;
     left: 12px;
     max-width: none;
+  }
+}
+
+/* ── SAFE AREA (notch/home-bar devices) ──────────────────────── */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  @media (max-width: 768px) {
+    .notes-main {
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+
+    .sidebar {
+      padding-bottom: env(safe-area-inset-bottom);
+    }
   }
 }

@@ -39,10 +39,7 @@ export const LLMMarkdown = ({ content }) => {
 
 /* ─── tiny toast helper ─────────────────────────────────────── */
 export const Toast = ({ message, type = "success", onClose }) => (
-  <div
-    className={`${styles.toast} ${styles[`toast--${type}`]}`}
-    role="alert"
-  >
+  <div className={`${styles.toast} ${styles[`toast--${type}`]}`} role="alert">
     <span className={styles["toast__icon"]}>
       {type === "success" ? "✦" : "x"}
     </span>
@@ -59,15 +56,9 @@ export const Toast = ({ message, type = "success", onClose }) => (
 
 /* ─── welcome/landing panel ─────────────────────────────────── */
 export const WelcomePanel = ({ onStart }) => (
-  <section
-    className={styles["welcome-panel"]}
-    aria-label="Welcome screen"
-  >
+  <section className={styles["welcome-panel"]} aria-label="Welcome screen">
     <div className={styles["welcome-panel__inner"]}>
-      <div
-        className={styles["welcome-panel__icon-wrap"]}
-        aria-hidden="true"
-      >
+      <div className={styles["welcome-panel__icon-wrap"]} aria-hidden="true">
         <span className={styles["welcome-panel__sparkle"]}>✦</span>
       </div>
       <h1 className={styles["welcome-panel__heading"]}>
@@ -78,44 +69,29 @@ export const WelcomePanel = ({ onStart }) => (
         structured summary with key insights in seconds.
       </p>
 
-      <div
-        className={styles["welcome-panel__features"]}
-        data-testid="welcome-card"
-      >
-        <div
-          className={styles["welcome-feature"]}
-          data-testid="welcome-card1"
-        >
+      <div className={styles["welcome-panel__features"]} data-testid="welcome-card">
+        <div className={styles["welcome-feature"]} data-testid="welcome-card1">
           <span className={styles["welcome-feature__icon"]}>📋</span>
           <div>
             <strong>Smart Summaries</strong>
             <p>AI condenses long content into crisp, readable notes</p>
           </div>
         </div>
-        <div
-          className={styles["welcome-feature"]}
-          data-testid="welcome-card2"
-        >
+        <div className={styles["welcome-feature"]} data-testid="welcome-card2">
           <span className={styles["welcome-feature__icon"]}>🔑</span>
           <div>
             <strong>Key Point Extraction</strong>
             <p>Never miss the important bits — surfaced automatically</p>
           </div>
         </div>
-        <div
-          className={styles["welcome-feature"]}
-          data-testid="welcome-card3"
-        >
+        <div className={styles["welcome-feature"]} data-testid="welcome-card3">
           <span className={styles["welcome-feature__icon"]}>📥</span>
           <div>
             <strong>Export Anywhere</strong>
             <p>Copy to clipboard or download as PDF instantly</p>
           </div>
         </div>
-        <div
-          className={styles["welcome-feature"]}
-          data-testid="welcome-card4"
-        >
+        <div className={styles["welcome-feature"]} data-testid="welcome-card4">
           <span className={styles["welcome-feature__icon"]}>📌</span>
           <div>
             <strong>Pin & Organise</strong>
@@ -124,10 +100,7 @@ export const WelcomePanel = ({ onStart }) => (
         </div>
       </div>
 
-      <button
-        className={styles["welcome-panel__cta"]}
-        onClick={onStart}
-      >
+      <button className={styles["welcome-panel__cta"]} onClick={onStart}>
         <span>Create your first note</span>
         <span aria-hidden="true">→</span>
       </button>
@@ -142,38 +115,14 @@ export const StyledSummary = ({ content }) => {
 
   while (i < lines.length) {
     const line = lines[i].trim();
-    if (!line) {
-      i++;
-      continue;
-    }
+    if (!line) { i++; continue; }
 
     if (line.startsWith("### ")) {
-      elements.push(
-        <h4
-          key={i}
-          className={styles["sum-h3"]}
-        >
-          {line.slice(4)}
-        </h4>,
-      );
+      elements.push(<h4 key={i} className={styles["sum-h3"]}>{line.slice(4)}</h4>);
     } else if (line.startsWith("## ")) {
-      elements.push(
-        <h3
-          key={i}
-          className={styles["sum-h2"]}
-        >
-          {line.slice(3)}
-        </h3>,
-      );
+      elements.push(<h3 key={i} className={styles["sum-h2"]}>{line.slice(3)}</h3>);
     } else if (line.startsWith("# ")) {
-      elements.push(
-        <h2
-          key={i}
-          className={styles["sum-h1"]}
-        >
-          {line.slice(2)}
-        </h2>,
-      );
+      elements.push(<h2 key={i} className={styles["sum-h1"]}>{line.slice(2)}</h2>);
     } else if (line.startsWith("- ") || line.startsWith("* ")) {
       const bullets = [];
       while (
@@ -181,29 +130,19 @@ export const StyledSummary = ({ content }) => {
         (lines[i].trim().startsWith("- ") || lines[i].trim().startsWith("* "))
       ) {
         bullets.push(
-          <li key={i}>
-            <LLMMarkdown content={lines[i].trim().slice(2)} />
-          </li>,
+          <li key={i}><LLMMarkdown content={lines[i].trim().slice(2)} /></li>
         );
         i++;
       }
       elements.push(
-        <ul
-          key={`ul-${i}`}
-          className={styles["sum-list"]}
-        >
-          {bullets}
-        </ul>,
+        <ul key={`ul-${i}`} className={styles["sum-list"]}>{bullets}</ul>
       );
       continue;
     } else {
       elements.push(
-        <div
-          key={i}
-          className={styles["sum-para"]}
-        >
+        <div key={i} className={styles["sum-para"]}>
           <LLMMarkdown content={line} />
-        </div>,
+        </div>
       );
     }
     i++;
@@ -214,14 +153,7 @@ export const StyledSummary = ({ content }) => {
 
 /* ─── single note document view ─────────────────────────────── */
 export const NoteDocument = ({
-  note,
-  onEdit,
-  onDelete,
-  onDownload,
-  onPin,
-  onCopy,
-  isCopied,
-  docRef,
+  note, onEdit, onDelete, onDownload, onPin, onCopy, isCopied, docRef,
 }) => {
   const keyPoints = Array.isArray(note.keyPoints)
     ? note.keyPoints
@@ -239,9 +171,7 @@ export const NoteDocument = ({
         <div className={styles["note-doc__meta"]}>
           <span className={styles["note-doc__badge"]}>Summary</span>
           {note.isPinned && (
-            <span
-              className={`${styles["note-doc__badge"]} ${styles["note-doc__badge--pinned"]}`}
-            >
+            <span className={`${styles["note-doc__badge"]} ${styles["note-doc__badge--pinned"]}`}>
               📌 Pinned
             </span>
           )}
@@ -291,12 +221,7 @@ export const NoteDocument = ({
       <div className={styles["note-doc__body"]}>
         <section className={styles["note-doc__section"]}>
           <h2 className={styles["note-doc__section-title"]}>
-            <span
-              className={styles["note-doc__section-icon"]}
-              aria-hidden="true"
-            >
-              ≡
-            </span>
+            <span className={styles["note-doc__section-icon"]} aria-hidden="true">≡</span>
             Summary
           </h2>
           <div className={styles["note-doc__summary-text"]}>
@@ -307,24 +232,13 @@ export const NoteDocument = ({
         {keyPoints.length > 0 && (
           <section className={styles["note-doc__section"]}>
             <h2 className={styles["note-doc__section-title"]}>
-              <span
-                className={styles["note-doc__section-icon"]}
-                aria-hidden="true"
-              >
-                ◆
-              </span>
+              <span className={styles["note-doc__section-icon"]} aria-hidden="true">◆</span>
               Key Points
             </h2>
             <ul className={styles["note-doc__keypoints"]}>
               {keyPoints.map((pt, i) => (
-                <li
-                  key={i}
-                  className={styles["note-doc__keypoint"]}
-                >
-                  <span
-                    className={styles["note-doc__keypoint-num"]}
-                    aria-hidden="true"
-                  >
+                <li key={i} className={styles["note-doc__keypoint"]}>
+                  <span className={styles["note-doc__keypoint-num"]} aria-hidden="true">
                     {String(i + 1).padStart(2, "0")}
                   </span>
                   <ReactMarkdown>{pt}</ReactMarkdown>
@@ -340,13 +254,7 @@ export const NoteDocument = ({
 
 /* ─── input / edit form ─────────────────────────────────────── */
 export const NoteInputForm = ({
-  content,
-  onChange,
-  onSubmit,
-  loading,
-  editId,
-  onCancelEdit,
-  inputRef,
+  content, onChange, onSubmit, loading, editId, onCancelEdit, inputRef,
 }) => (
   <div className={styles["note-input-wrap"]}>
     <div className={styles["note-input-card"]}>
@@ -364,10 +272,7 @@ export const NoteInputForm = ({
           </button>
         )}
       </div>
-      <form
-        onSubmit={onSubmit}
-        className={styles["note-input-card__form"]}
-      >
+      <form onSubmit={onSubmit} className={styles["note-input-card__form"]}>
         <textarea
           ref={inputRef}
           name="content"
@@ -393,10 +298,7 @@ export const NoteInputForm = ({
           >
             {loading ? (
               <>
-                <span
-                  className={styles.spinner}
-                  aria-hidden="true"
-                />
+                <span className={styles.spinner} aria-hidden="true" />
                 Summarising…
               </>
             ) : editId ? (
@@ -430,12 +332,18 @@ const Notes = () => {
   const [generatedIds, setGeneratedIds] = useState(new Set());
   const [toast, setToast] = useState(null);
   const [panelView, setPanelView] = useState("welcome");
-  // ── CHANGED: default false so sidebar starts closed, matches Quiz ──
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  // ── NEW: mobile drawer state ──
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const noteDocRef = useRef(null);
-
   const inputRef = useRef(null);
   const token = localStorage.getItem("token");
+
+  // ── NEW: lock body scroll when mobile drawer is open ──
+  useEffect(() => {
+    document.body.style.overflow = mobileSidebarOpen ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
+  }, [mobileSidebarOpen]);
 
   useEffect(() => {
     connectSocket();
@@ -478,7 +386,6 @@ const Notes = () => {
           body: JSON.stringify({ content }),
         });
         if (!res.ok) throw new Error("Update failed");
-        const data = await res.json();
         showToast("Note updated successfully!");
         setEditId("");
         setContent("");
@@ -597,9 +504,7 @@ const Notes = () => {
       };
 
       const keyPointsText = Array.isArray(note.keyPoints)
-        ? note.keyPoints
-            .map((pt, i) => `${i + 1}. ${stripMarkdown(pt)}`)
-            .join("\n")
+        ? note.keyPoints.map((pt, i) => `${i + 1}. ${stripMarkdown(pt)}`).join("\n")
         : stripMarkdown(note.keyPoints);
 
       const text = [
@@ -637,18 +542,11 @@ const Notes = () => {
       const imgData = canvas.toDataURL("image/png");
       const { jsPDF } = await import("jspdf");
 
-      const pdf = new jsPDF({
-        orientation: "portrait",
-        unit: "mm",
-        format: "a4",
-      });
-
+      const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
       const pageWidth = pdf.internal.pageSize.getWidth();
       const pageHeight = pdf.internal.pageSize.getHeight();
-      const imgWidthPx = canvas.width;
-      const imgHeightPx = canvas.height;
-      const ratio = pageWidth / imgWidthPx;
-      const imgHeightMm = imgHeightPx * ratio;
+      const ratio = pageWidth / canvas.width;
+      const imgHeightMm = canvas.height * ratio;
 
       let yOffset = 0;
       while (yOffset < imgHeightMm) {
@@ -693,6 +591,8 @@ const Notes = () => {
     setEditId("");
     setContent("");
     setPanelView("note");
+    // ── NEW: close mobile drawer after selecting a note ──
+    setMobileSidebarOpen(false);
   };
 
   const handleNewNote = () => {
@@ -700,22 +600,96 @@ const Notes = () => {
     setSummaryData(null);
     setEditId("");
     setContent("");
-    setPanelView("welcome");
+    setPanelView("form");
+    // ── NEW: close mobile drawer after tapping new note ──
+    setMobileSidebarOpen(false);
   };
 
   const activeNote = activeNoteId
     ? notes.find((n) => n._id === activeNoteId) || summaryData
     : summaryData;
 
-  useEffect(() => {
-    fetchNotes();
-  }, []);
+  useEffect(() => { fetchNotes(); }, []);
 
   const pinnedNotes = notes.filter((n) => n.isPinned);
   const unpinnedNotes = notes.filter((n) => !n.isPinned);
 
+  // ── Shared sidebar content — rendered in both desktop + mobile drawer ──
+  const SidebarContent = () => (
+    <div className={styles.sidebarContent} aria-label="Saved notes">
+      <div className={styles.sidebarHeader}>
+        <h3 className={styles.sidebarTitle}>📝 Your Notes</h3>
+        <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+          <button
+            className={styles.sidebarNewBtn}
+            onClick={handleNewNote}
+            aria-label="Create new note"
+            title="New note"
+          >
+            +
+          </button>
+          {/* ── NEW: close btn inside drawer header (mobile only via CSS) ── */}
+          <button
+            className={styles.sidebarCloseBtn}
+            onClick={() => setMobileSidebarOpen(false)}
+            aria-label="Close notes sidebar"
+          >
+            ✕
+          </button>
+        </div>
+      </div>
+
+      {fetching && <p className={styles.sidebarEmpty}>Loading…</p>}
+      {fetchError && <p className={styles.sidebarEmpty} role="alert">{fetchError}</p>}
+      {!fetching && notes.length === 0 && (
+        <p className={styles.sidebarEmpty}>No notes yet.</p>
+      )}
+
+      {pinnedNotes.length > 0 && (
+        <>
+          <p className={styles.sidebarGroupLabel}>📌 Pinned</p>
+          {pinnedNotes.map((note) => (
+            <div
+              key={note._id}
+              className={`${styles.sidebarItem} ${activeNoteId === note._id ? styles.sidebarItemActive : ""}`}
+              onClick={() => handleSidebarNoteClick(note)}
+            >
+              <div className={styles.sidebarItemTitle}>
+                {note.title.replace(/\*\*/g, "")}
+              </div>
+              <div className={styles.sidebarItemMeta}>
+                {new Date(note.createdAt).toLocaleDateString()}
+              </div>
+            </div>
+          ))}
+        </>
+      )}
+
+      {unpinnedNotes.length > 0 && (
+        <>
+          {pinnedNotes.length > 0 && (
+            <p className={styles.sidebarGroupLabel}>All Notes</p>
+          )}
+          {unpinnedNotes.map((note) => (
+            <div
+              key={note._id}
+              className={`${styles.sidebarItem} ${activeNoteId === note._id ? styles.sidebarItemActive : ""}`}
+              onClick={() => handleSidebarNoteClick(note)}
+            >
+              <div className={styles.sidebarItemTitle}>
+                {note.title.replace(/\*\*/g, "")}
+              </div>
+              <div className={styles.sidebarItemMeta}>
+                {new Date(note.createdAt).toLocaleDateString()}
+              </div>
+            </div>
+          ))}
+        </>
+      )}
+    </div>
+  );
+
   return (
-    // ── CHANGED: removed inline style, now pure CSS flex (matches Quiz homeWrapper) ──
     <div className={styles["notes-page"]}>
       {toast && (
         <Toast
@@ -726,11 +700,31 @@ const Notes = () => {
       )}
 
       {/* ── MAIN PANEL ── */}
-      <main
-        className={styles["notes-main"]}
-        role="main"
-        aria-label="Note content"
-      >
+      <main className={styles["notes-main"]} role="main" aria-label="Note content">
+
+        {/* ── NEW: mobile topbar — sticky, visible only on ≤768px via CSS ── */}
+        <div className={styles["mobile-topbar"]}>
+          <span className={styles["mobile-topbar__title"]}>📝 Notes</span>
+          <div className={styles["mobile-topbar__right"]}>
+            <button
+              className={styles["mobile-topbar__btn"]}
+              onClick={handleNewNote}
+              aria-label="New note"
+              title="New note"
+            >
+              ✏️
+            </button>
+            <button
+              className={styles["mobile-topbar__btn"]}
+              onClick={() => setMobileSidebarOpen(true)}
+              aria-label="Open notes list"
+              title="Your notes"
+            >
+              ☰
+            </button>
+          </div>
+        </div>
+
         {panelView === "welcome" && (
           <WelcomePanel onStart={() => setPanelView("form")} />
         )}
@@ -761,27 +755,17 @@ const Notes = () => {
         )}
 
         {error && (
-          <div
-            className={styles["notes-error"]}
-            role="alert"
-          >
+          <div className={styles["notes-error"]} role="alert">
             <span>⚠ {error}</span>
-            <button
-              onClick={() => setError("")}
-              aria-label="Dismiss error"
-            >
-              ✕
-            </button>
+            <button onClick={() => setError("")} aria-label="Dismiss error">✕</button>
           </div>
         )}
       </main>
 
-      {/* ── NOTES SIDEBAR (RIGHT) ── */}
-      {/* ── CHANGED: mirrors Quiz's historySidebar exactly ── */}
+      {/* ── DESKTOP SIDEBAR (RIGHT) — hidden on mobile via CSS ── */}
       <div
         className={`${styles.sidebar} ${sidebarOpen ? styles.sidebarOpen : styles.sidebarClosed}`}
       >
-        {/* Toggle button — absolute, vertically centered, same as Quiz */}
         <button
           className={styles.sidebarToggleBtn}
           onClick={() => setSidebarOpen((prev) => !prev)}
@@ -790,83 +774,24 @@ const Notes = () => {
           {sidebarOpen ? "→" : "←"}
         </button>
 
-        {/* Content — only render when open, same as Quiz */}
-        {sidebarOpen && (
-          <div
-            className={styles.sidebarContent}
-            aria-label="Saved notes"
-          >
-            <div className={styles.sidebarHeader}>
-              <h3 className={styles.sidebarTitle}>📝 Your Notes</h3>
-              <button
-                className={styles.sidebarNewBtn}
-                onClick={handleNewNote}
-                aria-label="Create new note"
-                title="New note"
-              >
-                +
-              </button>
-            </div>
-
-            {fetching && <p className={styles.sidebarEmpty}>Loading…</p>}
-
-            {fetchError && (
-              <p
-                className={styles.sidebarEmpty}
-                role="alert"
-              >
-                {fetchError}
-              </p>
-            )}
-
-            {!fetching && notes.length === 0 && (
-              <p className={styles.sidebarEmpty}>No notes yet.</p>
-            )}
-
-            {pinnedNotes.length > 0 && (
-              <>
-                <p className={styles.sidebarGroupLabel}>📌 Pinned</p>
-                {pinnedNotes.map((note) => (
-                  <div
-                    key={note._id}
-                    className={`${styles.sidebarItem} ${activeNoteId === note._id ? styles.sidebarItemActive : ""}`}
-                    onClick={() => handleSidebarNoteClick(note)}
-                  >
-                    <div className={styles.sidebarItemTitle}>
-                      {note.title.replace(/\*\*/g, "")}
-                    </div>
-                    <div className={styles.sidebarItemMeta}>
-                      {new Date(note.createdAt).toLocaleDateString()}
-                    </div>
-                  </div>
-                ))}
-              </>
-            )}
-
-            {unpinnedNotes.length > 0 && (
-              <>
-                {pinnedNotes.length > 0 && (
-                  <p className={styles.sidebarGroupLabel}>All Notes</p>
-                )}
-                {unpinnedNotes.map((note) => (
-                  <div
-                    key={note._id}
-                    className={`${styles.sidebarItem} ${activeNoteId === note._id ? styles.sidebarItemActive : ""}`}
-                    onClick={() => handleSidebarNoteClick(note)}
-                  >
-                    <div className={styles.sidebarItemTitle}>
-                      {note.title.replace(/\*\*/g, "")}
-                    </div>
-                    <div className={styles.sidebarItemMeta}>
-                      {new Date(note.createdAt).toLocaleDateString()}
-                    </div>
-                  </div>
-                ))}
-              </>
-            )}
-          </div>
-        )}
+        {sidebarOpen && <SidebarContent />}
       </div>
+
+      {/* ── MOBILE DRAWER + BACKDROP ── */}
+      {mobileSidebarOpen && (
+        <>
+          {/* backdrop — tap to close */}
+          <div
+            className={styles.sidebarOverlay}
+            onClick={() => setMobileSidebarOpen(false)}
+            aria-hidden="true"
+          />
+          {/* drawer */}
+          <div className={`${styles.sidebar} ${styles.sidebarMobileOpen}`}>
+            <SidebarContent />
+          </div>
+        </>
+      )}
     </div>
   );
 };

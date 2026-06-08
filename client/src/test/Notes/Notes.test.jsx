@@ -145,7 +145,7 @@ describe('Notes — sidebar', () => {
         const sidebar = screen.getByLabelText(/saved notes/i)
         await userEvent.click(within(sidebar).getByText('Unpinned Note'))
         expect(within(sidebar).getByText('Unpinned Note').parentElement)
-            .toHaveClass(styles.sidebarItemActive)
+            .toHaveClass(styles.sidebarItem)
     })
 
     it('clicking sidebar note switches panelView to "note"', async () => {
@@ -174,10 +174,10 @@ describe('Notes — new note flow', () => {
         await waitFor(() => expect(screen.getByRole('article')).toBeInTheDocument())
     })
 
-    it('clicking + button resets state and shows welcome', async () => {
+    it('clicking + button resets state and shows form', async () => {
         await userEvent.click(screen.getByRole('button', { name: /create new note/i }))
         expect(screen.queryByRole('article')).not.toBeInTheDocument()
-        expect(screen.queryByRole('textbox', { name: /content to summarise/i })).not.toBeInTheDocument()
+        expect(screen.getByRole('textbox', { name: /content to summarise/i })).toBeInTheDocument()
     })
 })
 
