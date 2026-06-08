@@ -98,4 +98,9 @@ describe("NoteDocument", ()=>{
 
         expect(onPinMock).toHaveBeenCalledTimes(1)
     })
+
+    it("shows Copied text when isCopied is true", () => {
+        const copyBtn = screen.getByRole("button", { name: /copy note/i })
+        expect(copyBtn).toHaveTextContent("✓ Copied")
+    })
 })
