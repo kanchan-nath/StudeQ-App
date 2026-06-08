@@ -323,7 +323,7 @@ export const NoteDocument = ({
 };
 
 /* ─── input / edit form ─────────────────────────────────────── */
-const NoteInputForm = ({
+export const NoteInputForm = ({
   content,
   onChange,
   onSubmit,

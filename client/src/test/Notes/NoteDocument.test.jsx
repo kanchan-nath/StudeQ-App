@@ -103,4 +103,72 @@ describe("NoteDocument", ()=>{
         const copyBtn = screen.getByRole("button", { name: /copy note/i })
         expect(copyBtn).toHaveTextContent("✓ Copied")
     })
+
+    it("renders Summary section", () => {
+        const heading = screen.getByRole("heading", { level: 2, name: "Summary" })
+        expect(heading).toBeInTheDocument()
+    })
+
+    it("renders Key Points list when keyPoints is array", () => {
+        expect(screen.getByText("Hooks are functions")).toBeInTheDocument()
+        expect(screen.getByText("State triggers re-renders")).toBeInTheDocument()
+    })
+
+    it("renders Key Points list when keyPoints is newline-separated string", () => {
+        cleanup()
+        render(
+            <NoteDocument note={{ ...noteMock, keyPoints: "Hooks are functions\nState triggers re-renders" }} onCopy={onCopyMock} onDelete={onDeleteMock} onDownload={onDownloadMock} onEdit={onEditMock} onPin={onPinMock} isCopied={false} docRef={null} />
+        )
+        expect(screen.getByText("Hooks are functions")).toBeInTheDocument()
+        expect(screen.getByText("State triggers re-renders")).toBeInTheDocument()
+    })
+
+    it("hides Key Points section when keyPoints is empty", () => {
+        cleanup()
+        render(
+            <NoteDocument note={{ ...noteMock, keyPoints: [] }} onCopy={onCopyMock} onDelete={onDeleteMock} onDownload={onDownloadMock} onEdit={onEditMock} onPin={onPinMock} isCopied={false} docRef={null} />
+        )
+        expect(screen.queryByText(/key points/i)).not.toBeInTheDocument()
+    })
+
+    it("pads key point numbers with leading zero", () => {
+        expect(screen.getByText("01")).toBeInTheDocument()
+        expect(screen.getByText("02")).toBeInTheDocument()
+    })
+
+    it("calls onPin with note when Pin button clicked", async () => {
+        const button = screen.getByRole("button", { name: /unpin note/i })
+        await userEvent.click(button)
+        expect(onPinMock).toHaveBeenCalledTimes(1)
+        expect(onPinMock).toHaveBeenCalledWith({ ...noteMock, isPinned: true })
+    })
+
+    it("calls onCopy with note when Copy button clicked", async () => {
+        const button = screen.getByRole("button", { name: /copy note/i })
+        await userEvent.click(button)
+        expect(onCopyMock).toHaveBeenCalledTimes(1)
+        expect(onCopyMock).toHaveBeenCalledWith({ ...noteMock, isPinned: true })
+    })
+
+    it("calls onDownload with note when PDF button clicked", async () => {
+        const button = screen.getByRole("button", { name: /download pdf/i })
+        await userEvent.click(button)
+        expect(onDownloadMock).toHaveBeenCalledTimes(1)
+        expect(onDownloadMock).toHaveBeenCalledWith({ ...noteMock, isPinned: true })
+    })
+
+    it("calls onEdit with note when Edit button clicked", async () => {
+        const button = screen.getByRole("button", { name: /edit note/i })
+        await userEvent.click(button)
+        expect(onEditMock).toHaveBeenCalledTimes(1)
+        expect(onEditMock).toHaveBeenCalledWith({ ...noteMock, isPinned: true })
+    })
+
+    it("calls onDelete with note._id when Delete button clicked", async () => {
+        const button = screen.getByRole("button", { name: /delete note/i })
+        await userEvent.click(button)
+        expect(onDeleteMock).toHaveBeenCalledTimes(1)
+        expect(onDeleteMock).toHaveBeenCalledWith(noteMock._id)
+    })
+
 })
