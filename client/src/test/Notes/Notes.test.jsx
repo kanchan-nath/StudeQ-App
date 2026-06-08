@@ -152,3 +152,19 @@ describe('Notes — sidebar', () => {
         expect(screen.getByRole('button', { name: /expand sidebar/i })).toBeInTheDocument()
     })
 })
+
+describe('Notes — new note flow', () => {
+    beforeEach(async () => {
+        global.fetch = vi.fn().mockResolvedValue({ ok: true, json: async () => ({ data: [] }) })
+        render(<Notes />)
+        await waitFor(() => expect(global.fetch).toHaveBeenCalled())
+        await act(async () => { socketHandlers['ai-response'](aiNote) })
+        await waitFor(() => expect(screen.getByRole('article')).toBeInTheDocument())
+    })
+
+    it('clicking + button resets state and shows welcome', async () => {
+        await userEvent.click(screen.getByRole('button', { name: /create new note/i }))
+        expect(screen.queryByRole('article')).not.toBeInTheDocument()
+        expect(screen.queryByRole('textbox', { name: /content to summarise/i })).not.toBeInTheDocument()
+    })
+})
