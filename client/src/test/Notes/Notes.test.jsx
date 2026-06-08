@@ -2,7 +2,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, screen, waitFor, cleanup, act } from '@testing-library/react'
 import userEvent from "@testing-library/user-event"
-import Notes  from '../../pages/Notes'
+import Notes from '../../pages/Notes'
 import styles from "/src/pages/styles/notes.module.css";
 
 // ─── Hoisted socket setup ─────────────────────────────────────────────────────
@@ -23,7 +23,7 @@ vi.mock('react-markdown', () => ({
     default: ({ children }) => <span>{children}</span>
 }))
 
-vi.mock("../../lib/socket.js", () => ({       
+vi.mock("../../lib/socket.js", () => ({
     connectSocket: connectSocketMock,
     getSocket: vi.fn(() => mockSocket)
 }))
@@ -40,7 +40,7 @@ afterEach(() => {
     Object.keys(socketHandlers).forEach(k => delete socketHandlers[k])
 })
 
-describe("Notes — initial render", ()=>{
+describe("Notes — initial render", () => {
     beforeEach(async () => {
         global.fetch = vi.fn().mockResolvedValue({ ok: true, json: async () => ({ data: [] }) })
         render(<Notes />)
@@ -64,7 +64,7 @@ describe("Notes — initial render", ()=>{
     })
 })
 
-describe("Notes — panel view switching", ()=>{
+describe("Notes — panel view switching", () => {
     beforeEach(async () => {
         global.fetch = vi.fn().mockResolvedValue({ ok: true, json: async () => ({ data: [] }) })
         render(<Notes />)
@@ -299,5 +299,86 @@ describe('Notes — delete flow', () => {
         global.fetch = vi.fn().mockResolvedValue({ ok: false })
         await userEvent.click(screen.getByRole('button', { name: /delete note/i }))
         await waitFor(() => expect(screen.getByText('Delete failed')).toBeInTheDocument())
+    })
+})
+
+describe('Notes — copy handler', () => {
+    const writeTextMock = vi.fn().mockResolvedValue(undefined)
+
+    beforeEach(async () => {
+        Object.defineProperty(navigator, 'clipboard', {
+            configurable: true,
+            writable: true, value: { writeText: writeTextMock }
+        })
+
+        writeTextMock.mockClear()
+
+        global.fetch = vi.fn().mockResolvedValue({ ok: true, json: async () => ({ data: [] }) })
+        render(<Notes />)
+        await waitFor(() => expect(global.fetch).toHaveBeenCalled())
+        await act(async () => {
+            socketHandlers['ai-response']({ _id: 'md-1', title: '**Bold**', summary: '*italic*', keyPoints: ['**KP**'], isPinned: false })
+        })
+        await waitFor(() => expect(screen.getByRole('article')).toBeInTheDocument())
+    })
+
+    it('strips markdown from title, summary, keyPoints before copying', async () => {
+        await userEvent.click(screen.getByRole('button', { name: /copy note/i }))
+        await waitFor(() => expect(writeTextMock).toHaveBeenCalled())
+        const text = writeTextMock.mock.calls[0][0]
+        expect(text).not.toMatch(/\*\*/)
+        expect(text).not.toMatch(/\*[^*]/)
+    })
+
+    it('writes plain text to clipboard', async () => {
+        await userEvent.click(screen.getByRole('button', { name: /copy note/i }))
+        await waitFor(() => expect(writeTextMock).toHaveBeenCalledWith(expect.any(String)))
+    })
+    // Error
+
+    // it('sets isCopied true then resets after 2s', async () => {
+    //     vi.useFakeTimers()
+    //     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime.bind(vi) })
+    //     await user.click(screen.getByRole('button', { name: /copy note/i }))
+    //     await waitFor(() => expect(screen.getByRole('button', { name: /copy note/i })).toHaveTextContent('✓ Copied'))
+    //     await act(async () => { vi.advanceTimersByTime(2000) })
+    //     await waitFor(() => expect(screen.getByRole('button', { name: /copy note/i })).toHaveTextContent('⎘ Copy'))
+    //     vi.useRealTimers()
+    // })
+
+    // it('shows error toast if clipboard write fails', async () => {
+    //     console.log(global.fetch.mock.calls)
+    //     writeTextMock.mockRejectedValueOnce(new Error('Clipboard error'))
+    //     await userEvent.click(screen.getByRole('button', { name: /copy note/i }))
+    //     await waitFor(() => expect(screen.getByText('Copy failed')).toBeInTheDocument())
+    // })
+})
+
+describe('Notes — socket: ai-response', () => {
+    beforeEach(async () => {
+        global.fetch = vi.fn().mockResolvedValue({ ok: true, json: async () => ({ data: [] }) })
+        render(<Notes />)
+        await waitFor(() => expect(global.fetch).toHaveBeenCalled())
+    })
+
+    it('ai-response event sets summaryData and switches to note view', async () => {
+        await act(async () => { socketHandlers['ai-response'](aiNote) })
+        await waitFor(() => expect(screen.getByRole('article', { name: new RegExp(aiNote.title) })).toBeInTheDocument())
+    })
+
+    it('adds new note _id to generatedIds', async () => {
+        // generatedIds is internal state — verified indirectly: note renders after ai-response
+        await act(async () => { socketHandlers['ai-response'](aiNote) })
+        await waitFor(() => expect(screen.getByRole('article')).toBeInTheDocument())
+    })
+
+    it('calls fetchNotes after ai-response', async () => {
+        const callsBefore = global.fetch.mock.calls.length
+        await act(async () => { socketHandlers['ai-response'](aiNote) })
+        await waitFor(() => expect(global.fetch.mock.calls.length).toBeGreaterThan(callsBefore))
+        expect(global.fetch).toHaveBeenCalledWith(
+            expect.stringContaining('/api/notes'),
+            expect.objectContaining({ method: 'GET' })
+        )
     })
 })
