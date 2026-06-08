@@ -2,17 +2,18 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from "@testing-library/user-event"
-import {StyledSummary } from '../../pages/Notes'
+import { StyledSummary } from '../../pages/Notes'
+import styles from "/Users/kanchannath/Coding/Spark.E/client/src/pages/styles/notes.module.css";
 
-describe("StyledSummary",()=>{
+describe("StyledSummary", () => {
 
-    it("renders h2 for # heading",()=>{
+    it("renders h2 for # heading", () => {
         render(<StyledSummary content="# Hello World!" />)
 
         const h2 = screen.getByRole("heading",
             {
-                level:2,
-                name:"Hello World!"
+                level: 2,
+                name: "Hello World!"
             }
         )
 
@@ -45,7 +46,7 @@ describe("StyledSummary",()=>{
         expect(h4).toBeInTheDocument()
     })
 
-    it("renders ul and li for - bullet lines",()=>{
+    it("renders ul and li for - bullet lines", () => {
         render(<StyledSummary content=
             {
                 `
@@ -89,5 +90,29 @@ describe("StyledSummary",()=>{
         expect(listitems[1]).toHaveTextContent("Naruto")
         expect(listitems[2]).toHaveTextContent("One Piece")
 
+    })
+
+    it("renders paragraph div for plain text", () => {
+        const { container } = render(<StyledSummary content="Hello World" />)
+
+        const div = container.querySelector(`.${styles["sum-para"]}`);
+        expect(div).toBeInTheDocument()
+        expect(div).toHaveTextContent("Hello World")
+    })
+
+    it("skips empty lines without rendering element",()=>{
+        const { container } = render(<StyledSummary content={
+            `
+            
+            
+            `
+        }/>)
+
+        const div = container.querySelector(`.${styles[".sum-para"]}`)
+
+        expect(div).not.toBeInTheDocument()
+        expect(screen.queryByRole("heading")).not.toBeInTheDocument()
+        expect(screen.queryByRole("list")).not.toBeInTheDocument()
+        expect(screen.queryByText(/.+/)).not.toBeInTheDocument()
     })
 })
