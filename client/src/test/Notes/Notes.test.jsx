@@ -1,6 +1,6 @@
 /// <reference types="vitest/globals" />
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { render, screen, waitFor, cleanup, act } from '@testing-library/react'
+import { render, screen, waitFor, cleanup, act, within } from '@testing-library/react'
 import userEvent from "@testing-library/user-event"
 import Notes from '../../pages/Notes'
 import styles from "/src/pages/styles/notes.module.css";
@@ -34,9 +34,16 @@ const pinnedNote = { _id: 'pin-1', title: 'Pinned Note', summary: 'Sum A', keyPo
 const unpinnedNote = { _id: 'unpin-1', title: 'Unpinned Note', summary: 'Sum B', keyPoints: ['KP 2'], isPinned: false }
 const aiNote = { _id: 'ai-1', title: 'AI Title', summary: 'AI Summary', keyPoints: ['AI KP'], isPinned: false }
 
+// ─── Helper ───────────────────────────────────────────────────────────────────
+
+async function openSidebar() {
+    await userEvent.click(screen.getByRole('button', { name: /expand sidebar/i }))
+}
+
 afterEach(() => {
     cleanup()
     vi.clearAllMocks()
+    vi.clearAllTimers()
     Object.keys(socketHandlers).forEach(k => delete socketHandlers[k])
 })
 
@@ -85,19 +92,19 @@ describe("Notes — panel view switching", () => {
         await userEvent.click(screen.getByRole('button', { name: /Create your first note/i }))
         expect(screen.getByRole('textbox', { name: /content to summarise/i })).toBeInTheDocument()
     })
-
-
 })
 
 describe('Notes — sidebar', () => {
     beforeEach(async () => {
         global.fetch = vi.fn().mockResolvedValue({ ok: true, json: async () => ({ data: [pinnedNote, unpinnedNote] }) })
         render(<Notes />)
+        await waitFor(() => expect(global.fetch).toHaveBeenCalled())
+        await openSidebar()
         await waitFor(() => expect(screen.getByText('Pinned Note')).toBeInTheDocument())
     })
 
     it('renders "Your Notes" title', () => {
-        expect(screen.getByText('Your Notes')).toBeInTheDocument()
+        expect(screen.getByText(/Your Notes/i)).toBeInTheDocument()
     })
 
     it('shows loading spinner when fetching', async () => {
@@ -105,6 +112,7 @@ describe('Notes — sidebar', () => {
         let resolveFetch
         global.fetch = vi.fn().mockReturnValue(new Promise(r => { resolveFetch = r }))
         render(<Notes />)
+        await openSidebar()
         await waitFor(() => expect(screen.getByText(/loading…/i)).toBeInTheDocument())
         act(() => resolveFetch({ ok: true, json: async () => ({ data: [] }) }))
     })
@@ -113,6 +121,7 @@ describe('Notes — sidebar', () => {
         cleanup()
         global.fetch = vi.fn().mockResolvedValue({ ok: false, json: async () => ({}) })
         render(<Notes />)
+        await openSidebar()
         await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Failed to fetch notes'))
     })
 
@@ -120,12 +129,12 @@ describe('Notes — sidebar', () => {
         cleanup()
         global.fetch = vi.fn().mockResolvedValue({ ok: true, json: async () => ({ data: [] }) })
         render(<Notes />)
+        await openSidebar()
         await waitFor(() => expect(screen.getByText(/no notes yet/i)).toBeInTheDocument())
     })
 
     it('renders pinned notes group when pinned notes exist', () => {
         expect(screen.getByText('📌 Pinned')).toBeInTheDocument()
-        // expect(screen.getByRole('button', { name: /Pinned Note/i })).toBeInTheDocument()
     })
 
     it('renders "All Notes" group label when both pinned and unpinned exist', () => {
@@ -133,12 +142,14 @@ describe('Notes — sidebar', () => {
     })
 
     it('clicking sidebar note sets it as active', async () => {
-        await userEvent.click(screen.getByRole('button', { name: /Unpinned Note/i }))
-        expect(screen.getByRole('button', { name: /Unpinned Note/i })).toHaveAttribute('aria-current', 'true')
+        const sidebar = screen.getByLabelText(/saved notes/i)
+        await userEvent.click(within(sidebar).getByText('Unpinned Note'))
+        expect(within(sidebar).getByText('Unpinned Note').parentElement)
+            .toHaveClass(styles.sidebarItemActive)
     })
 
     it('clicking sidebar note switches panelView to "note"', async () => {
-        await userEvent.click(screen.getByRole('button', { name: /Unpinned Note/i }))
+        await userEvent.click(screen.getByText('Unpinned Note'))
         await waitFor(() => expect(screen.getByRole('article')).toBeInTheDocument())
     })
 
@@ -158,6 +169,7 @@ describe('Notes — new note flow', () => {
         global.fetch = vi.fn().mockResolvedValue({ ok: true, json: async () => ({ data: [] }) })
         render(<Notes />)
         await waitFor(() => expect(global.fetch).toHaveBeenCalled())
+        await openSidebar()
         await act(async () => { socketHandlers['ai-response'](aiNote) })
         await waitFor(() => expect(screen.getByRole('article')).toBeInTheDocument())
     })
@@ -198,8 +210,6 @@ describe('Notes — edit flow', () => {
     })
 
     it('handleCancelEdit goes to "welcome" if no activeNoteId', async () => {
-        // No natural UI path reaches editId-set + activeNoteId-null simultaneously.
-        // Verifies the welcome state when no note is active (initial / post-reset condition).
         cleanup()
         global.fetch = vi.fn().mockResolvedValue({ ok: true, json: async () => ({ data: [] }) })
         render(<Notes />)
@@ -236,8 +246,10 @@ describe('Notes — pin toggle', () => {
             .mockResolvedValueOnce({ ok: true, json: async () => ({ data: [unpinnedNote] }) })
             .mockResolvedValue({ ok: true, json: async () => ({ data: [unpinnedNote] }) })
         render(<Notes />)
+        await waitFor(() => expect(global.fetch).toHaveBeenCalled())
+        await openSidebar()
         await waitFor(() => expect(screen.getByText('Unpinned Note')).toBeInTheDocument())
-        await userEvent.click(screen.getByRole('button', { name: /Unpinned Note/i }))
+        await userEvent.click(screen.getByText('Unpinned Note'))
         await waitFor(() => expect(screen.getByRole('article')).toBeInTheDocument())
     })
 
@@ -323,7 +335,7 @@ describe('Notes — copy handler', () => {
     })
 
     afterEach(() => {
-        vi.useRealTimers()  // ← always restore, even on test failure
+        vi.useRealTimers()
     })
 
     it('strips markdown from title, summary, keyPoints before copying', async () => {
@@ -340,20 +352,12 @@ describe('Notes — copy handler', () => {
     })
 
     it('sets isCopied true then resets after 2s', async () => {
-        // click BEFORE fake timers
         await userEvent.click(screen.getByRole('button', { name: /copy note/i }))
-
-        // now freeze time
         vi.useFakeTimers()
-
-        // isCopied should already be true
         expect(screen.getByRole('button', { name: /copy note/i })).toHaveTextContent('✓ Copied')
-
-        // advance past the 2000ms setTimeout in handleCopy
         await act(async () => {
             vi.advanceTimersByTime(2000)
         })
-
         expect(screen.getByRole('button', { name: /copy note/i })).toHaveTextContent('✓ Copied')
     })
 
@@ -378,7 +382,6 @@ describe('Notes — socket: ai-response', () => {
     })
 
     it('adds new note _id to generatedIds', async () => {
-        // generatedIds is internal state — verified indirectly: note renders after ai-response
         await act(async () => { socketHandlers['ai-response'](aiNote) })
         await waitFor(() => expect(screen.getByRole('article')).toBeInTheDocument())
     })
