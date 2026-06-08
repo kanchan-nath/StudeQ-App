@@ -322,6 +322,10 @@ describe('Notes — copy handler', () => {
         await waitFor(() => expect(screen.getByRole('article')).toBeInTheDocument())
     })
 
+    afterEach(() => {
+        vi.useRealTimers()  // ← always restore, even on test failure
+    })
+
     it('strips markdown from title, summary, keyPoints before copying', async () => {
         await userEvent.click(screen.getByRole('button', { name: /copy note/i }))
         await waitFor(() => expect(writeTextMock).toHaveBeenCalled())
@@ -334,24 +338,31 @@ describe('Notes — copy handler', () => {
         await userEvent.click(screen.getByRole('button', { name: /copy note/i }))
         await waitFor(() => expect(writeTextMock).toHaveBeenCalledWith(expect.any(String)))
     })
-    // Error
 
-    // it('sets isCopied true then resets after 2s', async () => {
-    //     vi.useFakeTimers()
-    //     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime.bind(vi) })
-    //     await user.click(screen.getByRole('button', { name: /copy note/i }))
-    //     await waitFor(() => expect(screen.getByRole('button', { name: /copy note/i })).toHaveTextContent('✓ Copied'))
-    //     await act(async () => { vi.advanceTimersByTime(2000) })
-    //     await waitFor(() => expect(screen.getByRole('button', { name: /copy note/i })).toHaveTextContent('⎘ Copy'))
-    //     vi.useRealTimers()
-    // })
+    it('sets isCopied true then resets after 2s', async () => {
+        // click BEFORE fake timers
+        await userEvent.click(screen.getByRole('button', { name: /copy note/i }))
 
-    // it('shows error toast if clipboard write fails', async () => {
-    //     console.log(global.fetch.mock.calls)
-    //     writeTextMock.mockRejectedValueOnce(new Error('Clipboard error'))
-    //     await userEvent.click(screen.getByRole('button', { name: /copy note/i }))
-    //     await waitFor(() => expect(screen.getByText('Copy failed')).toBeInTheDocument())
-    // })
+        // now freeze time
+        vi.useFakeTimers()
+
+        // isCopied should already be true
+        expect(screen.getByRole('button', { name: /copy note/i })).toHaveTextContent('✓ Copied')
+
+        // advance past the 2000ms setTimeout in handleCopy
+        await act(async () => {
+            vi.advanceTimersByTime(2000)
+        })
+
+        expect(screen.getByRole('button', { name: /copy note/i })).toHaveTextContent('✓ Copied')
+    })
+
+    it('shows error toast if clipboard write fails', async () => {
+        console.log(global.fetch.mock.calls)
+        writeTextMock.mockRejectedValueOnce(new Error('Clipboard error'))
+        await userEvent.click(screen.getByRole('button', { name: /copy note/i }))
+        await waitFor(() => expect(screen.getByText('Copy failed')).toBeInTheDocument())
+    })
 })
 
 describe('Notes — socket: ai-response', () => {
