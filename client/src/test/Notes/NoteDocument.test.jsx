@@ -164,4 +164,11 @@ describe("NoteDocument", ()=>{
         expect(onEditMock).toHaveBeenCalledWith({ ...noteMock, isPinned: true })
     })
 
+    it("calls onDelete with note._id when Delete button clicked", async () => {
+        const button = screen.getByRole("button", { name: /delete note/i })
+        await userEvent.click(button)
+        expect(onDeleteMock).toHaveBeenCalledTimes(1)
+        expect(onDeleteMock).toHaveBeenCalledWith(noteMock._id)
+    })
+
 })
