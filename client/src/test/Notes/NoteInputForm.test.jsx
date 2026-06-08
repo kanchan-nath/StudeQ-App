@@ -4,6 +4,7 @@ import { render, screen, waitFor, cleanup } from '@testing-library/react'
 import userEvent from "@testing-library/user-event"
 import { NoteInputForm } from '../../pages/Notes'
 import styles from "/src/pages/styles/notes.module.css";
+import { createRef } from 'react'
 
 describe('NoteInputForm', () => {
     const onChangeMock = vi.fn()
