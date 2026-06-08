@@ -266,3 +266,38 @@ describe('Notes — pin toggle', () => {
         await waitFor(() => expect(screen.getByText('Pin toggle failed')).toBeInTheDocument())
     })
 })
+
+describe('Notes — delete flow', () => {
+    beforeEach(async () => {
+        global.fetch = vi.fn().mockResolvedValue({ ok: true, json: async () => ({ data: [] }) })
+        render(<Notes />)
+        await waitFor(() => expect(global.fetch).toHaveBeenCalled())
+        await act(async () => { socketHandlers['ai-response'](aiNote) })
+        await waitFor(() => expect(screen.getByRole('article')).toBeInTheDocument())
+    })
+
+    it('DELETE request sent to correct endpoint', async () => {
+        global.fetch = vi.fn()
+            .mockResolvedValueOnce({ ok: true, json: async () => ({}) })
+            .mockResolvedValue({ ok: true, json: async () => ({ data: [] }) })
+        await userEvent.click(screen.getByRole('button', { name: /delete note/i }))
+        await waitFor(() => expect(global.fetch).toHaveBeenCalledWith(
+            expect.stringContaining(`/api/notes/${aiNote._id}`),
+            expect.objectContaining({ method: 'DELETE' })
+        ))
+    })
+
+    it('resets activeNoteId and goes to welcome if deleted note was active', async () => {
+        global.fetch = vi.fn()
+            .mockResolvedValueOnce({ ok: true, json: async () => ({}) })
+            .mockResolvedValue({ ok: true, json: async () => ({ data: [] }) })
+        await userEvent.click(screen.getByRole('button', { name: /delete note/i }))
+        await waitFor(() => expect(screen.queryByRole('article')).not.toBeInTheDocument())
+    })
+
+    it('shows error toast if delete fails', async () => {
+        global.fetch = vi.fn().mockResolvedValue({ ok: false })
+        await userEvent.click(screen.getByRole('button', { name: /delete note/i }))
+        await waitFor(() => expect(screen.getByText('Delete failed')).toBeInTheDocument())
+    })
+})
