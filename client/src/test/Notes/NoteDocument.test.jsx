@@ -1,0 +1,74 @@
+/// <reference types="vitest/globals" />
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { render, screen, waitFor } from '@testing-library/react'
+import userEvent from "@testing-library/user-event"
+import { NoteDocument } from '../../pages/Notes'
+import styles from "/src/pages/styles/notes.module.css";
+
+describe("NoteDocument", ()=>{
+    const onEditMock = vi.fn()
+    const onDeleteMock = vi.fn()
+    const onDownloadMock = vi.fn()
+    const onPinMock = vi.fn()
+    const onCopyMock = vi.fn()
+    
+    const noteMock = {
+        _id: "1",
+        title: "React Notes",
+        summary: "This is a summary",
+        keyPoints: [
+            "Hooks are functions",
+            "State triggers re-renders"
+        ],
+        isPinned: false,
+    };
+
+    beforeEach(()=>{
+        onEditMock.mockClear()
+        onDeleteMock.mockClear()
+        onDownloadMock.mockClear()
+        onPinMock.mockClear()
+        onCopyMock.mockClear()
+
+        render(<NoteDocument note={{...noteMock, isPinned:true }} onCopy={onCopyMock} onDelete={onDeleteMock} onDownload={onDownloadMock} onEdit={onEditMock} onPin={onPinMock} isCopied={true} docRef={ null} />)
+    })
+
+    it("renders note title", ()=>{
+      const title = screen.getByRole("heading",
+        {
+            level:1,
+            name: noteMock.title
+        }
+      )
+
+      expect(title).toBeInTheDocument()
+      expect(title).toHaveTextContent(noteMock.title)
+    })
+
+    it("shows Pinned badge when isPinned is true",async ()=>{
+        const button = screen.getByRole("button",
+            {
+                name:/Unpin note/i
+            }
+        )
+
+        expect(button).toBeInTheDocument()
+
+        await userEvent.click(button)
+        expect(onPinMock).toHaveBeenCalledTimes(1)
+    })
+
+    it("hides Pinned badge when isPinned is false", async()=>{
+        const button = screen.getByRole("button",
+            {
+                name:/Pin note/i
+            }
+        )
+
+        expect(button).toBeInTheDocument()
+
+        await userEvent.click(button)
+
+        expect(onPinMock).toHaveBeenCalledTimes(1)
+    })
+})
