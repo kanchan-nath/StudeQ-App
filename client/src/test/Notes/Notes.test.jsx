@@ -99,4 +99,13 @@ describe('Notes — sidebar', () => {
     it('renders "Your Notes" title', () => {
         expect(screen.getByText('Your Notes')).toBeInTheDocument()
     })
+
+    it('shows loading spinner when fetching', async () => {
+        cleanup()
+        let resolveFetch
+        global.fetch = vi.fn().mockReturnValue(new Promise(r => { resolveFetch = r }))
+        render(<Notes />)
+        await waitFor(() => expect(screen.getByText(/loading…/i)).toBeInTheDocument())
+        act(() => resolveFetch({ ok: true, json: async () => ({ data: [] }) }))
+    })
 })
