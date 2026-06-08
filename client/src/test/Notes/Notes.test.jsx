@@ -23,7 +23,7 @@ vi.mock('react-markdown', () => ({
     default: ({ children }) => <span>{children}</span>
 }))
 
-vi.mock('../../utils/socket', () => ({       // adjust path to match your project
+vi.mock("../../lib/socket.js", () => ({       
     connectSocket: connectSocketMock,
     getSocket: vi.fn(() => mockSocket)
 }))
@@ -52,5 +52,14 @@ describe("Notes — initial render", ()=>{
             expect.stringContaining('/api/notes'),
             expect.objectContaining({ method: 'GET' })
         )
+    })
+
+    it('connects socket on mount', () => {
+        expect(connectSocketMock).toHaveBeenCalledTimes(1)
+    })
+
+    it('shows WelcomePanel as default view', () => {
+        expect(screen.queryByRole('textbox', { name: /content to summarise/i })).not.toBeInTheDocument()
+        expect(screen.queryByRole('article')).not.toBeInTheDocument()
     })
 })
