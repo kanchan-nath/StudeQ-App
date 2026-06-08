@@ -135,4 +135,11 @@ describe("NoteDocument", ()=>{
         expect(screen.getByText("01")).toBeInTheDocument()
         expect(screen.getByText("02")).toBeInTheDocument()
     })
+
+    it("calls onPin with note when Pin button clicked", async () => {
+        const button = screen.getByRole("button", { name: /unpin note/i })
+        await userEvent.click(button)
+        expect(onPinMock).toHaveBeenCalledTimes(1)
+        expect(onPinMock).toHaveBeenCalledWith({ ...noteMock, isPinned: true })
+    })
 })
