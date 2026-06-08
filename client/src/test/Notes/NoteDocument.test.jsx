@@ -142,4 +142,13 @@ describe("NoteDocument", ()=>{
         expect(onPinMock).toHaveBeenCalledTimes(1)
         expect(onPinMock).toHaveBeenCalledWith({ ...noteMock, isPinned: true })
     })
+
+    it("calls onCopy with note when Copy button clicked", async () => {
+        const button = screen.getByRole("button", { name: /copy note/i })
+        await userEvent.click(button)
+        expect(onCopyMock).toHaveBeenCalledTimes(1)
+        expect(onCopyMock).toHaveBeenCalledWith({ ...noteMock, isPinned: true })
+    })
+
+    
 })
