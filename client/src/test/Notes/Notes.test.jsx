@@ -108,4 +108,11 @@ describe('Notes — sidebar', () => {
         await waitFor(() => expect(screen.getByText(/loading…/i)).toBeInTheDocument())
         act(() => resolveFetch({ ok: true, json: async () => ({ data: [] }) }))
     })
+
+    it('shows error message when fetchError is set', async () => {
+        cleanup()
+        global.fetch = vi.fn().mockResolvedValue({ ok: false, json: async () => ({}) })
+        render(<Notes />)
+        await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Failed to fetch notes'))
+    })
 })
