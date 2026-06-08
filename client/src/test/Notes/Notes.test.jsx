@@ -115,4 +115,11 @@ describe('Notes — sidebar', () => {
         render(<Notes />)
         await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Failed to fetch notes'))
     })
+
+    it('shows empty state when notes array is empty', async () => {
+        cleanup()
+        global.fetch = vi.fn().mockResolvedValue({ ok: true, json: async () => ({ data: [] }) })
+        render(<Notes />)
+        await waitFor(() => expect(screen.getByText(/no notes yet/i)).toBeInTheDocument())
+    })
 })
