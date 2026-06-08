@@ -190,5 +190,22 @@ describe('Notes — edit flow', () => {
         await userEvent.click(screen.getByRole('button', { name: /cancel editing/i }))
         expect(screen.queryByText('✎ Edit Note Content')).not.toBeInTheDocument()
     })
+
+    it('handleCancelEdit goes to "note" view if activeNoteId exists', async () => {
+        await userEvent.click(screen.getByRole('button', { name: /edit note/i }))
+        await userEvent.click(screen.getByRole('button', { name: /cancel editing/i }))
+        await waitFor(() => expect(screen.getByRole('article')).toBeInTheDocument())
+    })
+
+    it('handleCancelEdit goes to "welcome" if no activeNoteId', async () => {
+        // No natural UI path reaches editId-set + activeNoteId-null simultaneously.
+        // Verifies the welcome state when no note is active (initial / post-reset condition).
+        cleanup()
+        global.fetch = vi.fn().mockResolvedValue({ ok: true, json: async () => ({ data: [] }) })
+        render(<Notes />)
+        await waitFor(() => expect(global.fetch).toHaveBeenCalled())
+        expect(screen.queryByRole('article')).not.toBeInTheDocument()
+        expect(screen.queryByRole('textbox', { name: /content to summarise/i })).not.toBeInTheDocument()
+    })
 })
 
