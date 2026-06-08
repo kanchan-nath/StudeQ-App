@@ -64,4 +64,14 @@ describe('NoteInputForm', () => {
         render(<NoteInputForm content="" onChange={onChangeMock} onSubmit={onSubmitMock} loading={false} editId="abc123" onCancelEdit={onCancelEditMock} inputRef={null} />)
         expect(screen.getByRole("button", { name: /update note/i })).toHaveTextContent("✦ Update Note")
     })
+
+    it("shows '✦ Summarise & Save' on submit button when no editId", () => {
+        expect(screen.getByRole("button", { name: /summarise & save/i })).toHaveTextContent("✦ Summarise & Save")
+    })
+
+    it("calls onChange when user types in textarea", async () => {
+        const textarea = screen.getByRole("textbox", { name: /content to summarise/i })
+        await userEvent.type(textarea, "a")
+        expect(onChangeMock).toHaveBeenCalled()
+    })
 })
