@@ -63,3 +63,16 @@ describe("Notes — initial render", ()=>{
         expect(screen.queryByRole('article')).not.toBeInTheDocument()
     })
 })
+
+describe("Notes — panel view switching", ()=>{
+    beforeEach(async () => {
+        global.fetch = vi.fn().mockResolvedValue({ ok: true, json: async () => ({ data: [] }) })
+        render(<Notes />)
+        await waitFor(() => expect(global.fetch).toHaveBeenCalled())
+    })
+
+    it('renders NoteInputForm when panelView is "form"', async () => {
+        await userEvent.click(screen.getByRole('button', { name: /Create your first note/i }))
+        expect(screen.getByRole('textbox', { name: /content to summarise/i })).toBeInTheDocument()
+    })
+})
