@@ -122,4 +122,12 @@ describe("NoteDocument", ()=>{
         expect(screen.getByText("Hooks are functions")).toBeInTheDocument()
         expect(screen.getByText("State triggers re-renders")).toBeInTheDocument()
     })
+
+    it("hides Key Points section when keyPoints is empty", () => {
+        cleanup()
+        render(
+            <NoteDocument note={{ ...noteMock, keyPoints: [] }} onCopy={onCopyMock} onDelete={onDeleteMock} onDownload={onDownloadMock} onEdit={onEditMock} onPin={onPinMock} isCopied={false} docRef={null} />
+        )
+        expect(screen.queryByText(/key points/i)).not.toBeInTheDocument()
+    })
 })
