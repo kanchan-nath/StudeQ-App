@@ -122,4 +122,33 @@ describe('Notes — sidebar', () => {
         render(<Notes />)
         await waitFor(() => expect(screen.getByText(/no notes yet/i)).toBeInTheDocument())
     })
+
+    it('renders pinned notes group when pinned notes exist', () => {
+        expect(screen.getByText('📌 Pinned')).toBeInTheDocument()
+        // expect(screen.getByRole('button', { name: /Pinned Note/i })).toBeInTheDocument()
+    })
+
+    it('renders "All Notes" group label when both pinned and unpinned exist', () => {
+        expect(screen.getByText('All Notes')).toBeInTheDocument()
+    })
+
+    it('clicking sidebar note sets it as active', async () => {
+        await userEvent.click(screen.getByRole('button', { name: /Unpinned Note/i }))
+        expect(screen.getByRole('button', { name: /Unpinned Note/i })).toHaveAttribute('aria-current', 'true')
+    })
+
+    it('clicking sidebar note switches panelView to "note"', async () => {
+        await userEvent.click(screen.getByRole('button', { name: /Unpinned Note/i }))
+        await waitFor(() => expect(screen.getByRole('article')).toBeInTheDocument())
+    })
+
+    it('toggle button collapses sidebar', async () => {
+        await userEvent.click(screen.getByRole('button', { name: /collapse sidebar/i }))
+        expect(screen.queryByRole('complementary', { name: /saved notes/i })).not.toBeInTheDocument()
+    })
+
+    it('toggle button aria-label updates on state', async () => {
+        await userEvent.click(screen.getByRole('button', { name: /collapse sidebar/i }))
+        expect(screen.getByRole('button', { name: /expand sidebar/i })).toBeInTheDocument()
+    })
 })
