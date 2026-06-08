@@ -224,8 +224,45 @@ describe('Notes — toast', () => {
     it('clicking toast close button clears toast', async () => {
         await act(async () => { socketHandlers['ai-response'](aiNote) })
         await waitFor(() => expect(screen.getByText('Note created!')).toBeInTheDocument())
-        // TODO: adjust close button selector to match your Toast component
         await userEvent.click(screen.getByRole('button', { name: /dismiss/i }))
         await waitFor(() => expect(screen.queryByText('Note created!')).not.toBeInTheDocument())
+    })
+})
+
+
+describe('Notes — pin toggle', () => {
+    beforeEach(async () => {
+        global.fetch = vi.fn()
+            .mockResolvedValueOnce({ ok: true, json: async () => ({ data: [unpinnedNote] }) })
+            .mockResolvedValue({ ok: true, json: async () => ({ data: [unpinnedNote] }) })
+        render(<Notes />)
+        await waitFor(() => expect(screen.getByText('Unpinned Note')).toBeInTheDocument())
+        await userEvent.click(screen.getByRole('button', { name: /Unpinned Note/i }))
+        await waitFor(() => expect(screen.getByRole('article')).toBeInTheDocument())
+    })
+
+    it('PATCH request sent to /api/notes/:id/pin on pin', async () => {
+        global.fetch = vi.fn()
+            .mockResolvedValueOnce({ ok: true, json: async () => ({}) })
+            .mockResolvedValue({ ok: true, json: async () => ({ data: [] }) })
+        await userEvent.click(screen.getByRole('button', { name: /pin note/i }))
+        await waitFor(() => expect(global.fetch).toHaveBeenCalledWith(
+            expect.stringContaining(`/api/notes/${unpinnedNote._id}/pin`),
+            expect.objectContaining({ method: 'PATCH' })
+        ))
+    })
+
+    it('updates summaryData.isPinned if current note is active', async () => {
+        global.fetch = vi.fn()
+            .mockResolvedValueOnce({ ok: true, json: async () => ({}) })
+            .mockResolvedValue({ ok: true, json: async () => ({ data: [] }) })
+        await userEvent.click(screen.getByRole('button', { name: /pin note/i }))
+        await waitFor(() => expect(screen.getByRole('button', { name: /unpin note/i })).toBeInTheDocument())
+    })
+
+    it('shows error toast if pin request fails', async () => {
+        global.fetch = vi.fn().mockResolvedValue({ ok: false })
+        await userEvent.click(screen.getByRole('button', { name: /pin note/i }))
+        await waitFor(() => expect(screen.getByText('Pin toggle failed')).toBeInTheDocument())
     })
 })
