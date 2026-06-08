@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from "@testing-library/user-event"
 import { StyledSummary } from '../../pages/Notes'
-import styles from "/Users/kanchannath/Coding/Spark.E/client/src/pages/styles/notes.module.css";
+import styles from "/src/pages/styles/notes.module.css";
 
 describe("StyledSummary", () => {
 
@@ -108,7 +108,7 @@ describe("StyledSummary", () => {
             `
         }/>)
 
-        const div = container.querySelector(`.${styles[".sum-para"]}`)
+        const div = container.querySelector(`.${styles["sum-para"]}`)
 
         expect(div).not.toBeInTheDocument()
         expect(screen.queryByRole("heading")).not.toBeInTheDocument()
