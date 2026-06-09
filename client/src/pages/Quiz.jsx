@@ -480,7 +480,7 @@ export default function Quiz() {
                     onClick={() => setMobileSidebarOpen(false)}
                     aria-label="Close history"
                   >
-                    ✕
+                    {mobileSidebarOpen ? "✕" : ""}
                   </button>
                 </div>
 
