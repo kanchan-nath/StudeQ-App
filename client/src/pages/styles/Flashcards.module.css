@@ -1445,3 +1445,141 @@
     font-size: 0.8rem;
   }
 }
+
+/* ── MOBILE DRAWER ──────────────────────────────────────────────────────────── */
+
+.drawerOverlay {
+  display: none;
+}
+
+.drawerCloseBtn {
+  display: none;
+}
+
+.hamburgerBtn {
+  display: none;
+}
+
+@media (max-width: 768px) {
+
+  /* Floating hamburger — bottom-right, above all content */
+  .hamburgerBtn {
+    display: flex;
+      align-items: center;
+      justify-content: center;
+      position: fixed;
+      bottom: 70px;
+      /* headbar height (60px) + small gap */
+      right: 16px;
+      /* right edge */
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: none;
+      background: var(--accent);
+      color: #fff;
+      font-size: 20px;
+      cursor: pointer;
+      z-index: 298;
+      box-shadow: var(--shadow-md);
+      transition: background var(--transition-fast), transform var(--transition-fast);
+  }
+
+  .hamburgerBtn:active {
+    background: var(--accent-light);
+      color: var(--accent);
+  }
+
+  /* Hide when drawer open */
+  .hamburgerBtn:has(~ * .mobileSidebarOpen) {
+    display: none;
+  }
+
+  /* Backdrop */
+  .drawerOverlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 299;
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+    animation: fadeInOverlay 0.25s ease both;
+  }
+
+  @keyframes fadeInOverlay {
+    from {
+      opacity: 0;
+    }
+
+    to {
+      opacity: 1;
+    }
+  }
+
+  /* Sidebar → fixed right drawer */
+  .historySidebar {
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100%;
+    width: 85vw;
+    max-width: 300px;
+    z-index: 300;
+    box-shadow: -8px 0 32px rgba(0, 0, 0, 0.35);
+    transform: translateX(100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform;
+    overflow-y: auto;
+    /* reset desktop width classes */
+    border-left: 1px solid var(--border);
+  }
+
+  .mobileSidebarOpen {
+    transform: translateX(0) !important;
+  }
+
+  /* Force content visible on mobile regardless of desktop sidebarOpen state */
+  .historySidebar .sidebarContent {
+    padding: 16px;
+    display: flex !important;
+    flex-direction: column;
+  }
+
+  /* Hide desktop collapse toggle */
+  .sidebarToggleBtn {
+    display: none;
+  }
+
+  /* Close btn inside drawer header */
+  .drawerCloseBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--bg-dropdown);
+    color: var(--text-secondary);
+    font-size: 13px;
+    cursor: pointer;
+    margin: 14px 14px 4px auto;
+    transition: background 0.15s, color 0.15s, transform 0.2s;
+    flex-shrink: 0;
+  }
+
+  .drawerCloseBtn:hover {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+    transform: rotate(90deg);
+  }
+}
+
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  @media (max-width: 768px) {
+    .historySidebar {
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+  }
+}

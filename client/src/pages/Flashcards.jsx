@@ -472,7 +472,8 @@ const PATH_TO_VIEW = Object.fromEntries(
 );
 
 // ─── RIGHT Sidebar ────────────────────────────────────────────────────────────
-const RightSidebar = ({ activeView, onNavigate, allFlashcards, onSelectSet, onDeleteSet, selectedSet }) => {
+// ADD mobileSidebarOpen + setMobileSidebarOpen props
+const RightSidebar = ({ activeView, onNavigate, allFlashcards, onSelectSet, onDeleteSet, selectedSet, mobileSidebarOpen, setMobileSidebarOpen }) => {
   const [openMenuId, setOpenMenuId] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
@@ -483,75 +484,94 @@ const RightSidebar = ({ activeView, onNavigate, allFlashcards, onSelectSet, onDe
   }, []);
 
   return (
-    <aside className={`${styles.historySidebar} ${sidebarOpen ? styles.sidebarOpen : styles.sidebarClosed}`}>
-      <button
-        className={styles.sidebarToggleBtn}
-        onClick={() => setSidebarOpen((o) => !o)}
-      >
-        {sidebarOpen ? "→" : "←"}
-      </button>
+    <>
+      {/* BACKDROP — mobile only, hidden via CSS on desktop */}
+      {mobileSidebarOpen && (
+        <div
+          className={styles.drawerOverlay}
+          onClick={() => setMobileSidebarOpen(false)}
+        />
+      )}
 
-      {sidebarOpen && (
-        <div className={styles.sidebarContent}>
-          <h3 className={styles.sidebarTitle}>🕓 Recent Flashcards</h3>
+      <aside className={`${styles.historySidebar} ${sidebarOpen ? styles.sidebarOpen : styles.sidebarClosed} ${mobileSidebarOpen ? styles.mobileSidebarOpen : ""}`}>
+        {/* Mobile close btn — hidden on desktop via CSS */}
+        <button
+          className={styles.drawerCloseBtn}
+          onClick={() => setMobileSidebarOpen(false)}
+          aria-label="Close sidebar"
+        >
+          ✕
+        </button>
 
-          {allFlashcards.length === 0 ? (
-            <p className={styles.sidebarEmpty}>No flashcards yet.</p>
-          ) : (
-            allFlashcards.map((set) => (
-              <div
-                key={set._id}
-                className={`${styles.sidebarItem} ${selectedSet?._id === set._id ? styles.sidebarItemActive : ""}`}
-                onClick={() => { setOpenMenuId(null); onSelectSet(set); }}
-              >
-                <div className={styles.sidebarItemRow}>
-                  <div className={styles.sidebarItemText}>
-                    <div className={styles.sidebarItemTitle}>
-                      {set.topic || "Untitled Flashcard"}
-                    </div>
-                    <div className={styles.sidebarItemMeta}>
-                      {set.flashcards?.length || 0} cards
-                      {set.subject ? ` · ${set.subject}` : ""}
-                    </div>
-                  </div>
+        <button
+          className={styles.sidebarToggleBtn}
+          onClick={() => setSidebarOpen((o) => !o)}
+        >
+          {sidebarOpen ? "→" : "←"}
+        </button>
 
-                  <div className={styles.sidebarItemMenuWrapper}>
-                    <button
-                      className={styles.threeDotBtn}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setOpenMenuId(openMenuId === set._id ? null : set._id);
-                      }}
-                    >
-                      ···
-                    </button>
-                    {openMenuId === set._id && (
-                      <div className={styles.dotMenu}>
-                        <button
-                          className={styles.dotMenuDelete}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setOpenMenuId(null);
-                            onDeleteSet(set._id);
-                          }}
-                        >
-                          Delete
-                        </button>
+        {sidebarOpen && (
+          <div className={styles.sidebarContent}>
+            <h3 className={styles.sidebarTitle}>🕓 Recent Flashcards</h3>
+
+            {allFlashcards.length === 0 ? (
+              <p className={styles.sidebarEmpty}>No flashcards yet.</p>
+            ) : (
+              allFlashcards.map((set) => (
+                <div
+                  key={set._id}
+                  className={`${styles.sidebarItem} ${selectedSet?._id === set._id ? styles.sidebarItemActive : ""}`}
+                  onClick={() => { setOpenMenuId(null); onSelectSet(set); setMobileSidebarOpen(false); }}
+                >
+                  <div className={styles.sidebarItemRow}>
+                    <div className={styles.sidebarItemText}>
+                      <div className={styles.sidebarItemTitle}>
+                        {set.topic || "Untitled Flashcard"}
                       </div>
-                    )}
+                      <div className={styles.sidebarItemMeta}>
+                        {set.flashcards?.length || 0} cards
+                        {set.subject ? ` · ${set.subject}` : ""}
+                      </div>
+                    </div>
+
+                    <div className={styles.sidebarItemMenuWrapper}>
+                      <button
+                        className={styles.threeDotBtn}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setOpenMenuId(openMenuId === set._id ? null : set._id);
+                        }}
+                      >
+                        ···
+                      </button>
+                      {openMenuId === set._id && (
+                        <div className={styles.dotMenu}>
+                          <button
+                            className={styles.dotMenuDelete}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setOpenMenuId(null);
+                              onDeleteSet(set._id);
+                            }}
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))
-          )}
-        </div>
-      )}
-    </aside>
+              ))
+            )}
+          </div>
+        )}
+      </aside>
+    </>
   );
 };
 
 // ─── Flashcard Viewer ─────────────────────────────────────────────────────────
-const FlashcardViewer = ({ allFlashcards, onNavigate }) => {
+const FlashcardViewer = ({ allFlashcards, onNavigate, onOpenSidebar }) => {
   const cards = allFlashcards.flatMap((set) => set.flashcards || []);
 
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -1110,7 +1130,7 @@ const Flashcards = () => {
   const [inputResult, setInputResult] = useState({});
   const [allFlashcards, setAllFlashcards] = useState([]);
   const [selectedSet, setSelectedSet] = useState(null);
-
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false); 
   const inputRef = useRef(null);
   const token = localStorage.getItem("token");
 
@@ -1214,7 +1234,12 @@ const Flashcards = () => {
   useEffect(() => {
     fetchFlashcards();
   }, []);
-
+  useEffect(() => {
+    if (id && allFlashcards.length > 0 && !selectedSet) {
+      const found = allFlashcards.find((s) => s._id === id);
+      if (found) setSelectedSet(found);
+    }
+  }, [id, allFlashcards]);
   const handleDeleteSet = async (id) => {
     try {
       const res = await fetch(`${BASE_URL}/api/quiz/flashcards/${id}`, {
@@ -1237,11 +1262,20 @@ const Flashcards = () => {
 
   return (
     <div className={styles.appShell}>
+      {/* MOBILE HAMBURGER — floating, hidden on desktop via CSS */}
+      <button
+        className={styles.hamburgerBtn}
+        onClick={() => setMobileSidebarOpen(true)}
+        aria-label="Open history"
+      >
+        ☰
+      </button>
       <main className={styles.mainContent}>
         {currentView === VIEW.VIEWER && (
           <FlashcardViewer
             allFlashcards={id ? allFlashcards.filter(s => s._id === id) : allFlashcards}
             onNavigate={navigateTo}
+            onOpenSidebar={() => setMobileSidebarOpen(true)}
           />
         )}
         {currentView === VIEW.HOME && (
@@ -1288,6 +1322,8 @@ const Flashcards = () => {
           navigate("/flashcards/viewer/" + set._id);
         }}
         onDeleteSet={handleDeleteSet}
+        mobileSidebarOpen={mobileSidebarOpen}
+        setMobileSidebarOpen={setMobileSidebarOpen}
       />
     </div>
   );
