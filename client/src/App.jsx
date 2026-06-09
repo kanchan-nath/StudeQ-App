@@ -60,10 +60,14 @@ const App = () => {
             path="/notes"
             element={<ProtectedRoute component={<Notes />} />}
           />
-          <Route
-            path="/quiz"
-            element={<ProtectedRoute component={<Quiz />} />}
-          />
+          <Route path="/quiz" element={<ProtectedRoute component={<Quiz />} />} />
+          <Route path="/quiz/create" element={<ProtectedRoute component={<Quiz />} />} />
+          <Route path="/quiz/upload" element={<ProtectedRoute component={<Quiz />} />} />
+          <Route path="/quiz/text" element={<ProtectedRoute component={<Quiz />} />} />
+          <Route path="/quiz/types" element={<ProtectedRoute component={<Quiz />} />} />
+          <Route path="/quiz/take/:id" element={<ProtectedRoute component={<Quiz />} />} />
+          <Route path="/quiz/results/:id" element={<ProtectedRoute component={<Quiz />} />} />
+          <Route path="/quiz/history" element={<ProtectedRoute component={<Quiz />} />} />
           <Route
             path="/flashcards"
             element={<ProtectedRoute component={<Flashcards />} />}

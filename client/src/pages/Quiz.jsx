@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { v4 as uuidv4 } from "uuid";
+import { useNavigate, useLocation, useParams } from "react-router-dom";
 import BASE_URL from "../lib/api.js";
 import styles from "./styles/Quiz.module.css";
 
@@ -14,6 +15,27 @@ const PHASE = {
   QUIZ: "quiz",
   RESULTS: "results",
   HISTORY: "history",
+};
+
+// Phase → URL
+const PHASE_PATH = {
+  [PHASE.HOME]: "/quiz",
+  [PHASE.STEP1]: "/quiz/create",
+  [PHASE.STEP2A]: "/quiz/upload",
+  [PHASE.STEP2B]: "/quiz/text",
+  [PHASE.STEP3]: "/quiz/types",
+  [PHASE.LOADING]: "/quiz/types", // stays on /types during load
+  [PHASE.HISTORY]: "/quiz/history",
+};
+
+// URL → Phase (for mount init)
+const PATH_PHASE = {
+  "/quiz": PHASE.HOME,
+  "/quiz/create": PHASE.STEP1,
+  "/quiz/upload": PHASE.STEP2A,
+  "/quiz/text": PHASE.STEP2B,
+  "/quiz/types": PHASE.STEP3,
+  "/quiz/history": PHASE.HISTORY,
 };
 
 // ─── QUESTION TYPE CONFIG ─────────────────────────────────────────
@@ -70,12 +92,26 @@ const LOADER_STATUSES = [
 ];
 
 export default function Quiz() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { id: urlId } = useParams();
+
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
   // ─── GLOBAL STATE ──────────────────────────────────────────────
-  const [phase, setPhase] = useState(PHASE.HOME);
+  // Init phase from URL on mount
+  const initPhase = (() => {
+    const p = location.pathname;
+    if (p.startsWith("/quiz/take")) return PHASE.QUIZ;
+    if (p.startsWith("/quiz/results")) return PHASE.RESULTS;
+    return PATH_PHASE[p] ?? PHASE.HOME;
+  })();
+
+  const [phase, setPhaseRaw] = useState(initPhase);
   const [method, setMethod] = useState(null); // "materials" | "text"
   const [openMenuId, setOpenMenuId] = useState(null);
+
   // Step 2A
   const [file, setFile] = useState(null);
 
@@ -93,9 +129,9 @@ export default function Quiz() {
   );
 
   // Quiz taking
-  const [quizData, setQuizData] = useState(null); // full quiz doc from API
+  const [quizData, setQuizData] = useState(null);
   const [currentQ, setCurrentQ] = useState(0);
-  const [answers, setAnswers] = useState([]); // user's answers array
+  const [answers, setAnswers] = useState([]);
 
   // Results
   const [allQuizzes, setAllQuizzes] = useState([]);
@@ -110,7 +146,57 @@ export default function Quiz() {
 
   const timerRef = useRef(null);
   const loaderRef = useRef(null);
+  const quizDataRef = useRef(quizData);
   const token = localStorage.getItem("token");
+
+  // Keep ref in sync so setPhase closure always has latest quizData
+  useEffect(() => {
+    quizDataRef.current = quizData;
+  }, [quizData]);
+
+  // ─── PHASE SETTER — syncs URL ────────────────────────────────────
+  const setPhase = useCallback(
+    (newPhase, doc) => {
+      setPhaseRaw(newPhase);
+      const docId = doc?._id ?? quizDataRef.current?._id;
+      if (newPhase === PHASE.QUIZ && docId) {
+        navigate(`/quiz/take/${docId}`);
+      } else if (newPhase === PHASE.RESULTS && docId) {
+        navigate(`/quiz/results/${docId}`);
+      } else {
+        navigate(PHASE_PATH[newPhase] ?? "/quiz");
+      }
+    },
+    [navigate],
+  );
+
+  // ─── RESTORE STATE FROM URL ON MOUNT ────────────────────────────
+  useEffect(() => {
+    if (!urlId) return;
+    const p = location.pathname;
+
+    if (p.startsWith("/quiz/results") && !quizData) {
+      fetch(`${BASE_URL}/api/quiz/${urlId}/result`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+        .then((r) => r.json())
+        .then((data) => {
+          const saved = data.data[0];
+          setQuizData(saved);
+          setAnswers(saved.questions.map((q) => q.userResponse ?? null));
+          setElapsedSec(0);
+          setReviewFilter("all");
+          setPhaseRaw(PHASE.RESULTS); // raw — URL already correct
+        })
+        .catch(console.error);
+    }
+
+    if (p.startsWith("/quiz/take") && !quizData) {
+      // Quiz data not in memory (e.g. hard reload mid-quiz) — fall back to home
+      navigate("/quiz", { replace: true });
+      setPhaseRaw(PHASE.HOME);
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ─── FETCH ALL QUIZZES (history) ────────────────────────────────
   const fetchAllQuizzes = useCallback(async () => {
@@ -175,7 +261,7 @@ export default function Quiz() {
     document.addEventListener("click", close);
     return () => document.removeEventListener("click", close);
   }, []);
-  
+
   // ─── HELPERS ────────────────────────────────────────────────────
   const fmtTime = (sec) => {
     const m = Math.floor(sec / 60),
@@ -202,9 +288,6 @@ export default function Quiz() {
       let res;
 
       if (method === "materials" && file) {
-        // ── FILE UPLOAD PATH ──────────────────────────────────────
-        // POST /api/quiz/generate-from-file
-        // Multipart FormData with: file, types (JSON string), total (number)
         const fd = new FormData();
         const selectedTypes = QTYPES.filter((q) => typeCounts[q.id] > 0).map(
           (q) => ({ type: q.id, count: typeCounts[q.id] }),
@@ -220,9 +303,6 @@ export default function Quiz() {
           body: fd,
         });
       } else {
-        // ── TEXT INPUT PATH ───────────────────────────────────────
-        // POST /api/quiz/generate
-        // JSON body with topic, subject, title, types, difficulty, audience
         const selectedTypes = QTYPES.filter((q) => typeCounts[q.id] > 0).map(
           (q) => ({ type: q.id, count: typeCounts[q.id] }),
         );
@@ -247,9 +327,8 @@ export default function Quiz() {
       if (!res.ok) throw new Error("API error");
 
       const data = await res.json();
-      // data.data is the full Quiz mongoose doc: { _id, quiz:{title,totalQuestion,meta}, questions:[] }
       startQuiz(data.data);
-      fetchAllQuizzes(); // refresh history
+      fetchAllQuizzes();
     } catch (e) {
       console.error(e);
       setError("Generation failed. Check your connection or API.");
@@ -262,7 +341,7 @@ export default function Quiz() {
     setQuizData(doc);
     setCurrentQ(0);
     setAnswers(new Array(doc.questions.length).fill(null));
-    setPhase(PHASE.QUIZ);
+    setPhase(PHASE.QUIZ, doc); // pass doc so setPhase has _id immediately
   };
 
   const viewResult = async (doc) => {
@@ -277,7 +356,7 @@ export default function Quiz() {
       setAnswers(saved.questions.map((q) => q.userResponse ?? null));
       setElapsedSec(0);
       setReviewFilter("all");
-      setPhase(PHASE.RESULTS);
+      setPhase(PHASE.RESULTS, saved); // pass saved so setPhase has _id
     } catch (e) {
       console.error("viewResult:", e);
     }
@@ -287,8 +366,6 @@ export default function Quiz() {
   const submitQuiz = async () => {
     clearInterval(timerRef.current);
 
-    // PATCH /api/quiz/:id/submit
-    // Body: { answers: ["answer string", ...] }  — index maps to questions array
     try {
       await fetch(`${BASE_URL}/api/quiz/${quizData._id}/submit`, {
         method: "PATCH",
@@ -1085,28 +1162,6 @@ export default function Quiz() {
                   })}
                 </div>
               </div>
-              {/* <div className={styles.resultActions}>
-                <button
-                  className={`${styles.btnAction} ${styles.btnPrimary}`}
-                  onClick={() => {
-                    setAnswers(new Array(quizData.questions.length).fill(null));
-                    setCurrentQ(0);
-                    setElapsedSec(0);
-                    setPhase(PHASE.QUIZ);
-                  }}
-                >
-                  🔁 Retake This Quiz
-                </button>
-                <button
-                  className={styles.btnAction}
-                  onClick={() => {
-                    setQuizData(null);
-                    setPhase(PHASE.STEP1);
-                  }}
-                >
-                  ➕ New Quiz
-                </button>
-              </div> */}
             </div>
           );
         })()}
