@@ -1,10 +1,23 @@
 /* Quiz.module.css — CSS Modules, theme via data-theme on <html> */
 /* Colors now sourced from global.css --theme-* vars */
 
-/* ─── LOCAL ALIASES (map Quiz's old internal vars → theme vars) ─ */
-/* These override the old :root block; no hardcoded colors remain  */
-
+/* ─── DURATION SCALE ────────────────────────────────── */
+/* Centralised timing tokens — reference these everywhere  */
+/* fast=150ms  base=250ms  slow=400ms  slower=600ms        */
 .app {
+  --duration-fast: 150ms;
+  --duration-base: 250ms;
+  --duration-slow: 400ms;
+  --duration-slower: 600ms;
+
+  /* Named easing curves — no bare ease/linear anywhere */
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  /* overshoot for lift */
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-in-quart: cubic-bezier(0.5, 0, 0.75, 0);
+
+  /* ─── LOCAL ALIASES (map Quiz's old internal vars → theme vars) ─ */
   --bg: var(--theme-bg);
   --surface: var(--theme-surface);
   --surface2: var(--theme-surface-2);
@@ -30,7 +43,9 @@
   background: var(--bg);
   color: var(--text);
   font-family: "DM Sans", sans-serif;
-  transition: background var(--t-slow), color var(--t-slow);
+  transition:
+    background var(--duration-slow) var(--ease-in-out),
+    color var(--duration-slow) var(--ease-in-out);
 }
 
 .screen {
@@ -38,6 +53,19 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  /* Whole-screen fade-in on mount */
+  animation: screenEnter var(--duration-slow) var(--ease-out-quart) both;
+}
+
+/* Screen entrance — opacity only (GPU safe) */
+@keyframes screenEnter {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 /* ─── SPLIT LAYOUT ──────────────────────────────────── */
@@ -52,6 +80,7 @@
   overflow-y: auto;
   padding: 40px 48px;
   min-height: 0;
+  scroll-behavior: smooth;
 }
 
 .splitRight {
@@ -63,7 +92,23 @@
   justify-content: center;
   padding: 32px;
   flex-shrink: 0;
-  transition: background var(--t-slow), border-color var(--t-slow);
+  transition:
+    background var(--duration-slow) var(--ease-in-out),
+    border-color var(--duration-slow) var(--ease-in-out);
+  /* Slide in from right on mount */
+  animation: panelSlideIn var(--duration-slower) var(--ease-out-quart) both;
+}
+
+@keyframes panelSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 /* ─── HOME ──────────────────────────────────────────── */
@@ -72,8 +117,23 @@
   max-width: 600px;
   padding: 80px 32px;
   text-align: center;
+  /* Stagger children via nth-child in the sections below */
+  animation: fadeUp var(--duration-slow) var(--ease-out-quart) both;
 }
 
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Icon bounces in with a spring overshoot */
 .homeIcon {
   width: 64px;
   height: 64px;
@@ -85,6 +145,28 @@
   justify-content: center;
   font-size: 30px;
   box-shadow: 0 8px 24px rgba(124, 95, 245, 0.3);
+  animation: iconPop var(--duration-slower) var(--ease-spring) both;
+  /* Spring lift on hover — transform only */
+  transition:
+    transform var(--duration-base) var(--ease-spring),
+    box-shadow var(--duration-base) var(--ease-out-quart);
+}
+
+.homeIcon:hover {
+  transform: scale(1.08) rotate(-4deg);
+  box-shadow: 0 14px 36px rgba(124, 95, 245, 0.45);
+}
+
+@keyframes iconPop {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .homeH1 {
@@ -93,6 +175,8 @@
   line-height: 1.2;
   margin-bottom: 14px;
   color: var(--text);
+  /* Delayed stagger after icon */
+  animation: fadeUp var(--duration-slow) var(--ease-out-quart) 80ms both;
 }
 
 .homeSub {
@@ -100,6 +184,7 @@
   color: var(--text2);
   margin-bottom: 40px;
   line-height: 1.65;
+  animation: fadeUp var(--duration-slow) var(--ease-out-quart) 160ms both;
 }
 
 .homeCards {
@@ -108,6 +193,7 @@
   margin-bottom: 20px;
 }
 
+/* Each card staggers in via nth-child */
 .homeCard {
   background: var(--surface);
   border: 1.5px solid var(--border);
@@ -115,13 +201,36 @@
   padding: 28px 20px;
   text-align: center;
   cursor: pointer;
-  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), background var(--t-slow), border-color var(--t-slow);
+  /* Spring lift + border/shadow on hover — transform + opacity only */
+  transition:
+    transform var(--duration-base) var(--ease-spring),
+    box-shadow var(--duration-base) var(--ease-out-quart),
+    border-color var(--duration-base) var(--ease-out-quart),
+    background var(--duration-slow) var(--ease-in-out);
+  animation: fadeUp var(--duration-slow) var(--ease-out-quart) both;
+  will-change: transform;
+  /* card lift is frequent enough to hint */
+}
+
+/* Stagger entrance: card 1 at 240ms, card 2 at 320ms */
+.homeCard:nth-child(1) {
+  animation-delay: 240ms;
+}
+
+.homeCard:nth-child(2) {
+  animation-delay: 320ms;
 }
 
 .homeCard:hover {
   border-color: var(--accent-mid);
-  transform: translateY(-4px);
+  transform: translateY(-6px);
   box-shadow: var(--shadow-lg);
+}
+
+/* Press feedback — quick scale-down on active */
+.homeCard:active {
+  transform: translateY(-2px) scale(0.98);
+  transition-duration: var(--duration-fast);
 }
 
 .homeCard h3 {
@@ -138,9 +247,16 @@
   margin: 0;
 }
 
+/* Card icon spins slightly on card hover via sibling trick */
 .homeCardIcon {
   font-size: 32px;
   margin-bottom: 12px;
+  display: inline-block;
+  transition: transform var(--duration-base) var(--ease-spring);
+}
+
+.homeCard:hover .homeCardIcon {
+  transform: scale(1.2) rotate(-8deg);
 }
 
 .historyBtn {
@@ -157,13 +273,23 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  transition: background var(--t-slow), border-color var(--t-slow), color var(--t-base);
+  transition:
+    background var(--duration-base) var(--ease-out-quart),
+    border-color var(--duration-base) var(--ease-out-quart),
+    color var(--duration-base) var(--ease-out-quart),
+    transform var(--duration-fast) var(--ease-spring);
   margin-top: 12px;
+  animation: fadeUp var(--duration-slow) var(--ease-out-quart) 400ms both;
 }
 
 .historyBtn:hover {
   background: var(--surface2);
   border-color: var(--text3);
+  transform: translateY(-2px);
+}
+
+.historyBtn:active {
+  transform: scale(0.97);
 }
 
 /* ─── METHOD CARDS ──────────────────────────────────── */
@@ -181,18 +307,59 @@
   background: var(--surface);
   text-align: center;
   cursor: pointer;
-  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), background var(--t-slow), border-color var(--t-slow);
+  transition:
+    transform var(--duration-base) var(--ease-spring),
+    box-shadow var(--duration-base) var(--ease-out-quart),
+    border-color var(--duration-base) var(--ease-out-quart),
+    background var(--duration-slow) var(--ease-in-out);
+  animation: fadeUp var(--duration-slow) var(--ease-out-quart) both;
+  will-change: transform;
+}
+
+.methodCard:nth-child(1) {
+  animation-delay: 80ms;
+}
+
+.methodCard:nth-child(2) {
+  animation-delay: 160ms;
+}
+
+.methodCard:nth-child(3) {
+  animation-delay: 240ms;
+}
+
+.methodCard:nth-child(4) {
+  animation-delay: 320ms;
 }
 
 .methodCard:hover {
   border-color: var(--accent-mid);
-  transform: translateY(-3px);
+  transform: translateY(-5px);
   box-shadow: var(--shadow-lg);
 }
 
+.methodCard:active {
+  transform: translateY(-1px) scale(0.98);
+  transition-duration: var(--duration-fast);
+}
+
+/* Selected state pulses border gently */
 .methodCard.selected {
   border-color: var(--accent);
   background: var(--accent-light);
+  animation: selectedPulse 2s var(--ease-in-out) infinite;
+}
+
+@keyframes selectedPulse {
+
+  0%,
+  100% {
+    box-shadow: 0 0 0 0px rgba(124, 95, 245, 0);
+  }
+
+  50% {
+    box-shadow: 0 0 0 5px rgba(124, 95, 245, 0.18);
+  }
 }
 
 .methodCard h3 {
@@ -218,6 +385,11 @@
   align-items: center;
   justify-content: center;
   font-size: 24px;
+  transition: transform var(--duration-base) var(--ease-spring);
+}
+
+.methodCard:hover .methodIcon {
+  transform: scale(1.15) rotate(-6deg);
 }
 
 /* ─── FORMAT PILLS ──────────────────────────────────── */
@@ -236,7 +408,22 @@
   font-weight: 500;
   background: var(--surface);
   color: var(--text2);
-  transition: background var(--t-slow), border-color var(--t-slow);
+  cursor: pointer;
+  transition:
+    background var(--duration-base) var(--ease-out-quart),
+    border-color var(--duration-base) var(--ease-out-quart),
+    color var(--duration-base) var(--ease-out-quart),
+    transform var(--duration-fast) var(--ease-spring);
+}
+
+.pill:hover {
+  border-color: var(--accent-mid);
+  color: var(--accent);
+  transform: translateY(-2px);
+}
+
+.pill:active {
+  transform: scale(0.95);
 }
 
 /* ─── DROPZONE ──────────────────────────────────────── */
@@ -247,25 +434,52 @@
   text-align: center;
   cursor: pointer;
   background: var(--surface);
-  transition: background var(--t-slow), border-color var(--t-slow);
+  transition:
+    background var(--duration-base) var(--ease-out-quart),
+    border-color var(--duration-base) var(--ease-out-quart),
+    transform var(--duration-base) var(--ease-spring);
+  animation: fadeUp var(--duration-slow) var(--ease-out-quart) both;
 }
 
 .dropzone:hover,
 .dragover {
   border-color: var(--accent);
   background: var(--accent-light);
+  transform: scale(1.015);
+  /* subtle inflate signals readiness */
 }
 
+/* File landed — icon scales up briefly */
 .uploaded {
   border-color: var(--success);
   background: var(--theme-purple-dim);
-  /* repurposed: a subtle tint; swap to a green-dim if you add one */
+  animation: uploadPop var(--duration-base) var(--ease-spring) both;
+}
+
+@keyframes uploadPop {
+  0% {
+    transform: scale(0.97);
+  }
+
+  60% {
+    transform: scale(1.03);
+  }
+
+  100% {
+    transform: scale(1);
+  }
 }
 
 .dropIcon {
   font-size: 36px;
   display: block;
   margin-bottom: 12px;
+  transition: transform var(--duration-base) var(--ease-spring);
+}
+
+.dropzone:hover .dropIcon,
+.dragover .dropIcon {
+  transform: translateY(-4px) scale(1.1);
 }
 
 .dropText {
@@ -284,11 +498,38 @@
 .browseLink {
   color: var(--accent);
   text-decoration: underline;
+  transition: opacity var(--duration-fast) var(--ease-out-quart);
+}
+
+.browseLink:hover {
+  opacity: 0.75;
 }
 
 /* ─── FORM ──────────────────────────────────────────── */
 .formGroup {
   margin-bottom: 20px;
+  /* Each group fades in sequentially via nth-child in parent */
+  animation: fadeUp var(--duration-slow) var(--ease-out-quart) both;
+}
+
+.formGroup:nth-child(1) {
+  animation-delay: 0ms;
+}
+
+.formGroup:nth-child(2) {
+  animation-delay: 60ms;
+}
+
+.formGroup:nth-child(3) {
+  animation-delay: 120ms;
+}
+
+.formGroup:nth-child(4) {
+  animation-delay: 180ms;
+}
+
+.formGroup:nth-child(5) {
+  animation-delay: 240ms;
 }
 
 .formLabel {
@@ -299,6 +540,12 @@
   margin-bottom: 7px;
   text-transform: uppercase;
   letter-spacing: 0.04em;
+  transition: color var(--duration-fast) var(--ease-out-quart);
+}
+
+/* Label brightens when sibling input is focused */
+.formGroup:focus-within .formLabel {
+  color: var(--accent);
 }
 
 .formInput {
@@ -309,13 +556,19 @@
   font-size: 14px;
   color: var(--text);
   background: var(--surface);
-  transition: border-color var(--t-base), background var(--t-slow);
+  /* Box-shadow glow instead of outline (GPU-safe, doesn't affect layout) */
+  transition:
+    border-color var(--duration-fast) var(--ease-out-quart),
+    box-shadow var(--duration-fast) var(--ease-out-quart),
+    background var(--duration-slow) var(--ease-in-out);
   outline: none;
   font-family: "DM Sans", sans-serif;
 }
 
+/* Focus glow — inset shadow avoids layout shift */
 .formInput:focus {
   border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-light);
 }
 
 .formTextarea {
@@ -329,6 +582,7 @@
   color: var(--text3);
   text-align: right;
   margin-top: 4px;
+  transition: color var(--duration-fast) var(--ease-out-quart);
 }
 
 .segControl {
@@ -337,7 +591,9 @@
   border-radius: var(--radius-sm);
   overflow: hidden;
   background: var(--surface);
-  transition: background var(--t-slow), border-color var(--t-slow);
+  transition:
+    background var(--duration-slow) var(--ease-in-out),
+    border-color var(--duration-slow) var(--ease-in-out);
 }
 
 .segBtn {
@@ -349,7 +605,9 @@
   background: none;
   color: var(--text2);
   cursor: pointer;
-  transition: background var(--t-base), color var(--t-base);
+  transition:
+    background var(--duration-base) var(--ease-out-quart),
+    color var(--duration-base) var(--ease-out-quart);
 }
 
 .segActive {
@@ -367,7 +625,9 @@
   border: 1px solid var(--border);
   border-radius: var(--radius-sm) var(--radius-sm) 0 0;
   font-size: 14px;
-  transition: background var(--t-slow), border-color var(--t-slow);
+  transition:
+    background var(--duration-slow) var(--ease-in-out),
+    border-color var(--duration-slow) var(--ease-in-out);
 }
 
 .mutedText {
@@ -387,7 +647,32 @@
   border: 1px solid var(--border);
   border-top: none;
   background: var(--surface);
-  transition: background var(--t-slow), border-color var(--t-slow);
+  transition:
+    background var(--duration-base) var(--ease-out-quart),
+    border-color var(--duration-slow) var(--ease-in-out),
+    transform var(--duration-base) var(--ease-spring);
+  /* Stagger rows */
+  animation: fadeUp var(--duration-slow) var(--ease-out-quart) both;
+}
+
+.qtypeRow:nth-child(1) {
+  animation-delay: 0ms;
+}
+
+.qtypeRow:nth-child(2) {
+  animation-delay: 60ms;
+}
+
+.qtypeRow:nth-child(3) {
+  animation-delay: 120ms;
+}
+
+.qtypeRow:nth-child(4) {
+  animation-delay: 180ms;
+}
+
+.qtypeRow:nth-child(5) {
+  animation-delay: 240ms;
 }
 
 .qtypeRow:last-child {
@@ -408,6 +693,11 @@
   font-size: 18px;
   margin-right: 14px;
   flex-shrink: 0;
+  transition: transform var(--duration-base) var(--ease-spring);
+}
+
+.qtypeRow:hover .qtypeIcon {
+  transform: scale(1.12) rotate(-5deg);
 }
 
 .qtypeInfo {
@@ -426,6 +716,7 @@
   margin-top: 2px;
 }
 
+/* ─── COUNTER CONTROL ───────────────────────────────── */
 .counter {
   display: flex;
   align-items: center;
@@ -444,7 +735,11 @@
   justify-content: center;
   cursor: pointer;
   color: var(--text2);
-  transition: background var(--t-base), color var(--t-base), border-color var(--t-base);
+  transition:
+    background var(--duration-fast) var(--ease-out-quart),
+    color var(--duration-fast) var(--ease-out-quart),
+    border-color var(--duration-fast) var(--ease-out-quart),
+    transform var(--duration-fast) var(--ease-spring);
   line-height: 1;
 }
 
@@ -452,6 +747,11 @@
   background: var(--accent);
   color: var(--theme-text);
   border-color: var(--accent);
+}
+
+/* Tactile press feedback */
+.cntBtn:active {
+  transform: scale(0.88);
 }
 
 .cntVal {
@@ -465,7 +765,15 @@
   background: var(--surface);
   color: var(--text);
   outline: none;
-  transition: background var(--t-slow), border-color var(--t-slow);
+  transition:
+    background var(--duration-slow) var(--ease-in-out),
+    border-color var(--duration-fast) var(--ease-out-quart),
+    box-shadow var(--duration-fast) var(--ease-out-quart);
+}
+
+.cntVal:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-light);
 }
 
 /* ─── PREVIEW CARD (STEP 3 RIGHT PANEL) ─────────────── */
@@ -478,7 +786,11 @@
   box-shadow:
     0 0 0 6px var(--accent-light),
     var(--shadow-lg);
-  transition: background var(--t-slow), border-color var(--t-slow);
+  transition:
+    background var(--duration-slow) var(--ease-in-out),
+    border-color var(--duration-slow) var(--ease-in-out);
+  /* Float the preview card like the loader */
+  animation: cardFloat 3s var(--ease-in-out) infinite;
 }
 
 .pcHeader {
@@ -535,7 +847,8 @@
   padding: 60px;
   background: var(--bg);
   height: 100%;
-  transition: background var(--t-slow);
+  transition: background var(--duration-slow) var(--ease-in-out);
+  animation: screenEnter var(--duration-slow) var(--ease-out-quart) both;
 }
 
 .loaderCard {
@@ -547,8 +860,13 @@
   box-shadow:
     0 0 0 6px var(--accent-light),
     var(--shadow-lg);
-  animation: cardFloat 2s ease-in-out infinite;
-  transition: background var(--t-slow), border-color var(--t-slow);
+  /* Gentle float — transform only */
+  animation: cardFloat 2s var(--ease-in-out) infinite;
+  will-change: transform;
+  /* continuous animation — worth hinting */
+  transition:
+    background var(--duration-slow) var(--ease-in-out),
+    border-color var(--duration-slow) var(--ease-in-out);
 }
 
 @keyframes cardFloat {
@@ -572,29 +890,30 @@
   border-radius: 4px;
   background: var(--border);
   margin-bottom: 7px;
-  animation: shimmer 1.5s ease-in-out infinite;
+  /* Opacity-only shimmer — GPU safe */
+  animation: shimmer 1.5s var(--ease-in-out) infinite;
 }
 
 .loaderLine:nth-child(1) {
   width: 80%;
-  animation-delay: 0s;
+  animation-delay: 0ms;
 }
 
 .loaderLine:nth-child(2) {
   width: 60%;
-  animation-delay: 0.2s;
+  animation-delay: 200ms;
 }
 
 .loaderLine:nth-child(3) {
   width: 70%;
-  animation-delay: 0.4s;
+  animation-delay: 400ms;
 }
 
 @keyframes shimmer {
 
   0%,
   100% {
-    opacity: 0.4;
+    opacity: 0.35;
   }
 
   50% {
@@ -607,19 +926,21 @@
   font-weight: 700;
   color: var(--text);
   font-family: "DM Sans", sans-serif;
+  animation: fadeUp var(--duration-slow) var(--ease-out-quart) 200ms both;
 }
 
 .loaderStatus {
   font-size: 15px;
   color: var(--text2);
-  animation: fadeStatus 3s ease-in-out infinite;
+  /* Opacity pulse for "thinking" feel */
+  animation: fadeStatus 3s var(--ease-in-out) infinite;
 }
 
 @keyframes fadeStatus {
 
   0%,
   100% {
-    opacity: 0.5;
+    opacity: 0.45;
   }
 
   50% {
@@ -633,6 +954,7 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  animation: screenEnter var(--duration-slow) var(--ease-out-quart) both;
 }
 
 .quizTopbar {
@@ -646,7 +968,23 @@
   position: sticky;
   top: 0;
   z-index: 50;
-  transition: background var(--t-slow), border-color var(--t-slow);
+  transition:
+    background var(--duration-slow) var(--ease-in-out),
+    border-color var(--duration-slow) var(--ease-in-out);
+  /* Slide down from top */
+  animation: topbarIn var(--duration-slow) var(--ease-out-quart) both;
+}
+
+@keyframes topbarIn {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .quizTitleBar {
@@ -664,11 +1002,12 @@
   max-width: 300px;
 }
 
+/* Fill animates via width transition set inline from JS — only exception */
 .quizProgressFill {
   height: 100%;
   background: var(--accent);
   border-radius: 3px;
-  transition: width 0.4s ease;
+  transition: width var(--duration-slow) var(--ease-out-quart);
 }
 
 .quizQnum {
@@ -687,7 +1026,10 @@
   padding: 5px 10px;
   border-radius: 20px;
   border: 1px solid var(--border);
-  transition: background var(--t-slow), border-color var(--t-slow);
+  transition:
+    background var(--duration-slow) var(--ease-in-out),
+    border-color var(--duration-slow) var(--ease-in-out),
+    color var(--duration-base) var(--ease-out-quart);
 }
 
 .quizBody {
@@ -697,8 +1039,12 @@
   width: 100%;
   flex: 1;
   overflow-y: auto;
+  scroll-behavior: smooth;
+  /* Body content fades up after topbar */
+  animation: fadeUp var(--duration-slow) var(--ease-out-quart) 120ms both;
 }
 
+/* Question text slides in from below on each new question */
 .quizQText {
   font-size: 22px;
   font-weight: 600;
@@ -706,6 +1052,7 @@
   margin-bottom: 32px;
   font-family: "Lora", serif;
   color: var(--text);
+  animation: fadeUp var(--duration-base) var(--ease-out-quart) both;
 }
 
 .optionList {
@@ -714,6 +1061,7 @@
   gap: 12px;
 }
 
+/* Options stagger in after question text */
 .optionCard {
   border: 2px solid var(--border);
   border-radius: var(--radius);
@@ -725,17 +1073,45 @@
   align-items: center;
   gap: 12px;
   color: var(--text);
-  transition: background var(--t-base), border-color var(--t-base);
+  transition:
+    background var(--duration-fast) var(--ease-out-quart),
+    border-color var(--duration-fast) var(--ease-out-quart),
+    transform var(--duration-fast) var(--ease-spring);
+  animation: fadeUp var(--duration-base) var(--ease-out-quart) both;
+}
+
+.optionCard:nth-child(1) {
+  animation-delay: 80ms;
+}
+
+.optionCard:nth-child(2) {
+  animation-delay: 140ms;
+}
+
+.optionCard:nth-child(3) {
+  animation-delay: 200ms;
+}
+
+.optionCard:nth-child(4) {
+  animation-delay: 260ms;
 }
 
 .optionCard:hover {
   border-color: var(--accent-mid);
   background: var(--accent-light);
+  transform: translateX(4px);
+  /* horizontal nudge signals selection intent */
+}
+
+.optionCard:active {
+  transform: translateX(2px) scale(0.99);
+  transition-duration: var(--duration-fast);
 }
 
 .optionSelected {
   border-color: var(--accent) !important;
   background: var(--accent-light) !important;
+  transform: translateX(4px);
 }
 
 .optionLetter {
@@ -749,14 +1125,20 @@
   font-size: 13px;
   font-weight: 600;
   flex-shrink: 0;
-  transition: background var(--t-base), border-color var(--t-base), color var(--t-base);
   color: var(--text2);
+  transition:
+    background var(--duration-fast) var(--ease-out-quart),
+    border-color var(--duration-fast) var(--ease-out-quart),
+    color var(--duration-fast) var(--ease-out-quart),
+    transform var(--duration-fast) var(--ease-spring);
 }
 
+/* Letter circle pops when option selected */
 .optionLetterActive {
   background: var(--accent);
   border-color: var(--accent);
   color: var(--theme-text);
+  transform: scale(1.1);
 }
 
 .quizNav {
@@ -766,6 +1148,7 @@
   margin-top: 40px;
   padding-top: 24px;
   border-top: 1px solid var(--border);
+  animation: fadeUp var(--duration-slow) var(--ease-out-quart) 300ms both;
 }
 
 .btnNav {
@@ -776,13 +1159,21 @@
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
-  transition: background var(--t-base), border-color var(--t-base);
   color: var(--text);
   font-family: "DM Sans", sans-serif;
+  transition:
+    background var(--duration-fast) var(--ease-out-quart),
+    border-color var(--duration-fast) var(--ease-out-quart),
+    transform var(--duration-fast) var(--ease-spring);
 }
 
 .btnNav:hover {
   background: var(--surface2);
+  transform: translateY(-2px);
+}
+
+.btnNav:active {
+  transform: scale(0.96);
 }
 
 .btnSubmit {
@@ -794,12 +1185,22 @@
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  transition: background var(--t-base);
   font-family: "DM Sans", sans-serif;
+  transition:
+    background var(--duration-fast) var(--ease-out-quart),
+    transform var(--duration-fast) var(--ease-spring),
+    box-shadow var(--duration-fast) var(--ease-out-quart);
 }
 
 .btnSubmit:hover {
   background: var(--theme-purple-light);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(124, 95, 245, 0.35);
+}
+
+.btnSubmit:active {
+  transform: scale(0.96);
+  box-shadow: none;
 }
 
 /* ─── RESULTS ───────────────────────────────────────── */
@@ -808,6 +1209,7 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  animation: screenEnter var(--duration-slow) var(--ease-out-quart) both;
 }
 
 .resultsTop {
@@ -817,7 +1219,10 @@
   display: flex;
   align-items: center;
   gap: 24px;
-  transition: background var(--t-slow), border-color var(--t-slow);
+  transition:
+    background var(--duration-slow) var(--ease-in-out),
+    border-color var(--duration-slow) var(--ease-in-out);
+  animation: topbarIn var(--duration-slow) var(--ease-out-quart) both;
 }
 
 .scoreRing {
@@ -825,6 +1230,20 @@
   width: 90px;
   height: 90px;
   flex-shrink: 0;
+  /* Ring draws itself in — handled by SVG stroke-dashoffset in component */
+  animation: scoreRingIn var(--duration-slower) var(--ease-out-quart) both;
+}
+
+@keyframes scoreRingIn {
+  from {
+    opacity: 0;
+    transform: scale(0.7) rotate(-90deg);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
 }
 
 .scoreRingText {
@@ -841,6 +1260,7 @@
   font-weight: 700;
   line-height: 1;
   color: var(--text);
+  animation: fadeUp var(--duration-base) var(--ease-out-quart) 300ms both;
 }
 
 .scoreLabel {
@@ -852,6 +1272,7 @@
   font-size: 18px;
   margin-bottom: 4px;
   color: var(--text);
+  animation: fadeUp var(--duration-base) var(--ease-out-quart) 200ms both;
 }
 
 .scoreGrade {
@@ -863,6 +1284,8 @@
   margin-bottom: 10px;
   background: var(--accent-light);
   color: var(--accent);
+  /* Badge pops in */
+  animation: iconPop var(--duration-base) var(--ease-spring) 350ms both;
 }
 
 .scoreStats {
@@ -870,6 +1293,7 @@
   gap: 20px;
   font-size: 13px;
   color: var(--text2);
+  animation: fadeUp var(--duration-base) var(--ease-out-quart) 400ms both;
 }
 
 .resultsBody {
@@ -879,12 +1303,14 @@
   flex: 1;
   overflow-y: auto;
   width: 100%;
+  scroll-behavior: smooth;
 }
 
 .filterTabs {
   display: flex;
   gap: 8px;
   margin-bottom: 20px;
+  animation: fadeUp var(--duration-slow) var(--ease-out-quart) 200ms both;
 }
 
 .tabBtn {
@@ -895,9 +1321,21 @@
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
-  transition: background var(--t-base), border-color var(--t-base), color var(--t-base);
   color: var(--text2);
   font-family: "DM Sans", sans-serif;
+  transition:
+    background var(--duration-fast) var(--ease-out-quart),
+    border-color var(--duration-fast) var(--ease-out-quart),
+    color var(--duration-fast) var(--ease-out-quart),
+    transform var(--duration-fast) var(--ease-spring);
+}
+
+.tabBtn:hover {
+  transform: translateY(-2px);
+}
+
+.tabBtn:active {
+  transform: scale(0.95);
 }
 
 .tabActive {
@@ -912,12 +1350,56 @@
   gap: 12px;
 }
 
+/* Review cards stagger in */
 .reviewCard {
   background: var(--surface);
   border: 1.5px solid var(--border);
   border-radius: var(--radius);
   padding: 16px 18px;
-  transition: background var(--t-slow), border-color var(--t-slow);
+  transition:
+    background var(--duration-slow) var(--ease-in-out),
+    border-color var(--duration-slow) var(--ease-in-out),
+    transform var(--duration-base) var(--ease-spring),
+    box-shadow var(--duration-base) var(--ease-out-quart);
+  animation: fadeUp var(--duration-slow) var(--ease-out-quart) both;
+}
+
+/* Stagger up to 8 cards; additional cards inherit 0ms delay (acceptable) */
+.reviewCard:nth-child(1) {
+  animation-delay: 0ms;
+}
+
+.reviewCard:nth-child(2) {
+  animation-delay: 60ms;
+}
+
+.reviewCard:nth-child(3) {
+  animation-delay: 120ms;
+}
+
+.reviewCard:nth-child(4) {
+  animation-delay: 180ms;
+}
+
+.reviewCard:nth-child(5) {
+  animation-delay: 240ms;
+}
+
+.reviewCard:nth-child(6) {
+  animation-delay: 300ms;
+}
+
+.reviewCard:nth-child(7) {
+  animation-delay: 360ms;
+}
+
+.reviewCard:nth-child(8) {
+  animation-delay: 420ms;
+}
+
+.reviewCard:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow);
 }
 
 .correctCard {
@@ -945,7 +1427,6 @@
   gap: 6px;
 }
 
-/* Review answer states — use rgba overlays so they work in both themes */
 .userCorrect {
   background: rgba(34, 197, 94, 0.12);
   color: var(--success);
@@ -968,7 +1449,10 @@
   padding: 24px 32px;
   border-top: 1px solid var(--border);
   background: var(--surface);
-  transition: background var(--t-slow), border-color var(--t-slow);
+  transition:
+    background var(--duration-slow) var(--ease-in-out),
+    border-color var(--duration-slow) var(--ease-in-out);
+  animation: fadeUp var(--duration-slow) var(--ease-out-quart) 500ms both;
 }
 
 .btnAction {
@@ -979,16 +1463,25 @@
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
-  transition: background var(--t-base), border-color var(--t-base);
   color: var(--text);
   display: flex;
   align-items: center;
   gap: 8px;
   font-family: "DM Sans", sans-serif;
+  transition:
+    background var(--duration-fast) var(--ease-out-quart),
+    border-color var(--duration-fast) var(--ease-out-quart),
+    transform var(--duration-fast) var(--ease-spring),
+    box-shadow var(--duration-fast) var(--ease-out-quart);
 }
 
 .btnAction:hover {
   background: var(--surface2);
+  transform: translateY(-2px);
+}
+
+.btnAction:active {
+  transform: scale(0.96);
 }
 
 .btnPrimary {
@@ -999,12 +1492,14 @@
 
 .btnPrimary:hover {
   background: var(--theme-purple-light);
+  box-shadow: 0 6px 20px rgba(124, 95, 245, 0.35);
 }
 
 /* ─── RIGHT PANEL ───────────────────────────────────── */
 .rpanelInfo {
   text-align: center;
   padding: 0 20px;
+  animation: fadeUp var(--duration-slow) var(--ease-out-quart) 200ms both;
 }
 
 .rpanelInfo h3 {
@@ -1033,6 +1528,28 @@
   background: rgba(239, 68, 68, 0.1);
   border-radius: var(--radius-sm);
   border: 1px solid rgba(239, 68, 68, 0.25);
+  /* Error shakes in — horizontal only (transform) */
+  animation: errorShake var(--duration-slow) var(--ease-out-quart) both;
+}
+
+@keyframes errorShake {
+  0% {
+    opacity: 0;
+    transform: translateX(-6px);
+  }
+
+  40% {
+    transform: translateX(4px);
+  }
+
+  70% {
+    transform: translateX(-2px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 /* ─── HOME WRAPPER (sidebar layout) ─────────────────── */
@@ -1050,7 +1567,10 @@
   align-items: center;
   justify-content: center;
   overflow-y: auto;
-  transition: background var(--t-slow), flex var(--t-slow);
+  transition:
+    background var(--duration-slow) var(--ease-in-out),
+    flex var(--duration-slow) var(--ease-in-out);
+  scroll-behavior: smooth;
   scrollbar-width: thin;
   scrollbar-color: var(--accent-mid) var(--bg);
 }
@@ -1080,7 +1600,10 @@
   border-left: 1px solid var(--border);
   display: flex;
   flex-direction: row;
-  transition: width var(--t-slow), background var(--t-slow), border-color var(--t-slow);
+  transition:
+    width var(--duration-slow) var(--ease-in-out),
+    background var(--duration-slow) var(--ease-in-out),
+    border-color var(--duration-slow) var(--ease-in-out);
   flex-shrink: 0;
   overflow: hidden;
 }
@@ -1111,12 +1634,22 @@
   align-items: center;
   justify-content: center;
   z-index: 10;
-  transition: background var(--t-base), color var(--t-base), border-color var(--t-slow);
+  transition:
+    background var(--duration-fast) var(--ease-out-quart),
+    color var(--duration-fast) var(--ease-out-quart),
+    border-color var(--duration-slow) var(--ease-in-out),
+    transform var(--duration-fast) var(--ease-spring);
 }
 
+/* translateY stays in play; we add a micro scale on hover */
 .sidebarToggleBtn:hover {
   background: var(--accent-light);
   color: var(--accent);
+  transform: translateY(-50%) scaleX(1.12);
+}
+
+.sidebarToggleBtn:active {
+  transform: translateY(-50%) scaleX(0.95);
 }
 
 .sidebarContent {
@@ -1124,6 +1657,7 @@
   width: 100%;
   height: 100%;
   overflow-y: auto;
+  scroll-behavior: smooth;
   scrollbar-width: thin;
   scrollbar-color: var(--border) var(--surface2);
 }
@@ -1155,8 +1689,10 @@
 .sidebarEmpty {
   font-size: 13px;
   color: var(--text3);
+  animation: fadeUp var(--duration-base) var(--ease-out-quart) both;
 }
 
+/* History items stagger in */
 .sidebarItem {
   padding: 12px 14px;
   border: 1.5px solid var(--border);
@@ -1164,12 +1700,40 @@
   margin-bottom: 10px;
   cursor: pointer;
   background: var(--surface2);
-  transition: background var(--t-base), border-color var(--t-base);
+  transition:
+    background var(--duration-fast) var(--ease-out-quart),
+    border-color var(--duration-fast) var(--ease-out-quart),
+    transform var(--duration-fast) var(--ease-spring),
+    box-shadow var(--duration-fast) var(--ease-out-quart);
+  animation: fadeUp var(--duration-base) var(--ease-out-quart) both;
+}
+
+.sidebarItem:nth-child(1) {
+  animation-delay: 0ms;
+}
+
+.sidebarItem:nth-child(2) {
+  animation-delay: 50ms;
+}
+
+.sidebarItem:nth-child(3) {
+  animation-delay: 100ms;
+}
+
+.sidebarItem:nth-child(4) {
+  animation-delay: 150ms;
+}
+
+.sidebarItem:nth-child(5) {
+  animation-delay: 200ms;
 }
 
 .sidebarItem:hover {
   border-color: var(--accent-mid);
   background: var(--accent-light);
+  transform: translateX(-3px);
+  /* nudge left toward content */
+  box-shadow: 4px 0 12px rgba(124, 95, 245, 0.1);
 }
 
 .sidebarItemTitle {
@@ -1216,14 +1780,23 @@
   justify-content: center;
   line-height: 1;
   letter-spacing: -1px;
-  transition: background var(--t-base), color var(--t-base);
+  transition:
+    background var(--duration-fast) var(--ease-out-quart),
+    color var(--duration-fast) var(--ease-out-quart),
+    transform var(--duration-fast) var(--ease-spring);
 }
 
 .threeDotBtn:hover {
   background: var(--border);
   color: var(--text);
+  transform: scale(1.15);
 }
 
+.threeDotBtn:active {
+  transform: scale(0.9);
+}
+
+/* Dot-menu pops in from top-right */
 .dotMenu {
   position: absolute;
   right: 0;
@@ -1235,7 +1808,24 @@
   z-index: 50;
   min-width: 110px;
   overflow: hidden;
-  transition: background var(--t-slow), border-color var(--t-slow);
+  transition:
+    background var(--duration-slow) var(--ease-in-out),
+    border-color var(--duration-slow) var(--ease-in-out);
+  /* Scale + fade from origin */
+  animation: menuPop var(--duration-fast) var(--ease-spring) both;
+  transform-origin: top right;
+}
+
+@keyframes menuPop {
+  from {
+    opacity: 0;
+    transform: scale(0.88);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .dotMenuDelete {
@@ -1248,52 +1838,24 @@
   font-weight: 500;
   color: var(--error);
   cursor: pointer;
-  transition: background var(--t-base);
+  transition:
+    background var(--duration-fast) var(--ease-out-quart),
+    transform var(--duration-fast) var(--ease-spring);
 }
 
 .dotMenuDelete:hover {
   background: rgba(239, 68, 68, 0.1);
+  transform: translateX(3px);
+  /* small nudge emphasises action */
 }
 
 .mobileTopbar {
   display: none;
 }
 
-/* ─── RESPONSIVE ─────────────────────────────────────── */
-/* @media (max-width: 768px) {
-  .splitRight {
-    display: none;
-  }
-
-  .splitLeft {
-    padding: 24px 20px;
-  }
-
-  .homeCards,
-  .methodGrid {
-    grid-template-columns: 1fr;
-  }
-
-  .homeH1 {
-    font-size: 32px;
-  }
-
-  .quizBody {
-    padding: 32px 20px;
-  }
-
-  .resultsTop {
-    flex-direction: column;
-    gap: 20px;
-  }
-} */
-
 /* ─── MOBILE RESPONSIVE ──────────────────────────────────────── */
-
-/* Mobile topbar for HOME phase */
 @media (max-width: 768px) {
 
-  /* HOME wrapper */
   .homeWrapper {
     flex-direction: column;
     position: relative;
@@ -1304,7 +1866,6 @@
     min-height: 100%;
   }
 
-  /* Mobile topbar */
   .mobileTopbar {
     display: flex;
     align-items: center;
@@ -1315,7 +1876,10 @@
     position: sticky;
     top: 0;
     z-index: 60;
-    transition: background var(--t-slow), border-color var(--t-slow);
+    transition:
+      background var(--duration-slow) var(--ease-in-out),
+      border-color var(--duration-slow) var(--ease-in-out);
+    animation: topbarIn var(--duration-slow) var(--ease-out-quart) both;
   }
 
   .mobileTopbar__title {
@@ -1336,7 +1900,11 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: background var(--t-base), color var(--t-base);
+    transition:
+      background var(--duration-fast) var(--ease-out-quart),
+      color var(--duration-fast) var(--ease-out-quart),
+      transform var(--duration-fast) var(--ease-spring),
+      border-color var(--duration-fast) var(--ease-out-quart);
   }
 
   .mobileTopbar__btn:hover,
@@ -1344,9 +1912,10 @@
     background: var(--accent-light);
     color: var(--accent);
     border-color: var(--accent);
+    transform: scale(1.08);
   }
 
-  /* Sidebar becomes slide-in drawer from right */
+  /* Slide-in drawer — transform only for GPU performance */
   .historySidebar {
     position: fixed !important;
     top: 0;
@@ -1358,31 +1927,29 @@
     border-left: 1px solid var(--border);
     box-shadow: -8px 0 32px rgba(0, 0, 0, 0.35);
     transform: translateX(100%);
+    /* translateX only — compositor-friendly */
     transition:
-      transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-      background var(--t-slow),
-      border-color var(--t-slow);
+      transform var(--duration-slow) var(--ease-in-out),
+      background var(--duration-slow) var(--ease-in-out),
+      border-color var(--duration-slow) var(--ease-in-out);
     will-change: transform;
+    /* drawer animates on user tap — worth hinting */
     flex-direction: column;
   }
 
-  /* Open state — JS adds this class */
   .historySidebar.mobileSidebarOpen {
     transform: translateX(0);
   }
 
-  /* Hide desktop toggle arrow on mobile */
   .sidebarToggleBtn {
     display: none;
   }
 
-  /* Sidebar content takes full width */
   .sidebarContent {
     padding: 24px 16px !important;
     width: 100%;
   }
 
-  /* Close button inside sidebar header */
   .sidebarCloseBtn {
     display: flex;
     width: 28px;
@@ -1395,10 +1962,15 @@
     color: var(--text2);
     font-size: 14px;
     cursor: pointer;
-    transition: background var(--t-base), color var(--t-base), transform var(--t-base);
     flex-shrink: 0;
+    transition:
+      background var(--duration-fast) var(--ease-out-quart),
+      color var(--duration-fast) var(--ease-out-quart),
+      border-color var(--duration-fast) var(--ease-out-quart),
+      transform var(--duration-base) var(--ease-spring);
   }
 
+  /* X button rotates on hover — satisfying close affordance */
   .sidebarCloseBtn:hover {
     background: rgba(239, 68, 68, 0.1);
     color: var(--error);
@@ -1406,7 +1978,7 @@
     transform: rotate(90deg);
   }
 
-  /* Overlay backdrop */
+  /* Backdrop fades in */
   .sidebarOverlay {
     display: block;
     position: fixed;
@@ -1415,7 +1987,7 @@
     z-index: 299;
     backdrop-filter: blur(3px);
     -webkit-backdrop-filter: blur(3px);
-    animation: overlayIn 0.25s ease both;
+    animation: overlayIn var(--duration-base) var(--ease-out-quart) both;
   }
 
   @keyframes overlayIn {
@@ -1428,7 +2000,6 @@
     }
   }
 
-  /* Step screens */
   .splitRight {
     display: none;
   }
@@ -1450,18 +2021,15 @@
     padding: 40px 16px;
   }
 
-  /* BottomBar inline style override via class */
   .quizBody {
     padding: 24px 16px;
   }
 
   .quizTopbar {
-    padding: 0 16px;
+    padding: 10px 16px;
     gap: 8px;
     flex-wrap: wrap;
     height: auto;
-    padding-top: 10px;
-    padding-bottom: 10px;
   }
 
   .quizTitleBar {
@@ -1511,5 +2079,24 @@
     .historySidebar {
       padding-bottom: env(safe-area-inset-bottom);
     }
+  }
+}
+
+/* ─── REDUCED MOTION ────────────────────────────────── */
+/* Disable all animations & slow transitions for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  /* Sidebar drawer still needs to be reachable — keep it visible */
+  .historySidebar.mobileSidebarOpen {
+    transform: translateX(0) !important;
   }
 }
