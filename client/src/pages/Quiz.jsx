@@ -70,6 +70,7 @@ const LOADER_STATUSES = [
 ];
 
 export default function Quiz() {
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   // ─── GLOBAL STATE ──────────────────────────────────────────────
   const [phase, setPhase] = useState(PHASE.HOME);
@@ -321,7 +322,28 @@ export default function Quiz() {
       {/* ── HOME ─────────────────────────────────────────────────── */}
       {phase === PHASE.HOME && (
         <div className={styles.homeWrapper}>
-          {/* ── MAIN ── */}
+
+          {/* ── MOBILE TOPBAR ── */}
+          <div className={styles.mobileTopbar}>
+            <span className={styles.mobileTopbar__title}>🧠 Spark.E Quiz</span>
+            <button
+              className={styles.mobileTopbar__btn}
+              onClick={() => setMobileSidebarOpen(true)}
+              aria-label="Open quiz history"
+            >
+              ☰
+            </button>
+          </div>
+
+          {/* ── OVERLAY (mobile drawer backdrop) ── */}
+          {mobileSidebarOpen && (
+            <div
+              className={styles.sidebarOverlay}
+              onClick={() => setMobileSidebarOpen(false)}
+            />
+          )}
+
+          {/* ── MAIN CONTENT ── */}
           <div
             className={`${styles.homeScreen} ${sidebarOpen ? styles.homeScreenShrunk : ""}`}
           >
@@ -351,11 +373,15 @@ export default function Quiz() {
             </div>
           </div>
 
-          {/* ── SIDEBAR ── */}
+          {/* ── HISTORY SIDEBAR ── */}
           <div
-            className={`${styles.historySidebar} ${sidebarOpen ? styles.sidebarOpen : styles.sidebarClosed}`}
+            className={`
+        ${styles.historySidebar}
+        ${sidebarOpen ? styles.sidebarOpen : styles.sidebarClosed}
+        ${mobileSidebarOpen ? styles.mobileSidebarOpen : ""}
+      `}
           >
-            {/* Toggle arrow */}
+            {/* Desktop toggle arrow — CSS hides this on mobile */}
             <button
               className={styles.sidebarToggleBtn}
               onClick={() => setSidebarOpen((o) => !o)}
@@ -363,55 +389,70 @@ export default function Quiz() {
               {sidebarOpen ? "→" : "←"}
             </button>
 
-            {/* Content — only render when open */}
-            {sidebarOpen && (
+            {/* Content — desktop: only when sidebarOpen; mobile: only when mobileSidebarOpen */}
+            {(sidebarOpen || mobileSidebarOpen) && (
               <div className={styles.sidebarContent}>
-                <h3 className={styles.sidebarTitle}>🕓 Quiz History</h3>
+
+                {/* Header: title + close btn */}
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
+                  <h3 className={styles.sidebarTitle} style={{ margin: 0 }}>
+                    🕓 Quiz History
+                  </h3>
+                  <button
+                    className={styles.sidebarCloseBtn}
+                    onClick={() => setMobileSidebarOpen(false)}
+                    aria-label="Close history"
+                  >
+                    ✕
+                  </button>
+                </div>
+
+                {/* Empty state */}
                 {allQuizzes.length === 0 ? (
                   <p className={styles.sidebarEmpty}>No quizzes yet.</p>
                 ) : (
-                    allQuizzes.map((q) => (
-                      <div key={q._id} className={styles.sidebarItem}>
-                        <div className={styles.sidebarItemRow}>
-                          <div
-                            className={styles.sidebarItemText}
-                            onClick={() => viewResult(q)}
-                          >
-                            <div className={styles.sidebarItemTitle}>
-                              {q.quiz?.title || "Untitled"}
-                            </div>
-                            <div className={styles.sidebarItemMeta}>
-                              {q.quiz?.totalQuestion} q ·{" "}
-                              {new Date(q.createdAt).toLocaleDateString()}
-                            </div>
+                  allQuizzes.map((q) => (
+                    <div key={q._id} className={styles.sidebarItem}>
+                      <div className={styles.sidebarItemRow}>
+                        <div
+                          className={styles.sidebarItemText}
+                          onClick={() => viewResult(q)}
+                        >
+                          <div className={styles.sidebarItemTitle}>
+                            {q.quiz?.title || "Untitled"}
                           </div>
-                          <div className={styles.sidebarItemMenuWrapper}>
-                            <button
-                              className={styles.threeDotBtn}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setOpenMenuId(openMenuId === q._id ? null : q._id);
-                              }}
-                            >
-                              ···
-                            </button>
-                            {openMenuId === q._id && (
-                              <div className={styles.dotMenu}>
-                                <button
-                                  className={styles.dotMenuDelete}
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    deleteQuiz(q._id);
-                                  }}
-                                >
-                                  🗑 Delete
-                                </button>
-                              </div>
-                            )}
+                          <div className={styles.sidebarItemMeta}>
+                            {q.quiz?.totalQuestion} q ·{" "}
+                            {new Date(q.createdAt).toLocaleDateString()}
                           </div>
                         </div>
+                        <div className={styles.sidebarItemMenuWrapper}>
+                          <button
+                            className={styles.threeDotBtn}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setOpenMenuId(openMenuId === q._id ? null : q._id);
+                            }}
+                          >
+                            ···
+                          </button>
+                          {openMenuId === q._id && (
+                            <div className={styles.dotMenu}>
+                              <button
+                                className={styles.dotMenuDelete}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  deleteQuiz(q._id);
+                                }}
+                              >
+                                🗑 Delete
+                              </button>
+                            </div>
+                          )}
+                        </div>
                       </div>
-                    ))
+                    </div>
+                  ))
                 )}
               </div>
             )}

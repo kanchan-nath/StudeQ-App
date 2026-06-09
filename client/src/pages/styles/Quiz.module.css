@@ -1255,8 +1255,12 @@
   background: rgba(239, 68, 68, 0.1);
 }
 
+.mobileTopbar {
+  display: none;
+}
+
 /* ─── RESPONSIVE ─────────────────────────────────────── */
-@media (max-width: 768px) {
+/* @media (max-width: 768px) {
   .splitRight {
     display: none;
   }
@@ -1281,5 +1285,231 @@
   .resultsTop {
     flex-direction: column;
     gap: 20px;
+  }
+} */
+
+/* ─── MOBILE RESPONSIVE ──────────────────────────────────────── */
+
+/* Mobile topbar for HOME phase */
+@media (max-width: 768px) {
+
+  /* HOME wrapper */
+  .homeWrapper {
+    flex-direction: column;
+    position: relative;
+  }
+
+  .homeScreen {
+    width: 100%;
+    min-height: 100%;
+  }
+
+  /* Mobile topbar */
+  .mobileTopbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 60;
+    transition: background var(--t-slow), border-color var(--t-slow);
+  }
+
+  .mobileTopbar__title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .mobileTopbar__btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    color: var(--text2);
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background var(--t-base), color var(--t-base);
+  }
+
+  .mobileTopbar__btn:hover,
+  .mobileTopbar__btn:active {
+    background: var(--accent-light);
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+
+  /* Sidebar becomes slide-in drawer from right */
+  .historySidebar {
+    position: fixed !important;
+    top: 0;
+    right: 0;
+    height: 100% !important;
+    width: 85vw !important;
+    max-width: 320px;
+    z-index: 300;
+    border-left: 1px solid var(--border);
+    box-shadow: -8px 0 32px rgba(0, 0, 0, 0.35);
+    transform: translateX(100%);
+    transition:
+      transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+      background var(--t-slow),
+      border-color var(--t-slow);
+    will-change: transform;
+    flex-direction: column;
+  }
+
+  /* Open state — JS adds this class */
+  .historySidebar.mobileSidebarOpen {
+    transform: translateX(0);
+  }
+
+  /* Hide desktop toggle arrow on mobile */
+  .sidebarToggleBtn {
+    display: none;
+  }
+
+  /* Sidebar content takes full width */
+  .sidebarContent {
+    padding: 24px 16px !important;
+    width: 100%;
+  }
+
+  /* Close button inside sidebar header */
+  .sidebarCloseBtn {
+    display: flex;
+    width: 28px;
+    height: 28px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    color: var(--text2);
+    font-size: 14px;
+    cursor: pointer;
+    transition: background var(--t-base), color var(--t-base), transform var(--t-base);
+    flex-shrink: 0;
+  }
+
+  .sidebarCloseBtn:hover {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--error);
+    border-color: var(--error);
+    transform: rotate(90deg);
+  }
+
+  /* Overlay backdrop */
+  .sidebarOverlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 299;
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+    animation: overlayIn 0.25s ease both;
+  }
+
+  @keyframes overlayIn {
+    from {
+      opacity: 0;
+    }
+
+    to {
+      opacity: 1;
+    }
+  }
+
+  /* Step screens */
+  .splitRight {
+    display: none;
+  }
+
+  .splitLeft {
+    padding: 24px 16px;
+  }
+
+  .homeCards,
+  .methodGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .homeH1 {
+    font-size: 28px;
+  }
+
+  .homeCenter {
+    padding: 40px 16px;
+  }
+
+  /* BottomBar inline style override via class */
+  .quizBody {
+    padding: 24px 16px;
+  }
+
+  .quizTopbar {
+    padding: 0 16px;
+    gap: 8px;
+    flex-wrap: wrap;
+    height: auto;
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+
+  .quizTitleBar {
+    font-size: 13px;
+    flex: 1 1 100%;
+    order: -1;
+  }
+
+  .quizQText {
+    font-size: 18px;
+  }
+
+  .resultsTop {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 16px;
+    gap: 12px;
+  }
+
+  .scoreStats {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .resultsBody {
+    padding: 16px;
+  }
+
+  .resultActions {
+    padding: 16px;
+    flex-direction: column;
+  }
+
+  .btnAction {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .filterTabs {
+    flex-wrap: wrap;
+  }
+}
+
+/* Safe area (notch / home bar) */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  @media (max-width: 768px) {
+    .historySidebar {
+      padding-bottom: env(safe-area-inset-bottom);
+    }
   }
 }
