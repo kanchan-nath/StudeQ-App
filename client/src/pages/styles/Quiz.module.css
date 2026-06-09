@@ -34,6 +34,8 @@
   --radius-sm: 8px;
   --shadow: 0 2px 16px rgba(0, 0, 0, 0.18);
   --shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.28);
+  --theme-amber: #f59e0b;
+    --theme-orange: #f97316;
 }
 
 /* ─── BASE ──────────────────────────────────────────── */
@@ -1202,6 +1204,100 @@
   transform: scale(0.96);
   box-shadow: none;
 }
+.quizHeader {
+  height: 56px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  gap: 8px;
+}
+.quizHeaderIcon {
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, var(--theme-amber, #f59e0b), var(--theme-orange, #f97316));
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+.quizHeaderTitle {
+  font-weight: 600;
+  font-size: 15px;
+  margin-left: 12px;
+  color: var(--text);
+  flex: 1;
+}
+.btnAction {
+  flex-shrink: 0;
+  white-space: nowrap;
+  border: 1px solid var(--border);
+  background: none;
+  padding: 6px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  color: var(--text2);
+  cursor: pointer;
+  transition: background var(--duration-fast) var(--ease-out-quart),
+    border-color var(--duration-fast) var(--ease-out-quart);
+}
+
+.btnAction:hover {
+  background: var(--surface2);
+  border-color: var(--text3);
+}
+
+.btnPrimary {
+    background: none;
+    /* border-color: 1px solid var(--border);; */
+    color:var(--text2);;
+    font-weight: 600;
+}
+
+.btnPrimary:hover {
+  opacity: 0.88;
+}
+
+.btnExit {
+  flex-shrink: 0;
+  white-space: nowrap;
+  margin-left: auto;
+  border: 1px solid var(--border);
+  background: none;
+  padding: 6px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  color: var(--text2);
+  cursor: pointer;
+  transition: background var(--duration-fast) var(--ease-out-quart),
+    border-color var(--duration-fast) var(--ease-out-quart),
+    color var(--duration-fast) var(--ease-out-quart);
+}
+
+.btnExit:hover {
+  background: var(--error);
+  border-color: transparent;
+  color: #fff;
+}
+
+@media (max-width: 480px) {
+  .quizHeader {
+    padding: 0 12px;
+    gap: 6px;
+  }
+
+  .btnAction,
+  .btnExit {
+    padding: 5px 10px;
+    font-size: 12px;
+  }
+}
 
 /* ─── RESULTS ───────────────────────────────────────── */
 .resultsScreen {
@@ -1535,45 +1631,16 @@
   animation: fadeUp var(--duration-slow) var(--ease-out-quart) 500ms both;
 }
 
-.btnAction {
-  border: 1.5px solid var(--border);
-  background: var(--surface);
-  padding: 10px 20px;
-  border-radius: var(--radius-sm);
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  color: var(--text);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-family: "DM Sans", sans-serif;
-  transition:
-    background var(--duration-fast) var(--ease-out-quart),
-    border-color var(--duration-fast) var(--ease-out-quart),
-    transform var(--duration-fast) var(--ease-spring),
-    box-shadow var(--duration-fast) var(--ease-out-quart);
-}
-
-.btnAction:hover {
-  background: var(--surface2);
-  transform: translateY(-2px);
-}
-
-.btnAction:active {
-  transform: scale(0.96);
-}
-
-.btnPrimary {
+/* .btnPrimary {
   background: var(--accent);
   color: var(--theme-text);
   border-color: var(--accent);
-}
+} */
 
-.btnPrimary:hover {
+/* .btnPrimary:hover {
   background: var(--theme-purple-light);
   box-shadow: 0 6px 20px rgba(124, 95, 245, 0.35);
-}
+} */
 
 /* ─── RIGHT PANEL ───────────────────────────────────── */
 .rpanelInfo {

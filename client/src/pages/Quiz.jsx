@@ -868,52 +868,7 @@ export default function Quiz() {
 
           return (
             <div className={styles.quizScreen}>
-              <div
-                style={{
-                  height: 56,
-                  background: "#fff",
-                  borderBottom: "1px solid #e2e5ef",
-                  display: "flex",
-                  alignItems: "center",
-                  padding: "0 24px",
-                  position: "sticky",
-                  top: 0,
-                  zIndex: 100,
-                }}
-              >
-                <div
-                  style={{
-                    width: 32,
-                    height: 32,
-                    background: "linear-gradient(135deg,#f59e0b,#f97316)",
-                    borderRadius: 8,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: 16,
-                  }}
-                >
-                  📋
-                </div>
-                <span style={{ fontWeight: 600, fontSize: 15, marginLeft: 12 }}>
-                  Quiz Results
-                </span>
-                <button
-                  onClick={() => setPhase(PHASE.HOME)}
-                  style={{
-                    marginLeft: "auto",
-                    border: "1px solid #e2e5ef",
-                    background: "none",
-                    padding: "6px 14px",
-                    borderRadius: 8,
-                    fontSize: 13,
-                    color: "#5a6080",
-                    cursor: "pointer",
-                  }}
-                >
-                  ✕ Exit
-                </button>
-              </div>
+
               <div className={styles.quizTopbar}>
                 <span className={styles.quizTitleBar}>
                   {quizData.quiz?.title || "Quiz"}
@@ -1003,49 +958,41 @@ export default function Quiz() {
           return (
             <div className={styles.resultsScreen}>
               <div
-                style={{
-                  height: 56,
-                  background: "#fff",
-                  borderBottom: "1px solid #e2e5ef",
-                  display: "flex",
-                  alignItems: "center",
-                  padding: "0 24px",
-                  position: "sticky",
-                  top: 0,
-                  zIndex: 100,
-                }}
+                className={styles.quizHeader}
               >
                 <div
-                  style={{
-                    width: 32,
-                    height: 32,
-                    background: "linear-gradient(135deg,#f59e0b,#f97316)",
-                    borderRadius: 8,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: 16,
-                  }}
+                  className={styles.quizHeaderIcon}
                 >
                   📋
                 </div>
-                <span style={{ fontWeight: 600, fontSize: 15, marginLeft: 12 }}>
+                <span className={styles.quizHeaderTitle}>
                   Quiz Results
                 </span>
                 <button
-                  onClick={() => setPhase(PHASE.HOME)}
-                  style={{
-                    marginLeft: "auto",
-                    border: "1px solid #e2e5ef",
-                    background: "none",
-                    padding: "6px 14px",
-                    borderRadius: 8,
-                    fontSize: 13,
-                    color: "#5a6080",
-                    cursor: "pointer",
+                  className={`${styles.btnAction} ${styles.btnPrimary}`}
+                  onClick={() => {
+                    setAnswers(new Array(quizData.questions.length).fill(null));
+                    setCurrentQ(0);
+                    setElapsedSec(0);
+                    setPhase(PHASE.QUIZ);
                   }}
                 >
-                  ✕ Exit
+                  🔁 Retake This Quiz
+                </button>
+                <button
+                  className={styles.btnAction}
+                  onClick={() => {
+                    setQuizData(null);
+                    setPhase(PHASE.STEP1);
+                  }}
+                >
+                  ➕ New Quiz
+                </button>
+                <button
+                  onClick={() => setPhase(PHASE.HOME)}
+                  className={styles.btnExit}
+                >
+                  ✕ Exits
                 </button>
               </div>
               <div className={styles.resultsTop}>
@@ -1138,7 +1085,7 @@ export default function Quiz() {
                   })}
                 </div>
               </div>
-              <div className={styles.resultActions}>
+              {/* <div className={styles.resultActions}>
                 <button
                   className={`${styles.btnAction} ${styles.btnPrimary}`}
                   onClick={() => {
@@ -1159,7 +1106,7 @@ export default function Quiz() {
                 >
                   ➕ New Quiz
                 </button>
-              </div>
+              </div> */}
             </div>
           );
         })()}
