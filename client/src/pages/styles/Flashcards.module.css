@@ -1,8 +1,6 @@
-/* ─── Flashcards.module.css ─────────────────────────────────────────────── */
+/* ─── Flashcards.module.css — Motion-Enhanced ──────────────────────────── */
 
-/* ─── Flashcards.module.css ─────────────────────────────────────────────── */
-
-/* ── Non-theme vars (layout, radii, fonts, transitions) stay in :root ── */
+/* ── Non-theme vars: layout, radii, fonts, durations, easings ── */
 :root {
   --radius-sm: 8px;
   --radius-md: 14px;
@@ -15,8 +13,23 @@
   --font-body: "DM Sans", "Nunito", system-ui, sans-serif;
   --font-display: "DM Sans", sans-serif;
 
-  --transition-fast: 0.18s ease;
-  --transition-mid: 0.3s ease;
+  /* ── Duration scale ── */
+  --duration-fast: 150ms;
+  --duration-base: 250ms;
+  --duration-slow: 400ms;
+  --duration-slower: 600ms;
+
+  /* ── Easing curves (no plain ease/linear) ── */
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-in-quart: cubic-bezier(0.5, 0, 0.75, 0);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  /* slight overshoot */
+  --ease-snappy: cubic-bezier(0.4, 0, 0.2, 1);
+  /* Material-style */
+
+  /* Legacy aliases kept for backward compat (now point at new vars) */
+  --transition-fast: var(--duration-fast) var(--ease-out-quart);
+  --transition-mid: var(--duration-base) var(--ease-out-quart);
 }
 
 /* ── LIGHT theme ── */
@@ -47,46 +60,227 @@
   --shadow-hover: 0 16px 48px rgba(99, 102, 241, 0.18), 0 4px 16px rgba(0, 0, 0, 0.08);
 }
 
-/* ── DARK theme — aligned with global.css --theme-* tokens ── */
+/* ── DARK theme ── */
 [data-theme="dark"] {
-  /* Backgrounds */
   --bg-page: #0a0c14;
-  /* matches --theme-bg */
   --bg-card: #1c1c1f;
-  /* matches --theme-surface */
   --bg-sidebar: #1c1c1f;
   --bg-headbar: #1c1c1f;
   --bg-tile: #1c1c1f;
   --bg-input: #13141f;
-  /* matches --theme-bg-secondary */
   --bg-dropdown: #242428;
-  /* matches --theme-surface-2 */
 
-  /* Text — aligned with global --theme-text */
   --text-primary: #f0f0f0;
   --text-secondary: #8a8a9a;
   --text-muted: #5a5a6a;
   --text-label: #a0a0b0;
 
-  /* Accent */
   --accent: #818cf8;
   --accent-light: rgba(129, 140, 248, 0.12);
   --accent-hover: #6366f1;
 
-  /* Borders — aligned with global --theme-border */
   --border: rgba(255, 255, 255, 0.08);
   --border-card: rgba(255, 255, 255, 0.06);
 
-  /* Shadows — heavier on dark */
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
   --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.45);
   --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.5);
   --shadow-hover: 0 16px 48px rgba(0, 0, 0, 0.6);
 }
-/* ── App Shell ───────────────────────────────────────────────────────────── */
-/* height:100% fills AppShell main-content slot exactly; overflow:hidden kills page scroll */
 
-/* ── Flashcard Homepage ──────────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════
+   KEYFRAMES
+   Only transform + opacity — GPU composited, no reflow.
+═══════════════════════════════════════════════════════ */
+
+/* General fade-up: used for page sections, panels, cards */
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Fade-in only: overlays, sidebars sliding in from side */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+/* Scale-in: dropdowns, dot menus — feels snappy not floaty */
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Drop-down: mode dropdown, keeps slight Y shift */
+@keyframes dropIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.97);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Slide-in from right: history sidebar drawer on mobile */
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Stagger helper: sidebar items enter one by one */
+@keyframes staggerFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Button press feedback: quick scale-down then spring back */
+@keyframes pressDown {
+  0% {
+    transform: scale(1);
+  }
+
+  40% {
+    transform: scale(0.94);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Headbar entrance: slides down from top */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Card area entrance: subtle fade-up after headbar */
+@keyframes cardEntrance {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Fan card stagger: each fan card enters offset */
+@keyframes fanEntrance {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Overlay backdrop */
+@keyframes fadeInOverlay {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
+   REDUCED MOTION — disable all animations for a11y
+═══════════════════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
+   SMOOTH SCROLL
+═══════════════════════════════════════════════════════ */
+html {
+  scroll-behavior: smooth;
+}
+
+/* ── App Shell ── */
+.appShell {
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg-page);
+  font-family: var(--font-body);
+  color: var(--text-primary);
+  /* Entrance: shell fades in so first paint feels intentional */
+  animation: fadeIn var(--duration-slow) var(--ease-out-quart) both;
+}
+
+.mainContent {
+  flex: 1;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  /* Smooth scrolling inside main content pane */
+  scroll-behavior: smooth;
+}
+
+/* ── Flashcard Homepage ── */
 .flashHomeWrapper {
   display: flex;
   flex-direction: column;
@@ -96,6 +290,8 @@
   padding: 60px 24px;
   text-align: center;
   min-height: 100%;
+  /* Page entrance: fade up */
+  animation: fadeUp var(--duration-slow) var(--ease-out-quart) both;
 }
 
 .flashHomeIcon {
@@ -108,6 +304,14 @@
   align-items: center;
   justify-content: center;
   margin-bottom: 28px;
+  /* Icon pops in slightly after wrapper via delay */
+  animation: fadeUp var(--duration-slow) var(--ease-spring) 80ms both;
+  transition: transform var(--duration-base) var(--ease-spring);
+}
+
+.flashHomeIcon:hover {
+  /* Subtle lift on hover — engage without distraction */
+  transform: scale(1.08) rotate(-3deg);
 }
 
 .flashHomeHeading {
@@ -117,6 +321,7 @@
   margin: 0 0 14px;
   letter-spacing: -0.03em;
   max-width: 600px;
+  animation: fadeUp var(--duration-slow) var(--ease-out-quart) 120ms both;
 }
 
 .flashHomeSub {
@@ -125,6 +330,7 @@
   margin: 0 0 40px;
   max-width: 480px;
   line-height: 1.6;
+  animation: fadeUp var(--duration-slow) var(--ease-out-quart) 180ms both;
 }
 
 .flashHomeCard {
@@ -137,16 +343,29 @@
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
   cursor: pointer;
-  transition: all var(--transition-mid);
   text-align: left;
   max-width: 480px;
   width: 100%;
+  /* Card stagger: appears after subheading */
+  animation: fadeUp var(--duration-slow) var(--ease-spring) 240ms both;
+  /* GPU hint: will lift + shadow on hover */
+  will-change: transform;
+  transition:
+    transform var(--duration-base) var(--ease-spring),
+    box-shadow var(--duration-base) var(--ease-out-quart),
+    border-color var(--duration-fast) var(--ease-out-quart);
 }
 
 .flashHomeCard:hover {
   border-color: var(--accent);
   box-shadow: var(--shadow-hover);
   transform: translateY(-4px);
+}
+
+/* Press micro-interaction: triggers on :active */
+.flashHomeCard:active {
+  transform: translateY(-1px) scale(0.99);
+  transition-duration: var(--duration-fast);
 }
 
 .flashHomeCardIcon {
@@ -159,6 +378,12 @@
   justify-content: center;
   color: var(--accent);
   flex-shrink: 0;
+  /* Icon scales up gently when card hovered */
+  transition: transform var(--duration-base) var(--ease-spring);
+}
+
+.flashHomeCard:hover .flashHomeCardIcon {
+  transform: scale(1.12);
 }
 
 .flashHomeCardTitle {
@@ -174,29 +399,7 @@
   margin: 0;
 }
 
-.appShell {
-  display: flex;
-  flex-direction: row;
-  height: 100%;
-  overflow: hidden;
-  background: var(--bg-page);
-  font-family: var(--font-body);
-  color: var(--text-primary);
-}
-
-/* Only this region scrolls for page content */
-.mainContent {
-  flex: 1;
-  height: 100%;
-  overflow-y: auto;
-  overflow-x: hidden;
-  display: flex;
-  flex-direction: column;
-}
-
-/* ── RIGHT Sidebar ───────────────────────────────────────────────────────── */
-/* Static: full height, never scrolls itself */
-
+/* ── RIGHT Sidebar ── */
 .sidebarExpanded {
   width: var(--sidebar-width);
 }
@@ -205,8 +408,6 @@
   width: 40px;
 }
 
-/* Toggle — left edge of sidebar */
-/* ── RIGHT Sidebar ───────────────────────────────────────────────────────── */
 .historySidebar {
   position: relative;
   height: 100%;
@@ -214,10 +415,11 @@
   border-left: 1px solid var(--border);
   display: flex;
   flex-direction: row;
-  transition: width 0.3s ease;
   flex-shrink: 0;
   overflow: hidden;
   z-index: 20;
+  /* Width collapse uses snappy easing, not plain ease */
+  transition: width var(--duration-slow) var(--ease-snappy);
 }
 
 .sidebarOpen {
@@ -228,6 +430,7 @@
   width: 36px;
 }
 
+/* Toggle button at left edge of sidebar */
 .sidebarToggleBtn {
   position: absolute;
   left: 0;
@@ -246,12 +449,21 @@
   align-items: center;
   justify-content: center;
   z-index: 10;
-  transition: background 0.2s;
+  transition:
+    background var(--duration-fast) var(--ease-out-quart),
+    color var(--duration-fast) var(--ease-out-quart),
+    transform var(--duration-base) var(--ease-spring);
 }
 
 .sidebarToggleBtn:hover {
   background: var(--accent-light);
   color: var(--accent);
+  /* Nudge left toward sidebar — invites click */
+  transform: translateY(-50%) translateX(-2px);
+}
+
+.sidebarToggleBtn:active {
+  transform: translateY(-50%) scale(0.92);
 }
 
 .sidebarContent {
@@ -276,6 +488,7 @@
 .sidebarContent::-webkit-scrollbar-thumb {
   background: var(--border);
   border-radius: 999px;
+  transition: background var(--duration-fast) var(--ease-out-quart);
 }
 
 .sidebarContent::-webkit-scrollbar-thumb:hover {
@@ -296,14 +509,26 @@
   font-size: 0.875rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background var(--transition-fast), transform var(--transition-fast);
   margin-bottom: 20px;
   white-space: nowrap;
+  /* will-change for transform + opacity only */
+  will-change: transform;
+  transition:
+    background var(--duration-fast) var(--ease-out-quart),
+    transform var(--duration-base) var(--ease-spring),
+    box-shadow var(--duration-base) var(--ease-out-quart);
 }
 
 .uploadBtn:hover {
   background: var(--accent-hover);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.35);
+}
+
+/* Press: squish down then spring */
+.uploadBtn:active {
+  animation: pressDown var(--duration-fast) var(--ease-spring) both;
+  transform: translateY(0);
 }
 
 .sidebarTitle {
@@ -311,6 +536,8 @@
   font-weight: 700;
   margin-bottom: 16px;
   color: var(--text-primary);
+  /* Entrance: slides in slightly from left */
+  animation: fadeUp var(--duration-base) var(--ease-out-quart) 60ms both;
 }
 
 .sidebarEmpty {
@@ -318,6 +545,7 @@
   color: var(--text-muted);
 }
 
+/* Staggered sidebar items: nth-child delays create visual flow */
 .sidebarItem {
   padding: 12px 14px;
   border: 1.5px solid var(--border);
@@ -325,14 +553,62 @@
   margin-bottom: 10px;
   cursor: pointer;
   background: var(--bg-card);
-  transition: all 0.2s;
   flex-shrink: 0;
+  /* Stagger entrance via nth-child */
+  animation: staggerFadeUp var(--duration-base) var(--ease-out-quart) both;
+  will-change: transform;
+  transition:
+    transform var(--duration-base) var(--ease-spring),
+    border-color var(--duration-fast) var(--ease-out-quart),
+    background var(--duration-fast) var(--ease-out-quart),
+    box-shadow var(--duration-base) var(--ease-out-quart);
+}
+
+/* Stagger delay per item: up to 8 items, 40ms apart */
+.sidebarItem:nth-child(1) {
+  animation-delay: 80ms;
+}
+
+.sidebarItem:nth-child(2) {
+  animation-delay: 120ms;
+}
+
+.sidebarItem:nth-child(3) {
+  animation-delay: 160ms;
+}
+
+.sidebarItem:nth-child(4) {
+  animation-delay: 200ms;
+}
+
+.sidebarItem:nth-child(5) {
+  animation-delay: 240ms;
+}
+
+.sidebarItem:nth-child(6) {
+  animation-delay: 280ms;
+}
+
+.sidebarItem:nth-child(7) {
+  animation-delay: 320ms;
+}
+
+.sidebarItem:nth-child(8) {
+  animation-delay: 360ms;
 }
 
 .sidebarItem:hover {
   border-color: var(--accent);
   background: var(--accent-light);
+  transform: translateX(-2px);
+  /* slight left nudge = selected feel */
 }
+
+.sidebarItem:active {
+  transform: scale(0.98);
+  transition-duration: var(--duration-fast);
+}
+
 .sidebarItemActive {
   border-color: var(--accent);
   background: var(--accent-light);
@@ -342,6 +618,7 @@
 .sidebarItemActive .sidebarItemTitle {
   color: var(--accent);
 }
+
 .sidebarItemTitle {
   font-size: 13px;
   font-weight: 600;
@@ -356,33 +633,6 @@
   font-size: 11px;
   color: var(--text-muted);
 }
-
-.uploadBtn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  width: 100%;
-  padding: 10px;
-  background: var(--accent);
-  color: white;
-  border: none;
-  border-radius: var(--radius-sm);
-  font-size: 0.875rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition:
-    background var(--transition-fast),
-    transform var(--transition-fast);
-  white-space: nowrap;
-}
-
-.uploadBtn:hover {
-  background: var(--accent-hover);
-  transform: translateY(-1px);
-}
-
-/*  */
 
 .sidebarItemRow {
   display: flex;
@@ -415,14 +665,25 @@
   justify-content: center;
   line-height: 1;
   letter-spacing: -1px;
-  transition: background 0.15s, color 0.15s;
+  transition:
+    background var(--duration-fast) var(--ease-out-quart),
+    color var(--duration-fast) var(--ease-out-quart),
+    transform var(--duration-base) var(--ease-spring);
 }
 
 .threeDotBtn:hover {
   background: var(--border);
   color: var(--text-primary);
+  transform: scale(1.15);
+  /* enlarge hit area feel */
 }
 
+.threeDotBtn:active {
+  transform: scale(0.9);
+  transition-duration: var(--duration-fast);
+}
+
+/* Dot menu: scale-in from top-right origin */
 .dotMenu {
   position: absolute;
   right: 0;
@@ -434,6 +695,8 @@
   z-index: 50;
   min-width: 110px;
   overflow: hidden;
+  transform-origin: top right;
+  animation: scaleIn var(--duration-base) var(--ease-spring) both;
 }
 
 .dotMenuDelete {
@@ -446,21 +709,26 @@
   font-weight: 500;
   color: #ef4444;
   cursor: pointer;
-  transition: background 0.15s;
+  transition:
+    background var(--duration-fast) var(--ease-out-quart),
+    transform var(--duration-fast) var(--ease-out-quart);
 }
 
 .dotMenuDelete:hover {
   background: #fee2e2;
+  /* Subtle X-shift = destructive affordance */
+  transform: translateX(2px);
 }
 
-/* ── Viewer Layout ───────────────────────────────────────────────────────── */
+/* ── Viewer Layout ── */
 .viewerLayout {
   display: flex;
   flex-direction: column;
   min-height: 100%;
+  animation: fadeIn var(--duration-base) var(--ease-out-quart) both;
 }
 
-/* ── Headbar ─────────────────────────────────────────────────────────────── */
+/* ── Headbar ── */
 .headbar {
   display: flex;
   align-items: center;
@@ -475,6 +743,8 @@
   top: 0;
   z-index: 10;
   box-shadow: var(--shadow-sm);
+  /* Slides in from top on mount */
+  animation: slideDown var(--duration-slow) var(--ease-out-quart) both;
 }
 
 .headbarLeft {
@@ -507,15 +777,27 @@
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all var(--transition-fast);
   white-space: nowrap;
+  transition:
+    border-color var(--duration-fast) var(--ease-out-quart),
+    color var(--duration-fast) var(--ease-out-quart),
+    transform var(--duration-base) var(--ease-spring),
+    box-shadow var(--duration-base) var(--ease-out-quart);
 }
 
 .modeBtn:hover {
   border-color: var(--accent);
   color: var(--accent);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
 }
 
+.modeBtn:active {
+  transform: scale(0.97);
+  transition-duration: var(--duration-fast);
+}
+
+/* Dropdown: drop-in animation from updated keyframe */
 .modeDropdown {
   position: absolute;
   top: calc(100% + 6px);
@@ -527,19 +809,8 @@
   overflow: hidden;
   z-index: 50;
   min-width: 200px;
-  animation: dropIn 0.15s ease;
-}
-
-@keyframes dropIn {
-  from {
-    opacity: 0;
-    transform: translateY(-6px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  transform-origin: top left;
+  animation: dropIn var(--duration-base) var(--ease-spring) both;
 }
 
 .modeOption {
@@ -553,13 +824,18 @@
   color: var(--text-primary);
   font-size: 0.875rem;
   cursor: pointer;
-  transition: background var(--transition-fast);
   text-align: left;
+  transition:
+    background var(--duration-fast) var(--ease-out-quart),
+    color var(--duration-fast) var(--ease-out-quart),
+    transform var(--duration-fast) var(--ease-out-quart);
 }
 
 .modeOption:hover {
   background: var(--accent-light);
   color: var(--accent);
+  transform: translateX(3px);
+  /* nudge right = selected direction */
 }
 
 .modeOptionActive {
@@ -567,6 +843,7 @@
   font-weight: 600;
 }
 
+/* Progress dots */
 .progressDots {
   display: flex;
   align-items: center;
@@ -583,23 +860,27 @@
   border: 2px solid var(--border);
   background: transparent;
   cursor: pointer;
-  transition:
-    background var(--transition-fast),
-    border-color var(--transition-fast),
-    transform var(--transition-fast);
-  padding: 0;
   flex-shrink: 0;
+  padding: 0;
+  transition:
+    background var(--duration-fast) var(--ease-out-quart),
+    border-color var(--duration-fast) var(--ease-out-quart),
+    transform var(--duration-base) var(--ease-spring),
+    box-shadow var(--duration-base) var(--ease-out-quart);
 }
 
 .dot:hover {
   border-color: var(--accent);
-  transform: scale(1.2);
+  transform: scale(1.3);
+  /* spring scale = satisfying dot hover */
 }
 
 .dotActive {
   background: var(--accent);
   border-color: var(--accent);
   box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+  /* Active dot pops in */
+  animation: pressDown var(--duration-fast) var(--ease-spring) both;
 }
 
 .dotsMore {
@@ -618,13 +899,24 @@
   background: transparent;
   color: var(--text-secondary);
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition:
+    border-color var(--duration-fast) var(--ease-out-quart),
+    color var(--duration-fast) var(--ease-out-quart),
+    background var(--duration-fast) var(--ease-out-quart),
+    transform var(--duration-base) var(--ease-spring);
 }
 
 .shuffleBtn:hover {
   border-color: var(--accent);
   color: var(--accent);
   background: var(--accent-light);
+  transform: rotate(30deg) scale(1.08);
+  /* shuffle = rotation metaphor */
+}
+
+.shuffleBtn:active {
+  transform: rotate(-15deg) scale(0.9);
+  transition-duration: var(--duration-fast);
 }
 
 .cardCounter {
@@ -646,13 +938,28 @@
   background: transparent;
   color: var(--text-primary);
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition:
+    border-color var(--duration-fast) var(--ease-out-quart),
+    color var(--duration-fast) var(--ease-out-quart),
+    background var(--duration-fast) var(--ease-out-quart),
+    transform var(--duration-base) var(--ease-spring);
 }
 
 .navArrow:hover:not(:disabled) {
   border-color: var(--accent);
   color: var(--accent);
   background: var(--accent-light);
+  /* Left arrow nudges left, right nudges right = directional affordance */
+  transform: translateX(-2px);
+}
+
+.navArrow:last-child:hover:not(:disabled) {
+  transform: translateX(2px);
+}
+
+.navArrow:active:not(:disabled) {
+  transform: scale(0.88);
+  transition-duration: var(--duration-fast);
 }
 
 .navArrow:disabled {
@@ -660,7 +967,7 @@
   cursor: not-allowed;
 }
 
-/* ── Card Area ───────────────────────────────────────────────────────────── */
+/* ── Card Area ── */
 .cardArea {
   flex: 1;
   display: flex;
@@ -669,6 +976,8 @@
   justify-content: center;
   padding: 24px 32px;
   gap: 20px;
+  /* Enters after headbar: delayed so headbar lands first */
+  animation: cardEntrance var(--duration-slower) var(--ease-out-quart) 120ms both;
 }
 
 .cardMeta {
@@ -684,6 +993,7 @@
   font-weight: 600;
   color: var(--text-secondary);
   letter-spacing: 0.02em;
+  transition: opacity var(--duration-base) var(--ease-out-quart);
 }
 
 .ratingBtns {
@@ -702,34 +1012,48 @@
   background: transparent;
   color: var(--text-muted);
   cursor: pointer;
-  transition: all var(--transition-fast);
+  will-change: transform;
+  transition:
+    border-color var(--duration-fast) var(--ease-out-quart),
+    color var(--duration-fast) var(--ease-out-quart),
+    background var(--duration-fast) var(--ease-out-quart),
+    transform var(--duration-base) var(--ease-spring);
 }
 
 .ratingBtn:hover {
   border-color: var(--accent);
   color: var(--accent);
   background: var(--accent-light);
+  transform: scale(1.18);
+}
+
+.ratingBtn:active {
+  animation: pressDown var(--duration-fast) var(--ease-spring) both;
 }
 
 .ratingBtnActive {
   background: #dcfce7;
   border-color: #22c55e;
   color: #16a34a;
+  transform: scale(1.08);
+  /* stays slightly large = committed state */
 }
 
 .ratingBtnDown {
   background: #fee2e2;
   border-color: #ef4444;
   color: #dc2626;
+  transform: scale(1.08);
 }
 
 .ratingBtnBookmark {
   background: var(--accent-light);
   border-color: var(--accent);
   color: var(--accent);
+  transform: scale(1.08);
 }
 
-/* ── 3D Card Flip ────────────────────────────────────────────────────────── */
+/* ── 3D Card Flip ── */
 .cardScene {
   width: 100%;
   max-width: 720px;
@@ -737,6 +1061,8 @@
   perspective: 1200px;
   cursor: pointer;
   flex-shrink: 0;
+  will-change: transform;
+  /* hint compositor for flip */
 }
 
 .card3d {
@@ -744,7 +1070,8 @@
   height: 100%;
   position: relative;
   transform-style: preserve-3d;
-  transition: transform 0.6s ease;
+  /* Flip: slower = dramatic; spring-like easing via cubic-bezier */
+  transition: transform var(--duration-slower) cubic-bezier(0.4, 0.2, 0.2, 1.0);
 }
 
 .cardFlipped {
@@ -765,13 +1092,21 @@
   padding: 40px;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
+  /* Card surface hover: lift + shadow intensify */
+  transition:
+    box-shadow var(--duration-base) var(--ease-out-quart),
+    transform var(--duration-base) var(--ease-spring);
+}
+
+.cardScene:hover .cardFront,
+.cardScene:hover .cardBack {
+  box-shadow: var(--shadow-hover);
+  /* Only nudge up if not already flipping — no competing with 3D */
 }
 
 .cardBack {
   transform: rotateX(180deg);
-  background: linear-gradient(135deg,
-      var(--bg-card) 0%,
-      var(--accent-light) 100%);
+  background: linear-gradient(135deg, var(--bg-card) 0%, var(--accent-light) 100%);
 }
 
 .cardText {
@@ -781,15 +1116,18 @@
   text-align: center;
   line-height: 1.5;
   margin: 0;
+  /* Text fades in after flip completes */
+  transition: opacity var(--duration-fast) var(--ease-out-quart);
 }
 
-/* ── Bottom Bar ──────────────────────────────────────────────────────────── */
+/* ── Bottom Bar ── */
 .bottomBar {
   display: flex;
   align-items: center;
   gap: 12px;
   justify-content: center;
   padding-bottom: 24px;
+  animation: fadeUp var(--duration-slow) var(--ease-out-quart) 200ms both;
 }
 
 .bottomNavBtn {
@@ -804,13 +1142,24 @@
   font-size: 0.9rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all var(--transition-fast);
+  will-change: transform;
+  transition:
+    border-color var(--duration-fast) var(--ease-out-quart),
+    color var(--duration-fast) var(--ease-out-quart),
+    transform var(--duration-base) var(--ease-spring),
+    box-shadow var(--duration-base) var(--ease-out-quart);
 }
 
 .bottomNavBtn:hover:not(:disabled) {
   border-color: var(--accent);
   color: var(--accent);
   box-shadow: var(--shadow-sm);
+  transform: translateY(-2px);
+}
+
+.bottomNavBtn:active:not(:disabled) {
+  transform: scale(0.96) translateY(0);
+  transition-duration: var(--duration-fast);
 }
 
 .bottomNavBtn:disabled {
@@ -830,13 +1179,25 @@
   font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all var(--transition-fast);
+  will-change: transform;
+  transition:
+    border-color var(--duration-fast) var(--ease-out-quart),
+    color var(--duration-fast) var(--ease-out-quart),
+    background var(--duration-fast) var(--ease-out-quart),
+    transform var(--duration-base) var(--ease-spring),
+    box-shadow var(--duration-base) var(--ease-out-quart);
 }
 
 .flipBtn:hover {
   border-color: var(--accent);
   color: var(--accent);
   background: var(--accent-light);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+}
+
+.flipBtn:active {
+  animation: pressDown var(--duration-fast) var(--ease-spring) both;
 }
 
 .kbd {
@@ -849,14 +1210,16 @@
   font-size: 0.7rem;
   font-family: monospace;
   color: var(--text-muted);
+  transition: border-color var(--duration-fast) var(--ease-out-quart);
 }
 
-/* ── Create Layout ───────────────────────────────────────────────────────── */
+/* ── Create Layout ── */
 .createLayout {
   display: flex;
   flex-direction: column;
   min-height: 100%;
   background: var(--bg-page);
+  animation: fadeIn var(--duration-base) var(--ease-out-quart) both;
 }
 
 .createHeader {
@@ -872,6 +1235,7 @@
   top: 0;
   z-index: 10;
   box-shadow: var(--shadow-sm);
+  animation: slideDown var(--duration-slow) var(--ease-out-quart) both;
 }
 
 .createTitle {
@@ -895,12 +1259,21 @@
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition:
+    border-color var(--duration-fast) var(--ease-out-quart),
+    color var(--duration-fast) var(--ease-out-quart),
+    transform var(--duration-base) var(--ease-spring);
 }
 
 .exitBtn:hover {
   border-color: #ef4444;
   color: #ef4444;
+  transform: scale(1.03);
+}
+
+.exitBtn:active {
+  transform: scale(0.96);
+  transition-duration: var(--duration-fast);
 }
 
 .createBody {
@@ -914,6 +1287,7 @@
   padding: 36px 40px;
   overflow-y: auto;
   border-right: 1px solid var(--border);
+  animation: fadeUp var(--duration-slow) var(--ease-out-quart) 80ms both;
 }
 
 .stepIndicator {
@@ -932,15 +1306,17 @@
   margin: 0 0 6px;
   line-height: 1.2;
   letter-spacing: -0.02em;
+  animation: fadeUp var(--duration-slow) var(--ease-out-quart) 100ms both;
 }
 
 .createSubheading {
   font-size: 0.9rem;
   color: var(--text-secondary);
   margin: 0 0 28px;
+  animation: fadeUp var(--duration-slow) var(--ease-out-quart) 140ms both;
 }
 
-/* ── Tiles ───────────────────────────────────────────────────────────────── */
+/* ── Tiles ── */
 .tilesGrid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -959,18 +1335,47 @@
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   cursor: pointer;
-  transition:
-    transform 0.35s ease-out,
-    box-shadow 0.35s ease-out,
-    border-color 0.2s ease;
   position: relative;
   text-align: center;
+  /* Stagger tiles as grid fills in */
+  animation: fadeUp var(--duration-slow) var(--ease-spring) both;
+  will-change: transform;
+  transition:
+    transform var(--duration-slow) var(--ease-spring),
+    box-shadow var(--duration-slow) var(--ease-out-quart),
+    border-color var(--duration-fast) var(--ease-out-quart);
+}
+
+/* Tile stagger: pairs enter together, stagger by row */
+.tile:nth-child(1) {
+  animation-delay: 160ms;
+}
+
+.tile:nth-child(2) {
+  animation-delay: 200ms;
+}
+
+.tile:nth-child(3) {
+  animation-delay: 240ms;
+}
+
+.tile:nth-child(4) {
+  animation-delay: 280ms;
+}
+
+.tile:nth-child(5) {
+  animation-delay: 320ms;
 }
 
 .tile:hover:not(.tileDisabled) {
-  transform: translateY(-10px) rotate(var(--tile-rotate));
+  transform: translateY(-10px) rotate(var(--tile-rotate, 0deg));
   box-shadow: var(--shadow-hover);
   border-color: var(--accent);
+}
+
+.tile:active:not(.tileDisabled) {
+  transform: translateY(-4px) scale(0.98);
+  transition-duration: var(--duration-fast);
 }
 
 .tileDisabled {
@@ -987,8 +1392,15 @@
   justify-content: center;
   background: var(--accent-light);
   color: var(--accent);
+  transition: transform var(--duration-base) var(--ease-spring);
 }
 
+.tile:hover:not(.tileDisabled) .tileIcon {
+  transform: scale(1.15) rotate(-5deg);
+  /* icon wiggles on card hover */
+}
+
+/* Tile color variants */
 .tileColorIndigo .tileIcon {
   background: #ede9fe;
   color: #6366f1;
@@ -1035,7 +1447,7 @@
   letter-spacing: 0.04em;
 }
 
-/* ── Create Right Panel ──────────────────────────────────────────────────── */
+/* ── Create Right Panel ── */
 .createRight {
   width: 44%;
   background: var(--accent-light);
@@ -1044,6 +1456,7 @@
   justify-content: center;
   padding: 40px;
   overflow: hidden;
+  animation: fadeIn var(--duration-slow) var(--ease-out-quart) 120ms both;
 }
 
 [data-theme="dark"] .createRight {
@@ -1074,7 +1487,7 @@
   margin: 0 0 32px;
 }
 
-/* ── Fan Cards ───────────────────────────────────────────────────────────── */
+/* ── Fan Cards ── */
 .cardFanWrapper {
   position: relative;
   height: 260px;
@@ -1096,30 +1509,36 @@
   font-size: 0.8rem;
   color: var(--text-primary);
   font-weight: 600;
+  /* Fan cards enter from center-bottom staggered */
+  animation: fanEntrance var(--duration-slow) var(--ease-spring) both;
 }
 
 .fanCard1 {
   transform: rotate(-18deg) translateX(-90px) translateY(20px);
   z-index: 1;
   opacity: 0.7;
+  animation-delay: 80ms;
 }
 
 .fanCard2 {
   transform: rotate(-8deg) translateX(-40px) translateY(10px);
   z-index: 2;
   opacity: 0.85;
+  animation-delay: 140ms;
 }
 
 .fanCard3 {
   transform: rotate(0deg);
   z-index: 3;
   min-width: 160px;
+  animation-delay: 200ms;
 }
 
 .fanCard4 {
   transform: rotate(12deg) translateX(70px) translateY(10px);
   z-index: 2;
   opacity: 0.7;
+  animation-delay: 260ms;
 }
 
 .fanCardIcon {
@@ -1149,12 +1568,13 @@
   width: 100%;
 }
 
-/* ── Form Fields ─────────────────────────────────────────────────────────── */
+/* ── Form Fields ── */
 .fieldGroup {
   display: flex;
   flex-direction: column;
   gap: 6px;
   margin-bottom: 20px;
+  animation: fadeUp var(--duration-base) var(--ease-out-quart) both;
 }
 
 .fieldLabel {
@@ -1173,10 +1593,12 @@
   color: var(--text-primary);
   font-size: 0.9rem;
   font-family: var(--font-body);
-  transition:
-    border-color var(--transition-fast),
-    box-shadow var(--transition-fast);
   outline: none;
+  /* Focus glow: border-color + box-shadow animate together */
+  transition:
+    border-color var(--duration-fast) var(--ease-out-quart),
+    box-shadow var(--duration-base) var(--ease-out-quart),
+    transform var(--duration-base) var(--ease-spring);
 }
 
 .fieldInput::placeholder {
@@ -1185,7 +1607,10 @@
 
 .fieldInput:focus {
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+  /* Glow: layered shadows for depth */
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12), 0 0 0 1px var(--accent);
+  /* Micro lift on focus = "active" state */
+  transform: translateY(-1px);
 }
 
 .fieldHint {
@@ -1196,7 +1621,7 @@
   max-width: 480px;
 }
 
-/* ── Step Nav ────────────────────────────────────────────────────────────── */
+/* ── Step Nav ── */
 .stepNav {
   display: flex;
   gap: 12px;
@@ -1212,12 +1637,22 @@
   font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition:
+    border-color var(--duration-fast) var(--ease-out-quart),
+    color var(--duration-fast) var(--ease-out-quart),
+    transform var(--duration-base) var(--ease-spring);
 }
 
 .backBtn:hover {
   border-color: var(--accent);
   color: var(--accent);
+  transform: translateX(-3px);
+  /* back = leftward nudge */
+}
+
+.backBtn:active {
+  transform: scale(0.97);
+  transition-duration: var(--duration-fast);
 }
 
 .nextBtn {
@@ -1229,13 +1664,22 @@
   font-size: 0.9rem;
   font-weight: 700;
   cursor: pointer;
-  transition: all var(--transition-fast);
+  will-change: transform;
+  transition:
+    background var(--duration-fast) var(--ease-out-quart),
+    transform var(--duration-base) var(--ease-spring),
+    box-shadow var(--duration-base) var(--ease-out-quart);
 }
 
 .nextBtn:hover:not(:disabled) {
   background: var(--accent-hover);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.35);
+}
+
+.nextBtn:active:not(:disabled) {
+  animation: pressDown var(--duration-fast) var(--ease-spring) both;
+  transform: translateY(0);
 }
 
 .nextBtn:disabled {
@@ -1243,7 +1687,7 @@
   cursor: not-allowed;
 }
 
-/* ── Topic Preview ───────────────────────────────────────────────────────── */
+/* ── Topic Preview ── */
 .topicPreview {
   display: flex;
   flex-direction: column;
@@ -1255,11 +1699,17 @@
   padding: 36px 24px;
   margin-bottom: 28px;
   box-shadow: var(--shadow-sm);
+  animation: fadeUp var(--duration-slow) var(--ease-spring) 100ms both;
 }
 
 .topicPreviewIcon {
   color: var(--accent);
   display: flex;
+  transition: transform var(--duration-base) var(--ease-spring);
+}
+
+.topicPreview:hover .topicPreviewIcon {
+  transform: scale(1.12) rotate(-5deg);
 }
 
 .topicPreviewText {
@@ -1269,7 +1719,7 @@
   text-align: center;
 }
 
-/* ── PDF Dropzone ────────────────────────────────────────────────────────── */
+/* ── PDF Dropzone ── */
 .dropzone {
   position: relative;
   max-width: 480px;
@@ -1281,17 +1731,29 @@
   align-items: center;
   gap: 12px;
   cursor: pointer;
-  transition:
-    border-color var(--transition-fast),
-    background var(--transition-fast);
   color: var(--text-secondary);
   text-align: center;
   font-size: 0.875rem;
+  will-change: transform;
+  transition:
+    border-color var(--duration-fast) var(--ease-out-quart),
+    background var(--duration-fast) var(--ease-out-quart),
+    transform var(--duration-base) var(--ease-spring),
+    box-shadow var(--duration-base) var(--ease-out-quart);
 }
 
 .dropzone:hover {
   border-color: var(--accent);
   background: var(--accent-light);
+  transform: scale(1.01);
+  /* subtle swell = "droppable" affordance */
+  box-shadow: var(--shadow-sm);
+}
+
+/* Active drag state: more pronounced swell */
+.dropzone:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
 }
 
 .fileInput {
@@ -1310,9 +1772,11 @@
   background: var(--accent-light);
   padding: 4px 10px;
   border-radius: 99px;
+  /* Pill pops in when file selected */
+  animation: scaleIn var(--duration-base) var(--ease-spring) both;
 }
 
-/* ── Scratch Preview ─────────────────────────────────────────────────────── */
+/* ── Scratch Preview ── */
 .scratchPreview {
   display: flex;
   flex-direction: column;
@@ -1332,17 +1796,38 @@
   font-weight: 600;
   color: var(--text-secondary);
   box-shadow: var(--shadow-sm);
+  animation: staggerFadeUp var(--duration-base) var(--ease-out-quart) both;
+}
+
+.scratchCard:nth-child(1) {
+  animation-delay: 60ms;
+}
+
+.scratchCard:nth-child(2) {
+  animation-delay: 110ms;
+}
+
+.scratchCard:nth-child(3) {
+  animation-delay: 160ms;
 }
 
 .noteItem {
   cursor: pointer;
-  /* keep existing styles */
-  transition: background 0.15s;
+  transition:
+    background var(--duration-fast) var(--ease-out-quart),
+    transform var(--duration-base) var(--ease-spring);
 }
 
 .noteItem:hover {
   background: rgba(99, 102, 241, 0.08);
   border-radius: 8px;
+  transform: translateX(3px);
+  /* nudge right = list item selected */
+}
+
+.noteItem:active {
+  transform: scale(0.98);
+  transition-duration: var(--duration-fast);
 }
 
 .noteItemText {
@@ -1374,7 +1859,9 @@
   padding: 8px 4px;
 }
 
-/* ── Responsive ──────────────────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════════════════════ */
 @media (max-width: 1024px) {
   .createRight {
     width: 40%;
@@ -1446,8 +1933,7 @@
   }
 }
 
-/* ── MOBILE DRAWER ──────────────────────────────────────────────────────────── */
-
+/* ── MOBILE DRAWER ── */
 .drawerOverlay {
   display: none;
 }
@@ -1461,36 +1947,41 @@
 }
 
 @media (max-width: 768px) {
-
-  /* Floating hamburger — bottom-right, above all content */
   .hamburgerBtn {
     display: flex;
-      align-items: center;
-      justify-content: center;
-      position: fixed;
-      bottom: 70px;
-      /* headbar height (60px) + small gap */
-      right: 16px;
-      /* right edge */
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      border: none;
-      background: var(--accent);
-      color: #fff;
-      font-size: 20px;
-      cursor: pointer;
-      z-index: 298;
-      box-shadow: var(--shadow-md);
-      transition: background var(--transition-fast), transform var(--transition-fast);
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    bottom: 70px;
+    right: 16px;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: none;
+    background: var(--accent);
+    color: #fff;
+    font-size: 20px;
+    cursor: pointer;
+    z-index: 298;
+    box-shadow: var(--shadow-md);
+    will-change: transform;
+    transition:
+      background var(--duration-fast) var(--ease-out-quart),
+      transform var(--duration-base) var(--ease-spring),
+      box-shadow var(--duration-base) var(--ease-out-quart);
+  }
+
+  .hamburgerBtn:hover {
+    transform: scale(1.08);
+    box-shadow: var(--shadow-hover);
   }
 
   .hamburgerBtn:active {
     background: var(--accent-light);
-      color: var(--accent);
+    color: var(--accent);
+    animation: pressDown var(--duration-fast) var(--ease-spring) both;
   }
 
-  /* Hide when drawer open */
   .hamburgerBtn:has(~ * .mobileSidebarOpen) {
     display: none;
   }
@@ -1504,17 +1995,7 @@
     z-index: 299;
     backdrop-filter: blur(3px);
     -webkit-backdrop-filter: blur(3px);
-    animation: fadeInOverlay 0.25s ease both;
-  }
-
-  @keyframes fadeInOverlay {
-    from {
-      opacity: 0;
-    }
-
-    to {
-      opacity: 1;
-    }
+    animation: fadeInOverlay var(--duration-base) var(--ease-out-quart) both;
   }
 
   /* Sidebar → fixed right drawer */
@@ -1528,10 +2009,10 @@
     z-index: 300;
     box-shadow: -8px 0 32px rgba(0, 0, 0, 0.35);
     transform: translateX(100%);
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    /* Use snappy easing; will-change for compositor hint */
+    transition: transform var(--duration-slow) var(--ease-snappy);
     will-change: transform;
     overflow-y: auto;
-    /* reset desktop width classes */
     border-left: 1px solid var(--border);
   }
 
@@ -1539,19 +2020,16 @@
     transform: translateX(0) !important;
   }
 
-  /* Force content visible on mobile regardless of desktop sidebarOpen state */
   .historySidebar .sidebarContent {
     padding: 16px;
     display: flex !important;
     flex-direction: column;
   }
 
-  /* Hide desktop collapse toggle */
   .sidebarToggleBtn {
     display: none;
   }
 
-  /* Close btn inside drawer header */
   .drawerCloseBtn {
     display: flex;
     align-items: center;
@@ -1565,14 +2043,23 @@
     font-size: 13px;
     cursor: pointer;
     margin: 14px 14px 4px auto;
-    transition: background 0.15s, color 0.15s, transform 0.2s;
     flex-shrink: 0;
+    transition:
+      background var(--duration-fast) var(--ease-out-quart),
+      color var(--duration-fast) var(--ease-out-quart),
+      transform var(--duration-base) var(--ease-spring);
   }
 
   .drawerCloseBtn:hover {
     background: rgba(239, 68, 68, 0.1);
     color: #ef4444;
     transform: rotate(90deg);
+    /* X rotates in = close affordance */
+  }
+
+  .drawerCloseBtn:active {
+    transform: rotate(90deg) scale(0.88);
+    transition-duration: var(--duration-fast);
   }
 }
 
