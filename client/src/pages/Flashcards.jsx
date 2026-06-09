@@ -468,12 +468,21 @@ const PATH_MAP = {
 };
 
 const PATH_TO_VIEW = Object.fromEntries(
-  Object.entries(PATH_MAP).map(([v, p]) => [p, v])
+  Object.entries(PATH_MAP).map(([v, p]) => [p, v]),
 );
 
 // ─── RIGHT Sidebar ────────────────────────────────────────────────────────────
 // ADD mobileSidebarOpen + setMobileSidebarOpen props
-const RightSidebar = ({ activeView, onNavigate, allFlashcards, onSelectSet, onDeleteSet, selectedSet, mobileSidebarOpen, setMobileSidebarOpen }) => {
+const RightSidebar = ({
+  activeView,
+  onNavigate,
+  allFlashcards,
+  onSelectSet,
+  onDeleteSet,
+  selectedSet,
+  mobileSidebarOpen,
+  setMobileSidebarOpen,
+}) => {
   const [openMenuId, setOpenMenuId] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
@@ -493,7 +502,9 @@ const RightSidebar = ({ activeView, onNavigate, allFlashcards, onSelectSet, onDe
         />
       )}
 
-      <aside className={`${styles.historySidebar} ${sidebarOpen ? styles.sidebarOpen : styles.sidebarClosed} ${mobileSidebarOpen ? styles.mobileSidebarOpen : ""}`}>
+      <aside
+        className={`${styles.historySidebar} ${sidebarOpen ? styles.sidebarOpen : styles.sidebarClosed} ${mobileSidebarOpen ? styles.mobileSidebarOpen : ""}`}
+      >
         {/* Mobile close btn — hidden on desktop via CSS */}
         <button
           className={styles.drawerCloseBtn}
@@ -521,7 +532,11 @@ const RightSidebar = ({ activeView, onNavigate, allFlashcards, onSelectSet, onDe
                 <div
                   key={set._id}
                   className={`${styles.sidebarItem} ${selectedSet?._id === set._id ? styles.sidebarItemActive : ""}`}
-                  onClick={() => { setOpenMenuId(null); onSelectSet(set); setMobileSidebarOpen(false); }}
+                  onClick={() => {
+                    setOpenMenuId(null);
+                    onSelectSet(set);
+                    setMobileSidebarOpen(false);
+                  }}
                 >
                   <div className={styles.sidebarItemRow}>
                     <div className={styles.sidebarItemText}>
@@ -539,7 +554,9 @@ const RightSidebar = ({ activeView, onNavigate, allFlashcards, onSelectSet, onDe
                         className={styles.threeDotBtn}
                         onClick={(e) => {
                           e.stopPropagation();
-                          setOpenMenuId(openMenuId === set._id ? null : set._id);
+                          setOpenMenuId(
+                            openMenuId === set._id ? null : set._id,
+                          );
                         }}
                       >
                         ···
@@ -1099,7 +1116,8 @@ const FlashcardHome = ({ onNavigate }) => (
       Build Flashcards from <span className={styles.accent}>Any Material</span>
     </h1>
     <p className={styles.flashHomeSub}>
-      Upload a PDF, enter a topic, or build manually — AI generates your study set in seconds.
+      Upload a PDF, enter a topic, or build manually — AI generates your study
+      set in seconds.
     </p>
     <button
       className={styles.flashHomeCard}
@@ -1110,7 +1128,9 @@ const FlashcardHome = ({ onNavigate }) => (
       </div>
       <div>
         <p className={styles.flashHomeCardTitle}>Create Your Flashcards</p>
-        <p className={styles.flashHomeCardSub}>Upload PDF, enter a topic, or build from scratch</p>
+        <p className={styles.flashHomeCardSub}>
+          Upload PDF, enter a topic, or build from scratch
+        </p>
       </div>
     </button>
   </div>
@@ -1130,7 +1150,7 @@ const Flashcards = () => {
   const [inputResult, setInputResult] = useState({});
   const [allFlashcards, setAllFlashcards] = useState([]);
   const [selectedSet, setSelectedSet] = useState(null);
-  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false); 
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const inputRef = useRef(null);
   const token = localStorage.getItem("token");
 
@@ -1273,14 +1293,14 @@ const Flashcards = () => {
       <main className={styles.mainContent}>
         {currentView === VIEW.VIEWER && (
           <FlashcardViewer
-            allFlashcards={id ? allFlashcards.filter(s => s._id === id) : allFlashcards}
+            allFlashcards={
+              id ? allFlashcards.filter((s) => s._id === id) : allFlashcards
+            }
             onNavigate={navigateTo}
             onOpenSidebar={() => setMobileSidebarOpen(true)}
           />
         )}
-        {currentView === VIEW.HOME && (
-          <FlashcardHome onNavigate={navigateTo} />
-        )}
+        {currentView === VIEW.HOME && <FlashcardHome onNavigate={navigateTo} />}
         {currentView === VIEW.CREATE_STEP1 && (
           <CreateStep1
             onSelect={navigateTo}
