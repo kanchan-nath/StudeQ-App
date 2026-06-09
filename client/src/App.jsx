@@ -68,10 +68,12 @@ const App = () => {
           <Route path="/quiz/take/:id" element={<ProtectedRoute component={<Quiz />} />} />
           <Route path="/quiz/results/:id" element={<ProtectedRoute component={<Quiz />} />} />
           <Route path="/quiz/history" element={<ProtectedRoute component={<Quiz />} />} />
-          <Route
-            path="/flashcards"
-            element={<ProtectedRoute component={<Flashcards />} />}
-          />
+          <Route path="/flashcard" element={<ProtectedRoute component={<Flashcards />} />} />
+          <Route path="/flashcard/viewer/:id" element={<ProtectedRoute component={<Flashcards />} />} />
+          <Route path="/flashcard/create" element={<ProtectedRoute component={<Flashcards />} />} />
+          <Route path="/flashcard/create/topic" element={<ProtectedRoute component={<Flashcards />} />} />
+          <Route path="/flashcard/create/scratch" element={<ProtectedRoute component={<Flashcards />} />} />
+          <Route path="/flashcard/create/pdf" element={<ProtectedRoute component={<Flashcards />} />} />
           <Route
             path="/tutor"
             element={<ProtectedRoute component={<Tutor />} />}

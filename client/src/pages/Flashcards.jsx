@@ -1,4 +1,5 @@
 import React, { useRef, useState, useEffect, useCallback } from "react";
+import { useNavigate, useLocation, useParams } from "react-router-dom";
 import BASE_URL from "../lib/api.js";
 import { v4 as uuidv4 } from "uuid";
 import styles from "./styles/Flashcards.module.css";
@@ -448,7 +449,7 @@ const IconNote = () => (
 );
 
 const VIEW = {
-  HOME: "home", 
+  HOME: "home",
   VIEWER: "viewer",
   CREATE_STEP1: "create_step1",
   CREATE_STEP2_TOPIC: "create_step2_topic",
@@ -456,17 +457,31 @@ const VIEW = {
   CREATE_STEP2_PDF: "create_step2_pdf",
 };
 
+// ─── Path ↔ View maps ─────────────────────────────────────────────────────────
+const PATH_MAP = {
+  [VIEW.HOME]: "/flashcard",
+  [VIEW.VIEWER]: "/flashcard/viewer",
+  [VIEW.CREATE_STEP1]: "/flashcard/create",
+  [VIEW.CREATE_STEP2_TOPIC]: "/flashcard/create/topic",
+  [VIEW.CREATE_STEP2_SCRATCH]: "/flashcard/create/scratch",
+  [VIEW.CREATE_STEP2_PDF]: "/flashcard/create/pdf",
+};
+
+const PATH_TO_VIEW = Object.fromEntries(
+  Object.entries(PATH_MAP).map(([v, p]) => [p, v])
+);
+
 // ─── RIGHT Sidebar ────────────────────────────────────────────────────────────
 const RightSidebar = ({ activeView, onNavigate, allFlashcards, onSelectSet, onDeleteSet }) => {
   const [openMenuId, setOpenMenuId] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
-
 
   useEffect(() => {
     const close = () => setOpenMenuId(null);
     document.addEventListener("click", close);
     return () => document.removeEventListener("click", close);
   }, []);
+
   return (
     <aside className={`${styles.historySidebar} ${sidebarOpen ? styles.sidebarOpen : styles.sidebarClosed}`}>
       <button
@@ -478,57 +493,56 @@ const RightSidebar = ({ activeView, onNavigate, allFlashcards, onSelectSet, onDe
 
       {sidebarOpen && (
         <div className={styles.sidebarContent}>
-
           <h3 className={styles.sidebarTitle}>🕓 Recent Flashcards</h3>
 
           {allFlashcards.length === 0 ? (
             <p className={styles.sidebarEmpty}>No flashcards yet.</p>
           ) : (
-              allFlashcards.map((set) => (
-                <div
-                  key={set._id}
-                  className={styles.sidebarItem}
-                  onClick={() => { setOpenMenuId(null); onSelectSet(set); }}
-                >
-                  <div className={styles.sidebarItemRow}>
-                    <div className={styles.sidebarItemText}>
-                      <div className={styles.sidebarItemTitle}>
-                        {set.topic || "Untitled"}
-                      </div>
-                      <div className={styles.sidebarItemMeta}>
-                        {set.flashcards?.length || 0} cards
-                        {set.subject ? ` · ${set.subject}` : ""}
-                      </div>
+            allFlashcards.map((set) => (
+              <div
+                key={set._id}
+                className={styles.sidebarItem}
+                onClick={() => { setOpenMenuId(null); onSelectSet(set); }}
+              >
+                <div className={styles.sidebarItemRow}>
+                  <div className={styles.sidebarItemText}>
+                    <div className={styles.sidebarItemTitle}>
+                      {set.topic || "Untitled"}
                     </div>
-
-                    <div className={styles.sidebarItemMenuWrapper}>
-                      <button
-                        className={styles.threeDotBtn}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setOpenMenuId(openMenuId === set._id ? null : set._id);
-                        }}
-                      >
-                        ···
-                      </button>
-                      {openMenuId === set._id && (
-                        <div className={styles.dotMenu}>
-                          <button
-                            className={styles.dotMenuDelete}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setOpenMenuId(null);
-                              onDeleteSet(set._id);
-                            }}
-                          >
-                            Delete
-                          </button>
-                        </div>
-                      )}
+                    <div className={styles.sidebarItemMeta}>
+                      {set.flashcards?.length || 0} cards
+                      {set.subject ? ` · ${set.subject}` : ""}
                     </div>
                   </div>
+
+                  <div className={styles.sidebarItemMenuWrapper}>
+                    <button
+                      className={styles.threeDotBtn}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setOpenMenuId(openMenuId === set._id ? null : set._id);
+                      }}
+                    >
+                      ···
+                    </button>
+                    {openMenuId === set._id && (
+                      <div className={styles.dotMenu}>
+                        <button
+                          className={styles.dotMenuDelete}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setOpenMenuId(null);
+                            onDeleteSet(set._id);
+                          }}
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </div>
-              ))
+              </div>
+            ))
           )}
         </div>
       )}
@@ -593,7 +607,6 @@ const FlashcardViewer = ({ allFlashcards, onNavigate }) => {
     <div className={styles.viewerLayout}>
       {/* Headbar */}
       <div className={styles.headbar}>
-
         <div className={styles.progressDots}>
           {cards.slice(0, Math.min(cards.length, 12)).map((_, i) => (
             <button
@@ -633,7 +646,6 @@ const FlashcardViewer = ({ allFlashcards, onNavigate }) => {
           <span className={styles.cardSideLabel}>
             {isFlipped ? "Definition" : "Term"}
           </span>
-
         </div>
 
         <div
@@ -1086,6 +1098,10 @@ const FlashcardHome = ({ onNavigate }) => (
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 const Flashcards = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const [pdfFilePath, setPdfFilePath] = useState("");
   const [moreFlashId, setMoreFlashId] = useState("");
   const [input, setInput] = useState({ topic: "", subject: "" });
@@ -1093,11 +1109,18 @@ const Flashcards = () => {
   const [loading, setLoading] = useState(false);
   const [inputResult, setInputResult] = useState({});
   const [allFlashcards, setAllFlashcards] = useState([]);
-  const [currentView, setCurrentView] = useState(VIEW.HOME);
   const [selectedSet, setSelectedSet] = useState(null);
 
   const inputRef = useRef(null);
   const token = localStorage.getItem("token");
+
+  // Derive currentView from URL — reload always restores correct view
+  const currentView = location.pathname.startsWith("/flashcard/viewer")
+    ? VIEW.VIEWER
+    : (PATH_TO_VIEW[location.pathname] ?? VIEW.HOME);
+
+  const navigateTo = (view) => navigate(PATH_MAP[view] ?? "/flashcard");
+  const exitToViewer = () => navigate("/flashcard");
 
   const handleSubmit = async ({ topic, subject }) => {
     setLoading(true);
@@ -1141,7 +1164,7 @@ const Flashcards = () => {
         setInput({ topic: "", subject: "" });
         fetchFlashcards();
         setSelectedSet(null);
-        setCurrentView(VIEW.VIEWER);
+        navigate("/flashcard/viewer/" + data.data._id);
       } catch (error) {
         console.error(error);
       } finally {
@@ -1182,7 +1205,7 @@ const Flashcards = () => {
       setInputResult(data.data);
       fetchFlashcards();
       setSelectedSet(null);
-      setCurrentView(VIEW.VIEWER);
+      navigate("/flashcard/viewer/" + data.data._id);
     } catch (error) {
       console.error(error);
     }
@@ -1191,8 +1214,6 @@ const Flashcards = () => {
   useEffect(() => {
     fetchFlashcards();
   }, []);
-
-
 
   const handleDeleteSet = async (id) => {
     try {
@@ -1207,23 +1228,19 @@ const Flashcards = () => {
       setAllFlashcards((prev) => prev.filter((s) => s._id !== id));
       if (selectedSet?._id === id) {
         setSelectedSet(null);
-        setCurrentView(VIEW.HOME);
+        navigate("/flashcard");
       }
     } catch (err) {
       console.error(err);
     }
   };
 
-  const navigateTo = (view) => setCurrentView(view);
-  const exitToViewer = () => setCurrentView(VIEW.HOME);
-
   return (
     <div className={styles.appShell}>
-      {/* Main scrollable content */}
       <main className={styles.mainContent}>
         {currentView === VIEW.VIEWER && (
           <FlashcardViewer
-            allFlashcards={selectedSet ? [selectedSet] : allFlashcards}
+            allFlashcards={id ? allFlashcards.filter(s => s._id === id) : allFlashcards}
             onNavigate={navigateTo}
           />
         )}
@@ -1261,14 +1278,13 @@ const Flashcards = () => {
         )}
       </main>
 
-      {/* Single right sidebar — static, inner scrollable */}
       <RightSidebar
         activeView={currentView}
         onNavigate={navigateTo}
         allFlashcards={allFlashcards}
         onSelectSet={(set) => {
           setSelectedSet(set);
-          navigateTo(VIEW.VIEWER);
+          navigate("/flashcard/viewer/" + set._id);
         }}
         onDeleteSet={handleDeleteSet}
       />

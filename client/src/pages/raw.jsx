@@ -3,6 +3,7 @@ import "../src/index.css"
 import "./pages/styles/global.css";
 import { Routes, Route } from "react-router-dom";
 import Quiz from "./pages/Quiz.jsx";
+import Flashcards from "./Flashcards.jsx";
 const App = () => {
     const token = localStorage.getItem("token");
 
@@ -37,7 +38,7 @@ const App = () => {
                     />
                     <Route
                         path="/quiz"
-                        element={<ProtectedRoute component={<Quiz />} />}
+                        element={<ProtectedRoute component={<Flashcards />} />}
                     />
                 </Route>
 
