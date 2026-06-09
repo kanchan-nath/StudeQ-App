@@ -130,7 +130,7 @@ const Notebook = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   const [toasts, setToasts] = useState([]);
-  const [theme, setTheme] = useState("light");
+  const [theme, setTheme] = useState(() => localStorage.getItem("sparke-theme") || "dark");
 
   const inputRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -398,13 +398,6 @@ const Notebook = () => {
     // FIX: root is now a flex row containing appShell + rightSidebar
     <div className={styles.root}>
       {/* Theme toggle */}
-      <button
-        className={styles.themeToggle}
-        onClick={() => setTheme((t) => (t === "light" ? "dark" : "light"))}
-        aria-label="Toggle theme"
-      >
-        {theme === "light" ? "🌙" : "☀️"}
-      </button>
 
       <Toast toasts={toasts} removeToast={removeToast} />
 
