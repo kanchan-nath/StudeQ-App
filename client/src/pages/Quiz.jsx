@@ -1051,8 +1051,8 @@ export default function Quiz() {
               <div className={styles.resultsTop}>
                 <div className={styles.scoreRing}>
                   <svg
-                    width="90"
-                    height="90"
+                    width="55"
+                    height="55"
                     viewBox="0 0 120 120"
                     style={{ transform: "rotate(-90deg)" }}
                   >
