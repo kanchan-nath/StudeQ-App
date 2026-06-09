@@ -333,7 +333,15 @@
   border-color: var(--accent);
   background: var(--accent-light);
 }
+.sidebarItemActive {
+  border-color: var(--accent);
+  background: var(--accent-light);
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.18);
+}
 
+.sidebarItemActive .sidebarItemTitle {
+  color: var(--accent);
+}
 .sidebarItemTitle {
   font-size: 13px;
   font-weight: 600;

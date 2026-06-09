@@ -459,12 +459,12 @@ const VIEW = {
 
 // ─── Path ↔ View maps ─────────────────────────────────────────────────────────
 const PATH_MAP = {
-  [VIEW.HOME]: "/flashcard",
-  [VIEW.VIEWER]: "/flashcard/viewer",
-  [VIEW.CREATE_STEP1]: "/flashcard/create",
-  [VIEW.CREATE_STEP2_TOPIC]: "/flashcard/create/topic",
-  [VIEW.CREATE_STEP2_SCRATCH]: "/flashcard/create/scratch",
-  [VIEW.CREATE_STEP2_PDF]: "/flashcard/create/pdf",
+  [VIEW.HOME]: "/flashcards",
+  [VIEW.VIEWER]: "/flashcards/viewer",
+  [VIEW.CREATE_STEP1]: "/flashcards/create",
+  [VIEW.CREATE_STEP2_TOPIC]: "/flashcards/create/topic",
+  [VIEW.CREATE_STEP2_SCRATCH]: "/flashcards/create/scratch",
+  [VIEW.CREATE_STEP2_PDF]: "/flashcards/create/pdf",
 };
 
 const PATH_TO_VIEW = Object.fromEntries(
@@ -472,7 +472,7 @@ const PATH_TO_VIEW = Object.fromEntries(
 );
 
 // ─── RIGHT Sidebar ────────────────────────────────────────────────────────────
-const RightSidebar = ({ activeView, onNavigate, allFlashcards, onSelectSet, onDeleteSet }) => {
+const RightSidebar = ({ activeView, onNavigate, allFlashcards, onSelectSet, onDeleteSet, selectedSet }) => {
   const [openMenuId, setOpenMenuId] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
@@ -501,13 +501,13 @@ const RightSidebar = ({ activeView, onNavigate, allFlashcards, onSelectSet, onDe
             allFlashcards.map((set) => (
               <div
                 key={set._id}
-                className={styles.sidebarItem}
+                className={`${styles.sidebarItem} ${selectedSet?._id === set._id ? styles.sidebarItemActive : ""}`}
                 onClick={() => { setOpenMenuId(null); onSelectSet(set); }}
               >
                 <div className={styles.sidebarItemRow}>
                   <div className={styles.sidebarItemText}>
                     <div className={styles.sidebarItemTitle}>
-                      {set.topic || "Untitled"}
+                      {set.topic || "Untitled Flashcard"}
                     </div>
                     <div className={styles.sidebarItemMeta}>
                       {set.flashcards?.length || 0} cards
@@ -1115,12 +1115,12 @@ const Flashcards = () => {
   const token = localStorage.getItem("token");
 
   // Derive currentView from URL — reload always restores correct view
-  const currentView = location.pathname.startsWith("/flashcard/viewer")
+  const currentView = location.pathname.startsWith("/flashcards/viewer")
     ? VIEW.VIEWER
     : (PATH_TO_VIEW[location.pathname] ?? VIEW.HOME);
 
-  const navigateTo = (view) => navigate(PATH_MAP[view] ?? "/flashcard");
-  const exitToViewer = () => navigate("/flashcard");
+  const navigateTo = (view) => navigate(PATH_MAP[view] ?? "/flashcards");
+  const exitToViewer = () => navigate("/flashcards");
 
   const handleSubmit = async ({ topic, subject }) => {
     setLoading(true);
@@ -1164,7 +1164,7 @@ const Flashcards = () => {
         setInput({ topic: "", subject: "" });
         fetchFlashcards();
         setSelectedSet(null);
-        navigate("/flashcard/viewer/" + data.data._id);
+        navigate("/flashcards/viewer/" + data.data._id);
       } catch (error) {
         console.error(error);
       } finally {
@@ -1205,7 +1205,7 @@ const Flashcards = () => {
       setInputResult(data.data);
       fetchFlashcards();
       setSelectedSet(null);
-      navigate("/flashcard/viewer/" + data.data._id);
+      navigate("/flashcards/viewer/" + data.data._id);
     } catch (error) {
       console.error(error);
     }
@@ -1228,7 +1228,7 @@ const Flashcards = () => {
       setAllFlashcards((prev) => prev.filter((s) => s._id !== id));
       if (selectedSet?._id === id) {
         setSelectedSet(null);
-        navigate("/flashcard");
+        navigate("/flashcards");
       }
     } catch (err) {
       console.error(err);
@@ -1282,9 +1282,10 @@ const Flashcards = () => {
         activeView={currentView}
         onNavigate={navigateTo}
         allFlashcards={allFlashcards}
+        selectedSet={selectedSet}
         onSelectSet={(set) => {
           setSelectedSet(set);
-          navigate("/flashcard/viewer/" + set._id);
+          navigate("/flashcards/viewer/" + set._id);
         }}
         onDeleteSet={handleDeleteSet}
       />
