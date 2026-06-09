@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { v4 as uuidv4 } from "uuid";
+import { useNavigate, useLocation, useParams } from "react-router-dom";
 import BASE_URL from "../lib/api.js";
 import styles from "./styles/Quiz.module.css";
 
@@ -14,6 +15,27 @@ const PHASE = {
   QUIZ: "quiz",
   RESULTS: "results",
   HISTORY: "history",
+};
+
+// Phase → URL
+const PHASE_PATH = {
+  [PHASE.HOME]: "/quiz",
+  [PHASE.STEP1]: "/quiz/create",
+  [PHASE.STEP2A]: "/quiz/upload",
+  [PHASE.STEP2B]: "/quiz/text",
+  [PHASE.STEP3]: "/quiz/types",
+  [PHASE.LOADING]: "/quiz/types", // stays on /types during load
+  [PHASE.HISTORY]: "/quiz/history",
+};
+
+// URL → Phase (for mount init)
+const PATH_PHASE = {
+  "/quiz": PHASE.HOME,
+  "/quiz/create": PHASE.STEP1,
+  "/quiz/upload": PHASE.STEP2A,
+  "/quiz/text": PHASE.STEP2B,
+  "/quiz/types": PHASE.STEP3,
+  "/quiz/history": PHASE.HISTORY,
 };
 
 // ─── QUESTION TYPE CONFIG ─────────────────────────────────────────
@@ -70,11 +92,26 @@ const LOADER_STATUSES = [
 ];
 
 export default function Quiz() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { id: urlId } = useParams();
+
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
   // ─── GLOBAL STATE ──────────────────────────────────────────────
-  const [phase, setPhase] = useState(PHASE.HOME);
+  // Init phase from URL on mount
+  const initPhase = (() => {
+    const p = location.pathname;
+    if (p.startsWith("/quiz/take")) return PHASE.QUIZ;
+    if (p.startsWith("/quiz/results")) return PHASE.RESULTS;
+    return PATH_PHASE[p] ?? PHASE.HOME;
+  })();
+
+  const [phase, setPhaseRaw] = useState(initPhase);
   const [method, setMethod] = useState(null); // "materials" | "text"
   const [openMenuId, setOpenMenuId] = useState(null);
+
   // Step 2A
   const [file, setFile] = useState(null);
 
@@ -92,9 +129,9 @@ export default function Quiz() {
   );
 
   // Quiz taking
-  const [quizData, setQuizData] = useState(null); // full quiz doc from API
+  const [quizData, setQuizData] = useState(null);
   const [currentQ, setCurrentQ] = useState(0);
-  const [answers, setAnswers] = useState([]); // user's answers array
+  const [answers, setAnswers] = useState([]);
 
   // Results
   const [allQuizzes, setAllQuizzes] = useState([]);
@@ -109,7 +146,57 @@ export default function Quiz() {
 
   const timerRef = useRef(null);
   const loaderRef = useRef(null);
+  const quizDataRef = useRef(quizData);
   const token = localStorage.getItem("token");
+
+  // Keep ref in sync so setPhase closure always has latest quizData
+  useEffect(() => {
+    quizDataRef.current = quizData;
+  }, [quizData]);
+
+  // ─── PHASE SETTER — syncs URL ────────────────────────────────────
+  const setPhase = useCallback(
+    (newPhase, doc) => {
+      setPhaseRaw(newPhase);
+      const docId = doc?._id ?? quizDataRef.current?._id;
+      if (newPhase === PHASE.QUIZ && docId) {
+        navigate(`/quiz/take/${docId}`);
+      } else if (newPhase === PHASE.RESULTS && docId) {
+        navigate(`/quiz/results/${docId}`);
+      } else {
+        navigate(PHASE_PATH[newPhase] ?? "/quiz");
+      }
+    },
+    [navigate],
+  );
+
+  // ─── RESTORE STATE FROM URL ON MOUNT ────────────────────────────
+  useEffect(() => {
+    if (!urlId) return;
+    const p = location.pathname;
+
+    if (p.startsWith("/quiz/results") && !quizData) {
+      fetch(`${BASE_URL}/api/quiz/${urlId}/result`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+        .then((r) => r.json())
+        .then((data) => {
+          const saved = data.data[0];
+          setQuizData(saved);
+          setAnswers(saved.questions.map((q) => q.userResponse ?? null));
+          setElapsedSec(0);
+          setReviewFilter("all");
+          setPhaseRaw(PHASE.RESULTS); // raw — URL already correct
+        })
+        .catch(console.error);
+    }
+
+    if (p.startsWith("/quiz/take") && !quizData) {
+      // Quiz data not in memory (e.g. hard reload mid-quiz) — fall back to home
+      navigate("/quiz", { replace: true });
+      setPhaseRaw(PHASE.HOME);
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ─── FETCH ALL QUIZZES (history) ────────────────────────────────
   const fetchAllQuizzes = useCallback(async () => {
@@ -174,7 +261,7 @@ export default function Quiz() {
     document.addEventListener("click", close);
     return () => document.removeEventListener("click", close);
   }, []);
-  
+
   // ─── HELPERS ────────────────────────────────────────────────────
   const fmtTime = (sec) => {
     const m = Math.floor(sec / 60),
@@ -201,9 +288,6 @@ export default function Quiz() {
       let res;
 
       if (method === "materials" && file) {
-        // ── FILE UPLOAD PATH ──────────────────────────────────────
-        // POST /api/quiz/generate-from-file
-        // Multipart FormData with: file, types (JSON string), total (number)
         const fd = new FormData();
         const selectedTypes = QTYPES.filter((q) => typeCounts[q.id] > 0).map(
           (q) => ({ type: q.id, count: typeCounts[q.id] }),
@@ -219,9 +303,6 @@ export default function Quiz() {
           body: fd,
         });
       } else {
-        // ── TEXT INPUT PATH ───────────────────────────────────────
-        // POST /api/quiz/generate
-        // JSON body with topic, subject, title, types, difficulty, audience
         const selectedTypes = QTYPES.filter((q) => typeCounts[q.id] > 0).map(
           (q) => ({ type: q.id, count: typeCounts[q.id] }),
         );
@@ -246,9 +327,8 @@ export default function Quiz() {
       if (!res.ok) throw new Error("API error");
 
       const data = await res.json();
-      // data.data is the full Quiz mongoose doc: { _id, quiz:{title,totalQuestion,meta}, questions:[] }
       startQuiz(data.data);
-      fetchAllQuizzes(); // refresh history
+      fetchAllQuizzes();
     } catch (e) {
       console.error(e);
       setError("Generation failed. Check your connection or API.");
@@ -261,7 +341,7 @@ export default function Quiz() {
     setQuizData(doc);
     setCurrentQ(0);
     setAnswers(new Array(doc.questions.length).fill(null));
-    setPhase(PHASE.QUIZ);
+    setPhase(PHASE.QUIZ, doc); // pass doc so setPhase has _id immediately
   };
 
   const viewResult = async (doc) => {
@@ -276,7 +356,7 @@ export default function Quiz() {
       setAnswers(saved.questions.map((q) => q.userResponse ?? null));
       setElapsedSec(0);
       setReviewFilter("all");
-      setPhase(PHASE.RESULTS);
+      setPhase(PHASE.RESULTS, saved); // pass saved so setPhase has _id
     } catch (e) {
       console.error("viewResult:", e);
     }
@@ -286,8 +366,6 @@ export default function Quiz() {
   const submitQuiz = async () => {
     clearInterval(timerRef.current);
 
-    // PATCH /api/quiz/:id/submit
-    // Body: { answers: ["answer string", ...] }  — index maps to questions array
     try {
       await fetch(`${BASE_URL}/api/quiz/${quizData._id}/submit`, {
         method: "PATCH",
@@ -321,7 +399,28 @@ export default function Quiz() {
       {/* ── HOME ─────────────────────────────────────────────────── */}
       {phase === PHASE.HOME && (
         <div className={styles.homeWrapper}>
-          {/* ── MAIN ── */}
+
+          {/* ── MOBILE TOPBAR ── */}
+          <div className={styles.mobileTopbar}>
+            <span className={styles.mobileTopbar__title}>🧠 Spark.E Quiz</span>
+            <button
+              className={styles.mobileTopbar__btn}
+              onClick={() => setMobileSidebarOpen(true)}
+              aria-label="Open quiz history"
+            >
+              ☰
+            </button>
+          </div>
+
+          {/* ── OVERLAY (mobile drawer backdrop) ── */}
+          {mobileSidebarOpen && (
+            <div
+              className={styles.sidebarOverlay}
+              onClick={() => setMobileSidebarOpen(false)}
+            />
+          )}
+
+          {/* ── MAIN CONTENT ── */}
           <div
             className={`${styles.homeScreen} ${sidebarOpen ? styles.homeScreenShrunk : ""}`}
           >
@@ -351,11 +450,15 @@ export default function Quiz() {
             </div>
           </div>
 
-          {/* ── SIDEBAR ── */}
+          {/* ── HISTORY SIDEBAR ── */}
           <div
-            className={`${styles.historySidebar} ${sidebarOpen ? styles.sidebarOpen : styles.sidebarClosed}`}
+            className={`
+        ${styles.historySidebar}
+        ${sidebarOpen ? styles.sidebarOpen : styles.sidebarClosed}
+        ${mobileSidebarOpen ? styles.mobileSidebarOpen : ""}
+      `}
           >
-            {/* Toggle arrow */}
+            {/* Desktop toggle arrow — CSS hides this on mobile */}
             <button
               className={styles.sidebarToggleBtn}
               onClick={() => setSidebarOpen((o) => !o)}
@@ -363,55 +466,70 @@ export default function Quiz() {
               {sidebarOpen ? "→" : "←"}
             </button>
 
-            {/* Content — only render when open */}
-            {sidebarOpen && (
+            {/* Content — desktop: only when sidebarOpen; mobile: only when mobileSidebarOpen */}
+            {(sidebarOpen || mobileSidebarOpen) && (
               <div className={styles.sidebarContent}>
-                <h3 className={styles.sidebarTitle}>🕓 Quiz History</h3>
+
+                {/* Header: title + close btn */}
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
+                  <h3 className={styles.sidebarTitle} style={{ margin: 0 }}>
+                    🕓 Quiz History
+                  </h3>
+                  <button
+                    className={styles.sidebarCloseBtn}
+                    onClick={() => setMobileSidebarOpen(false)}
+                    aria-label="Close history"
+                  >
+                    {mobileSidebarOpen ? "✕" : ""}
+                  </button>
+                </div>
+
+                {/* Empty state */}
                 {allQuizzes.length === 0 ? (
                   <p className={styles.sidebarEmpty}>No quizzes yet.</p>
                 ) : (
-                    allQuizzes.map((q) => (
-                      <div key={q._id} className={styles.sidebarItem}>
-                        <div className={styles.sidebarItemRow}>
-                          <div
-                            className={styles.sidebarItemText}
-                            onClick={() => viewResult(q)}
-                          >
-                            <div className={styles.sidebarItemTitle}>
-                              {q.quiz?.title || "Untitled"}
-                            </div>
-                            <div className={styles.sidebarItemMeta}>
-                              {q.quiz?.totalQuestion} q ·{" "}
-                              {new Date(q.createdAt).toLocaleDateString()}
-                            </div>
+                  allQuizzes.map((q) => (
+                    <div key={q._id} className={styles.sidebarItem}>
+                      <div className={styles.sidebarItemRow}>
+                        <div
+                          className={styles.sidebarItemText}
+                          onClick={() => viewResult(q)}
+                        >
+                          <div className={styles.sidebarItemTitle}>
+                            {q.quiz?.title || "Untitled"}
                           </div>
-                          <div className={styles.sidebarItemMenuWrapper}>
-                            <button
-                              className={styles.threeDotBtn}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setOpenMenuId(openMenuId === q._id ? null : q._id);
-                              }}
-                            >
-                              ···
-                            </button>
-                            {openMenuId === q._id && (
-                              <div className={styles.dotMenu}>
-                                <button
-                                  className={styles.dotMenuDelete}
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    deleteQuiz(q._id);
-                                  }}
-                                >
-                                  🗑 Delete
-                                </button>
-                              </div>
-                            )}
+                          <div className={styles.sidebarItemMeta}>
+                            {q.quiz?.totalQuestion} q ·{" "}
+                            {new Date(q.createdAt).toLocaleDateString()}
                           </div>
                         </div>
+                        <div className={styles.sidebarItemMenuWrapper}>
+                          <button
+                            className={styles.threeDotBtn}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setOpenMenuId(openMenuId === q._id ? null : q._id);
+                            }}
+                          >
+                            ···
+                          </button>
+                          {openMenuId === q._id && (
+                            <div className={styles.dotMenu}>
+                              <button
+                                className={styles.dotMenuDelete}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  deleteQuiz(q._id);
+                                }}
+                              >
+                                🗑 Delete
+                              </button>
+                            </div>
+                          )}
+                        </div>
                       </div>
-                    ))
+                    </div>
+                  ))
                 )}
               </div>
             )}
@@ -827,52 +945,7 @@ export default function Quiz() {
 
           return (
             <div className={styles.quizScreen}>
-              <div
-                style={{
-                  height: 56,
-                  background: "#fff",
-                  borderBottom: "1px solid #e2e5ef",
-                  display: "flex",
-                  alignItems: "center",
-                  padding: "0 24px",
-                  position: "sticky",
-                  top: 0,
-                  zIndex: 100,
-                }}
-              >
-                <div
-                  style={{
-                    width: 32,
-                    height: 32,
-                    background: "linear-gradient(135deg,#f59e0b,#f97316)",
-                    borderRadius: 8,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: 16,
-                  }}
-                >
-                  📋
-                </div>
-                <span style={{ fontWeight: 600, fontSize: 15, marginLeft: 12 }}>
-                  Quiz Results
-                </span>
-                <button
-                  onClick={() => setPhase(PHASE.HOME)}
-                  style={{
-                    marginLeft: "auto",
-                    border: "1px solid #e2e5ef",
-                    background: "none",
-                    padding: "6px 14px",
-                    borderRadius: 8,
-                    fontSize: 13,
-                    color: "#5a6080",
-                    cursor: "pointer",
-                  }}
-                >
-                  ✕ Exit
-                </button>
-              </div>
+
               <div className={styles.quizTopbar}>
                 <span className={styles.quizTitleBar}>
                   {quizData.quiz?.title || "Quiz"}
@@ -962,56 +1035,48 @@ export default function Quiz() {
           return (
             <div className={styles.resultsScreen}>
               <div
-                style={{
-                  height: 56,
-                  background: "#fff",
-                  borderBottom: "1px solid #e2e5ef",
-                  display: "flex",
-                  alignItems: "center",
-                  padding: "0 24px",
-                  position: "sticky",
-                  top: 0,
-                  zIndex: 100,
-                }}
+                className={styles.quizHeader}
               >
                 <div
-                  style={{
-                    width: 32,
-                    height: 32,
-                    background: "linear-gradient(135deg,#f59e0b,#f97316)",
-                    borderRadius: 8,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: 16,
-                  }}
+                  className={styles.quizHeaderIcon}
                 >
                   📋
                 </div>
-                <span style={{ fontWeight: 600, fontSize: 15, marginLeft: 12 }}>
+                <span className={styles.quizHeaderTitle}>
                   Quiz Results
                 </span>
                 <button
-                  onClick={() => setPhase(PHASE.HOME)}
-                  style={{
-                    marginLeft: "auto",
-                    border: "1px solid #e2e5ef",
-                    background: "none",
-                    padding: "6px 14px",
-                    borderRadius: 8,
-                    fontSize: 13,
-                    color: "#5a6080",
-                    cursor: "pointer",
+                  className={`${styles.btnAction} ${styles.btnPrimary}`}
+                  onClick={() => {
+                    setAnswers(new Array(quizData.questions.length).fill(null));
+                    setCurrentQ(0);
+                    setElapsedSec(0);
+                    setPhase(PHASE.QUIZ);
                   }}
                 >
-                  ✕ Exit
+                  🔁 Retake This Quiz
+                </button>
+                <button
+                  className={styles.btnAction}
+                  onClick={() => {
+                    setQuizData(null);
+                    setPhase(PHASE.STEP1);
+                  }}
+                >
+                  ➕ New Quiz
+                </button>
+                <button
+                  onClick={() => setPhase(PHASE.HOME)}
+                  className={styles.btnExit}
+                >
+                  ✕ Exits
                 </button>
               </div>
               <div className={styles.resultsTop}>
                 <div className={styles.scoreRing}>
                   <svg
-                    width="90"
-                    height="90"
+                    width="55"
+                    height="55"
                     viewBox="0 0 120 120"
                     style={{ transform: "rotate(-90deg)" }}
                   >
@@ -1097,28 +1162,6 @@ export default function Quiz() {
                   })}
                 </div>
               </div>
-              <div className={styles.resultActions}>
-                <button
-                  className={`${styles.btnAction} ${styles.btnPrimary}`}
-                  onClick={() => {
-                    setAnswers(new Array(quizData.questions.length).fill(null));
-                    setCurrentQ(0);
-                    setElapsedSec(0);
-                    setPhase(PHASE.QUIZ);
-                  }}
-                >
-                  🔁 Retake This Quiz
-                </button>
-                <button
-                  className={styles.btnAction}
-                  onClick={() => {
-                    setQuizData(null);
-                    setPhase(PHASE.STEP1);
-                  }}
-                >
-                  ➕ New Quiz
-                </button>
-              </div>
             </div>
           );
         })()}
@@ -1131,34 +1174,14 @@ export default function Quiz() {
 function Topbar({ step, onExit }) {
   return (
     <div
-      style={{
-        height: 56,
-        background: "#fff",
-        borderBottom: "1px solid #e2e5ef",
-        display: "flex",
-        alignItems: "center",
-        padding: "0 24px",
-        gap: 12,
-        position: "sticky",
-        top: 0,
-        zIndex: 100,
-      }}
+      className={styles.quizHeader}
     >
       <div
-        style={{
-          width: 32,
-          height: 32,
-          background: "linear-gradient(135deg,#f59e0b,#f97316)",
-          borderRadius: 8,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          fontSize: 16,
-        }}
+        className={styles.quizHeaderIcon}
       >
         📋
       </div>
-      <span style={{ fontWeight: 600, fontSize: 15 }}>Create Quiz</span>
+      <span className={styles.quizHeaderTitle}>Create Quiz</span>
       <span style={{ fontSize: 13, color: "#9298b0", marginLeft: 8 }}>
         {step}
       </span>
@@ -1218,8 +1241,8 @@ function BottomBar({ onBack, onNext, nextDisabled, nextLabel = "Continue →" })
     <div
       style={{
         padding: "16px 48px",
-        background: "#fff",
-        borderTop: "1px solid #e2e5ef",
+        background: "var(--surface)",
+        borderTop: "1px solid var(--border)",
         display: "flex",
         justifyContent: "space-between",
         alignItems: "center",
@@ -1228,14 +1251,14 @@ function BottomBar({ onBack, onNext, nextDisabled, nextLabel = "Continue →" })
       <button
         onClick={onBack}
         style={{
-          border: "1.5px solid #e2e5ef",
-          background: "#fff",
+          border: "1.5px solid var(--border)",
+          background: "var(--surface)",
           padding: "10px 22px",
-          borderRadius: 8,
+          borderRadius: "var(--radius-sm)",
           fontSize: 14,
           fontWeight: 500,
           cursor: "pointer",
-          color: "#5a6080",
+          color: "var(--text2)",
         }}
       >
         ← Back
@@ -1244,15 +1267,15 @@ function BottomBar({ onBack, onNext, nextDisabled, nextLabel = "Continue →" })
         onClick={onNext}
         disabled={nextDisabled}
         style={{
-          background: nextDisabled ? "#e2e5ef" : "#4f46e5",
-          color: nextDisabled ? "#9298b0" : "#fff",
+          background: nextDisabled ? "var(--border)" : "var(--accent)",
+          color: nextDisabled ? "var(--text3)" : "var(--surface)",
           border: "none",
           padding: "10px 28px",
-          borderRadius: 8,
+          borderRadius: "var(--radius-sm)",
           fontSize: 14,
           fontWeight: 600,
           cursor: nextDisabled ? "not-allowed" : "pointer",
-          transition: "all .2s",
+          transition: `all var(--duration-fast) var(--ease-in-out)`,
         }}
       >
         {nextLabel}

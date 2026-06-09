@@ -4,6 +4,7 @@ import "./index.css";
 import App from "./App.jsx";
 import { BrowserRouter } from "react-router-dom";
 import UserProvider from "./ContextApi/UserProvider.jsx";
+import LoaderProvider from "./ContextApi/LoaderProvider.jsx";
 
 try {
   const savedTheme = localStorage.getItem("sparke-theme") || "dark";
@@ -12,8 +13,10 @@ try {
 
 createRoot(document.getElementById("root")).render(
   <BrowserRouter>
-    <UserProvider>
-      <App />
-    </UserProvider>
+    <LoaderProvider>
+      <UserProvider>
+        <App />
+      </UserProvider>
+    </LoaderProvider>
   </BrowserRouter>,
 );

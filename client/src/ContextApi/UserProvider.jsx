@@ -1,14 +1,17 @@
 import React, { useEffect, useState } from "react";
 import UserContext from "./UserContext.js";
 import BASE_URL from "../lib/api.js";
+import useLoader from "./useLoader.js"
 
 const UserProvider = ({ children }) => {
+  const { show, hide } = useLoader();
   const [user, setUser] = useState("");
   const [loading, setLoading] = useState(true);
 
   const token = localStorage.getItem("token");
 
   useEffect(() => {
+    show("Loading your profile…");
     const fetchUser = async () => {
       try {
         const res = await fetch(`${BASE_URL}/api/auth/userinfo`, {
@@ -29,6 +32,8 @@ const UserProvider = ({ children }) => {
         setLoading(false);
       } catch (error) {
         setLoading(false);
+      } finally {
+        hide();  // ← ADD
       }
     };
     fetchUser();
