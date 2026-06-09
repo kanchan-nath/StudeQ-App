@@ -1174,34 +1174,14 @@ export default function Quiz() {
 function Topbar({ step, onExit }) {
   return (
     <div
-      style={{
-        height: 56,
-        background: "#fff",
-        borderBottom: "1px solid #e2e5ef",
-        display: "flex",
-        alignItems: "center",
-        padding: "0 24px",
-        gap: 12,
-        position: "sticky",
-        top: 0,
-        zIndex: 100,
-      }}
+      className={styles.quizHeader}
     >
       <div
-        style={{
-          width: 32,
-          height: 32,
-          background: "linear-gradient(135deg,#f59e0b,#f97316)",
-          borderRadius: 8,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          fontSize: 16,
-        }}
+        className={styles.quizHeaderIcon}
       >
         📋
       </div>
-      <span style={{ fontWeight: 600, fontSize: 15 }}>Create Quiz</span>
+      <span className={styles.quizHeaderTitle}>Create Quiz</span>
       <span style={{ fontSize: 13, color: "#9298b0", marginLeft: 8 }}>
         {step}
       </span>
@@ -1261,8 +1241,8 @@ function BottomBar({ onBack, onNext, nextDisabled, nextLabel = "Continue →" })
     <div
       style={{
         padding: "16px 48px",
-        background: "#fff",
-        borderTop: "1px solid #e2e5ef",
+        background: "var(--surface)",
+        borderTop: "1px solid var(--border)",
         display: "flex",
         justifyContent: "space-between",
         alignItems: "center",
@@ -1271,14 +1251,14 @@ function BottomBar({ onBack, onNext, nextDisabled, nextLabel = "Continue →" })
       <button
         onClick={onBack}
         style={{
-          border: "1.5px solid #e2e5ef",
-          background: "#fff",
+          border: "1.5px solid var(--border)",
+          background: "var(--surface)",
           padding: "10px 22px",
-          borderRadius: 8,
+          borderRadius: "var(--radius-sm)",
           fontSize: 14,
           fontWeight: 500,
           cursor: "pointer",
-          color: "#5a6080",
+          color: "var(--text2)",
         }}
       >
         ← Back
@@ -1287,15 +1267,15 @@ function BottomBar({ onBack, onNext, nextDisabled, nextLabel = "Continue →" })
         onClick={onNext}
         disabled={nextDisabled}
         style={{
-          background: nextDisabled ? "#e2e5ef" : "#4f46e5",
-          color: nextDisabled ? "#9298b0" : "#fff",
+          background: nextDisabled ? "var(--border)" : "var(--accent)",
+          color: nextDisabled ? "var(--text3)" : "var(--surface)",
           border: "none",
           padding: "10px 28px",
-          borderRadius: 8,
+          borderRadius: "var(--radius-sm)",
           fontSize: 14,
           fontWeight: 600,
           cursor: nextDisabled ? "not-allowed" : "pointer",
-          transition: "all .2s",
+          transition: `all var(--duration-fast) var(--ease-in-out)`,
         }}
       >
         {nextLabel}
