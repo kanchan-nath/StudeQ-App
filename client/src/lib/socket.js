@@ -1,4 +1,5 @@
 import { io } from "socket.io-client";
+import BASE_URL from "./api.js";
 
 let socket = null;
 
@@ -8,7 +9,7 @@ const connectSocket = () => {
   if (!token) return;
   if (socket?.connnected) return;
 
-  socket = io("http://localhost:4000", {
+  socket = io(BASE_URL, {
     auth: {
       token,
     },
