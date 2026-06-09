@@ -15,6 +15,7 @@ import {
   Logout01Icon,
   Home01Icon,
 } from "hugeicons-react";
+import useLoader from "../ContextApi/useLoader.js";
 
 export const QUICK_ACTIONS = [
   { label: "Upload Material", icon: Upload01Icon, to: "/notes" },
@@ -127,6 +128,7 @@ const DEFAULT_PROFILE = {
 };
 
 const Dashboard = () => {
+  const { show, hide } = useLoader();
   const [activeNav, setActiveNav] = useState("home");
   const [userData, setUserData] = useState(DEFAULT_USER);
   const [userLoading, setUserLoading] = useState(true);
@@ -142,6 +144,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     const fetchData = async () => {
+      show("Fetching data…");
       try {
         // ── User info (active) ───────────────────────────────────────────
         const res = await fetch(`${BASE_URL}/api/user/userinfo`, {
@@ -204,6 +207,7 @@ const Dashboard = () => {
         console.error(err);
       } finally {
         setUserLoading(false);
+        hide()
       }
     };
 
