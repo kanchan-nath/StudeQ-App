@@ -205,7 +205,7 @@ const Dashboard = () => {
         // });
       } catch (err) {
         console.error(err);
-      } finally {
+      } finally { 
         setUserLoading(false);
         hide()
       }

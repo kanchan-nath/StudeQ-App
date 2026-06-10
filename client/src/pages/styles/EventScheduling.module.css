@@ -228,9 +228,17 @@
 }
 
 .pageSubtitle {
-    font-size: 13px;
-    color: var(--text-muted);
-    margin: 0;
+    display: flex;
+        align-items: center;
+        gap: 6px;
+        font-family: var(--font-display);
+        font-size: 12px;
+        color: var(--theme-text-secondary);
+        background: var(--theme-surface-2);
+        border: 1px solid var(--theme-border);
+        border-radius: var(--r-full);
+        padding: 6px 12px;
+        width: 16%;
 }
 
 /* ─── Stat Cards ─────────────────────────────────────────────────────────── */
