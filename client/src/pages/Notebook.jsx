@@ -412,7 +412,7 @@ const Notebook = () => {
       <div className={styles.appShell}>
 {/* ── NEW: mobile topbar — sticky, visible only on ≤768px via CSS ── */}
         {/* ── SINGLE mobile topbar — first child, always in DOM ── */}
-        {!chatRoom && (
+        {!chatRoom && mobileSidebarOpen && (
           <div className={styles.mobileTopbar}>
             <span className={styles.mobileTopbarTitle}>Notebook</span>
             <button
