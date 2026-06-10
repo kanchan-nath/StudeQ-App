@@ -1,26 +1,34 @@
-import React, { useEffect, useState, useRef, useCallback } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import BASE_URL from "../lib/api.js";
 import styles from "./styles/TimeTable.module.css";
 
-// ─── Constants ───────────────────────────────────────────────────────────────
 const VIEWS = ["Day", "Week", "Month", "Agenda"];
-const CATEGORIES = ["All", "Work", "Personal", "Health", "Learning", "Social"];
-const CATEGORY_COLORS = {
-    All: { dot: "#6c63ff", pill: "#6c63ff22", text: "#6c63ff" },
-    Work: { dot: "#4f8ef7", pill: "#4f8ef722", text: "#4f8ef7" },
-    Personal: { dot: "#a78bfa", pill: "#a78bfa22", text: "#a78bfa" },
-    Health: { dot: "#34d399", pill: "#34d39922", text: "#34d399" },
-    Learning: { dot: "#fbbf24", pill: "#fbbf2422", text: "#fbbf24" },
-    Social: { dot: "#f472b6", pill: "#f472b622", text: "#f472b6" },
-};
-const EVENT_COLORS = [
-    "#4f8ef7", "#a78bfa", "#34d399", "#fbbf24", "#f472b6",
-    "#6c63ff", "#f87171", "#38bdf8", "#fb923c", "#a3e635",
-];
-const REPEAT_OPTIONS = [
-    "Does not repeat", "Daily", "Weekly", "Monthly", "Custom"
-];
 const HOURS = Array.from({ length: 24 }, (_, i) => i);
+
+const DEFAULT_CONFIG = {
+    categories: ["All", "Work", "Personal", "Health", "Learning", "Social"],
+    categoryColors: {
+        All: { dot: "#6c63ff", pill: "#6c63ff22", text: "#6c63ff" },
+        Work: { dot: "#4f8ef7", pill: "#4f8ef722", text: "#4f8ef7" },
+        Personal: { dot: "#a78bfa", pill: "#a78bfa22", text: "#a78bfa" },
+        Health: { dot: "#34d399", pill: "#34d39922", text: "#34d399" },
+        Learning: { dot: "#fbbf24", pill: "#fbbf2422", text: "#fbbf24" },
+        Social: { dot: "#f472b6", pill: "#f472b622", text: "#f472b6" },
+    },
+    eventColors: [
+        "#4f8ef7", "#a78bfa", "#34d399", "#fbbf24", "#f472b6",
+        "#6c63ff", "#f87171", "#38bdf8", "#fb923c", "#a3e635",
+    ],
+    repeatOptions: ["Does not repeat", "Daily", "Weekly", "Monthly", "Custom"],
+};
+
+// ── Date helpers ──────────────────────────────────────────────────────────────
+// Backend returns either ISO string or { $date: "..." }
+function parseDate(val) {
+    if (!val) return null;
+    if (typeof val === "object" && val.$date) return new Date(val.$date);
+    return new Date(val);
+}
 
 function formatHour(h) {
     if (h === 0) return "12 AM";
@@ -61,11 +69,6 @@ function getMonthDays(date) {
     }
     return days;
 }
-function timeToMinutes(t) {
-    if (!t) return 0;
-    const [h, m] = t.split(":").map(Number);
-    return h * 60 + m;
-}
 function sameDay(a, b) {
     return a.getFullYear() === b.getFullYear() &&
         a.getMonth() === b.getMonth() &&
@@ -75,83 +78,84 @@ function toLocalDateStr(date) {
     return date.toISOString().split("T")[0];
 }
 
-// ─── Default form state ───────────────────────────────────────────────────────
-const EMPTY_FORM = {
+// category is array in backend — resolve first entry for color lookup
+function evColor(ev, config) {
+    if (ev.color) return ev.color;
+    const cat = Array.isArray(ev.category) ? ev.category[0] : ev.category;
+    return config.categoryColors[cat]?.dot || "#6c63ff";
+}
+
+const EMPTY_FORM_BASE = {
     title: "", topic: "", startTime: "", endTime: "",
     plannedDuration: "", isRecurring: false,
     recurrencePattern: "", recurrenceDays: [],
     recurrenceEndDate: "", status: "in_progress", actualDuration: "",
     goalDescription: "", reminderEnabled: false,
-    reminderMinutesBefore: 10, category: "Work",
-    color: EVENT_COLORS[0], repeat: "Does not repeat", notes: "",
+    reminderMinutesBefore: 10,
+    repeat: "Does not repeat", notes: "",
     date: toLocalDateStr(new Date()),
+    category: [], color: DEFAULT_CONFIG.eventColors[0],
 };
 
 // ─── Component ────────────────────────────────────────────────────────────────
 const TimeTable = () => {
     const token = localStorage.getItem("token");
 
-    // State
     const [view, setView] = useState("Day");
     const [currentDate, setCurrentDate] = useState(new Date());
     const [activeCategory, setActiveCategory] = useState("All");
     const [allTimeTables, setAllTimeTables] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [config] = useState(DEFAULT_CONFIG);
 
-    // Modal
     const [showModal, setShowModal] = useState(false);
-    const [modalMode, setModalMode] = useState("create"); // "create" | "edit"
+    const [modalMode, setModalMode] = useState("create");
     const [editId, setEditId] = useState(null);
-    const [form, setForm] = useState(EMPTY_FORM);
+    const [form, setForm] = useState({ ...EMPTY_FORM_BASE });
     const [formError, setFormError] = useState("");
     const [saving, setSaving] = useState(false);
 
-    // Drag-to-create
     const [dragPreview, setDragPreview] = useState(null);
     const gridRef = useRef(null);
 
-    // Detail panel
     const [selectedEvent, setSelectedEvent] = useState(null);
-
-    // Theme
     const [theme, setTheme] = useState("dark");
 
     useEffect(() => {
         document.documentElement.setAttribute("data-theme", theme);
     }, [theme]);
 
-    // ── API helpers ──────────────────────────────────────────────────────────
-    const apiFetch = useCallback(async (path, opts = {}) => {
-        const res = await fetch(`${BASE_URL}/api/scheduler/time-table${path}`, {
-            ...opts,
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
-                ...(opts.headers || {}),
-            },
-        });
-        if (!res.ok) throw new Error(`API error ${res.status}`);
-        return res.json();
-    }, [token]);
-
-    const fetchAll = useCallback(async () => {
-        setLoading(true);
-        try {
-            const data = await apiFetch("", { method: "GET" });
-            setAllTimeTables(data.data || []);
-        } catch (e) { console.error(e); }
-        finally { setLoading(false); }
-    }, [apiFetch]);
-
-    useEffect(() => { fetchAll(); }, [fetchAll]);
-
-    // ── Form handlers ────────────────────────────────────────────────────────
-    const handleFormChange = (field, value) => {
-        setForm(f => ({ ...f, [field]: value }));
+    // ── Fetch helpers ─────────────────────────────────────────────────────────
+    const authHeaders = {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
     };
 
+    const fetchAll = () => {
+        setLoading(true);
+        fetch(`${BASE_URL}/api/scheduler/time-table`, { headers: authHeaders })
+            .then(r => { if (!r.ok) throw new Error(`${r.status}`); return r.json(); })
+            .then(d => setAllTimeTables(d.data || []))
+            .catch(e => console.error("fetchAll:", e))
+            .finally(() => setLoading(false));
+    };
+
+    useEffect(() => { fetchAll(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+    // ── Form helpers ──────────────────────────────────────────────────────────
+    const makeEmptyForm = () => ({
+        ...EMPTY_FORM_BASE,
+        date: toLocalDateStr(new Date()),
+        color: config.eventColors[0],
+        category: [],
+        repeat: config.repeatOptions[0],
+    });
+
+    const handleFormChange = (field, value) =>
+        setForm(f => ({ ...f, [field]: value }));
+
     const openCreate = (prefill = {}) => {
-        setForm({ ...EMPTY_FORM, ...prefill });
+        setForm({ ...makeEmptyForm(), ...prefill });
         setModalMode("create");
         setEditId(null);
         setFormError("");
@@ -159,21 +163,29 @@ const TimeTable = () => {
     };
 
     const openEdit = (item) => {
-        const d = item.startTime ? new Date(item.startTime) : new Date();
+        const start = parseDate(item.startTime);
+        const end = parseDate(item.endTime);
+        const recEnd = parseDate(item.recurrenceEndDate);
         setForm({
-            ...EMPTY_FORM,
+            ...makeEmptyForm(),
             title: item.title || "",
             topic: item.topic || "",
-            date: toLocalDateStr(d),
-            startTime: item.startTime ? d.toTimeString().slice(0, 5) : "",
-            endTime: item.endTime ? new Date(item.endTime).toTimeString().slice(0, 5) : "",
+            date: start ? toLocalDateStr(start) : toLocalDateStr(new Date()),
+            startTime: start ? start.toTimeString().slice(0, 5) : "",
+            endTime: end ? end.toTimeString().slice(0, 5) : "",
             plannedDuration: item.plannedDuration || "",
-            category: item.category || "Work",
-            color: item.color || EVENT_COLORS[0],
-            repeat: item.repeat || "Does not repeat",
+            actualDuration: item.actualDuration ?? "",
+            category: Array.isArray(item.category) ? item.category : (item.category ? [item.category] : []),
+            color: item.color || config.eventColors[0],
+            repeat: item.repeat || config.repeatOptions[0],
             notes: item.goalDescription || "",
             isRecurring: item.isRecurring || false,
-            status: item.status || "pending",
+            recurrencePattern: item.recurrencePattern || "",
+            recurrenceDays: item.recurrenceDays || [],
+            recurrenceEndDate: recEnd ? toLocalDateStr(recEnd) : "",
+            status: item.status || "in_progress",
+            reminderEnabled: item.reminderEnabled || false,
+            reminderMinutesBefore: item.reminderMinutesBefore ?? 10,
         });
         setModalMode("edit");
         setEditId(item._id);
@@ -182,68 +194,67 @@ const TimeTable = () => {
         setSelectedEvent(null);
     };
 
-    const handleSave = async () => {
+    const handleSave = () => {
         if (!form.title || !form.topic || !form.startTime || !form.endTime || !form.plannedDuration) {
             setFormError("Title, topic, start time, end time and duration are required.");
             return;
         }
         setSaving(true);
         setFormError("");
-        try {
-            const startISO = new Date(`${form.date}T${form.startTime}`).toISOString();
-            const endISO = new Date(`${form.date}T${form.endTime}`).toISOString();
-            const body = {
-                title: form.title, topic: form.topic,
-                startTime: startISO, endTime: endISO,
-                plannedDuration: Number(form.plannedDuration),
-                isRecurring: form.isRecurring,
-                recurrencePattern: form.recurrencePattern,
-                recurrenceDays: form.recurrenceDays,
-                recurrenceEndDate: form.recurrenceEndDate || undefined,
-                status: form.status,
-                goalDescription: form.notes,
-                reminderEnabled: form.reminderEnabled,
-                reminderMinutesBefore: form.reminderMinutesBefore,
-                category: form.category,
-                color: form.color,
-                repeat: form.repeat,
-            };
-            if (modalMode === "create") {
-                await apiFetch("", { method: "POST", body: JSON.stringify(body) });
-            } else {
-                await apiFetch(`/${editId}`, { method: "PATCH", body: JSON.stringify(body) });
-            }
-            setShowModal(false);
-            fetchAll();
-        } catch (e) {
-            setFormError("Failed to save. Please check for time conflicts.");
-        }
-        setSaving(false);
+
+        const startISO = new Date(`${form.date}T${form.startTime}`).toISOString();
+        const endISO = new Date(`${form.date}T${form.endTime}`).toISOString();
+        const body = JSON.stringify({
+            title: form.title,
+            topic: form.topic,
+            startTime: startISO,
+            endTime: endISO,
+            plannedDuration: Number(form.plannedDuration),
+            actualDuration: form.actualDuration !== "" ? Number(form.actualDuration) : undefined,
+            isRecurring: form.isRecurring,
+            recurrencePattern: form.recurrencePattern || undefined,
+            recurrenceDays: form.recurrenceDays.length ? form.recurrenceDays : undefined,
+            recurrenceEndDate: form.recurrenceEndDate || undefined,
+            status: form.status,
+            goalDescription: form.notes,
+            reminderEnabled: form.reminderEnabled,
+            reminderMinutesBefore: form.reminderMinutesBefore,
+            category: form.category,
+            color: form.color,
+        });
+
+        const url = modalMode === "create"
+            ? `${BASE_URL}/api/scheduler/time-table`
+            : `${BASE_URL}/api/scheduler/time-table/${editId}`;
+        const method = modalMode === "create" ? "POST" : "PATCH";
+
+        fetch(url, { method, headers: authHeaders, body })
+            .then(r => { if (!r.ok) throw new Error(`${r.status}`); return r.json(); })
+            .then(() => { setShowModal(false); fetchAll(); })
+            .catch(() => setFormError("Failed to save. Check for time conflicts."))
+            .finally(() => setSaving(false));
     };
 
-    const handleDelete = async (id) => {
-        try {
-            await apiFetch(`/${id}`, { method: "DELETE" });
-            setSelectedEvent(null);
-            fetchAll();
-        } catch (e) { console.error(e); }
+    const handleDelete = (id) => {
+        fetch(`${BASE_URL}/api/scheduler/time-table/${id}`, { method: "DELETE", headers: authHeaders })
+            .then(r => { if (!r.ok) throw new Error(`${r.status}`); })
+            .then(() => { setSelectedEvent(null); fetchAll(); })
+            .catch(e => console.error("delete:", e));
     };
 
-    const handleDownloadICS = async (id) => {
-        try {
-            const res = await fetch(`${BASE_URL}/api/scheduler/time-table/${id}/ics`, {
-                headers: { Authorization: `Bearer ${token}` },
-            });
-            if (!res.ok) throw new Error("ICS download failed");
-            const blob = await res.blob();
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.href = url; a.download = `sparke-${id}.ics`; a.click();
-            window.URL.revokeObjectURL(url);
-        } catch (e) { console.error(e); }
+    const handleDownloadICS = (id) => {
+        fetch(`${BASE_URL}/api/scheduler/time-table/${id}/ics`, { headers: { Authorization: `Bearer ${token}` } })
+            .then(r => { if (!r.ok) throw new Error("ICS failed"); return r.blob(); })
+            .then(blob => {
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url; a.download = `sparke-${id}.ics`; a.click();
+                window.URL.revokeObjectURL(url);
+            })
+            .catch(e => console.error("ics:", e));
     };
 
-    // ── Navigation ───────────────────────────────────────────────────────────
+    // ── Navigation ────────────────────────────────────────────────────────────
     const navigate = (dir) => {
         const d = new Date(currentDate);
         if (view === "Day") d.setDate(d.getDate() + dir);
@@ -253,23 +264,22 @@ const TimeTable = () => {
         setCurrentDate(d);
     };
 
-    // ── Filter events ────────────────────────────────────────────────────────
+    // ── Filter ────────────────────────────────────────────────────────────────
     const filteredEvents = allTimeTables.filter(ev => {
         if (activeCategory === "All") return true;
-        return (ev.category || "Work") === activeCategory;
+        const cats = Array.isArray(ev.category) ? ev.category : [ev.category];
+        return cats.includes(activeCategory);
     });
 
-    // ── Events for a given day ───────────────────────────────────────────────
     const eventsForDay = (date) => filteredEvents.filter(ev => {
-        if (!ev.startTime) return false;
-        return sameDay(new Date(ev.startTime), date);
+        const start = parseDate(ev.startTime);
+        return start && sameDay(start, date);
     });
 
-    // ── Drag to create ───────────────────────────────────────────────────────
+    // ── Drag to create ────────────────────────────────────────────────────────
     const handleGridMouseDown = (e, hour) => {
         if (view !== "Day") return;
-        const startMin = hour * 60;
-        setDragPreview({ startMin, endMin: startMin + 60 });
+        setDragPreview({ startMin: hour * 60, endMin: (hour + 1) * 60 });
     };
     const handleGridMouseMove = (e, hour) => {
         if (!dragPreview) return;
@@ -278,18 +288,12 @@ const TimeTable = () => {
     const handleGridMouseUp = () => {
         if (!dragPreview) return;
         const sh = Math.floor(dragPreview.startMin / 60).toString().padStart(2, "0");
-        const sm = "00";
         const eh = Math.floor(dragPreview.endMin / 60).toString().padStart(2, "0");
-        const em = "00";
-        openCreate({
-            date: toLocalDateStr(currentDate),
-            startTime: `${sh}:${sm}`,
-            endTime: `${eh}:${em}`,
-        });
+        openCreate({ date: toLocalDateStr(currentDate), startTime: `${sh}:00`, endTime: `${eh}:00` });
         setDragPreview(null);
     };
 
-    // ── Header label ─────────────────────────────────────────────────────────
+    // ── Header label ──────────────────────────────────────────────────────────
     const headerLabel = () => {
         if (view === "Day") return formatDateHeader(currentDate);
         if (view === "Week") {
@@ -300,67 +304,42 @@ const TimeTable = () => {
         return "Upcoming";
     };
 
-    // ─── Render ───────────────────────────────────────────────────────────────
+    // ── Render ────────────────────────────────────────────────────────────────
     return (
         <div className={styles.root}>
             {/* ── Navbar ── */}
             <header className={styles.navbar}>
                 <div className={styles.navLogo}>
-                    <span className={styles.logoIcon}>⚡</span>
-                    <span className={styles.logoText}>Spark<span className={styles.logoAccent}>.E</span></span>
+                    <span className={styles.logoText}>Time Table</span>
                 </div>
-
                 <nav className={styles.viewSwitcher}>
                     {VIEWS.map(v => (
                         <button
                             key={v}
                             className={`${styles.viewTab} ${view === v ? styles.viewTabActive : ""}`}
                             onClick={() => setView(v)}
-                        >
-                            {v}
-                        </button>
+                        >{v}</button>
                     ))}
                 </nav>
-
                 <div className={styles.navRight}>
                     <button
                         className={styles.themeToggle}
                         onClick={() => setTheme(t => t === "dark" ? "light" : "dark")}
                         title="Toggle theme"
-                    >
-                        {theme === "dark" ? "☀️" : "🌙"}
-                    </button>
+                    >{theme === "dark" ? "☀️" : "🌙"}</button>
                     <button className={styles.createBtn} onClick={() => openCreate()}>
                         <span className={styles.createPlus}>+</span> Create Block
                     </button>
                 </div>
             </header>
 
-            {/* ── Sub-header: date nav + category filter ── */}
+            {/* ── Sub-header ── */}
             <div className={styles.subHeader}>
                 <div className={styles.dateNav}>
                     <button className={styles.navArrow} onClick={() => setCurrentDate(new Date())}>Today</button>
                     <button className={styles.navArrow} onClick={() => navigate(-1)}>‹</button>
                     <button className={styles.navArrow} onClick={() => navigate(1)}>›</button>
                     <span className={styles.dateLabel}>{headerLabel()}</span>
-                </div>
-
-                <div className={styles.categoryRow}>
-                    {CATEGORIES.map(cat => (
-                        <button
-                            key={cat}
-                            className={`${styles.catPill} ${activeCategory === cat ? styles.catPillActive : ""}`}
-                            style={{
-                                "--cat-color": CATEGORY_COLORS[cat].dot,
-                                "--cat-bg": CATEGORY_COLORS[cat].pill,
-                                "--cat-text": CATEGORY_COLORS[cat].text,
-                            }}
-                            onClick={() => setActiveCategory(cat)}
-                        >
-                            <span className={styles.catDot} />
-                            {cat}
-                        </button>
-                    ))}
                 </div>
             </div>
 
@@ -387,7 +366,6 @@ const TimeTable = () => {
                             onMouseLeave={() => setDragPreview(null)}
                             onMouseUp={handleGridMouseUp}
                         >
-                            {/* Hour rows */}
                             {HOURS.map(h => (
                                 <div
                                     key={h}
@@ -399,7 +377,6 @@ const TimeTable = () => {
                                 </div>
                             ))}
 
-                            {/* Drag preview */}
                             {dragPreview && (
                                 <div
                                     className={styles.dragPreview}
@@ -410,15 +387,15 @@ const TimeTable = () => {
                                 />
                             )}
 
-                            {/* Events */}
                             {eventsForDay(currentDate).map(ev => {
-                                const start = new Date(ev.startTime);
-                                const end = new Date(ev.endTime);
+                                const start = parseDate(ev.startTime);
+                                const end = parseDate(ev.endTime);
                                 const startMin = start.getHours() * 60 + start.getMinutes();
                                 const endMin = end.getHours() * 60 + end.getMinutes();
                                 const top = (startMin / 60) * 64;
                                 const height = Math.max(((endMin - startMin) / 60) * 64, 32);
-                                const color = ev.color || CATEGORY_COLORS[ev.category || "Work"]?.dot || "#6c63ff";
+                                const color = evColor(ev, config);
+                                const cats = Array.isArray(ev.category) ? ev.category : (ev.category ? [ev.category] : []);
                                 return (
                                     <div
                                         key={ev._id}
@@ -436,6 +413,13 @@ const TimeTable = () => {
                                             {start.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })} –{" "}
                                             {end.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}
                                         </span>
+                                        {cats.length > 0 && (
+                                            <div className={styles.eventCatPills}>
+                                                {cats.map(c => (
+                                                    <span key={c} className={styles.eventCatPill} style={{ background: `${color}33`, color }}>{c}</span>
+                                                ))}
+                                            </div>
+                                        )}
                                         <div className={styles.eventActions}>
                                             <button className={styles.eventActionBtn} onClick={e => { e.stopPropagation(); openEdit(ev); }}>✏️</button>
                                             <button className={styles.eventActionBtn} onClick={e => { e.stopPropagation(); handleDelete(ev._id); }}>🗑️</button>
@@ -473,13 +457,13 @@ const TimeTable = () => {
                                 <div key={di} className={styles.weekDayCol}>
                                     {HOURS.map(h => <div key={h} className={styles.weekHourCell} />)}
                                     {eventsForDay(d).map(ev => {
-                                        const start = new Date(ev.startTime);
-                                        const end = new Date(ev.endTime);
+                                        const start = parseDate(ev.startTime);
+                                        const end = parseDate(ev.endTime);
                                         const sMin = start.getHours() * 60 + start.getMinutes();
                                         const eMin = end.getHours() * 60 + end.getMinutes();
                                         const top = (sMin / 60) * 48;
                                         const h_ = Math.max(((eMin - sMin) / 60) * 48, 24);
-                                        const color = ev.color || CATEGORY_COLORS[ev.category || "Work"]?.dot || "#6c63ff";
+                                        const color = evColor(ev, config);
                                         return (
                                             <div
                                                 key={ev._id}
@@ -524,7 +508,7 @@ const TimeTable = () => {
                                                 <span
                                                     key={ev._id}
                                                     className={styles.monthDot}
-                                                    style={{ background: ev.color || CATEGORY_COLORS[ev.category || "Work"]?.dot || "#6c63ff" }}
+                                                    style={{ background: evColor(ev, config) }}
                                                     title={ev.title}
                                                 />
                                             ))}
@@ -541,7 +525,9 @@ const TimeTable = () => {
                 {view === "Agenda" && (
                     <div className={styles.agendaView}>
                         {(() => {
-                            const sorted = [...filteredEvents].sort((a, b) => new Date(a.startTime) - new Date(b.startTime));
+                            const sorted = [...filteredEvents].sort((a, b) =>
+                                parseDate(a.startTime) - parseDate(b.startTime)
+                            );
                             if (sorted.length === 0) return (
                                 <div className={styles.agendaEmpty}>
                                     <span>No blocks scheduled. <button className={styles.agendaCreateLink} onClick={() => openCreate()}>Create one →</button></span>
@@ -549,15 +535,20 @@ const TimeTable = () => {
                             );
                             const groups = {};
                             sorted.forEach(ev => {
-                                const key = new Date(ev.startTime).toDateString();
+                                const key = parseDate(ev.startTime).toDateString();
                                 if (!groups[key]) groups[key] = [];
                                 groups[key].push(ev);
                             });
                             return Object.entries(groups).map(([dateStr, evs]) => (
                                 <div key={dateStr} className={styles.agendaGroup}>
-                                    <div className={styles.agendaDateHeader}>{new Date(dateStr).toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}</div>
+                                    <div className={styles.agendaDateHeader}>
+                                        {new Date(dateStr).toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}
+                                    </div>
                                     {evs.map(ev => {
-                                        const color = ev.color || CATEGORY_COLORS[ev.category || "Work"]?.dot || "#6c63ff";
+                                        const color = evColor(ev, config);
+                                        const cats = Array.isArray(ev.category) ? ev.category : (ev.category ? [ev.category] : []);
+                                        const start = parseDate(ev.startTime);
+                                        const end = parseDate(ev.endTime);
                                         return (
                                             <div
                                                 key={ev._id}
@@ -568,16 +559,29 @@ const TimeTable = () => {
                                                 <div className={styles.agendaItemLeft}>
                                                     <span className={styles.agendaItemTitle}>{ev.title}</span>
                                                     <span className={styles.agendaItemMeta}>{ev.topic}</span>
+                                                    {ev.goalDescription && (
+                                                        <span className={styles.agendaItemMeta}>{ev.goalDescription}</span>
+                                                    )}
                                                 </div>
                                                 <div className={styles.agendaItemRight}>
                                                     <span className={styles.agendaItemTime}>
-                                                        {new Date(ev.startTime).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })} –{" "}
-                                                        {new Date(ev.endTime).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}
+                                                        {start.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })} –{" "}
+                                                        {end.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}
                                                     </span>
-                                                    <span
-                                                        className={styles.agendaCat}
-                                                        style={{ background: `${color}22`, color }}
-                                                    >{ev.category || "Work"}</span>
+                                                    {cats.map(c => (
+                                                        <span
+                                                            key={c}
+                                                            className={styles.agendaCat}
+                                                            style={{ background: `${color}22`, color }}
+                                                        >{c}</span>
+                                                    ))}
+                                                    <span className={styles.agendaItemMeta}>
+                                                        {ev.plannedDuration} min planned
+                                                        {ev.actualDuration > 0 ? ` · ${ev.actualDuration} min actual` : ""}
+                                                    </span>
+                                                    <span className={styles.agendaItemMeta} style={{ textTransform: "capitalize" }}>
+                                                        {ev.status?.replace("_", " ")}
+                                                    </span>
                                                 </div>
                                                 <div className={styles.agendaActions}>
                                                     <button className={styles.agendaBtn} onClick={e => { e.stopPropagation(); openEdit(ev); }}>Edit</button>
@@ -595,31 +599,92 @@ const TimeTable = () => {
             </main>
 
             {/* ── Event Detail Panel ── */}
-            {selectedEvent && (
-                <div className={styles.detailBackdrop} onClick={() => setSelectedEvent(null)}>
-                    <div className={styles.detailPanel} onClick={e => e.stopPropagation()}>
-                        <div className={styles.detailColorBar} style={{ background: selectedEvent.color || "#6c63ff" }} />
-                        <button className={styles.detailClose} onClick={() => setSelectedEvent(null)}>✕</button>
-                        <h3 className={styles.detailTitle}>{selectedEvent.title}</h3>
-                        <p className={styles.detailTopic}>{selectedEvent.topic}</p>
-                        <div className={styles.detailRow}>
-                            <span>🕐</span>
-                            <span>
-                                {new Date(selectedEvent.startTime).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })} –{" "}
-                                {new Date(selectedEvent.endTime).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}
-                            </span>
-                        </div>
-                        {selectedEvent.goalDescription && (
-                            <div className={styles.detailRow}><span>📝</span><span>{selectedEvent.goalDescription}</span></div>
-                        )}
-                        <div className={styles.detailActions}>
-                            <button className={styles.detailEditBtn} onClick={() => openEdit(selectedEvent)}>Edit Block</button>
-                            <button className={styles.detailICSBtn} onClick={() => handleDownloadICS(selectedEvent._id)}>↓ ICS</button>
-                            <button className={styles.detailDeleteBtn} onClick={() => handleDelete(selectedEvent._id)}>Delete</button>
+            {selectedEvent && (() => {
+                const ev = selectedEvent;
+                const color = evColor(ev, config);
+                const start = parseDate(ev.startTime);
+                const end = parseDate(ev.endTime);
+                const recEnd = parseDate(ev.recurrenceEndDate);
+                const cats = Array.isArray(ev.category) ? ev.category : (ev.category ? [ev.category] : []);
+                return (
+                    <div className={styles.detailBackdrop} onClick={() => setSelectedEvent(null)}>
+                        <div className={styles.detailPanel} onClick={e => e.stopPropagation()}>
+                            <div className={styles.detailColorBar} style={{ background: color }} />
+                            <button className={styles.detailClose} onClick={() => setSelectedEvent(null)}>✕</button>
+                            <h3 className={styles.detailTitle}>{ev.title}</h3>
+                            <p className={styles.detailTopic}>{ev.topic}</p>
+
+                            <div className={styles.detailRow}>
+                                <span>🕐</span>
+                                <span>
+                                    {start.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })} –{" "}
+                                    {end.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}
+                                </span>
+                            </div>
+
+                            <div className={styles.detailRow}>
+                                <span>📅</span>
+                                <span>{start.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", year: "numeric" })}</span>
+                            </div>
+
+                            {cats.length > 0 && (
+                                <div className={styles.detailRow}>
+                                    <span>🏷️</span>
+                                    <span>{cats.join(", ")}</span>
+                                </div>
+                            )}
+
+                            <div className={styles.detailRow}>
+                                <span>⏱️</span>
+                                <span>
+                                    {ev.plannedDuration} min planned
+                                    {ev.actualDuration > 0 ? ` · ${ev.actualDuration} min actual` : ""}
+                                </span>
+                            </div>
+
+                            <div className={styles.detailRow}>
+                                <span>📌</span>
+                                <span style={{ textTransform: "capitalize" }}>{ev.status?.replace("_", " ")}</span>
+                            </div>
+
+                            {ev.isRecurring && (
+                                <div className={styles.detailRow}>
+                                    <span>🔁</span>
+                                    <span>
+                                        {ev.recurrencePattern}
+                                        {ev.recurrenceDays?.length > 0 ? ` — ${ev.recurrenceDays.join(", ")}` : ""}
+                                        {recEnd ? ` until ${recEnd.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}` : ""}
+                                    </span>
+                                </div>
+                            )}
+
+                            {ev.reminderEnabled && (
+                                <div className={styles.detailRow}>
+                                    <span>🔔</span>
+                                    <span>{ev.reminderMinutesBefore} min before</span>
+                                </div>
+                            )}
+
+                            {ev.goalDescription && (
+                                <div className={styles.detailRow}><span>📝</span><span>{ev.goalDescription}</span></div>
+                            )}
+
+                            {ev.completedAt && (
+                                <div className={styles.detailRow}>
+                                    <span>✅</span>
+                                    <span>Completed {parseDate(ev.completedAt).toLocaleDateString()}</span>
+                                </div>
+                            )}
+
+                            <div className={styles.detailActions}>
+                                <button className={styles.detailEditBtn} onClick={() => openEdit(ev)}>Edit Block</button>
+                                <button className={styles.detailICSBtn} onClick={() => handleDownloadICS(ev._id)}>↓ ICS</button>
+                                <button className={styles.detailDeleteBtn} onClick={() => handleDelete(ev._id)}>Delete</button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
+                );
+            })()}
 
             {/* ── Create / Edit Modal ── */}
             {showModal && (
@@ -631,97 +696,76 @@ const TimeTable = () => {
                         </div>
 
                         <div className={styles.modalBody}>
-                            {/* Title */}
                             <div className={styles.fieldGroup}>
                                 <label className={styles.fieldLabel}>Title</label>
-                                <input
-                                    className={styles.fieldInput}
-                                    placeholder="e.g. Team Standup"
-                                    value={form.title}
-                                    onChange={e => handleFormChange("title", e.target.value)}
-                                />
+                                <input className={styles.fieldInput} placeholder="e.g. Team Standup"
+                                    value={form.title} onChange={e => handleFormChange("title", e.target.value)} />
                             </div>
 
-                            {/* Topic */}
                             <div className={styles.fieldGroup}>
                                 <label className={styles.fieldLabel}>Topic / Subject</label>
-                                <input
-                                    className={styles.fieldInput}
-                                    placeholder="e.g. Project sync"
-                                    value={form.topic}
-                                    onChange={e => handleFormChange("topic", e.target.value)}
-                                />
+                                <input className={styles.fieldInput} placeholder="e.g. Project sync"
+                                    value={form.topic} onChange={e => handleFormChange("topic", e.target.value)} />
                             </div>
 
-                            {/* Date */}
                             <div className={styles.fieldGroup}>
                                 <label className={styles.fieldLabel}>Date</label>
-                                <input
-                                    className={styles.fieldInput}
-                                    type="date"
-                                    value={form.date}
-                                    onChange={e => handleFormChange("date", e.target.value)}
-                                />
+                                <input className={styles.fieldInput} type="date"
+                                    value={form.date} onChange={e => handleFormChange("date", e.target.value)} />
                             </div>
 
-                            {/* Start + End time */}
                             <div className={styles.fieldRow}>
                                 <div className={styles.fieldGroup}>
                                     <label className={styles.fieldLabel}>Start Time</label>
-                                    <input
-                                        className={styles.fieldInput}
-                                        type="time"
-                                        value={form.startTime}
-                                        onChange={e => handleFormChange("startTime", e.target.value)}
-                                    />
+                                    <input className={styles.fieldInput} type="time"
+                                        value={form.startTime} onChange={e => handleFormChange("startTime", e.target.value)} />
                                 </div>
                                 <div className={styles.fieldGroup}>
                                     <label className={styles.fieldLabel}>End Time</label>
-                                    <input
-                                        className={styles.fieldInput}
-                                        type="time"
-                                        value={form.endTime}
-                                        onChange={e => handleFormChange("endTime", e.target.value)}
-                                    />
+                                    <input className={styles.fieldInput} type="time"
+                                        value={form.endTime} onChange={e => handleFormChange("endTime", e.target.value)} />
                                 </div>
                             </div>
 
-                            {/* Duration */}
                             <div className={styles.fieldGroup}>
                                 <label className={styles.fieldLabel}>Planned Duration (min)</label>
+                                <input className={styles.fieldInput} type="number" placeholder="60"
+                                    value={form.plannedDuration} onChange={e => handleFormChange("plannedDuration", e.target.value)} />
+                            </div>
+
+                            <div className={styles.fieldGroup}>
+                                <label className={styles.fieldLabel}>Actual Duration (min)</label>
+                                <input className={styles.fieldInput} type="number" placeholder="0"
+                                    value={form.actualDuration} onChange={e => handleFormChange("actualDuration", e.target.value)} />
+                            </div>
+
+                            <div className={styles.fieldGroup}>
+                                <label className={styles.fieldLabel}>Status</label>
+                                <select className={styles.fieldSelect} value={form.status}
+                                    onChange={e => handleFormChange("status", e.target.value)}>
+                                    {["scheduled", "in_progress", "completed", "skipped", "cancelled"].map(s => (
+                                        <option key={s} value={s}>{s.replace("_", " ")}</option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            <div className={styles.fieldGroup}>
+                                <label className={styles.fieldLabel}>Category (tags)</label>
                                 <input
                                     className={styles.fieldInput}
-                                    type="number"
-                                    placeholder="60"
-                                    value={form.plannedDuration}
-                                    onChange={e => handleFormChange("plannedDuration", e.target.value)}
+                                    placeholder="e.g. Study, DSA (comma separated)"
+                                    value={form.category.join(", ")}
+                                    onChange={e => handleFormChange("category",
+                                        e.target.value.split(",").map(s => s.trim()).filter(Boolean)
+                                    )}
                                 />
                             </div>
 
-                            {/* Category */}
-                            <div className={styles.fieldGroup}>
-                                <label className={styles.fieldLabel}>Category</label>
-                                <div className={styles.catSegmented}>
-                                    {CATEGORIES.filter(c => c !== "All").map(cat => (
-                                        <button
-                                            key={cat}
-                                            className={`${styles.catSeg} ${form.category === cat ? styles.catSegActive : ""}`}
-                                            style={{ "--cat-color": CATEGORY_COLORS[cat].dot }}
-                                            onClick={() => handleFormChange("category", cat)}
-                                        >
-                                            {cat}
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-
-                            {/* Color */}
                             <div className={styles.fieldGroup}>
                                 <label className={styles.fieldLabel}>Color</label>
                                 <div className={styles.colorRow}>
-                                    {EVENT_COLORS.map(c => (
-                                        <button
-                                            key={c}
+                                    {config.eventColors.map(c => (
+                                        <button key={c}
                                             className={`${styles.colorSwatch} ${form.color === c ? styles.colorSwatchActive : ""}`}
                                             style={{ background: c }}
                                             onClick={() => handleFormChange("color", c)}
@@ -730,30 +774,57 @@ const TimeTable = () => {
                                 </div>
                             </div>
 
-                            {/* Repeat */}
                             <div className={styles.fieldGroup}>
                                 <label className={styles.fieldLabel}>Repeat</label>
-                                <select
-                                    className={styles.fieldSelect}
-                                    value={form.repeat}
+                                <select className={styles.fieldSelect} value={form.repeat}
                                     onChange={e => {
                                         handleFormChange("repeat", e.target.value);
-                                        handleFormChange("isRecurring", e.target.value !== "Does not repeat");
-                                    }}
-                                >
-                                    {REPEAT_OPTIONS.map(r => <option key={r}>{r}</option>)}
+                                        handleFormChange("isRecurring", e.target.value !== config.repeatOptions[0]);
+                                        handleFormChange("recurrencePattern", e.target.value.toLowerCase() === "does not repeat" ? "" : e.target.value.toLowerCase());
+                                    }}>
+                                    {config.repeatOptions.map(r => <option key={r}>{r}</option>)}
                                 </select>
                             </div>
 
-                            {/* Notes */}
+                            {form.isRecurring && (
+                                <>
+                                    <div className={styles.fieldGroup}>
+                                        <label className={styles.fieldLabel}>Recurrence Days (comma separated)</label>
+                                        <input
+                                            className={styles.fieldInput}
+                                            placeholder="e.g. Monday, Wednesday, Friday"
+                                            value={form.recurrenceDays.join(", ")}
+                                            onChange={e => handleFormChange("recurrenceDays",
+                                                e.target.value.split(",").map(s => s.trim()).filter(Boolean)
+                                            )}
+                                        />
+                                    </div>
+                                    <div className={styles.fieldGroup}>
+                                        <label className={styles.fieldLabel}>Recurrence End Date</label>
+                                        <input className={styles.fieldInput} type="date"
+                                            value={form.recurrenceEndDate}
+                                            onChange={e => handleFormChange("recurrenceEndDate", e.target.value)} />
+                                    </div>
+                                </>
+                            )}
+
                             <div className={styles.fieldGroup}>
-                                <label className={styles.fieldLabel}>Notes</label>
-                                <textarea
-                                    className={styles.fieldTextarea}
-                                    placeholder="Add any notes or context…"
-                                    value={form.notes}
-                                    onChange={e => handleFormChange("notes", e.target.value)}
-                                />
+                                <label className={styles.fieldLabel}>
+                                    <input type="checkbox" checked={form.reminderEnabled}
+                                        onChange={e => handleFormChange("reminderEnabled", e.target.checked)} />
+                                    {" "}Enable Reminder
+                                </label>
+                                {form.reminderEnabled && (
+                                    <input className={styles.fieldInput} type="number" placeholder="Minutes before"
+                                        value={form.reminderMinutesBefore}
+                                        onChange={e => handleFormChange("reminderMinutesBefore", Number(e.target.value))} />
+                                )}
+                            </div>
+
+                            <div className={styles.fieldGroup}>
+                                <label className={styles.fieldLabel}>Notes / Goal</label>
+                                <textarea className={styles.fieldTextarea} placeholder="Add any notes or context…"
+                                    value={form.notes} onChange={e => handleFormChange("notes", e.target.value)} />
                             </div>
 
                             {formError && <p className={styles.formError}>{formError}</p>}
