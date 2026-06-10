@@ -99,10 +99,11 @@ const App = () => {
             element={<ProtectedRoute component={<Scheduler />} />}
           />
 
-          <Route
-            path="/time-table"
-            element={<ProtectedRoute component={<TimeTable />} />}
-          />
+          <Route path="/time-table" element={<ProtectedRoute component={<TimeTable />} />} />
+          <Route path="/time-table/:view" element={<ProtectedRoute component={<TimeTable />} />} />
+          <Route path="/time-table/:view/event/:id" element={<ProtectedRoute component={<TimeTable />} />} />
+          <Route path="/time-table/:view/create" element={<ProtectedRoute component={<TimeTable />} />} />
+          <Route path="/time-table/:view/edit/:id" element={<ProtectedRoute component={<TimeTable />} />} />
           <Route
             path="/event-scheduling"
             element={<ProtectedRoute component={<EventScheduling />} />}

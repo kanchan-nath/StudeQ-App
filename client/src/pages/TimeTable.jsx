@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import BASE_URL from "../lib/api.js";
 import styles from "./styles/TimeTable.module.css";
 
@@ -101,7 +102,17 @@ const EMPTY_FORM_BASE = {
 const TimeTable = () => {
     const token = localStorage.getItem("token");
 
-    const [view, setView] = useState("Day");
+    const navigate = useNavigate();
+    const { view: viewParam, id: idParam } = useParams();
+    const location = useLocation();
+
+    // ── View state derived from URL ─────────────────────────────────────────
+    const VIEW_PATHS = { day: "Day", week: "Week", month: "Month", agenda: "Agenda" };
+    const view = VIEW_PATHS[viewParam?.toLowerCase()] || "Day";
+    const v = view.toLowerCase();
+
+    const setView = (val) => navigate(`/time-table/${val.toLowerCase()}`);
+
     const [currentDate, setCurrentDate] = useState(new Date());
     const [activeCategory, setActiveCategory] = useState("All");
     const [allTimeTables, setAllTimeTables] = useState([]);
@@ -124,6 +135,11 @@ const TimeTable = () => {
     useEffect(() => {
         document.documentElement.setAttribute("data-theme", theme);
     }, [theme]);
+
+    // Redirect bare /scheduler → /scheduler/day so reload keeps a real path
+    useEffect(() => {
+        if (!viewParam) navigate("/time-table/day", { replace: true });
+    }, [viewParam]); // eslint-disable-line react-hooks/exhaustive-deps
 
     // ── Fetch helpers ─────────────────────────────────────────────────────────
     const authHeaders = {
@@ -230,7 +246,7 @@ const TimeTable = () => {
 
         fetch(url, { method, headers: authHeaders, body })
             .then(r => { if (!r.ok) throw new Error(`${r.status}`); return r.json(); })
-            .then(() => { setShowModal(false); fetchAll(); })
+            .then(() => { navigate(`/scheduler/${v}`); fetchAll(); })
             .catch(() => setFormError("Failed to save. Check for time conflicts."))
             .finally(() => setSaving(false));
     };
@@ -238,7 +254,7 @@ const TimeTable = () => {
     const handleDelete = (id) => {
         fetch(`${BASE_URL}/api/scheduler/time-table/${id}`, { method: "DELETE", headers: authHeaders })
             .then(r => { if (!r.ok) throw new Error(`${r.status}`); })
-            .then(() => { setSelectedEvent(null); fetchAll(); })
+            .then(() => { navigate(`/scheduler/${v}`); fetchAll(); })
             .catch(e => console.error("delete:", e));
     };
 
@@ -254,8 +270,28 @@ const TimeTable = () => {
             .catch(e => console.error("ics:", e));
     };
 
+    // ── URL-driven restore for modal / detail panel (reload-safe) ──────────────
+    useEffect(() => {
+        const parts = location.pathname.split("/").filter(Boolean); // ["scheduler", view, action?, id?]
+        const action = parts[2];
+        const id = parts[3];
+
+        if (action === "create") {
+            if (!showModal || modalMode !== "create") openCreate();
+        } else if (action === "edit" && id) {
+            const item = allTimeTables.find(e => e._id === id);
+            if (item && (!showModal || editId !== id)) openEdit(item);
+        } else if (action === "event" && id) {
+            const item = allTimeTables.find(e => e._id === id);
+            if (item && selectedEvent?._id !== id) setSelectedEvent(item);
+        } else {
+            if (showModal) setShowModal(false);
+            if (selectedEvent) setSelectedEvent(null);
+        }
+    }, [location.pathname, allTimeTables]); // eslint-disable-line react-hooks/exhaustive-deps
+
     // ── Navigation ────────────────────────────────────────────────────────────
-    const navigate = (dir) => {
+    const navigateDate = (dir) => {
         const d = new Date(currentDate);
         if (view === "Day") d.setDate(d.getDate() + dir);
         else if (view === "Week") d.setDate(d.getDate() + dir * 7);
@@ -290,6 +326,7 @@ const TimeTable = () => {
         const sh = Math.floor(dragPreview.startMin / 60).toString().padStart(2, "0");
         const eh = Math.floor(dragPreview.endMin / 60).toString().padStart(2, "0");
         openCreate({ date: toLocalDateStr(currentDate), startTime: `${sh}:00`, endTime: `${eh}:00` });
+        navigate(`/scheduler/${v}/create`);
         setDragPreview(null);
     };
 
@@ -313,12 +350,12 @@ const TimeTable = () => {
                     <span className={styles.logoText}>Time Table</span>
                 </div>
                 <nav className={styles.viewSwitcher}>
-                    {VIEWS.map(v => (
+                    {VIEWS.map(vw => (
                         <button
-                            key={v}
-                            className={`${styles.viewTab} ${view === v ? styles.viewTabActive : ""}`}
-                            onClick={() => setView(v)}
-                        >{v}</button>
+                            key={vw}
+                            className={`${styles.viewTab} ${view === vw ? styles.viewTabActive : ""}`}
+                            onClick={() => setView(vw)}
+                        >{vw}</button>
                     ))}
                 </nav>
                 <div className={styles.navRight}>
@@ -327,7 +364,7 @@ const TimeTable = () => {
                         onClick={() => setTheme(t => t === "dark" ? "light" : "dark")}
                         title="Toggle theme"
                     >{theme === "dark" ? "☀️" : "🌙"}</button>
-                    <button className={styles.createBtn} onClick={() => openCreate()}>
+                    <button className={styles.createBtn} onClick={() => navigate(`/scheduler/${v}/create`)}>
                         <span className={styles.createPlus}>+</span> Create Block
                     </button>
                 </div>
@@ -337,8 +374,8 @@ const TimeTable = () => {
             <div className={styles.subHeader}>
                 <div className={styles.dateNav}>
                     <button className={styles.navArrow} onClick={() => setCurrentDate(new Date())}>Today</button>
-                    <button className={styles.navArrow} onClick={() => navigate(-1)}>‹</button>
-                    <button className={styles.navArrow} onClick={() => navigate(1)}>›</button>
+                    <button className={styles.navArrow} onClick={() => navigateDate(-1)}>‹</button>
+                    <button className={styles.navArrow} onClick={() => navigateDate(1)}>›</button>
                     <span className={styles.dateLabel}>{headerLabel()}</span>
                 </div>
             </div>
@@ -406,7 +443,7 @@ const TimeTable = () => {
                                             background: `${color}22`,
                                             borderLeft: `3px solid ${color}`,
                                         }}
-                                        onClick={() => setSelectedEvent(ev)}
+                                        onClick={() => navigate(`/scheduler/${v}/event/${ev._id}`)}
                                     >
                                         <span className={styles.eventTitle}>{ev.title}</span>
                                         <span className={styles.eventTime}>
@@ -421,7 +458,7 @@ const TimeTable = () => {
                                             </div>
                                         )}
                                         <div className={styles.eventActions}>
-                                            <button className={styles.eventActionBtn} onClick={e => { e.stopPropagation(); openEdit(ev); }}>✏️</button>
+                                            <button className={styles.eventActionBtn} onClick={e => { e.stopPropagation(); navigate(`/scheduler/${v}/edit/${ev._id}`); }}>✏️</button>
                                             <button className={styles.eventActionBtn} onClick={e => { e.stopPropagation(); handleDelete(ev._id); }}>🗑️</button>
                                         </div>
                                     </div>
@@ -472,7 +509,7 @@ const TimeTable = () => {
                                                     top: `${top}px`, height: `${h_}px`,
                                                     background: `${color}33`, borderLeft: `3px solid ${color}`,
                                                 }}
-                                                onClick={() => setSelectedEvent(ev)}
+                                                onClick={() => navigate(`/scheduler/${v}/event/${ev._id}`)}
                                             >
                                                 <span>{ev.title}</span>
                                             </div>
@@ -530,7 +567,7 @@ const TimeTable = () => {
                             );
                             if (sorted.length === 0) return (
                                 <div className={styles.agendaEmpty}>
-                                    <span>No blocks scheduled. <button className={styles.agendaCreateLink} onClick={() => openCreate()}>Create one →</button></span>
+                                    <span>No blocks scheduled. <button className={styles.agendaCreateLink} onClick={() => navigate(`/scheduler/${v}/create`)}>Create one →</button></span>
                                 </div>
                             );
                             const groups = {};
@@ -554,7 +591,7 @@ const TimeTable = () => {
                                                 key={ev._id}
                                                 className={styles.agendaItem}
                                                 style={{ "--ev-color": color, borderLeft: `3px solid ${color}` }}
-                                                onClick={() => setSelectedEvent(ev)}
+                                                onClick={() => navigate(`/scheduler/${v}/event/${ev._id}`)}
                                             >
                                                 <div className={styles.agendaItemLeft}>
                                                     <span className={styles.agendaItemTitle}>{ev.title}</span>
@@ -584,7 +621,7 @@ const TimeTable = () => {
                                                     </span>
                                                 </div>
                                                 <div className={styles.agendaActions}>
-                                                    <button className={styles.agendaBtn} onClick={e => { e.stopPropagation(); openEdit(ev); }}>Edit</button>
+                                                    <button className={styles.agendaBtn} onClick={e => { e.stopPropagation(); navigate(`/scheduler/${v}/edit/${ev._id}`); }}>Edit</button>
                                                     <button className={styles.agendaBtn} onClick={e => { e.stopPropagation(); handleDownloadICS(ev._id); }}>ICS</button>
                                                     <button className={`${styles.agendaBtn} ${styles.agendaBtnDanger}`} onClick={e => { e.stopPropagation(); handleDelete(ev._id); }}>Del</button>
                                                 </div>
@@ -607,10 +644,10 @@ const TimeTable = () => {
                 const recEnd = parseDate(ev.recurrenceEndDate);
                 const cats = Array.isArray(ev.category) ? ev.category : (ev.category ? [ev.category] : []);
                 return (
-                    <div className={styles.detailBackdrop} onClick={() => setSelectedEvent(null)}>
+                    <div className={styles.detailBackdrop} onClick={() => navigate(`/scheduler/${v}`)}>
                         <div className={styles.detailPanel} onClick={e => e.stopPropagation()}>
                             <div className={styles.detailColorBar} style={{ background: color }} />
-                            <button className={styles.detailClose} onClick={() => setSelectedEvent(null)}>✕</button>
+                            <button className={styles.detailClose} onClick={() => navigate(`/scheduler/${v}`)}>✕</button>
                             <h3 className={styles.detailTitle}>{ev.title}</h3>
                             <p className={styles.detailTopic}>{ev.topic}</p>
 
@@ -677,7 +714,7 @@ const TimeTable = () => {
                             )}
 
                             <div className={styles.detailActions}>
-                                <button className={styles.detailEditBtn} onClick={() => openEdit(ev)}>Edit Block</button>
+                                <button className={styles.detailEditBtn} onClick={() => navigate(`/scheduler/${v}/edit/${ev._id}`)}>Edit Block</button>
                                 <button className={styles.detailICSBtn} onClick={() => handleDownloadICS(ev._id)}>↓ ICS</button>
                                 <button className={styles.detailDeleteBtn} onClick={() => handleDelete(ev._id)}>Delete</button>
                             </div>
@@ -688,11 +725,11 @@ const TimeTable = () => {
 
             {/* ── Create / Edit Modal ── */}
             {showModal && (
-                <div className={styles.modalBackdrop} onClick={() => setShowModal(false)}>
+                <div className={styles.modalBackdrop} onClick={() => navigate(`/scheduler/${v}`)}>
                     <div className={styles.modal} onClick={e => e.stopPropagation()}>
                         <div className={styles.modalHeader}>
                             <h2 className={styles.modalTitle}>{modalMode === "create" ? "Create Time Block" : "Edit Time Block"}</h2>
-                            <button className={styles.modalClose} onClick={() => setShowModal(false)}>✕</button>
+                            <button className={styles.modalClose} onClick={() => navigate(`/scheduler/${v}`)}>✕</button>
                         </div>
 
                         <div className={styles.modalBody}>
@@ -833,7 +870,7 @@ const TimeTable = () => {
                         <div className={styles.modalFooter}>
                             <p className={styles.modalTip}>Tip: You can also click and drag on the grid to quick-create a block.</p>
                             <div className={styles.modalFooterBtns}>
-                                <button className={styles.cancelBtn} onClick={() => setShowModal(false)}>Cancel</button>
+                                <button className={styles.cancelBtn} onClick={() => navigate(`/scheduler/${v}`)}>Cancel</button>
                                 <button className={styles.saveBtn} onClick={handleSave} disabled={saving}>
                                     {saving ? "Saving…" : "Save Block"}
                                 </button>
