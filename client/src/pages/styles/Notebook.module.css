@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════════════
-   Notebook.module.css
+   Notebook.module.css — Motion Refactor
    Theming via global.css --theme-* tokens only.
    Local --n-* tokens bridge gaps; defined on :root per theme.
    ═══════════════════════════════════════════════════════════════════ */
@@ -34,7 +34,29 @@
   --n-radius-pill: 999px;
   --n-font-display: "DM Serif Display", "Georgia", serif;
   --n-sidebar-w: 260px;
-  --n-transition: 0.2s ease;
+
+  /* ── Duration scale ──────────────────────────────────────────── */
+  --n-duration-fast: 150ms;
+  /* micro: hover color, opacity flicks   */
+  --n-duration-base: 250ms;
+  /* default interactive: buttons, inputs  */
+  --n-duration-slow: 400ms;
+  /* entrances, sidebar slide              */
+  --n-duration-slower: 600ms;
+  /* page-level, stagger parents           */
+
+  /* ── Easing library ──────────────────────────────────────────── */
+  --n-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  /* overshoot-free decelerate */
+  --n-ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  /* playful spring pop        */
+  --n-ease-in: cubic-bezier(0.55, 0, 1, 0.45);
+  /* accelerate into dismiss   */
+  --n-ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+  /* material-style standard   */
+
+  /* Legacy alias kept for one-liner properties */
+  --n-transition: var(--n-duration-base) var(--n-ease-smooth);
 }
 
 [data-theme="dark"] {
@@ -64,6 +86,205 @@
   --n-shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.55);
 }
 
+/* ── Accessibility: kill all motion for prefers-reduced-motion ── */
+@media (prefers-reduced-motion: reduce) {
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-delay: 0ms !important;
+    transition-duration: 1ms !important;
+    transition-delay: 0ms !important;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   KEYFRAMES
+══════════════════════════════════════════════════════════════════ */
+
+/* Page-level fade+lift entrance — used on uploadPage, chatroom shells */
+@keyframes pageEnter {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Card/item stagger entrance — shorter travel for subtlety */
+@keyframes itemEnter {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Sidebar slide-in from right */
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Message bubble pop-in */
+@keyframes msgFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Floating upload icon */
+@keyframes floatUp {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-7px);
+  }
+}
+
+/* Morph blob loader */
+@keyframes morphBlob {
+  0% {
+    border-radius: 50%;
+    transform: scale(1);
+    box-shadow: 0 0 0 0 var(--n-accent-glow);
+  }
+
+  30% {
+    border-radius: 40% 60% 60% 40% / 50% 40% 60% 50%;
+    transform: scale(1.08);
+  }
+
+  60% {
+    border-radius: 60% 40% 40% 60% / 40% 60% 50% 40%;
+    transform: scale(0.96);
+    box-shadow: 0 0 0 14px transparent;
+  }
+
+  100% {
+    border-radius: 50%;
+    transform: scale(1);
+    box-shadow: 0 0 0 0 var(--n-accent-glow);
+  }
+}
+
+/* Text pulse for loader label */
+@keyframes pulse {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.45;
+  }
+}
+
+/* Live dot pulse on chat header */
+@keyframes dotPulse {
+
+  0%,
+  100% {
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.25);
+  }
+
+  50% {
+    box-shadow: 0 0 0 6px rgba(34, 197, 94, 0.1);
+  }
+}
+
+/* Dot bounce for "thinking" indicator */
+@keyframes dotBounce {
+
+  0%,
+  80%,
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 0.5;
+  }
+
+  40% {
+    transform: translateY(-7px) scale(1.1);
+    opacity: 1;
+  }
+}
+
+/* Context-menu spring pop */
+@keyframes menuPop {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(-4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Toast slide in/out */
+@keyframes toastSlideIn {
+  from {
+    transform: translateX(110%);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes toastSlideOut {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+
+  to {
+    transform: translateX(110%);
+    opacity: 0;
+  }
+}
+
+/* Mobile backdrop fade */
+@keyframes fadeInOverlay {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
 /* ══════════════════════════════════════════════════════════════════
    Root shell
 ══════════════════════════════════════════════════════════════════ */
@@ -76,7 +297,10 @@
   position: relative;
   display: flex;
   flex-direction: row;
-  transition: background var(--n-transition), color var(--n-transition);
+  /* Theme swap fades rather than jumps */
+  transition:
+    background var(--n-duration-slow) var(--n-ease-smooth),
+    color var(--n-duration-slow) var(--n-ease-smooth);
 }
 
 .appShell {
@@ -105,12 +329,24 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: transform 0.2s, box-shadow 0.2s;
+  /* GPU: transform + box-shadow only */
+  transition:
+    transform var(--n-duration-base) var(--n-ease-spring),
+    box-shadow var(--n-duration-base) var(--n-ease-smooth),
+    border-color var(--n-duration-fast) var(--n-ease-smooth),
+    background var(--n-duration-fast) var(--n-ease-smooth);
 }
 
 .themeToggle:hover {
-  transform: scale(1.1);
+  transform: scale(1.1) rotate(20deg);
+  /* icon spin hints at theme flip */
   box-shadow: var(--n-shadow-md);
+}
+
+.themeToggle:active {
+  transform: scale(0.94) rotate(0deg);
+  /* press-down micro-interaction */
+  transition-duration: var(--n-duration-fast);
 }
 
 /* ══════════════════════════════════════════════════════════════════
@@ -124,7 +360,11 @@
   flex-direction: row;
   flex-shrink: 0;
   overflow: hidden;
-  transition: width 0.3s ease;
+  /* Width change → slide feel; avoid animating width directly but
+     sidebar uses overflow:hidden so content clips cleanly */
+  transition:
+    width var(--n-duration-slow) var(--n-ease-smooth),
+    background var(--n-duration-base) var(--n-ease-smooth);
   position: relative;
 }
 
@@ -134,6 +374,11 @@
 
 .rightSidebarClosed {
   width: 36px;
+}
+
+/* Sidebar content entrance: slides in from right when panel opens */
+.rightSidebarOpen .rightSidebarContent {
+  animation: slideInRight var(--n-duration-slow) var(--n-ease-out) both;
 }
 
 .rightSidebarToggleBtn {
@@ -154,12 +399,24 @@
   align-items: center;
   justify-content: center;
   z-index: 10;
-  transition: background 0.2s;
+  /* Animate colour + icon nudge — not position */
+  transition:
+    background var(--n-duration-fast) var(--n-ease-smooth),
+    color var(--n-duration-fast) var(--n-ease-smooth),
+    transform var(--n-duration-fast) var(--n-ease-spring);
+  /* already has translateY(-50%) */
 }
 
 .rightSidebarToggleBtn:hover {
   background: var(--n-accent-glow);
   color: var(--n-accent);
+  /* Subtle horizontal nudge draws eye to expand affordance */
+  transform: translateY(-50%) translateX(2px);
+}
+
+.rightSidebarToggleBtn:active {
+  transform: translateY(-50%) translateX(0px);
+  transition-duration: var(--n-duration-fast);
 }
 
 .rightSidebarContent {
@@ -194,6 +451,8 @@
   margin-bottom: 14px;
   color: var(--n-text);
   letter-spacing: 0.01em;
+  /* Entrance: title fades in slightly after content panel */
+  animation: itemEnter var(--n-duration-base) var(--n-ease-out) 80ms both;
 }
 
 /* ══════════════════════════════════════════════════════════════════
@@ -214,6 +473,41 @@
   color: var(--n-text-faint);
   padding: 12px 4px;
   text-align: center;
+  animation: itemEnter var(--n-duration-base) var(--n-ease-out) both;
+}
+
+/* Stagger: each card delays by its DOM order via nth-child.
+   CSS-only stagger up to 8 cards; beyond that they share last delay. */
+.sidebarList>li:nth-child(1) {
+  animation-delay: 60ms;
+}
+
+.sidebarList>li:nth-child(2) {
+  animation-delay: 110ms;
+}
+
+.sidebarList>li:nth-child(3) {
+  animation-delay: 160ms;
+}
+
+.sidebarList>li:nth-child(4) {
+  animation-delay: 210ms;
+}
+
+.sidebarList>li:nth-child(5) {
+  animation-delay: 260ms;
+}
+
+.sidebarList>li:nth-child(6) {
+  animation-delay: 310ms;
+}
+
+.sidebarList>li:nth-child(7) {
+  animation-delay: 360ms;
+}
+
+.sidebarList>li:nth-child(n+8) {
+  animation-delay: 400ms;
 }
 
 /* Card */
@@ -228,21 +522,31 @@
   border: 1.5px solid transparent;
   cursor: pointer;
   position: relative;
+  /* Stagger parent drives the entrance; card handles its own hovers */
+  animation: itemEnter var(--n-duration-slow) var(--n-ease-out) both;
   transition:
-    background var(--t-fast, 150ms ease),
-    border-color var(--t-fast, 150ms ease),
-    box-shadow var(--t-fast, 150ms ease),
-    transform var(--t-fast, 150ms ease);
+    background var(--n-duration-fast) var(--n-ease-smooth),
+    border-color var(--n-duration-fast) var(--n-ease-smooth),
+    box-shadow var(--n-duration-base) var(--n-ease-smooth),
+    transform var(--n-duration-base) var(--n-ease-spring);
+  /* lift uses spring */
 }
 
 .historyCard:hover {
   background: var(--theme-surface-2);
   border-color: var(--n-border);
   box-shadow: var(--theme-card-shadow);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  /* lift: GPU transform only */
 }
 
-/* Active — layered border glow effect */
+.historyCard:active {
+  transform: translateY(0px) scale(0.98);
+  /* press-down */
+  transition-duration: var(--n-duration-fast);
+}
+
+/* Active — layered border glow */
 .historyCardActive {
   background: var(--n-accent-glow) !important;
   border-color: var(--n-accent) !important;
@@ -282,7 +586,7 @@
   overflow: hidden;
   text-transform: capitalize;
   margin: 0;
-  transition: color var(--t-fast, 150ms ease);
+  transition: color var(--n-duration-fast) var(--n-ease-smooth);
 }
 
 .historyCardActive .historyCardTitle {
@@ -293,6 +597,7 @@
   font-size: 11px;
   color: var(--n-text-faint);
   white-space: nowrap;
+  transition: color var(--n-duration-fast) var(--n-ease-smooth);
 }
 
 .historyCardActive .historyCardMeta {
@@ -316,7 +621,10 @@
   border-radius: 4px;
   opacity: 0;
   line-height: 1;
-  transition: opacity var(--t-fast, 150ms ease), background var(--t-fast, 150ms ease);
+  transition:
+    opacity var(--n-duration-fast) var(--n-ease-smooth),
+    background var(--n-duration-fast) var(--n-ease-smooth),
+    transform var(--n-duration-fast) var(--n-ease-spring);
 }
 
 .historyCard:hover .historyDots,
@@ -327,9 +635,16 @@
 .historyDots:hover {
   background: var(--n-border);
   color: var(--n-text);
+  transform: scale(1.15);
+  /* subtle enlarge on hover */
 }
 
-/* Shared dropdown (reused from sidebarMenu) */
+.historyDots:active {
+  transform: scale(0.9);
+  transition-duration: var(--n-duration-fast);
+}
+
+/* Shared dropdown */
 .sidebarMenu {
   position: absolute;
   right: 0;
@@ -340,20 +655,10 @@
   border-radius: var(--n-radius-sm);
   box-shadow: var(--n-shadow-md);
   padding: 4px;
-  animation: menuPop 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
   min-width: 110px;
-}
-
-@keyframes menuPop {
-  from {
-    opacity: 0;
-    transform: scale(0.9) translateY(-4px);
-  }
-
-  to {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
+  /* Spring pop for delight */
+  animation: menuPop var(--n-duration-base) var(--n-ease-spring) both;
+  transform-origin: top right;
 }
 
 .sidebarMenuDelete {
@@ -369,11 +674,15 @@
   color: var(--n-toast-err-fg);
   cursor: pointer;
   white-space: nowrap;
-  transition: background 0.15s;
+  transition:
+    background var(--n-duration-fast) var(--n-ease-smooth),
+    transform var(--n-duration-fast) var(--n-ease-spring);
 }
 
 .sidebarMenuDelete:hover {
   background: var(--n-toast-err-bg);
+  transform: translateX(2px);
+  /* micro slide hint */
 }
 
 /* ══════════════════════════════════════════════════════════════════
@@ -401,42 +710,22 @@
   font-weight: 500;
   box-shadow: var(--n-shadow-md);
   max-width: 340px;
-  animation-duration: 0.32s;
-  animation-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);
+  animation-duration: var(--n-duration-slow);
   animation-fill-mode: both;
 }
 
 .toastEnter {
   animation-name: toastSlideIn;
+  animation-timing-function: var(--n-ease-spring);
+  /* spring = satisfying arrival */
 }
 
 .toastExit {
   animation-name: toastSlideOut;
-  animation-timing-function: ease-in;
-}
-
-@keyframes toastSlideIn {
-  from {
-    transform: translateX(110%);
-    opacity: 0;
-  }
-
-  to {
-    transform: translateX(0);
-    opacity: 1;
-  }
-}
-
-@keyframes toastSlideOut {
-  from {
-    transform: translateX(0);
-    opacity: 1;
-  }
-
-  to {
-    transform: translateX(110%);
-    opacity: 0;
-  }
+  animation-timing-function: var(--n-ease-in);
+  /* accelerate = quick dismiss */
+  animation-duration: var(--n-duration-base);
+  /* exits faster than entrances */
 }
 
 .toast_success {
@@ -469,11 +758,15 @@
   opacity: 0.6;
   line-height: 1;
   padding: 0;
-  transition: opacity 0.15s;
+  transition:
+    opacity var(--n-duration-fast) var(--n-ease-smooth),
+    transform var(--n-duration-fast) var(--n-ease-spring);
 }
 
 .toastClose:hover {
   opacity: 1;
+  transform: scale(1.2) rotate(90deg);
+  /* × button rotates on hover */
 }
 
 /* ══════════════════════════════════════════════════════════════════
@@ -487,6 +780,8 @@
   align-items: center;
   padding: 80px 24px 60px;
   gap: 32px;
+  /* Whole page fades+lifts in */
+  animation: pageEnter var(--n-duration-slower) var(--n-ease-out) both;
 }
 
 .uploadHeader {
@@ -495,11 +790,15 @@
   flex-direction: column;
   align-items: center;
   gap: 16px;
+  /* Header lands slightly after page shell */
+  animation: itemEnter var(--n-duration-slow) var(--n-ease-out) 80ms both;
 }
 
 .logoMark {
   margin-bottom: 8px;
   filter: drop-shadow(0 4px 12px var(--n-accent-glow));
+  /* Logo scales up from nothing for a focal entrance */
+  animation: itemEnter var(--n-duration-slow) var(--n-ease-spring) 40ms both;
 }
 
 .uploadTitle {
@@ -509,6 +808,7 @@
   line-height: 1.2;
   color: var(--n-text);
   margin: 0;
+  animation: itemEnter var(--n-duration-slow) var(--n-ease-out) 120ms both;
 }
 
 .uploadTitle em {
@@ -522,6 +822,7 @@
   max-width: 480px;
   margin: 0;
   line-height: 1.6;
+  animation: itemEnter var(--n-duration-slow) var(--n-ease-out) 180ms both;
 }
 
 .formatGrid {
@@ -533,6 +834,7 @@
   margin: 0;
   justify-content: center;
   max-width: 520px;
+  animation: itemEnter var(--n-duration-slow) var(--n-ease-out) 240ms both;
 }
 
 .formatChip {
@@ -547,13 +849,18 @@
   font-weight: 500;
   color: var(--n-text-muted);
   box-shadow: var(--n-shadow-sm);
-  transition: border-color 0.2s, color 0.2s, transform 0.15s;
+  transition:
+    border-color var(--n-duration-fast) var(--n-ease-smooth),
+    color var(--n-duration-fast) var(--n-ease-smooth),
+    transform var(--n-duration-base) var(--n-ease-spring),
+    box-shadow var(--n-duration-base) var(--n-ease-smooth);
 }
 
 .formatChip:hover {
   border-color: var(--n-accent);
   color: var(--n-accent);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  box-shadow: var(--n-shadow-md);
 }
 
 .dropZone {
@@ -567,9 +874,16 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
   box-shadow: var(--n-shadow-sm);
   position: relative;
+  /* entrance after chips */
+  animation: itemEnter var(--n-duration-slow) var(--n-ease-out) 300ms both;
+  transition:
+    border-color var(--n-duration-base) var(--n-ease-smooth),
+    background var(--n-duration-base) var(--n-ease-smooth),
+    box-shadow var(--n-duration-base) var(--n-ease-smooth),
+    transform var(--n-duration-base) var(--n-ease-spring);
+  /* slight lift on drag-over */
 }
 
 .dropZone:hover,
@@ -577,6 +891,8 @@
   border-color: var(--n-accent);
   background: var(--n-accent-glow);
   box-shadow: 0 0 0 4px var(--n-accent-glow), var(--n-shadow-md);
+  transform: scale(1.012);
+  /* subtle grow confirms drag target */
 }
 
 .dropZoneHasFile {
@@ -602,19 +918,8 @@
   font-size: 2.2rem;
   display: block;
   margin-bottom: 4px;
-  animation: floatUp 2.4s ease-in-out infinite;
-}
-
-@keyframes floatUp {
-
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-
-  50% {
-    transform: translateY(-7px);
-  }
+  animation: floatUp 2.4s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+  /* smooth sinusoidal float */
 }
 
 .dropHint p {
@@ -633,6 +938,8 @@
   align-items: center;
   gap: 12px;
   padding: 20px;
+  animation: itemEnter var(--n-duration-base) var(--n-ease-spring) both;
+  /* spring = file popped in */
 }
 
 .fileIcon {
@@ -657,11 +964,19 @@
   color: var(--n-text-muted);
   line-height: 1;
   padding: 0;
-  transition: color 0.15s;
+  transition:
+    color var(--n-duration-fast) var(--n-ease-smooth),
+    transform var(--n-duration-fast) var(--n-ease-spring);
 }
 
 .fileRemove:hover {
   color: var(--n-toast-err-fg);
+  transform: scale(1.2) rotate(10deg);
+  /* × grows + tilts */
+}
+
+.fileRemove:active {
+  transform: scale(0.9) rotate(0deg);
 }
 
 .uploadLoader {
@@ -677,52 +992,17 @@
   height: 52px;
   background: var(--n-accent);
   border-radius: 50%;
-  animation: morphBlob 1.8s ease-in-out infinite;
+  animation: morphBlob 1.8s cubic-bezier(0.45, 0, 0.55, 1) infinite;
   box-shadow: 0 0 0 0 var(--n-accent-glow);
-}
-
-@keyframes morphBlob {
-  0% {
-    border-radius: 50%;
-    transform: scale(1);
-    box-shadow: 0 0 0 0 var(--n-accent-glow);
-  }
-
-  30% {
-    border-radius: 40% 60% 60% 40% / 50% 40% 60% 50%;
-    transform: scale(1.08);
-  }
-
-  60% {
-    border-radius: 60% 40% 40% 60% / 40% 60% 50% 40%;
-    transform: scale(0.96);
-    box-shadow: 0 0 0 14px transparent;
-  }
-
-  100% {
-    border-radius: 50%;
-    transform: scale(1);
-    box-shadow: 0 0 0 0 var(--n-accent-glow);
-  }
+  /* will-change justified: morphBlob runs indefinitely on a visible loader */
+  will-change: border-radius, transform;
 }
 
 .uploadLoaderText {
   font-size: 14px;
   color: var(--n-text-muted);
   margin: 0;
-  animation: pulse 1.4s ease-in-out infinite;
-}
-
-@keyframes pulse {
-
-  0%,
-  100% {
-    opacity: 1;
-  }
-
-  50% {
-    opacity: 0.45;
-  }
+  animation: pulse 1.4s cubic-bezier(0.45, 0, 0.55, 1) infinite;
 }
 
 .submitBtn {
@@ -738,7 +1018,12 @@
   font-size: 15px;
   font-weight: 600;
   cursor: not-allowed;
-  transition: background 0.2s, color 0.2s, box-shadow 0.2s, transform 0.15s;
+  animation: itemEnter var(--n-duration-slow) var(--n-ease-out) 360ms both;
+  transition:
+    background var(--n-duration-base) var(--n-ease-smooth),
+    color var(--n-duration-base) var(--n-ease-smooth),
+    box-shadow var(--n-duration-base) var(--n-ease-smooth),
+    transform var(--n-duration-base) var(--n-ease-spring);
 }
 
 .submitBtnActive {
@@ -750,12 +1035,14 @@
 
 .submitBtnActive:hover {
   background: var(--n-accent-hover);
-  transform: translateY(-2px);
+  transform: translateY(-2px) scale(1.02);
   box-shadow: 0 8px 28px var(--n-accent-glow);
 }
 
 .submitBtnActive:active {
-  transform: translateY(0);
+  transform: translateY(0) scale(0.97);
+  /* press-down feedback */
+  transition-duration: var(--n-duration-fast);
 }
 
 /* ══════════════════════════════════════════════════════════════════
@@ -765,6 +1052,8 @@
   display: flex;
   height: 100%;
   overflow: hidden;
+  /* Chatroom view transitions in from upload page */
+  animation: pageEnter var(--n-duration-slow) var(--n-ease-out) both;
 }
 
 .chatroomMain {
@@ -798,19 +1087,8 @@
   background: #22c55e;
   box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.25);
   flex-shrink: 0;
-  animation: dotPulse 2s ease-in-out infinite;
-}
-
-@keyframes dotPulse {
-
-  0%,
-  100% {
-    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.25);
-  }
-
-  50% {
-    box-shadow: 0 0 0 6px rgba(34, 197, 94, 0.1);
-  }
+  /* Continuous ambient pulse signals live connection */
+  animation: dotPulse 2s cubic-bezier(0.45, 0, 0.55, 1) infinite;
 }
 
 .chatTitle {
@@ -836,23 +1114,12 @@
   min-height: 0;
 }
 
+/* Message row entrance */
 .messageRow {
   display: flex;
   align-items: flex-end;
   gap: 10px;
-  animation: msgFadeUp 0.28s ease both;
-}
-
-@keyframes msgFadeUp {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  animation: msgFadeUp var(--n-duration-base) var(--n-ease-out) both;
 }
 
 .messageRowUser {
@@ -893,7 +1160,14 @@
   border-radius: 16px;
   position: relative;
   box-shadow: var(--n-shadow-sm);
-  transition: box-shadow 0.2s;
+  transition:
+    box-shadow var(--n-duration-base) var(--n-ease-smooth),
+    transform var(--n-duration-fast) var(--n-ease-spring);
+}
+
+.messageBubble:hover {
+  transform: translateY(-1px);
+  /* subtle lift on hover reveals editability */
 }
 
 .bubbleUser {
@@ -911,6 +1185,7 @@
   padding: 4px 0;
 }
 
+/* ── AI content rich formatting ─────────────────────────────── */
 .aiContent {
   font-size: 15px;
   line-height: 1.75;
@@ -1062,6 +1337,7 @@
   box-shadow: 0 0 0 2px var(--n-accent), var(--n-shadow-sm);
 }
 
+/* ── User message content ─────────────────────────────────── */
 .messageContent {
   margin: 0 0 4px;
   font-size: 14px;
@@ -1180,6 +1456,7 @@
   color: var(--n-accent);
   text-decoration: underline;
   text-underline-offset: 2px;
+  transition: color var(--n-duration-fast) var(--n-ease-smooth);
 }
 
 .messageContent a:hover {
@@ -1208,6 +1485,7 @@
   margin-top: 2px;
 }
 
+/* Edit button pops up below bubble */
 .editBtn {
   position: absolute;
   bottom: -30px;
@@ -1222,15 +1500,25 @@
   font-weight: 600;
   box-shadow: var(--n-shadow-sm);
   white-space: nowrap;
-  animation: menuPop 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
   z-index: 10;
-  transition: background 0.15s;
+  animation: menuPop var(--n-duration-base) var(--n-ease-spring) both;
+  transition:
+    background var(--n-duration-fast) var(--n-ease-smooth),
+    transform var(--n-duration-fast) var(--n-ease-spring);
 }
 
 .editBtn:hover {
   background: var(--n-sidebar-active);
+  transform: scale(1.06);
+  /* subtle enlarge */
 }
 
+.editBtn:active {
+  transform: scale(0.95);
+  transition-duration: var(--n-duration-fast);
+}
+
+/* Thinking indicator */
 .thinkingBubble {
   display: flex;
   align-items: center;
@@ -1240,6 +1528,7 @@
   border-radius: 16px;
   border-bottom-left-radius: 4px;
   box-shadow: var(--n-shadow-sm);
+  animation: msgFadeUp var(--n-duration-base) var(--n-ease-out) both;
 }
 
 .thinkingLabel {
@@ -1259,7 +1548,7 @@
   height: 6px;
   border-radius: 50%;
   background: var(--n-accent);
-  animation: dotBounce 1.2s ease-in-out infinite;
+  animation: dotBounce 1.2s cubic-bezier(0.45, 0, 0.55, 1) infinite;
   display: block;
 }
 
@@ -1271,21 +1560,7 @@
   animation-delay: 0.36s;
 }
 
-@keyframes dotBounce {
-
-  0%,
-  80%,
-  100% {
-    transform: translateY(0) scale(1);
-    opacity: 0.5;
-  }
-
-  40% {
-    transform: translateY(-7px) scale(1.1);
-    opacity: 1;
-  }
-}
-
+/* Input bar */
 .inputBar {
   padding: 16px 28px 20px;
   background: var(--n-surface);
@@ -1304,6 +1579,7 @@
   color: var(--n-accent);
   font-weight: 600;
   margin-bottom: 10px;
+  animation: itemEnter var(--n-duration-base) var(--n-ease-spring) both;
 }
 
 .editBanner button {
@@ -1314,7 +1590,7 @@
   font-size: 12px;
   font-weight: 700;
   padding: 0;
-  transition: opacity 0.15s;
+  transition: opacity var(--n-duration-fast) var(--n-ease-smooth);
 }
 
 .editBanner button:hover {
@@ -1329,12 +1605,16 @@
   border: 1px solid var(--n-border);
   border-radius: var(--n-radius-pill);
   padding: 6px 6px 6px 18px;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  /* Focus glow uses box-shadow — GPU composited, no layout */
+  transition:
+    border-color var(--n-duration-base) var(--n-ease-smooth),
+    box-shadow var(--n-duration-base) var(--n-ease-smooth);
 }
 
 .inputForm:focus-within {
   border-color: var(--n-accent);
   box-shadow: 0 0 0 3px var(--n-accent-glow);
+  /* ring expands in — satisfying focus signal */
 }
 
 .queryInput {
@@ -1364,7 +1644,11 @@
   justify-content: center;
   cursor: not-allowed;
   flex-shrink: 0;
-  transition: background 0.2s, color 0.2s, transform 0.15s, box-shadow 0.2s;
+  transition:
+    background var(--n-duration-base) var(--n-ease-smooth),
+    color var(--n-duration-base) var(--n-ease-smooth),
+    transform var(--n-duration-base) var(--n-ease-spring),
+    box-shadow var(--n-duration-base) var(--n-ease-smooth);
 }
 
 .sendBtnActive {
@@ -1376,18 +1660,24 @@
 
 .sendBtnActive:hover {
   background: var(--n-accent-hover);
-  transform: scale(1.07);
+  transform: scale(1.1);
+  /* send button bounces on hover = ready signal */
 }
 
 .sendBtnActive:active {
-  transform: scale(0.96);
+  transform: scale(0.92) rotate(-10deg);
+  /* press + slight rotation = "launched" */
+  transition-duration: var(--n-duration-fast);
 }
 
+.mobileTopbar {
+  display: none;
+}
 /* ══════════════════════════════════════════════════════════════════
    RESPONSIVE
 ══════════════════════════════════════════════════════════════════ */
 @media (max-width: 768px) {
-.mobileTopbar {
+  .mobileTopbar {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -1479,16 +1769,14 @@
 .sidebarList::-webkit-scrollbar-track {
   background: transparent;
 }
+
 .hamburgerBtn {
   display: none;
 }
 
 /* ══════════════════════════════════════════════════════════════════
-   MOBILE SIDEBAR DRAWER — append only, no desktop changes
+   MOBILE SIDEBAR DRAWER
 ══════════════════════════════════════════════════════════════════ */
-
-/* Hidden on desktop */
-
 .overlay {
   display: none;
 }
@@ -1498,34 +1786,38 @@
 }
 
 @media (max-width: 768px) {
-
   .chatHeaderInner {
-      justify-content: space-between;
-    }
+    justify-content: space-between;
+  }
 
   .hamburgerBtn {
     display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 36px;
-      height: 36px;
-      border: 1px solid var(--n-border);
-      border-radius: var(--n-radius-sm);
-      background: var(--n-input-bg);
-      color: var(--n-text);
-      font-size: 18px;
-      cursor: pointer;
-      flex-shrink: 0;
-      margin-left: auto;
-      transition: background 0.15s, color 0.15s;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border: 1px solid var(--n-border);
+    border-radius: var(--n-radius-sm);
+    background: var(--n-input-bg);
+    color: var(--n-text);
+    font-size: 18px;
+    cursor: pointer;
+    flex-shrink: 0;
+    margin-left: auto;
+    transition:
+      background var(--n-duration-fast) var(--n-ease-smooth),
+      color var(--n-duration-fast) var(--n-ease-smooth),
+      transform var(--n-duration-fast) var(--n-ease-spring);
   }
 
   .hamburgerBtn:active {
-  background: var(--n-accent-glow);
+    background: var(--n-accent-glow);
     color: var(--n-accent);
+    transform: scale(0.92);
+    /* press feedback */
   }
 
-  /* ── Backdrop ── */
+  /* Backdrop */
   .overlay {
     display: block;
     position: fixed;
@@ -1534,20 +1826,10 @@
     z-index: 299;
     backdrop-filter: blur(3px);
     -webkit-backdrop-filter: blur(3px);
-    animation: fadeInOverlay 0.25s ease both;
+    animation: fadeInOverlay var(--n-duration-base) var(--n-ease-smooth) both;
   }
 
-  @keyframes fadeInOverlay {
-    from {
-      opacity: 0;
-    }
-
-    to {
-      opacity: 1;
-    }
-  }
-
-  /* ── Sidebar becomes fixed right drawer ── */
+  /* Sidebar fixed right drawer */
   .rightSidebar {
     position: fixed !important;
     top: 0;
@@ -1558,32 +1840,29 @@
     z-index: 300;
     box-shadow: -8px 0 32px rgba(0, 0, 0, 0.35);
     transform: translateX(100%);
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    /* will-change: GPU layer ready before slide starts */
     will-change: transform;
+    transition: transform var(--n-duration-slow) var(--n-ease-smooth) !important;
     border-left: 1px solid var(--n-border);
     overflow-y: auto;
-    /* Override desktop open/closed width classes */
     display: flex !important;
     flex-direction: column;
   }
 
-  /* Width classes have no effect on mobile — transform handles show/hide */
   .rightSidebarOpen,
   .rightSidebarClosed {
     width: 85vw !important;
   }
 
-  /* Open state */
   .mobileSidebarOpen {
     transform: translateX(0) !important;
   }
 
-  /* Desktop toggle btn — hide on mobile */
   .rightSidebarToggleBtn {
     display: none;
   }
 
-  /* ── Close button inside drawer header ── */
+  /* Close button inside drawer */
   .sidebarCloseBtn {
     display: flex;
     position: absolute;
@@ -1600,23 +1879,25 @@
     font-size: 13px;
     cursor: pointer;
     z-index: 10;
-    transition: background 0.15s, color 0.15s, transform 0.2s;
+    transition:
+      background var(--n-duration-fast) var(--n-ease-smooth),
+      color var(--n-duration-fast) var(--n-ease-smooth),
+      transform var(--n-duration-base) var(--n-ease-spring);
   }
 
   .sidebarCloseBtn:hover {
     background: var(--n-toast-err-bg);
     color: var(--n-toast-err-fg);
-    transform: rotate(90deg);
+    transform: rotate(90deg) scale(1.1);
+    /* × rotates closed = clear affordance */
   }
 
-  /* Nudge content away from close btn */
   .rightSidebarContent {
     padding-top: 52px;
   }
-  
 }
 
-/* ── Safe area (iPhone notch / home bar) ── */
+/* Safe area (iPhone notch / home bar) */
 @supports (padding-bottom: env(safe-area-inset-bottom)) {
   @media (max-width: 768px) {
     .rightSidebar {
