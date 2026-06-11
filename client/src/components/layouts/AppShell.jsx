@@ -122,10 +122,20 @@ const AppShell = ({ userName = "" }) => {
     localStorage.removeItem("token");
     navigate("/login");
   };
+  // AFTER
   useEffect(() => {
+    const html = document.documentElement;
+    html.classList.add("theme-transitioning");
+
     const theme = isDark ? "dark" : "light";
-    document.documentElement.setAttribute("data-theme", theme);
+    html.setAttribute("data-theme", theme);
     localStorage.setItem("sparke-theme", theme);
+
+    const timer = setTimeout(() => {
+      html.classList.remove("theme-transitioning");
+    }, 350);
+
+    return () => clearTimeout(timer);
   }, [isDark]);
 
   return (
