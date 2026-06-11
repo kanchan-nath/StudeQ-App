@@ -275,12 +275,28 @@ const App = () => {
           />
           <Route
             path="/event-scheduling/exams"
-            element={<ProtectedRoute component={<ExamSchedule />} />}
+            element={<ProtectedRoute component={
+              <ComingSoon
+                label="Exam Sxhedule"
+                eta="July 2026"
+              >
+
+                <ExamSchedule />
+              </ComingSoon>
+          } />}
           />
           <Route
             path="/event-scheduling/projects"
             element={
-              <ProtectedRoute component={<ProjectSubmissionScheduler />} />
+              <ProtectedRoute component={
+                <ComingSoon
+                  label="Project Scheduler"
+                  eta="July 2026"
+                >
+
+                  <ProjectSubmissionScheduler />
+                </ComingSoon>
+            } />
             }
           />
           <Route
