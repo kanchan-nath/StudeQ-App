@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useSearchParams, useParams, useNavigate, useLocation } from "react-router-dom";
 import BASE_URL from "../lib/api.js";
 import styles from "./styles/Assignments.module.css";
 
@@ -66,10 +67,19 @@ const Assignments = () => {
     // ── State ──
     const [allAssignments, setAllAssignments] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [activeFilter, setActiveFilter] = useState("All");
+    const [searchParams, setSearchParams] = useSearchParams();
+    const activeFilter = searchParams.get("filter") || "All";
+    const setActiveFilter = (f) => setSearchParams(f === "All" ? {} : { filter: f });
     const [selectedIds, setSelectedIds] = useState([]);
     const [expandedIds, setExpandedIds] = useState([]);
-    const [showModal, setShowModal] = useState(false);
+    const location = useLocation();
+    const { id } = useParams();
+    const navigate = useNavigate();
+    const showModal = location.pathname.endsWith("/new");
+    const setShowModal = (val) =>
+        val
+            ? navigate("/event-scheduling/assignments/new")
+            : navigate("/event-scheduling/assignments");
     const [modalLoading, setModalLoading] = useState(false);
     const [form, setForm] = useState({
         title: "",
@@ -83,7 +93,11 @@ const Assignments = () => {
         allowLateSubmission: false,
         linkedAssignmentId: "",
     });
-    const [updateId, setUpdateId] = useState(null);
+    const updateId = location.pathname.includes("/edit") ? id : null;
+    const setUpdateId = (val) =>
+        val
+            ? navigate(`/event-scheduling/assignments/${val}/edit`)
+            : navigate("/event-scheduling/assignments");
     const [updateForm, setUpdateForm] = useState({});
 
     // ── Fetch ──

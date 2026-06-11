@@ -1,5 +1,20 @@
 /* ─── Assignments.module.css ──────────────────────────────────────────── */
 
+/* ─────────────────────────────────────────────────────────────────────────
+   MOTION: Global animation kill-switch for reduced-motion preference
+   ───────────────────────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
 :root {
     --orange: #f97316;
     --orange-light: #fff7ed;
@@ -27,6 +42,15 @@
     --radius-md: 10px;
     --radius-lg: 16px;
     --radius-pill: 999px;
+
+    /* RESPONSIVE: sidebar width token — swap to 0 on mobile via JS class */
+    --sidebar-width: 220px;
+    /* MOTION: timing tokens for consistent feel */
+    --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+    --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+    --dur-fast: 140ms;
+    --dur-normal: 220ms;
+    --dur-slow: 320ms;
 }
 
 [data-theme="dark"] {
@@ -45,6 +69,11 @@
     --purple: #a78bfa;
 }
 
+/* ─── MOTION: smooth scroll on content area ──────────────────────────────── */
+html {
+    scroll-behavior: smooth;
+}
+
 /* ─── Layout ─────────────────────────────────────────────────────────────── */
 .layout {
     display: flex;
@@ -52,12 +81,25 @@
     background: var(--bg-page);
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     position: relative;
+    /* MOTION: fade the whole page in on mount */
+    animation: pageFadeIn var(--dur-normal) var(--ease-out) both;
+}
+
+/* MOTION: page-level fade-in — no layout shift, just opacity */
+@keyframes pageFadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }
 
 /* ─── Sidebar ────────────────────────────────────────────────────────────── */
 .sidebar {
-    width: 220px;
-    min-width: 220px;
+    width: var(--sidebar-width);
+    min-width: var(--sidebar-width);
     background: var(--sidebar-bg);
     display: flex;
     flex-direction: column;
@@ -67,6 +109,25 @@
     top: 0;
     height: 100vh;
     overflow: hidden;
+    /* MOTION: sidebar slides in from left on page load */
+    animation: sidebarSlideIn var(--dur-slow) var(--ease-out) both;
+    /* RESPONSIVE: will-change helps GPU-composite the drawer slide */
+    will-change: transform;
+    z-index: 300;
+    flex-shrink: 0;
+}
+
+/* MOTION: sidebar entrance */
+@keyframes sidebarSlideIn {
+    from {
+        transform: translateX(-16px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
 }
 
 .sidebarTop {
@@ -128,13 +189,19 @@
     font-size: 13.5px;
     color: var(--sidebar-sub);
     cursor: pointer;
-    transition: background 0.15s, color 0.15s;
+    /* MOTION: smooth bg + color transitions on hover */
+    transition:
+        background var(--dur-fast) ease,
+        color var(--dur-fast) ease,
+        transform var(--dur-fast) var(--ease-spring);
     user-select: none;
 }
 
 .navItem:hover {
     background: rgba(255, 255, 255, 0.07);
     color: var(--sidebar-text);
+    transform: translateX(2px);
+    /* MOTION: subtle nudge */
 }
 
 .navActive {
@@ -181,12 +248,57 @@
     margin: 0;
 }
 
+/* RESPONSIVE: Hamburger button — hidden on desktop */
+.hamburger {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: none;
+    border: 1.5px solid var(--card-border);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    color: var(--text-primary);
+    /* MOTION: hover lift */
+    transition:
+        background var(--dur-fast) ease,
+        border-color var(--dur-fast) ease,
+        transform var(--dur-fast) var(--ease-spring);
+}
+
+.hamburger:hover {
+    background: var(--bg-white);
+    border-color: var(--orange);
+    transform: scale(1.05);
+}
+
+/* RESPONSIVE: Drawer backdrop overlay */
+.drawerBackdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0);
+    z-index: 250;
+    /* MOTION: fade in backdrop */
+    transition: background var(--dur-normal) ease;
+    pointer-events: none;
+}
+
+.drawerBackdrop.open {
+    background: rgba(0, 0, 0, 0.45);
+    pointer-events: all;
+    /* MOTION: allow click-through when closed */
+}
+
 /* ─── Main ───────────────────────────────────────────────────────────────── */
 .main {
     flex: 1;
     padding: 36px 40px 120px;
     min-width: 0;
     overflow-y: auto;
+    /* MOTION: content area scrolls smoothly */
+    scroll-behavior: smooth;
 }
 
 .header {
@@ -194,6 +306,7 @@
     align-items: center;
     justify-content: space-between;
     margin-bottom: 24px;
+    gap: 12px;
 }
 
 .pageTitle {
@@ -202,6 +315,14 @@
     color: var(--text-primary);
     margin: 0;
     letter-spacing: -0.4px;
+}
+
+/* RESPONSIVE: header left = hamburger + title stacked on mobile */
+.headerLeft {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
 }
 
 .newBtn {
@@ -216,17 +337,32 @@
     font-size: 13.5px;
     font-weight: 600;
     cursor: pointer;
-    transition: background 0.15s, transform 0.1s;
+    /* MOTION: lift + color on hover, press feedback */
+    transition:
+        background var(--dur-fast) ease,
+        transform var(--dur-fast) var(--ease-spring),
+        box-shadow var(--dur-fast) ease;
     box-shadow: 0 2px 8px rgba(249, 115, 22, 0.3);
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
 .newBtn:hover {
     background: var(--orange-hover);
-    transform: translateY(-1px);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(249, 115, 22, 0.35);
 }
 
 .newBtn:active {
-    transform: translateY(0);
+    transform: translateY(0) scale(0.97);
+    /* MOTION: press feedback */
+    box-shadow: 0 1px 4px rgba(249, 115, 22, 0.25);
+}
+
+/* MOTION: focus rings — keyboard users get clear outline */
+.newBtn:focus-visible {
+    outline: 2px solid var(--orange);
+    outline-offset: 3px;
 }
 
 /* ─── Filter Tabs ────────────────────────────────────────────────────────── */
@@ -235,6 +371,16 @@
     gap: 6px;
     margin-bottom: 28px;
     flex-wrap: wrap;
+    /* RESPONSIVE: allow horizontal scroll on very small screens */
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 2px;
+    /* prevent clipping focus rings */
+}
+
+.filters::-webkit-scrollbar {
+    display: none;
 }
 
 .filterTab {
@@ -246,18 +392,38 @@
     font-size: 13px;
     font-weight: 500;
     cursor: pointer;
-    transition: all 0.15s;
+    /* MOTION: smooth all transitional states */
+    transition:
+        border-color var(--dur-fast) ease,
+        color var(--dur-fast) ease,
+        background var(--dur-fast) ease,
+        transform var(--dur-fast) var(--ease-spring);
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
 .filterTab:hover {
     border-color: var(--orange);
     color: var(--orange);
+    transform: translateY(-1px);
+    /* MOTION: lift on hover */
+}
+
+.filterTab:active {
+    transform: translateY(0) scale(0.97);
+}
+
+.filterTab:focus-visible {
+    outline: 2px solid var(--orange);
+    outline-offset: 2px;
 }
 
 .filterActive {
     background: var(--orange) !important;
     border-color: var(--orange) !important;
     color: #fff !important;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(249, 115, 22, 0.25);
 }
 
 /* ─── List Area ──────────────────────────────────────────────────────────── */
@@ -298,6 +464,45 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
+    /* MOTION: groups slide up as they mount */
+    animation: groupMount var(--dur-normal) var(--ease-out) both;
+}
+
+/* stagger via nth-child — up to 6 groups */
+.group:nth-child(1) {
+    animation-delay: 0ms;
+}
+
+.group:nth-child(2) {
+    animation-delay: 40ms;
+}
+
+.group:nth-child(3) {
+    animation-delay: 80ms;
+}
+
+.group:nth-child(4) {
+    animation-delay: 120ms;
+}
+
+.group:nth-child(5) {
+    animation-delay: 160ms;
+}
+
+.group:nth-child(6) {
+    animation-delay: 200ms;
+}
+
+@keyframes groupMount {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .groupHeader {
@@ -365,18 +570,26 @@
     border: 1.5px solid var(--card-border);
     border-radius: var(--radius-md);
     overflow: hidden;
-    transition: box-shadow 0.15s, border-color 0.15s;
+    /* MOTION: shadow + border transitions on hover */
+    transition:
+        box-shadow var(--dur-fast) ease,
+        border-color var(--dur-fast) ease,
+        transform var(--dur-fast) var(--ease-out);
     box-shadow: var(--shadow-sm);
 }
 
 .row:hover {
     box-shadow: var(--shadow-md);
     border-color: #d1d5db;
+    transform: translateY(-1px);
+    /* MOTION: subtle card lift */
 }
 
 .rowSelected {
     border-color: var(--orange) !important;
-    box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.15);
+    box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.15) !important;
+    transform: none !important;
+    /* selected rows stay grounded */
 }
 
 .rowMain {
@@ -393,6 +606,13 @@
     accent-color: var(--orange);
     cursor: pointer;
     flex-shrink: 0;
+    /* MOTION: scale on check via browser accent-color — no custom animation needed */
+    transition: transform var(--dur-fast) var(--ease-spring);
+}
+
+.checkbox:focus-visible {
+    outline: 2px solid var(--orange);
+    outline-offset: 2px;
 }
 
 .rowInfo {
@@ -464,7 +684,10 @@
     display: flex;
     align-items: center;
     border-radius: 4px;
-    transition: background 0.1s;
+    /* MOTION: smooth bg + rotate for chevron icon */
+    transition:
+        background var(--dur-fast) ease,
+        color var(--dur-fast) ease;
 }
 
 .chevronBtn:hover {
@@ -472,17 +695,32 @@
     color: var(--text-primary);
 }
 
+.chevronBtn:focus-visible {
+    outline: 2px solid var(--orange);
+    outline-offset: 2px;
+}
+
+/* MOTION: rotate the chevron svg when expanded */
+.chevronBtn svg {
+    transition: transform var(--dur-fast) var(--ease-out);
+}
+
+.chevronBtnExpanded svg {
+    transform: rotate(90deg);
+}
+
 /* ─── Expanded Content ───────────────────────────────────────────────────── */
 .expanded {
     border-top: 1.5px solid var(--card-border);
     padding: 14px 16px 14px 52px;
-    animation: expandIn 0.18s ease;
+    /* MOTION: expand from top with opacity + slight slide */
+    animation: expandIn var(--dur-fast) var(--ease-out) both;
 }
 
 @keyframes expandIn {
     from {
         opacity: 0;
-        transform: translateY(-4px);
+        transform: translateY(-6px);
     }
 
     to {
@@ -521,6 +759,12 @@
     color: var(--orange);
     font-weight: 500;
     cursor: pointer;
+    /* MOTION: opacity micro-interaction */
+    transition: opacity var(--dur-fast) ease;
+}
+
+.viewRubric:hover {
+    opacity: 0.75;
 }
 
 .rubricDot {
@@ -544,12 +788,26 @@
     padding: 4px 10px;
     border-radius: var(--radius-sm);
     cursor: pointer;
-    transition: background 0.1s;
+    transition:
+        background var(--dur-fast) ease,
+        border-color var(--dur-fast) ease,
+        transform var(--dur-fast) var(--ease-spring);
 }
 
 .deleteSmall:hover {
     background: var(--red-light);
     border-color: var(--red);
+    transform: scale(1.03);
+    /* MOTION: slight grow signals destructive */
+}
+
+.deleteSmall:active {
+    transform: scale(0.97);
+}
+
+.deleteSmall:focus-visible {
+    outline: 2px solid var(--red);
+    outline-offset: 2px;
 }
 
 /* ─── Bulk Action Bar ────────────────────────────────────────────────────── */
@@ -567,13 +825,14 @@
     gap: 14px;
     box-shadow: var(--shadow-lg);
     z-index: 100;
-    animation: slideUp 0.2s ease;
+    /* MOTION: slide up from below + fade in */
+    animation: slideUp var(--dur-normal) var(--ease-out) both;
 }
 
 @keyframes slideUp {
     from {
         opacity: 0;
-        transform: translateX(-50%) translateY(12px);
+        transform: translateX(-50%) translateY(16px);
     }
 
     to {
@@ -588,6 +847,7 @@
     font-weight: 500;
     padding-right: 6px;
     border-right: 1.5px solid var(--card-border);
+    white-space: nowrap;
 }
 
 .bulkComplete {
@@ -602,11 +862,19 @@
     font-size: 13px;
     font-weight: 600;
     cursor: pointer;
-    transition: background 0.15s;
+    transition:
+        background var(--dur-fast) ease,
+        transform var(--dur-fast) var(--ease-spring);
+    white-space: nowrap;
 }
 
 .bulkComplete:hover {
     background: var(--orange-hover);
+    transform: translateY(-1px);
+}
+
+.bulkComplete:active {
+    transform: scale(0.97);
 }
 
 .bulkReassign {
@@ -621,11 +889,15 @@
     font-size: 13px;
     font-weight: 500;
     cursor: pointer;
-    transition: border-color 0.15s;
+    transition:
+        border-color var(--dur-fast) ease,
+        transform var(--dur-fast) var(--ease-spring);
+    white-space: nowrap;
 }
 
 .bulkReassign:hover {
     border-color: var(--text-secondary);
+    transform: translateY(-1px);
 }
 
 .bulkDelete {
@@ -640,12 +912,24 @@
     font-size: 13px;
     font-weight: 500;
     cursor: pointer;
-    transition: background 0.15s;
+    transition:
+        background var(--dur-fast) ease,
+        border-color var(--dur-fast) ease,
+        transform var(--dur-fast) var(--ease-spring);
+    white-space: nowrap;
 }
 
 .bulkDelete:hover {
     background: var(--red-light);
     border-color: var(--red);
+    transform: translateY(-1px);
+}
+
+.bulkDelete:focus-visible,
+.bulkComplete:focus-visible,
+.bulkReassign:focus-visible {
+    outline: 2px solid var(--orange);
+    outline-offset: 3px;
 }
 
 /* ─── Modal Overlay ──────────────────────────────────────────────────────── */
@@ -658,7 +942,8 @@
     justify-content: center;
     z-index: 200;
     padding: 24px;
-    animation: fadeIn 0.15s ease;
+    /* MOTION: overlay fades in behind modal */
+    animation: fadeIn var(--dur-fast) ease both;
 }
 
 @keyframes fadeIn {
@@ -680,13 +965,16 @@
     max-height: 90vh;
     overflow-y: auto;
     box-shadow: var(--shadow-lg);
-    animation: modalIn 0.2s ease;
+    /* MOTION: scale up from 97% with slight y-lift */
+    animation: modalIn var(--dur-normal) var(--ease-out) both;
+    /* Prevent jitter when content grows */
+    overscroll-behavior: contain;
 }
 
 @keyframes modalIn {
     from {
         opacity: 0;
-        transform: scale(0.97) translateY(8px);
+        transform: scale(0.96) translateY(10px);
     }
 
     to {
@@ -723,7 +1011,10 @@
     color: var(--text-muted);
     padding: 4px;
     border-radius: 6px;
-    transition: background 0.1s, color 0.1s;
+    transition:
+        background var(--dur-fast) ease,
+        color var(--dur-fast) ease,
+        transform var(--dur-fast) var(--ease-spring);
     display: flex;
     align-items: center;
 }
@@ -731,6 +1022,17 @@
 .closeBtn:hover {
     background: var(--theme-surface-2);
     color: var(--text-primary);
+    transform: rotate(90deg);
+    /* MOTION: satisfying close-button spin */
+}
+
+.closeBtn:active {
+    transform: rotate(90deg) scale(0.9);
+}
+
+.closeBtn:focus-visible {
+    outline: 2px solid var(--orange);
+    outline-offset: 2px;
 }
 
 /* ─── Form ───────────────────────────────────────────────────────────────── */
@@ -770,7 +1072,10 @@
     outline: none;
     width: 100%;
     box-sizing: border-box;
-    transition: border-color 0.15s, box-shadow 0.15s;
+    /* MOTION: border + glow on focus */
+    transition:
+        border-color var(--dur-fast) ease,
+        box-shadow var(--dur-fast) ease;
     font-family: inherit;
 }
 
@@ -804,7 +1109,11 @@
     cursor: pointer;
     color: var(--text-secondary);
     background: var(--bg-white);
-    transition: all 0.15s;
+    transition:
+        border-color var(--dur-fast) ease,
+        color var(--dur-fast) ease,
+        background var(--dur-fast) ease,
+        transform var(--dur-fast) var(--ease-spring);
     user-select: none;
 }
 
@@ -815,12 +1124,15 @@
 .radioPill:hover {
     border-color: var(--orange);
     color: var(--orange);
+    transform: translateY(-1px);
 }
 
 .radioPillActive {
     background: var(--orange) !important;
     border-color: var(--orange) !important;
     color: #fff !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 2px 8px rgba(249, 115, 22, 0.25);
 }
 
 /* ─── Drop Zone ──────────────────────────────────────────────────────────── */
@@ -833,13 +1145,18 @@
     align-items: center;
     gap: 8px;
     color: var(--text-muted);
-    transition: border-color 0.15s, background 0.15s;
+    transition:
+        border-color var(--dur-fast) ease,
+        background var(--dur-fast) ease,
+        transform var(--dur-fast) var(--ease-out);
     cursor: pointer;
 }
 
 .dropZone:hover {
     border-color: var(--orange);
     background: var(--orange-light);
+    transform: scale(1.01);
+    /* MOTION: subtle expand on hover */
 }
 
 .dropText {
@@ -902,7 +1219,8 @@
     display: flex;
     align-items: center;
     padding: 2px;
-    transition: background 0.2s;
+    /* MOTION: smooth color change on toggle */
+    transition: background var(--dur-normal) ease;
     position: relative;
 }
 
@@ -916,7 +1234,8 @@
     background: #fff;
     border-radius: 50%;
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
-    transition: transform 0.2s;
+    /* MOTION: thumb slides with spring */
+    transition: transform var(--dur-normal) var(--ease-spring);
     position: relative;
 }
 
@@ -941,12 +1260,21 @@
     font-size: 13.5px;
     font-weight: 500;
     cursor: pointer;
-    transition: border-color 0.15s;
+    transition:
+        border-color var(--dur-fast) ease,
+        color var(--dur-fast) ease,
+        transform var(--dur-fast) var(--ease-spring);
 }
 
 .cancelBtn:hover {
     border-color: var(--text-secondary);
     color: var(--text-primary);
+    transform: translateY(-1px);
+}
+
+.cancelBtn:focus-visible {
+    outline: 2px solid var(--orange);
+    outline-offset: 3px;
 }
 
 .saveBtn {
@@ -961,47 +1289,317 @@
     font-size: 13.5px;
     font-weight: 600;
     cursor: pointer;
-    transition: background 0.15s, transform 0.1s;
+    transition:
+        background var(--dur-fast) ease,
+        transform var(--dur-fast) var(--ease-spring),
+        box-shadow var(--dur-fast) ease;
     box-shadow: 0 2px 8px rgba(249, 115, 22, 0.3);
 }
 
 .saveBtn:hover {
     background: var(--orange-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(249, 115, 22, 0.35);
+}
+
+.saveBtn:active {
+    transform: scale(0.97);
+    box-shadow: 0 1px 4px rgba(249, 115, 22, 0.25);
 }
 
 .saveBtn:disabled {
     opacity: 0.7;
     cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
 }
 
-/* ─── Responsive ─────────────────────────────────────────────────────────── */
-@media (max-width: 900px) {
+.saveBtn:focus-visible {
+    outline: 2px solid var(--orange);
+    outline-offset: 3px;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   RESPONSIVE — Mobile-first breakpoints
+   320px → base (mobile)
+   600px → tablet portrait
+   768px → tablet landscape / small desktop
+   1024px+ → desktop (existing layout)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─── RESPONSIVE: Base mobile (320px+) ─────────────────────────────────── */
+@media (max-width: 767px) {
+
+    /* Sidebar becomes off-canvas drawer */
     .sidebar {
-        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        width: 260px;
+        /* RESPONSIVE: wider drawer for thumb reach */
+        /* MOTION: slide in from left */
+        transform: translateX(-100%);
+        transition: transform var(--dur-slow) var(--ease-out);
+        animation: none;
+        /* disable page-load animation on mobile */
+        box-shadow: none;
+        z-index: 300;
+    }
+
+    /* RESPONSIVE: open state applied via JS class */
+    .sidebar.sidebarOpen {
+        transform: translateX(0);
+        box-shadow: 4px 0 32px rgba(0, 0, 0, 0.25);
+    }
+
+    /* Backdrop shown on mobile */
+    .drawerBackdrop {
+        display: block;
+    }
+
+    /* Hamburger shown on mobile */
+    .hamburger {
+        display: flex;
     }
 
     .main {
-        padding: 24px 20px 100px;
-    }
-}
-
-@media (max-width: 560px) {
-    .formRow {
-        grid-template-columns: 1fr;
+        padding: 20px 16px 100px;
+        /* RESPONSIVE: no sidebar offset on mobile */
     }
 
-    .bulkBar {
-        bottom: 16px;
-        left: 16px;
-        right: 16px;
-        transform: none;
-        border-radius: var(--radius-md);
-        flex-wrap: wrap;
+    .pageTitle {
+        font-size: 20px;
+        letter-spacing: -0.3px;
+        /* RESPONSIVE: truncate on very small screens */
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .newBtn {
+        padding: 8px 14px;
+        font-size: 13px;
+    }
+
+    .newBtn span {
+        /* RESPONSIVE: hide text on tiny screens, keep + icon */
+    }
+
+    /* RESPONSIVE: filter tabs scroll horizontally */
+    .filters {
+        margin-bottom: 20px;
+    }
+
+    /* RESPONSIVE: assignment rows get tighter */
+    .rowMain {
+        padding: 12px 12px;
         gap: 8px;
+    }
+
+    .rowTitle {
+        font-size: 13px;
+    }
+
+    /* RESPONSIVE: hide initials avatar on small mobile to save space */
+    .initials {
+        display: none;
+    }
+
+    /* RESPONSIVE: expanded section loses left indent on mobile */
+    .expanded {
+        padding: 12px 12px 12px 12px;
+    }
+
+    /* RESPONSIVE: meta items wrap tighter */
+    .expandedMeta {
+        gap: 12px;
+    }
+
+    /* RESPONSIVE: bulk bar goes full width on mobile */
+    .bulkBar {
+        bottom: 0;
+        left: 0;
+        right: 0;
+        transform: none;
+        border-radius: var(--radius-md) var(--radius-md) 0 0;
+        border-left: none;
+        border-right: none;
+        border-bottom: none;
+        padding: 12px 16px;
+        gap: 8px;
+        flex-wrap: wrap;
+        animation: bulkBarMobile var(--dur-normal) var(--ease-out) both;
+    }
+
+    @keyframes bulkBarMobile {
+        from {
+            opacity: 0;
+            transform: translateY(100%);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .bulkCount {
+        flex: 0 0 100%;
+        border-right: none;
+        border-bottom: 1.5px solid var(--card-border);
+        padding: 0 0 8px;
+    }
+
+    .bulkComplete,
+    .bulkReassign,
+    .bulkDelete {
+        flex: 1;
+        justify-content: center;
+        min-width: 0;
+        padding: 8px 8px;
+        font-size: 12px;
+    }
+
+    /* RESPONSIVE: modal full-screen on mobile */
+    .overlay {
+        padding: 0;
+        align-items: flex-end;
+        /* sheet slides up from bottom */
     }
 
     .modal {
         max-width: 100%;
-        max-height: 95vh;
+        max-height: 92vh;
+        border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+        animation: sheetUp var(--dur-normal) var(--ease-out) both;
+    }
+
+    /* MOTION: bottom-sheet enter on mobile */
+    @keyframes sheetUp {
+        from {
+            opacity: 0;
+            transform: translateY(40px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .modalHeader {
+        padding: 20px 20px 0;
+    }
+
+    .modalForm {
+        padding: 0 20px 32px;
+        /* extra bottom pad for home indicator */
+    }
+
+    .formRow {
+        grid-template-columns: 1fr;
+        /* RESPONSIVE: stack form columns */
+    }
+
+    .radioGroup {
+        flex-wrap: wrap;
+    }
+
+    .modalFooter {
+        flex-direction: column-reverse;
+        /* RESPONSIVE: CTA on top on mobile */
+    }
+
+    .saveBtn,
+    .cancelBtn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* ─── RESPONSIVE: Tablet portrait (600px–767px) ─────────────────────────── */
+@media (min-width: 600px) and (max-width: 767px) {
+    .main {
+        padding: 24px 24px 120px;
+    }
+
+    .pageTitle {
+        font-size: 22px;
+    }
+
+    /* RESPONSIVE: restore form grid on wider tablet */
+    .formRow {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    /* RESPONSIVE: restore initials on tablet */
+    .initials {
+        display: flex;
+    }
+
+    /* RESPONSIVE: modal as centered card on tablet portrait */
+    .overlay {
+        padding: 24px;
+        align-items: center;
+    }
+
+    .modal {
+        max-width: 520px;
+        max-height: 90vh;
+        border-radius: var(--radius-lg);
+        animation: modalIn var(--dur-normal) var(--ease-out) both;
+    }
+
+    .modalFooter {
+        flex-direction: row;
+    }
+
+    .saveBtn,
+    .cancelBtn {
+        width: auto;
+    }
+}
+
+/* ─── RESPONSIVE: Tablet landscape / small desktop (768px–1023px) ───────── */
+@media (min-width: 768px) and (max-width: 1023px) {
+    .sidebar {
+        width: 180px;
+        min-width: 180px;
+    }
+
+    .main {
+        padding: 28px 28px 120px;
+    }
+
+    .pageTitle {
+        font-size: 22px;
+    }
+
+    .logoName,
+    .logoSub {
+        display: none;
+        /* RESPONSIVE: icon-only logo at this breakpoint */
+    }
+
+    .logo {
+        justify-content: center;
+        padding: 0 12px;
+    }
+
+    .navItem {
+        gap: 8px;
+        font-size: 12.5px;
+    }
+}
+
+/* ─── RESPONSIVE: Large desktop (1280px+) ───────────────────────────────── */
+@media (min-width: 1280px) {
+    .main {
+        padding: 40px 56px 120px;
+    }
+
+    .pageTitle {
+        font-size: 28px;
     }
 }
