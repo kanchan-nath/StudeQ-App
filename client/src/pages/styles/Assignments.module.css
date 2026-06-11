@@ -8,21 +8,21 @@
     --sidebar-text: #ffffff;
     --sidebar-sub: #8b93a7;
     --sidebar-active-bg: rgba(255, 255, 255, 0.12);
-    --card-border: #e5e7eb;
+    --card-border: var(--theme-border);
     --red: #ef4444;
     --red-light: #fef2f2;
     --teal: #14b8a6;
     --teal-light: #f0fdfa;
     --blue: #3b82f6;
     --purple: #8b5cf6;
-    --bg-page: #f8f9fc;
-    --bg-white: #ffffff;
-    --text-primary: #111827;
-    --text-secondary: #6b7280;
-    --text-muted: #9ca3af;
-    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.07), 0 1px 2px rgba(0, 0, 0, 0.05);
-    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
-    --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.12);
+    --bg-page: var(--theme-bg);
+    --bg-white: var(--theme-surface);
+    --text-primary: var(--theme-text);
+    --text-secondary: var(--theme-text-secondary);
+    --text-muted: var(--theme-text-muted);
+    --shadow-sm: var(--shadow-xs);
+    --shadow-md: var(--shadow-md);
+    --shadow-lg: var(--theme-card-shadow);
     --radius-sm: 6px;
     --radius-md: 10px;
     --radius-lg: 16px;
@@ -37,21 +37,12 @@
     --sidebar-text: #f1f5f9;
     --sidebar-sub: #64748b;
     --sidebar-active-bg: rgba(249, 115, 22, 0.18);
-    --card-border: #1e293b;
     --red: #f87171;
     --red-light: #1c0a0a;
     --teal: #2dd4bf;
     --teal-light: #042f2e;
     --blue: #60a5fa;
     --purple: #a78bfa;
-    --bg-page: #0d1117;
-    --bg-white: #161b27;
-    --text-primary: #f1f5f9;
-    --text-secondary: #94a3b8;
-    --text-muted: #475569;
-    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
-    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.35);
-    --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.45);
 }
 
 /* ─── Layout ─────────────────────────────────────────────────────────────── */
@@ -313,13 +304,9 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background: #f3f4f6;
+    background: var(--theme-surface-2);
     border-radius: var(--radius-sm);
     padding: 8px 14px;
-}
-
-[data-theme="dark"] .groupHeader {
-    background: #1e293b;
 }
 
 .groupLeft {
@@ -481,7 +468,7 @@
 }
 
 .chevronBtn:hover {
-    background: #f3f4f6;
+    background: var(--theme-surface-2);
     color: var(--text-primary);
 }
 
@@ -742,7 +729,7 @@
 }
 
 .closeBtn:hover {
-    background: #f3f4f6;
+    background: var(--theme-surface-2);
     color: var(--text-primary);
 }
 
@@ -910,7 +897,7 @@
 .toggleTrack {
     width: 42px;
     height: 24px;
-    background: #d1d5db;
+    background: var(--toggle-track-bg);
     border-radius: var(--radius-pill);
     display: flex;
     align-items: center;
