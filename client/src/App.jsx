@@ -1,4 +1,6 @@
 import React from "react";
+import ErrorPage, { RouteErrorPage } from "./errors/components/ErrorPage.jsx";
+import { ERROR_TYPES } from "./errors/config/errorConfig.js";
 import "../src/index.css"
 import "./pages/styles/global.css";
 import { Routes, Route } from "react-router-dom";
@@ -50,7 +52,7 @@ const App = () => {
           element={<Login />}
         />
 
-        <Route element={<AppShell />}>
+        <Route element={<AppShell />} errorElement={<RouteErrorPage />}>
           {/* <Route path='/dashboard' element={<ProtectedRoute component={<Dashboard/>}/>} /> */}
           <Route
             path="/dashboard"
@@ -128,10 +130,10 @@ const App = () => {
             path="/event-scheduling/projects"
             element={<ProtectedRoute component={<ProjectSubmissionScheduler />} />}
           />
-          <Route
-            path="/event-scheduling/assignments"
-            element={<ProtectedRoute component={<Assignments />} />}
-          />
+          <Route path="/event-scheduling/assignments" element={<ProtectedRoute component={<Assignments />} />} />
+          <Route path="/event-scheduling/assignments/new" element={<ProtectedRoute component={<Assignments />} />} />
+          <Route path="/event-scheduling/assignments/:id/edit" element={<ProtectedRoute component={<Assignments />} />} />
+          
           <Route path="/search" element={<ProtectedRoute component={<SearchResults />} />} />
           <Route path="/search/:tab" element={<ProtectedRoute component={<SearchResults />} />} />
         </Route>

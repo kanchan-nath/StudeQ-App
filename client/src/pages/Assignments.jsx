@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useSearchParams, useParams, useNavigate, useLocation } from "react-router-dom";
 import BASE_URL from "../lib/api.js";
 import styles from "./styles/Assignments.module.css";
 
@@ -56,32 +57,6 @@ const WarningIcon = () => (
     </svg>
 );
 
-// ─── Nav Items ────────────────────────────────────────────────────────────────
-const NAV_ITEMS = [
-    { label: "Dashboard", icon: "grid" },
-    { label: "Exams", icon: "file-text" },
-    { label: "Projects", icon: "folder" },
-    { label: "Assignments", icon: "book-open", active: true },
-    { label: "Calendar", icon: "calendar" },
-    { label: "Settings", icon: "settings" },
-];
-
-const NavIcon = ({ type }) => {
-    const icons = {
-        grid: <><rect x="3" y="3" width="4" height="4" rx="1" /><rect x="9" y="3" width="4" height="4" rx="1" /><rect x="3" y="9" width="4" height="4" rx="1" /><rect x="9" y="9" width="4" height="4" rx="1" /></>,
-        "file-text": <><path d="M14 2H6a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8z" /><polyline points="14 2 14 8 20 8" /><line x1="8" y1="13" x2="16" y2="13" /><line x1="8" y1="17" x2="16" y2="17" /></>,
-        folder: <><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z" /></>,
-        "book-open": <><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z" /><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z" /></>,
-        calendar: <><rect x="3" y="4" width="18" height="18" rx="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></>,
-        settings: <><circle cx="12" cy="12" r="3" /><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" /></>,
-    };
-    return (
-        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-            {icons[type]}
-        </svg>
-    );
-};
-
 // ─── FILTER TABS ──────────────────────────────────────────────────────────────
 const FILTERS = ["All", "Today", "This Week", "Overdue", "Completed"];
 
@@ -92,10 +67,19 @@ const Assignments = () => {
     // ── State ──
     const [allAssignments, setAllAssignments] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [activeFilter, setActiveFilter] = useState("All");
+    const [searchParams, setSearchParams] = useSearchParams();
+    const activeFilter = searchParams.get("filter") || "All";
+    const setActiveFilter = (f) => setSearchParams(f === "All" ? {} : { filter: f });
     const [selectedIds, setSelectedIds] = useState([]);
     const [expandedIds, setExpandedIds] = useState([]);
-    const [showModal, setShowModal] = useState(false);
+    const location = useLocation();
+    const { id } = useParams();
+    const navigate = useNavigate();
+    const showModal = location.pathname.endsWith("/new");
+    const setShowModal = (val) =>
+        val
+            ? navigate("/event-scheduling/assignments/new")
+            : navigate("/event-scheduling/assignments");
     const [modalLoading, setModalLoading] = useState(false);
     const [form, setForm] = useState({
         title: "",
@@ -109,7 +93,11 @@ const Assignments = () => {
         allowLateSubmission: false,
         linkedAssignmentId: "",
     });
-    const [updateId, setUpdateId] = useState(null);
+    const updateId = location.pathname.includes("/edit") ? id : null;
+    const setUpdateId = (val) =>
+        val
+            ? navigate(`/event-scheduling/assignments/${val}/edit`)
+            : navigate("/event-scheduling/assignments");
     const [updateForm, setUpdateForm] = useState({});
 
     // ── Fetch ──
@@ -282,41 +270,12 @@ const Assignments = () => {
 
     return (
         <div className={styles.layout}>
-            {/* ── Sidebar ── */}
-            <aside className={styles.sidebar}>
-                <div className={styles.sidebarTop}>
-                    <div className={styles.logo}>
-                        <div className={styles.logoIcon}>S</div>
-                        <div>
-                            <p className={styles.logoName}>Scholaris</p>
-                            <p className={styles.logoSub}>Academic Suite</p>
-                        </div>
-                    </div>
-
-                    <nav className={styles.nav}>
-                        {NAV_ITEMS.map((item) => (
-                            <div key={item.label} className={`${styles.navItem} ${item.active ? styles.navActive : ""}`}>
-                                <NavIcon type={item.icon} />
-                                <span>{item.label}</span>
-                            </div>
-                        ))}
-                    </nav>
-                </div>
-
-                <div className={styles.sidebarUser}>
-                    <div className={styles.userAvatar}>EM</div>
-                    <div>
-                        <p className={styles.userName}>Emma Morgan</p>
-                        <p className={styles.userRole}>Senior · CS Major</p>
-                    </div>
-                </div>
-            </aside>
 
             {/* ── Main ── */}
             <main className={styles.main}>
                 {/* Header */}
                 <div className={styles.header}>
-                    <h1 className={styles.pageTitle}>Assignments</h1>
+                    <h1 className={styles.pageTitle}>Schedule Your Assignments</h1>
                     <button className={styles.newBtn} onClick={() => setShowModal(true)}>
                         <span>+</span> New Assignment
                     </button>

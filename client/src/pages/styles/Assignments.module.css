@@ -1,6 +1,32 @@
 /* ─── Assignments.module.css ──────────────────────────────────────────── */
 
+/* ─────────────────────────────────────────────────────────────────────────
+   MOTION: Global kill-switch — reduced-motion collapses all durations to
+   near-zero. Transition/animation still fire (avoids flash), just instant.
+   ───────────────────────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   DESIGN TOKENS
+   Duration scale: fast=150ms  base=250ms  slow=400ms  slower=600ms
+   Easing: all cubic-bezier — no plain `ease` or `linear` anywhere.
+     --ease-out-quart  : standard decelerate (most UI motion)
+     --ease-spring     : overshoot for bouncy interactive feedback
+     --ease-in-quart   : accelerate for exits/collapses
+     --ease-in-out     : symmetric for toggles / continuous motion
+   ───────────────────────────────────────────────────────────────────────── */
 :root {
+    /* ── Colors ── */
     --orange: #f97316;
     --orange-light: #fff7ed;
     --orange-hover: #ea6c10;
@@ -8,25 +34,46 @@
     --sidebar-text: #ffffff;
     --sidebar-sub: #8b93a7;
     --sidebar-active-bg: rgba(255, 255, 255, 0.12);
-    --card-border: #e5e7eb;
+    --card-border: var(--theme-border);
     --red: #ef4444;
     --red-light: #fef2f2;
     --teal: #14b8a6;
     --teal-light: #f0fdfa;
     --blue: #3b82f6;
     --purple: #8b5cf6;
-    --bg-page: #f8f9fc;
-    --bg-white: #ffffff;
-    --text-primary: #111827;
-    --text-secondary: #6b7280;
-    --text-muted: #9ca3af;
-    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.07), 0 1px 2px rgba(0, 0, 0, 0.05);
-    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
-    --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.12);
+    --bg-page: var(--theme-bg);
+    --bg-white: var(--theme-surface);
+    --text-primary: var(--theme-text);
+    --text-secondary: var(--theme-text-secondary);
+    --text-muted: var(--theme-text-muted);
+    --shadow-sm: var(--shadow-xs);
+    --shadow-md: var(--shadow-md);
+    --shadow-lg: var(--theme-card-shadow);
     --radius-sm: 6px;
     --radius-md: 10px;
     --radius-lg: 16px;
     --radius-pill: 999px;
+    --sidebar-width: 220px;
+
+    /* ── Duration scale ── */
+    --duration-fast: 150ms;
+    /* micro-interactions: hover bg, color swap      */
+    --duration-base: 250ms;
+    /* most transitions: cards, inputs, buttons       */
+    --duration-slow: 400ms;
+    /* entrance animations, sidebar slide             */
+    --duration-slower: 600ms;
+    /* page-level fades, backdrop                     */
+
+    /* ── Easing library — all cubic-bezier ── */
+    --ease-out-quart: cubic-bezier(0.22, 1, 0.36, 1);
+    /* fast decelerate   */
+    --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+    /* bouncy overshoot  */
+    --ease-in-quart: cubic-bezier(0.5, 0, 0.75, 0);
+    /* fast accelerate   */
+    --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+    /* symmetric/toggle  */
 }
 
 [data-theme="dark"] {
@@ -37,36 +84,45 @@
     --sidebar-text: #f1f5f9;
     --sidebar-sub: #64748b;
     --sidebar-active-bg: rgba(249, 115, 22, 0.18);
-    --card-border: #1e293b;
     --red: #f87171;
     --red-light: #1c0a0a;
     --teal: #2dd4bf;
     --teal-light: #042f2e;
     --blue: #60a5fa;
     --purple: #a78bfa;
-    --bg-page: #0d1117;
-    --bg-white: #161b27;
-    --text-primary: #f1f5f9;
-    --text-secondary: #94a3b8;
-    --text-muted: #475569;
-    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
-    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.35);
-    --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.45);
+}
+
+/* ── Smooth scroll on scroll container ── */
+html {
+    scroll-behavior: smooth;
 }
 
 /* ─── Layout ─────────────────────────────────────────────────────────────── */
+/* MOTION: whole page fades in on mount — opacity only, zero layout shift */
 .layout {
     display: flex;
     min-height: 100vh;
     background: var(--bg-page);
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     position: relative;
+    animation: pageFadeIn var(--duration-slow) var(--ease-out-quart) both;
+}
+
+@keyframes pageFadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }
 
 /* ─── Sidebar ────────────────────────────────────────────────────────────── */
+/* MOTION: slides in from left on load — translateX only (GPU layer) */
 .sidebar {
-    width: 220px;
-    min-width: 220px;
+    width: var(--sidebar-width);
+    min-width: var(--sidebar-width);
     background: var(--sidebar-bg);
     display: flex;
     flex-direction: column;
@@ -76,6 +132,24 @@
     top: 0;
     height: 100vh;
     overflow: hidden;
+    z-index: 300;
+    flex-shrink: 0;
+    /* will-change: sidebar slides via transform → promote to GPU layer */
+    will-change: transform;
+    animation: sidebarSlideIn var(--duration-slow) var(--ease-out-quart) both;
+}
+
+/* MOTION: entrance — translateX + opacity (both composited) */
+@keyframes sidebarSlideIn {
+    from {
+        transform: translateX(-20px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
 }
 
 .sidebarTop {
@@ -128,6 +202,7 @@
     padding: 0 12px;
 }
 
+/* MOTION: nav items nudge right on hover — translateX only, spring easing */
 .navItem {
     display: flex;
     align-items: center;
@@ -137,13 +212,19 @@
     font-size: 13.5px;
     color: var(--sidebar-sub);
     cursor: pointer;
-    transition: background 0.15s, color 0.15s;
     user-select: none;
+    /* Separate transitions so each property gets its own curve */
+    transition:
+        background var(--duration-fast) var(--ease-out-quart),
+        color var(--duration-fast) var(--ease-out-quart),
+        transform var(--duration-base) var(--ease-spring);
 }
 
 .navItem:hover {
     background: rgba(255, 255, 255, 0.07);
     color: var(--sidebar-text);
+    transform: translateX(3px);
+    /* subtle nudge signals depth */
 }
 
 .navActive {
@@ -190,12 +271,56 @@
     margin: 0;
 }
 
+/* RESPONSIVE: hamburger hidden on desktop */
+.hamburger {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: none;
+    border: 1.5px solid var(--card-border);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    color: var(--text-primary);
+    /* MOTION: scale spring on hover — scale is GPU-composited */
+    transition:
+        background var(--duration-fast) var(--ease-out-quart),
+        border-color var(--duration-fast) var(--ease-out-quart),
+        transform var(--duration-base) var(--ease-spring);
+}
+
+.hamburger:hover {
+    background: var(--bg-white);
+    border-color: var(--orange);
+    transform: scale(1.06);
+    /* scale spring gives tactile feel */
+}
+
+/* RESPONSIVE: backdrop overlay */
+.drawerBackdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0);
+    z-index: 250;
+    pointer-events: none;
+    /* MOTION: fade backdrop — opacity only */
+    transition: background var(--duration-base) var(--ease-in-out);
+}
+
+.drawerBackdrop.open {
+    background: rgba(0, 0, 0, 0.45);
+    pointer-events: all;
+}
+
 /* ─── Main ───────────────────────────────────────────────────────────────── */
 .main {
     flex: 1;
     padding: 36px 40px 120px;
     min-width: 0;
     overflow-y: auto;
+    scroll-behavior: smooth;
 }
 
 .header {
@@ -203,6 +328,7 @@
     align-items: center;
     justify-content: space-between;
     margin-bottom: 24px;
+    gap: 12px;
 }
 
 .pageTitle {
@@ -213,6 +339,14 @@
     letter-spacing: -0.4px;
 }
 
+.headerLeft {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+}
+
+/* MOTION: lift + shadow on hover; press snaps back with scale */
 .newBtn {
     display: flex;
     align-items: center;
@@ -225,17 +359,34 @@
     font-size: 13.5px;
     font-weight: 600;
     cursor: pointer;
-    transition: background 0.15s, transform 0.1s;
+    white-space: nowrap;
+    flex-shrink: 0;
     box-shadow: 0 2px 8px rgba(249, 115, 22, 0.3);
+    /* All three props on separate transitions for precise control */
+    transition:
+        background var(--duration-fast) var(--ease-out-quart),
+        transform var(--duration-base) var(--ease-spring),
+        box-shadow var(--duration-base) var(--ease-out-quart);
 }
 
 .newBtn:hover {
     background: var(--orange-hover);
-    transform: translateY(-1px);
+    transform: translateY(-2px);
+    /* lift */
+    box-shadow: 0 6px 20px rgba(249, 115, 22, 0.4);
 }
 
+/* MOTION: press — snaps down instantly, scale creates "click" sensation */
 .newBtn:active {
-    transform: translateY(0);
+    transform: translateY(0) scale(0.96);
+    box-shadow: 0 1px 4px rgba(249, 115, 22, 0.2);
+    transition-duration: 80ms;
+    /* faster on press for snappy feel */
+}
+
+.newBtn:focus-visible {
+    outline: 2px solid var(--orange);
+    outline-offset: 3px;
 }
 
 /* ─── Filter Tabs ────────────────────────────────────────────────────────── */
@@ -244,8 +395,17 @@
     gap: 6px;
     margin-bottom: 28px;
     flex-wrap: wrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 2px;
 }
 
+.filters::-webkit-scrollbar {
+    display: none;
+}
+
+/* MOTION: lift + border color on hover, faster press feedback */
 .filterTab {
     padding: 7px 16px;
     border-radius: var(--radius-pill);
@@ -255,18 +415,37 @@
     font-size: 13px;
     font-weight: 500;
     cursor: pointer;
-    transition: all 0.15s;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition:
+        border-color var(--duration-fast) var(--ease-out-quart),
+        color var(--duration-fast) var(--ease-out-quart),
+        background var(--duration-fast) var(--ease-out-quart),
+        transform var(--duration-base) var(--ease-spring);
 }
 
 .filterTab:hover {
     border-color: var(--orange);
     color: var(--orange);
+    transform: translateY(-1px);
+}
+
+/* MOTION: press collapses spring overshoot */
+.filterTab:active {
+    transform: translateY(0) scale(0.96);
+}
+
+.filterTab:focus-visible {
+    outline: 2px solid var(--orange);
+    outline-offset: 2px;
 }
 
 .filterActive {
     background: var(--orange) !important;
     border-color: var(--orange) !important;
     color: #fff !important;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 10px rgba(249, 115, 22, 0.3);
 }
 
 /* ─── List Area ──────────────────────────────────────────────────────────── */
@@ -287,13 +466,16 @@
     font-size: 14px;
 }
 
+/* MOTION: spinner uses rotate — only transform, never layout props */
 .spinner {
     width: 28px;
     height: 28px;
     border: 2.5px solid var(--card-border);
     border-top-color: var(--orange);
     border-radius: 50%;
-    animation: spin 0.7s linear infinite;
+    /* will-change: rotate is composited, declare it to avoid paint on first frame */
+    will-change: transform;
+    animation: spin 0.75s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
 @keyframes spin {
@@ -303,23 +485,59 @@
 }
 
 /* ─── Group ──────────────────────────────────────────────────────────────── */
+/* MOTION: groups slide up as they paint — translateY + opacity only */
 .group {
     display: flex;
     flex-direction: column;
     gap: 8px;
+    /* Base animation — delay overridden per child below */
+    animation: groupMount var(--duration-base) var(--ease-out-quart) both;
+}
+
+/* Stagger: each group delayed 60ms more than previous */
+.group:nth-child(1) {
+    animation-delay: 0ms;
+}
+
+.group:nth-child(2) {
+    animation-delay: 60ms;
+}
+
+.group:nth-child(3) {
+    animation-delay: 120ms;
+}
+
+.group:nth-child(4) {
+    animation-delay: 180ms;
+}
+
+.group:nth-child(5) {
+    animation-delay: 240ms;
+}
+
+.group:nth-child(6) {
+    animation-delay: 300ms;
+}
+
+@keyframes groupMount {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .groupHeader {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background: #f3f4f6;
+    background: var(--theme-surface-2);
     border-radius: var(--radius-sm);
     padding: 8px 14px;
-}
-
-[data-theme="dark"] .groupHeader {
-    background: #1e293b;
 }
 
 .groupLeft {
@@ -373,23 +591,79 @@
 }
 
 /* ─── Row ────────────────────────────────────────────────────────────────── */
+/* MOTION: card lift on hover — shadow + translateY (composited).
+   Rows also stagger their entrance via nth-child inside groups. */
 .row {
     background: var(--bg-white);
     border: 1.5px solid var(--card-border);
     border-radius: var(--radius-md);
     overflow: hidden;
-    transition: box-shadow 0.15s, border-color 0.15s;
     box-shadow: var(--shadow-sm);
+    /* Entrance: each row fades+slides in, delayed by nth-child */
+    animation: rowMount var(--duration-base) var(--ease-out-quart) both;
+    transition:
+        box-shadow var(--duration-base) var(--ease-out-quart),
+        border-color var(--duration-fast) var(--ease-out-quart),
+        transform var(--duration-base) var(--ease-out-quart);
+}
+
+/* Row stagger — up to 8 rows per group */
+.row:nth-child(1) {
+    animation-delay: 30ms;
+}
+
+.row:nth-child(2) {
+    animation-delay: 60ms;
+}
+
+.row:nth-child(3) {
+    animation-delay: 90ms;
+}
+
+.row:nth-child(4) {
+    animation-delay: 120ms;
+}
+
+.row:nth-child(5) {
+    animation-delay: 150ms;
+}
+
+.row:nth-child(6) {
+    animation-delay: 180ms;
+}
+
+.row:nth-child(7) {
+    animation-delay: 210ms;
+}
+
+.row:nth-child(8) {
+    animation-delay: 240ms;
+}
+
+@keyframes rowMount {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .row:hover {
     box-shadow: var(--shadow-md);
     border-color: #d1d5db;
+    transform: translateY(-2px);
+    /* lift — perceivable but not dramatic */
 }
 
+/* Selected row stays grounded — override hover lift */
 .rowSelected {
     border-color: var(--orange) !important;
-    box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.15);
+    box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.15) !important;
+    transform: none !important;
 }
 
 .rowMain {
@@ -399,6 +673,7 @@
     padding: 14px 16px;
 }
 
+/* MOTION: accent-color drives browser's native check animation */
 .checkbox {
     width: 16px;
     height: 16px;
@@ -406,6 +681,12 @@
     accent-color: var(--orange);
     cursor: pointer;
     flex-shrink: 0;
+    transition: transform var(--duration-base) var(--ease-spring);
+}
+
+.checkbox:focus-visible {
+    outline: 2px solid var(--orange);
+    outline-offset: 2px;
 }
 
 .rowInfo {
@@ -468,6 +749,7 @@
     color: var(--text-secondary);
 }
 
+/* MOTION: chevron button — bg fade + icon rotation */
 .chevronBtn {
     background: none;
     border: none;
@@ -477,25 +759,44 @@
     display: flex;
     align-items: center;
     border-radius: 4px;
-    transition: background 0.1s;
+    transition:
+        background var(--duration-fast) var(--ease-out-quart),
+        color var(--duration-fast) var(--ease-out-quart);
 }
 
 .chevronBtn:hover {
-    background: #f3f4f6;
+    background: var(--theme-surface-2);
     color: var(--text-primary);
 }
 
+.chevronBtn:focus-visible {
+    outline: 2px solid var(--orange);
+    outline-offset: 2px;
+}
+
+/* MOTION: chevron icon rotates 90° to signal expanded state */
+.chevronBtn svg {
+    /* will-change: rotate is GPU — declare to avoid repaint flash */
+    will-change: transform;
+    transition: transform var(--duration-base) var(--ease-out-quart);
+}
+
+.chevronBtnExpanded svg {
+    transform: rotate(90deg);
+}
+
 /* ─── Expanded Content ───────────────────────────────────────────────────── */
+/* MOTION: reveal slides down from top edge — translateY + opacity, no height */
 .expanded {
     border-top: 1.5px solid var(--card-border);
     padding: 14px 16px 14px 52px;
-    animation: expandIn 0.18s ease;
+    animation: expandIn var(--duration-base) var(--ease-out-quart) both;
 }
 
 @keyframes expandIn {
     from {
         opacity: 0;
-        transform: translateY(-4px);
+        transform: translateY(-8px);
     }
 
     to {
@@ -526,6 +827,7 @@
     color: var(--text-secondary);
 }
 
+/* MOTION: rubric link fades opacity — avoids layout shift from color change */
 .viewRubric {
     display: flex;
     align-items: center;
@@ -534,6 +836,11 @@
     color: var(--orange);
     font-weight: 500;
     cursor: pointer;
+    transition: opacity var(--duration-fast) var(--ease-out-quart);
+}
+
+.viewRubric:hover {
+    opacity: 0.7;
 }
 
 .rubricDot {
@@ -544,6 +851,7 @@
     display: inline-block;
 }
 
+/* MOTION: delete button — scale grows slightly (danger signals intent) */
 .deleteSmall {
     margin-left: auto;
     display: flex;
@@ -557,15 +865,31 @@
     padding: 4px 10px;
     border-radius: var(--radius-sm);
     cursor: pointer;
-    transition: background 0.1s;
+    transition:
+        background var(--duration-fast) var(--ease-out-quart),
+        border-color var(--duration-fast) var(--ease-out-quart),
+        transform var(--duration-base) var(--ease-spring);
 }
 
 .deleteSmall:hover {
     background: var(--red-light);
     border-color: var(--red);
+    transform: scale(1.04);
+    /* small grow signals destructive action */
+}
+
+/* MOTION: press snaps to slightly smaller — confirms click registered */
+.deleteSmall:active {
+    transform: scale(0.96);
+}
+
+.deleteSmall:focus-visible {
+    outline: 2px solid var(--red);
+    outline-offset: 2px;
 }
 
 /* ─── Bulk Action Bar ────────────────────────────────────────────────────── */
+/* MOTION: bar slides up from below on mount — translateY only (composited) */
 .bulkBar {
     position: fixed;
     bottom: 28px;
@@ -580,13 +904,15 @@
     gap: 14px;
     box-shadow: var(--shadow-lg);
     z-index: 100;
-    animation: slideUp 0.2s ease;
+    /* will-change: bar animates via translate → GPU layer */
+    will-change: transform, opacity;
+    animation: bulkBarIn var(--duration-slow) var(--ease-out-quart) both;
 }
 
-@keyframes slideUp {
+@keyframes bulkBarIn {
     from {
         opacity: 0;
-        transform: translateX(-50%) translateY(12px);
+        transform: translateX(-50%) translateY(20px);
     }
 
     to {
@@ -601,8 +927,10 @@
     font-weight: 500;
     padding-right: 6px;
     border-right: 1.5px solid var(--card-border);
+    white-space: nowrap;
 }
 
+/* Shared bulk button base — hover lift + press snap */
 .bulkComplete {
     display: flex;
     align-items: center;
@@ -615,11 +943,19 @@
     font-size: 13px;
     font-weight: 600;
     cursor: pointer;
-    transition: background 0.15s;
+    white-space: nowrap;
+    transition:
+        background var(--duration-fast) var(--ease-out-quart),
+        transform var(--duration-base) var(--ease-spring);
 }
 
 .bulkComplete:hover {
     background: var(--orange-hover);
+    transform: translateY(-1px);
+}
+
+.bulkComplete:active {
+    transform: scale(0.96);
 }
 
 .bulkReassign {
@@ -634,11 +970,19 @@
     font-size: 13px;
     font-weight: 500;
     cursor: pointer;
-    transition: border-color 0.15s;
+    white-space: nowrap;
+    transition:
+        border-color var(--duration-fast) var(--ease-out-quart),
+        transform var(--duration-base) var(--ease-spring);
 }
 
 .bulkReassign:hover {
     border-color: var(--text-secondary);
+    transform: translateY(-1px);
+}
+
+.bulkReassign:active {
+    transform: scale(0.96);
 }
 
 .bulkDelete {
@@ -653,15 +997,33 @@
     font-size: 13px;
     font-weight: 500;
     cursor: pointer;
-    transition: background 0.15s;
+    white-space: nowrap;
+    transition:
+        background var(--duration-fast) var(--ease-out-quart),
+        border-color var(--duration-fast) var(--ease-out-quart),
+        transform var(--duration-base) var(--ease-spring);
 }
 
 .bulkDelete:hover {
     background: var(--red-light);
     border-color: var(--red);
+    transform: translateY(-1px);
+}
+
+.bulkDelete:active {
+    transform: scale(0.96);
+}
+
+/* Shared focus ring */
+.bulkComplete:focus-visible,
+.bulkReassign:focus-visible,
+.bulkDelete:focus-visible {
+    outline: 2px solid var(--orange);
+    outline-offset: 3px;
 }
 
 /* ─── Modal Overlay ──────────────────────────────────────────────────────── */
+/* MOTION: overlay fades in, modal scales up from 96% — both GPU-composited */
 .overlay {
     position: fixed;
     inset: 0;
@@ -671,10 +1033,10 @@
     justify-content: center;
     z-index: 200;
     padding: 24px;
-    animation: fadeIn 0.15s ease;
+    animation: overlayFadeIn var(--duration-base) var(--ease-out-quart) both;
 }
 
-@keyframes fadeIn {
+@keyframes overlayFadeIn {
     from {
         opacity: 0;
     }
@@ -693,13 +1055,17 @@
     max-height: 90vh;
     overflow-y: auto;
     box-shadow: var(--shadow-lg);
-    animation: modalIn 0.2s ease;
+    overscroll-behavior: contain;
+    /* will-change: modal enters via scale+translate → compositor layer */
+    will-change: transform, opacity;
+    animation: modalIn var(--duration-slow) var(--ease-out-quart) both;
 }
 
+/* MOTION: modal scales up from slightly small — depth cue of z-arrival */
 @keyframes modalIn {
     from {
         opacity: 0;
-        transform: scale(0.97) translateY(8px);
+        transform: scale(0.94) translateY(12px);
     }
 
     to {
@@ -729,6 +1095,7 @@
     margin: 0;
 }
 
+/* MOTION: close button spins 90° on hover — unmistakable "close" signal */
 .closeBtn {
     background: none;
     border: none;
@@ -736,14 +1103,27 @@
     color: var(--text-muted);
     padding: 4px;
     border-radius: 6px;
-    transition: background 0.1s, color 0.1s;
     display: flex;
     align-items: center;
+    transition:
+        background var(--duration-fast) var(--ease-out-quart),
+        color var(--duration-fast) var(--ease-out-quart),
+        transform var(--duration-base) var(--ease-spring);
 }
 
 .closeBtn:hover {
-    background: #f3f4f6;
+    background: var(--theme-surface-2);
     color: var(--text-primary);
+    transform: rotate(90deg);
+}
+
+.closeBtn:active {
+    transform: rotate(90deg) scale(0.88);
+}
+
+.closeBtn:focus-visible {
+    outline: 2px solid var(--orange);
+    outline-offset: 2px;
 }
 
 /* ─── Form ───────────────────────────────────────────────────────────────── */
@@ -773,6 +1153,8 @@
     letter-spacing: 0.2px;
 }
 
+/* MOTION: input glow on focus — box-shadow is GPU-composited via the
+   compositor's opacity layer. border-color also transitions smoothly. */
 .input {
     background: var(--bg-white);
     border: 1.5px solid var(--card-border);
@@ -783,13 +1165,16 @@
     outline: none;
     width: 100%;
     box-sizing: border-box;
-    transition: border-color 0.15s, box-shadow 0.15s;
     font-family: inherit;
+    transition:
+        border-color var(--duration-fast) var(--ease-out-quart),
+        box-shadow var(--duration-base) var(--ease-out-quart);
 }
 
+/* MOTION: orange glow ring on focus — depth cue that field is active */
 .input:focus {
     border-color: var(--orange);
-    box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.12);
+    box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.14);
 }
 
 .input::placeholder {
@@ -808,6 +1193,7 @@
     gap: 8px;
 }
 
+/* MOTION: pills lift + recolor on hover, spring on select */
 .radioPill {
     padding: 7px 18px;
     border-radius: var(--radius-pill);
@@ -817,8 +1203,12 @@
     cursor: pointer;
     color: var(--text-secondary);
     background: var(--bg-white);
-    transition: all 0.15s;
     user-select: none;
+    transition:
+        border-color var(--duration-fast) var(--ease-out-quart),
+        color var(--duration-fast) var(--ease-out-quart),
+        background var(--duration-fast) var(--ease-out-quart),
+        transform var(--duration-base) var(--ease-spring);
 }
 
 .radioPill input[type="radio"] {
@@ -828,15 +1218,19 @@
 .radioPill:hover {
     border-color: var(--orange);
     color: var(--orange);
+    transform: translateY(-1px);
 }
 
 .radioPillActive {
     background: var(--orange) !important;
     border-color: var(--orange) !important;
     color: #fff !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 2px 10px rgba(249, 115, 22, 0.3);
 }
 
 /* ─── Drop Zone ──────────────────────────────────────────────────────────── */
+/* MOTION: subtle scale expand on hover — scale only (composited) */
 .dropZone {
     border: 2px dashed var(--card-border);
     border-radius: var(--radius-md);
@@ -846,13 +1240,18 @@
     align-items: center;
     gap: 8px;
     color: var(--text-muted);
-    transition: border-color 0.15s, background 0.15s;
     cursor: pointer;
+    transition:
+        border-color var(--duration-fast) var(--ease-out-quart),
+        background var(--duration-fast) var(--ease-out-quart),
+        transform var(--duration-base) var(--ease-out-quart);
 }
 
 .dropZone:hover {
     border-color: var(--orange);
     background: var(--orange-light);
+    transform: scale(1.015);
+    /* slight expand invites drag */
 }
 
 .dropText {
@@ -907,29 +1306,34 @@
     height: 0;
 }
 
+/* MOTION: track color cross-fades — background transitions via ease-in-out
+   which feels like a physical switch snapping through center */
 .toggleTrack {
     width: 42px;
     height: 24px;
-    background: #d1d5db;
+    background: var(--toggle-track-bg);
     border-radius: var(--radius-pill);
     display: flex;
     align-items: center;
     padding: 2px;
-    transition: background 0.2s;
     position: relative;
+    transition: background var(--duration-base) var(--ease-in-out);
 }
 
 .toggle input:checked~.toggleTrack {
     background: #3b82f6;
 }
 
+/* MOTION: thumb slides with spring — overshoot simulates physical momentum */
 .toggleThumb {
     width: 20px;
     height: 20px;
     background: #fff;
     border-radius: 50%;
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
-    transition: transform 0.2s;
+    /* will-change: thumb animates translateX every toggle */
+    will-change: transform;
+    transition: transform var(--duration-base) var(--ease-spring);
     position: relative;
 }
 
@@ -949,19 +1353,29 @@
     padding: 9px 20px;
     background: none;
     border: 1.5px solid var(--card-border);
-    border-radius: var(--radius-pill);
     color: var(--text-secondary);
+    border-radius: var(--radius-pill);
     font-size: 13.5px;
     font-weight: 500;
     cursor: pointer;
-    transition: border-color 0.15s;
+    transition:
+        border-color var(--duration-fast) var(--ease-out-quart),
+        color var(--duration-fast) var(--ease-out-quart),
+        transform var(--duration-base) var(--ease-spring);
 }
 
 .cancelBtn:hover {
     border-color: var(--text-secondary);
     color: var(--text-primary);
+    transform: translateY(-1px);
 }
 
+.cancelBtn:focus-visible {
+    outline: 2px solid var(--orange);
+    outline-offset: 3px;
+}
+
+/* MOTION: same lift + press pattern as primary .newBtn */
 .saveBtn {
     display: flex;
     align-items: center;
@@ -974,47 +1388,297 @@
     font-size: 13.5px;
     font-weight: 600;
     cursor: pointer;
-    transition: background 0.15s, transform 0.1s;
     box-shadow: 0 2px 8px rgba(249, 115, 22, 0.3);
+    transition:
+        background var(--duration-fast) var(--ease-out-quart),
+        transform var(--duration-base) var(--ease-spring),
+        box-shadow var(--duration-base) var(--ease-out-quart);
 }
 
 .saveBtn:hover {
     background: var(--orange-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(249, 115, 22, 0.4);
+}
+
+.saveBtn:active {
+    transform: scale(0.96);
+    box-shadow: 0 1px 4px rgba(249, 115, 22, 0.2);
+    transition-duration: 80ms;
 }
 
 .saveBtn:disabled {
     opacity: 0.7;
     cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
 }
 
-/* ─── Responsive ─────────────────────────────────────────────────────────── */
-@media (max-width: 900px) {
+.saveBtn:focus-visible {
+    outline: 2px solid var(--orange);
+    outline-offset: 3px;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   RESPONSIVE — breakpoints
+   <768px      → mobile (off-canvas sidebar)
+   600-767px   → tablet portrait
+   768-1023px  → tablet landscape
+   ≥1280px     → large desktop
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@media (max-width: 767px) {
+
+    /* MOTION: sidebar becomes off-canvas drawer, slides in via translate */
     .sidebar {
-        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        width: 260px;
+        transform: translateX(-100%);
+        /* will-change already declared above */
+        transition: transform var(--duration-slow) var(--ease-out-quart);
+        animation: none;
+        /* disable page-load animation — replaced by drawer slide */
+        box-shadow: none;
+        z-index: 300;
+    }
+
+    .sidebar.sidebarOpen {
+        transform: translateX(0);
+        box-shadow: 4px 0 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .drawerBackdrop {
+        display: block;
+    }
+
+    .hamburger {
+        display: flex;
     }
 
     .main {
-        padding: 24px 20px 100px;
-    }
-}
-
-@media (max-width: 560px) {
-    .formRow {
-        grid-template-columns: 1fr;
+        padding: 20px 16px 100px;
     }
 
-    .bulkBar {
-        bottom: 16px;
-        left: 16px;
-        right: 16px;
-        transform: none;
-        border-radius: var(--radius-md);
-        flex-wrap: wrap;
+    .pageTitle {
+        font-size: 20px;
+        letter-spacing: -0.3px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .newBtn {
+        padding: 8px 14px;
+        font-size: 13px;
+    }
+
+    .filters {
+        margin-bottom: 20px;
+    }
+
+    .rowMain {
+        padding: 12px 12px;
         gap: 8px;
+    }
+
+    .rowTitle {
+        font-size: 13px;
+    }
+
+    .initials {
+        display: none;
+    }
+
+    /* save horizontal space */
+    .expanded {
+        padding: 12px;
+    }
+
+    .expandedMeta {
+        gap: 12px;
+    }
+
+    /* MOTION: bulk bar slides up from screen bottom — full-width sheet on mobile */
+    .bulkBar {
+        bottom: 0;
+        left: 0;
+        right: 0;
+        transform: none;
+        border-radius: var(--radius-md) var(--radius-md) 0 0;
+        border-left: none;
+        border-right: none;
+        border-bottom: none;
+        padding: 12px 16px;
+        gap: 8px;
+        flex-wrap: wrap;
+        animation: bulkBarMobile var(--duration-base) var(--ease-out-quart) both;
+    }
+
+    @keyframes bulkBarMobile {
+        from {
+            opacity: 0;
+            transform: translateY(100%);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .bulkCount {
+        flex: 0 0 100%;
+        border-right: none;
+        border-bottom: 1.5px solid var(--card-border);
+        padding: 0 0 8px;
+    }
+
+    .bulkComplete,
+    .bulkReassign,
+    .bulkDelete {
+        flex: 1;
+        justify-content: center;
+        min-width: 0;
+        padding: 8px;
+        font-size: 12px;
+    }
+
+    /* MOTION: modal becomes bottom sheet — slides up from below */
+    .overlay {
+        padding: 0;
+        align-items: flex-end;
+        padding-top: 60px;
     }
 
     .modal {
         max-width: 100%;
-        max-height: 95vh;
+        max-height: calc(100vh - 60px - env(safe-area-inset-bottom, 0px));
+        border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+        padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 16px);
+        animation: sheetUp var(--duration-slow) var(--ease-out-quart) both;
+    }
+
+    @keyframes sheetUp {
+        from {
+            opacity: 0;
+            transform: translateY(48px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .modalHeader {
+        padding: 20px 20px 0;
+    }
+
+    .modalForm {
+        padding: 0 20px 20px;
+    }
+
+    .formRow {
+        grid-template-columns: 1fr;
+    }
+
+    /* stack on mobile */
+    .radioGroup {
+        flex-wrap: wrap;
+    }
+
+    .modalFooter {
+        flex-direction: column-reverse;
+    }
+
+    /* CTA on top */
+    .saveBtn,
+    .cancelBtn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+@media (min-width: 600px) and (max-width: 767px) {
+    .main {
+        padding: 24px 24px 120px;
+    }
+
+    .pageTitle {
+        font-size: 22px;
+    }
+
+    .formRow {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    /* restore 2-col on wider mobile */
+    .initials {
+        display: flex;
+    }
+
+    .overlay {
+        padding: 24px;
+        align-items: center;
+    }
+
+    .modal {
+        max-width: 520px;
+        max-height: 90vh;
+        border-radius: var(--radius-lg);
+        animation: modalIn var(--duration-slow) var(--ease-out-quart) both;
+    }
+
+    .modalFooter {
+        flex-direction: row;
+    }
+
+    .saveBtn,
+    .cancelBtn {
+        width: auto;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+    .sidebar {
+        width: 180px;
+        min-width: 180px;
+    }
+
+    .main {
+        padding: 28px 28px 120px;
+    }
+
+    .pageTitle {
+        font-size: 22px;
+    }
+
+    .logoName,
+    .logoSub {
+        display: none;
+    }
+
+    /* icon-only sidebar at mid-width */
+    .logo {
+        justify-content: center;
+        padding: 0 12px;
+    }
+
+    .navItem {
+        gap: 8px;
+        font-size: 12.5px;
+    }
+}
+
+@media (min-width: 1280px) {
+    .main {
+        padding: 40px 56px 120px;
+    }
+
+    .pageTitle {
+        font-size: 28px;
     }
 }

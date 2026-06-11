@@ -37,8 +37,8 @@ const App = () => {
                         element={<ProtectedRoute component={<Notes />} />}
                     />
                     <Route
-                        path="/notebook"
-                        element={<ProtectedRoute component={<Notebook />} />}
+                        path="/event-scheduling/assignments"
+                        element={<ProtectedRoute component={<Assignments />} />}
                     />
                 </Route>
 
