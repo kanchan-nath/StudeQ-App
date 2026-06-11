@@ -311,7 +311,6 @@ function InlineVideos({ videos }) {
 }
 
 function KnowledgePanel({ google }) {
-    // Derive entity info from search_information + organic first result
     const firstResult = google?.organic_results?.[0];
     const query = google?.search_parameters?.q || "";
     if (!firstResult && !query) return null;
@@ -441,7 +440,11 @@ export default function SearchResults() {
     const navigate = useNavigate();
     const [searchParams, setSearchParams] = useSearchParams();
 
-    const activeTab = tab && tab.toLowerCase() === "youtube" ? "YouTube" : "Google";
+    const activeTab =
+        tab?.toLowerCase() === "youtube" ? "YouTube" :
+            tab?.toLowerCase() === "saved" ? "Saved" :
+                "Google";
+
     const urlQuery = searchParams.get("q") || "";
 
     const [data, setData] = useState(null);
@@ -450,12 +453,26 @@ export default function SearchResults() {
     const [query, setQuery] = useState(urlQuery);
     const [filterChip, setFilterChip] = useState("All");
     const [dark, setDark] = useState(() => {
-        localStorage.getItem("sparke-theme")
+        return localStorage.getItem("sparke-theme");
     });
-    const [savedLinks, setSavedLinks] = useState(() => {
-        try { return JSON.parse(localStorage.getItem("saved_links") || "[]"); }
-        catch { return []; }
+
+    // ── Saved items: store full result objects keyed by link ──
+    const [savedItems, setSavedItems] = useState(() => {
+        try {
+            // migrate old saved_links array if present
+            const oldLinks = JSON.parse(localStorage.getItem("saved_links") || "null");
+            const newItems = JSON.parse(localStorage.getItem("saved_items") || "null");
+            if (newItems) return newItems;
+            if (oldLinks) return oldLinks.map((link) => ({ link, title: link, snippet: "", displayed_link: link }));
+            return [];
+        } catch {
+            return [];
+        }
     });
+
+    // savedLinks — kept for compat with OrganicResults prop
+    const savedLinks = savedItems.map((i) => i.link);
+
     const [activeResultIndex, setActiveResultIndex] = useState(-1);
 
     const token = typeof window !== "undefined"
@@ -468,10 +485,12 @@ export default function SearchResults() {
         localStorage.setItem("search_theme", dark ? "dark" : "light");
     }, [dark]);
 
-    // Save bookmarks
+    // Persist saved items
     useEffect(() => {
-        localStorage.setItem("saved_links", JSON.stringify(savedLinks));
-    }, [savedLinks]);
+        localStorage.setItem("saved_items", JSON.stringify(savedItems));
+        // remove old key
+        localStorage.removeItem("saved_links");
+    }, [savedItems]);
 
     // Keyboard navigation
     useEffect(() => {
@@ -503,7 +522,6 @@ export default function SearchResults() {
         setData(null);
         setActiveResultIndex(-1);
 
-        // sync ?q= into URL without adding history entry
         const params = new URLSearchParams(searchParams);
         params.set("q", q);
         setSearchParams(params, { replace: true });
@@ -518,7 +536,7 @@ export default function SearchResults() {
         }
     }
 
-    // Restore search on mount/reload from ?q= param
+    // Restore search on mount from ?q= param
     useEffect(() => {
         if (urlQuery && !data && !loading) {
             handleSearch(urlQuery);
@@ -527,15 +545,30 @@ export default function SearchResults() {
     }, []);
 
     function toggleSave(link) {
-        setSavedLinks((prev) =>
-            prev.includes(link) ? prev.filter((l) => l !== link) : [...prev, link]
-        );
+        setSavedItems((prev) => {
+            if (prev.some((i) => i.link === link)) {
+                return prev.filter((i) => i.link !== link);
+            }
+            // find full result from current search data
+            const match = data?.googleResponse?.organic_results?.find((r) => r.link === link);
+            const item = match
+                ? {
+                    link,
+                    title: match.title,
+                    snippet: match.snippet,
+                    displayed_link: match.displayed_link,
+                    favicon: match.favicon,
+                    date: match.date,
+                }
+                : { link, title: link, snippet: "", displayed_link: link };
+            return [...prev, item];
+        });
     }
 
     function handleTabChange(t) {
-        const path = t === "Google" ? "/search" : "/search/youtube";
+        const paths = { Google: "/search", YouTube: "/search/youtube", Saved: "/search/saved" };
         const qs = query ? `?q=${encodeURIComponent(query)}` : "";
-        navigate(`${path}${qs}`);
+        navigate(`${paths[t]}${qs}`);
     }
 
     const google = data?.googleResponse;
@@ -557,24 +590,33 @@ export default function SearchResults() {
             {/* Tabs */}
             <div className={styles.tabsBar}>
                 <div className={styles.tabs}>
-                    {["Google", "YouTube"].map((t) => (
+                    {["Google", "YouTube", "Saved"].map((t) => (
                         <button
                             key={t}
                             className={`${styles.tab} ${activeTab === t ? styles.tabActive : ""}`}
                             onClick={() => handleTabChange(t)}
                         >
-                            {t === "Google" ? (
+                            {t === "Google" && (
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style={{ marginRight: 5 }}>
                                     <path d="M21.35 11.1h-9.17v2.73h6.51c-.33 3.81-3.5 5.44-6.5 5.44C8.36 19.27 5 16.25 5 12c0-4.1 3.2-7.27 7.2-7.27 3.09 0 4.9 1.97 4.9 1.97L19 4.72S16.56 2 12.1 2C6.42 2 2.03 6.8 2.03 12c0 5.05 4.13 10 10.22 10 5.35 0 9.25-3.67 9.25-9.09 0-1.15-.15-1.81-.15-1.81z" />
                                 </svg>
-                            ) : (
+                            )}
+                            {t === "YouTube" && (
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style={{ marginRight: 5 }}>
                                     <path d="M23.495 6.205a3.007 3.007 0 0 0-2.088-2.088c-1.87-.501-9.396-.501-9.396-.501s-7.507-.01-9.396.501A3.007 3.007 0 0 0 .527 6.205a31.247 31.247 0 0 0-.522 5.805 31.247 31.247 0 0 0 .522 5.783 3.007 3.007 0 0 0 2.088 2.088c1.868.502 9.396.502 9.396.502s7.506 0 9.396-.502a3.007 3.007 0 0 0 2.088-2.088 31.247 31.247 0 0 0 .5-5.783 31.247 31.247 0 0 0-.5-5.805zM9.609 15.601V8.408l6.264 3.602z" />
+                                </svg>
+                            )}
+                            {t === "Saved" && (
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style={{ marginRight: 5 }}>
+                                    <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
                                 </svg>
                             )}
                             {t}
                             {t === "Google" && totalResults != null && query && (
                                 <span className={styles.tabCount}>{(totalResults / 1e6).toFixed(1)}M</span>
+                            )}
+                            {t === "Saved" && savedItems.length > 0 && (
+                                <span className={styles.tabCount}>{savedItems.length}</span>
                             )}
                         </button>
                     ))}
@@ -616,8 +658,8 @@ export default function SearchResults() {
                 </div>
             )}
 
-            {/* Empty state */}
-            {!loading && !data && !error && (
+            {/* Empty state — only on Google/YouTube tabs when no data */}
+            {!loading && !data && !error && activeTab !== "Saved" && (
                 <div className={styles.emptyState}>
                     <div className={styles.emptyIcon}>
                         <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2">
@@ -633,8 +675,6 @@ export default function SearchResults() {
             {!loading && google && activeTab === "Google" && (
                 <div className={styles.contentLayout}>
                     <main className={styles.mainCol}>
-                        {/* Filter chips */}
-
                         {/* Result count row */}
                         <div className={styles.resultCountRow}>
                             <span className={styles.resultCount}>
@@ -645,28 +685,18 @@ export default function SearchResults() {
                             </span>
                         </div>
 
-                        {/* AI Overview */}
                         <AIOverview aiOverview={google.ai_overview} />
-
-                        {/* Inline videos */}
                         <InlineVideos videos={google.inline_videos} />
-
-                        {/* People Also Ask */}
                         <PeopleAlsoAsk questions={google.related_questions} />
-
-                        {/* Organic results */}
                         <OrganicResults
                             results={google.organic_results}
                             savedLinks={savedLinks}
                             onToggleSave={toggleSave}
                             activeIndex={activeResultIndex}
                         />
-
-                        {/* Related searches */}
                         <RelatedSearches searches={google.related_searches} onSearch={handleSearch} />
                     </main>
 
-                    {/* Sidebar */}
                     <KnowledgePanel google={google} />
                 </div>
             )}
@@ -674,22 +704,50 @@ export default function SearchResults() {
             {/* ── YOUTUBE TAB ── */}
             {!loading && youtube && activeTab === "YouTube" && (
                 <div className={styles.ytLayout}>
-                    {/* Result count */}
                     <div className={styles.resultCountRow}>
                         <span className={styles.resultCount}>
                             About <strong>{ytTotal?.toLocaleString()}</strong> results
                         </span>
                     </div>
-
-                    {/* Video grid */}
                     <div className={styles.ytGrid}>
                         {youtube.video_results?.map((v, i) => (
                             <YouTubeVideoCard key={i} v={v} />
                         ))}
                     </div>
-
-                    {/* Shorts */}
                     <ShortsRow shorts={shorts} />
+                </div>
+            )}
+
+            {/* ── SAVED TAB ── */}
+            {activeTab === "Saved" && (
+                <div className={styles.contentLayout}>
+                    <main className={styles.mainCol}>
+                        {savedItems.length === 0 ? (
+                            <div className={styles.emptyState}>
+                                <div className={styles.emptyIcon}>
+                                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2">
+                                        <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                                    </svg>
+                                </div>
+                                <p>No saved links yet</p>
+                                <span className={styles.emptyHint}>☆ bookmark any result to save it here</span>
+                            </div>
+                        ) : (
+                            <>
+                                <div className={styles.resultCountRow}>
+                                    <span className={styles.resultCount}>
+                                        <strong>{savedItems.length}</strong> saved {savedItems.length === 1 ? "link" : "links"}
+                                    </span>
+                                </div>
+                                <OrganicResults
+                                    results={savedItems}
+                                    savedLinks={savedLinks}
+                                    onToggleSave={toggleSave}
+                                    activeIndex={-1}
+                                />
+                            </>
+                        )}
+                    </main>
                 </div>
             )}
         </div>
