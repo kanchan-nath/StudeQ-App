@@ -358,6 +358,13 @@ const TimeTable = () => {
                         >{vw}</button>
                     ))}
                 </nav>
+                <select
+                    className={styles.mobileViewSelect}
+                    value={view}
+                    onChange={(e) => setView(e.target.value)}
+                >
+                    {VIEWS.map(vw => <option key={vw} value={vw}>{vw}</option>)}
+                </select>
                 <div className={styles.navRight}>
                     <button className={styles.createBtn} onClick={() => navigate(`/time-table/${v}/create`)}>
                         <span className={styles.createPlus}>+</span> Create Block

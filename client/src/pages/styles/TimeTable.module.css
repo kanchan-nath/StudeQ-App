@@ -1879,3 +1879,281 @@
         border-radius: var(--r-lg) var(--r-lg) 0 0;
     }
 }
+
+@media (hover: none) {
+    .eventActions {
+        opacity: 1;
+        transform: translateY(0);
+        /* Slightly smaller so they don't crowd short blocks */
+        gap: 2px;
+    }
+
+    .eventActionBtn {
+        font-size: 10px;
+        padding: 2px 4px;
+    }
+}
+
+/* ── 2. themeToggle / createBtn — kill hover transforms on touch ──── */
+/* Hover transforms on touch cause stuck :hover state after tap.       */
+@media (hover: none) {
+    .themeToggle:hover {
+        transform: none;
+        border-color: var(--theme-border);
+    }
+
+    .createBtn:hover {
+        transform: none;
+        box-shadow: 0 0 20px var(--theme-purple-dim);
+        opacity: 1;
+    }
+
+    .createBtn:hover .createPlus {
+        transform: none;
+    }
+
+    /* Active states still work fine — touch fires :active */
+    .themeToggle:active {
+        transform: scale(0.9);
+    }
+
+    .createBtn:active {
+        transform: translateY(1px) scale(0.97);
+        box-shadow: 0 2px 10px var(--theme-purple-dim);
+    }
+}
+
+/* ── 3. Agenda translateX hover — hover-only, dead on touch ───────── */
+@media (hover: none) {
+    .agendaItem:hover {
+        transform: none;
+        box-shadow: none;
+    }
+
+    .agendaItem:active {
+        transform: translateX(2px) scale(0.99);
+    }
+}
+
+/* ── 4. Month cells — cramped on small screens ─────────────────────  */
+@media (max-width: 640px) {
+    .monthCell {
+        min-height: 52px;
+        padding: 5px;
+        gap: 2px;
+    }
+
+    .monthDayNum {
+        font-size: 11px;
+        width: 20px;
+        height: 20px;
+    }
+
+    .monthCellToday .monthDayNum {
+        width: 20px;
+        height: 20px;
+        font-size: 11px;
+    }
+
+    .monthDots {
+        gap: 2px;
+    }
+
+    .monthDot {
+        width: 5px;
+        height: 5px;
+    }
+
+    .monthMore {
+        font-size: 9px;
+    }
+
+    .monthWeekLabel {
+        font-size: 9px;
+        padding: 5px 0;
+        letter-spacing: 0.2px;
+    }
+}
+
+/* ── 5. Week horizontal scroll — add touch-scroll momentum ─────────  */
+@media (max-width: 640px) {
+
+    .weekBody,
+    .weekHeader {
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior-x: contain;
+    }
+
+    /* Visual hint: faint fade at right edge signals scrollability */
+    .weekView {
+        position: relative;
+    }
+
+    .weekView::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        width: 24px;
+        background: linear-gradient(to right, transparent, var(--theme-bg));
+        pointer-events: none;
+        z-index: 5;
+    }
+}
+
+/* ── 6. Drag grid — prevent pinch-zoom conflict ──────────────────── */
+.dayGrid {
+    touch-action: pan-y;
+    /* allow vertical scroll, block pinch on grid */
+}
+
+.weekDayCol {
+    touch-action: pan-y;
+}
+
+/* ── 7. Modal safe-area inset — iPhone notch / home bar ─────────── */
+.modalBackdrop {
+    padding: 24px;
+    padding-bottom: max(24px, env(safe-area-inset-bottom));
+}
+
+.modal {
+    max-height: calc(90vh - env(safe-area-inset-bottom));
+}
+
+/* Detail panel bottom-sheet on mobile also needs safe area */
+@media (max-width: 640px) {
+    .detailBackdrop {
+        padding-bottom: max(0px, env(safe-area-inset-bottom));
+    }
+
+    .detailPanel {
+        padding-bottom: max(24px, env(safe-area-inset-bottom));
+    }
+}
+
+/* ── 8. General touch tap targets — 44px minimum ─────────────────── */
+@media (hover: none) {
+    .navArrow {
+        min-width: 44px;
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .themeToggle {
+        width: 44px;
+        height: 44px;
+    }
+
+    .eventActionBtn {
+        min-height: 28px;
+        min-width: 28px;
+    }
+
+    .agendaBtn {
+        min-height: 36px;
+        padding: 6px 12px;
+    }
+
+    .catPill {
+        min-height: 36px;
+        padding: 6px 14px;
+    }
+}
+/* RESPONSIVE: dropdown view-switcher for mobile, replaces hidden viewSwitcher */
+.mobileViewSelect {
+    display: none;
+}
+
+@media (max-width: 640px) {
+    .mobileViewSelect {
+        display: block;
+        font-family: var(--font-body);
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--theme-text);
+        background: var(--theme-surface);
+        border: 1px solid var(--theme-border);
+        border-radius: var(--r-full);
+        padding: 6px 28px 6px 14px;
+        cursor: pointer;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238a8a9a' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 10px center;
+        transition: border-color var(--duration-fast) var(--ease-out);
+    }
+
+    .mobileViewSelect:focus-visible {
+        outline: none;
+        border-color: var(--theme-purple);
+        box-shadow: 0 0 0 3px var(--theme-purple-dim);
+    }
+}
+
+/* RESPONSIVE: stack subHeader rows, full-width category scroll */
+@media (max-width: 640px) {
+    .subHeader {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+    }
+
+    .dateNav {
+        justify-content: space-between;
+    }
+
+    .categoryRow {
+        width: 100%;
+    }
+}
+
+/* RESPONSIVE: ultra-small phones — icon-only create btn, stack agenda rows */
+@media (max-width: 380px) {
+    .createBtn {
+        padding: 8px 12px;
+    }
+
+    .createBtnLabel {
+        display: none;
+    }
+
+    .agendaItem {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+    }
+
+    .agendaItemRight {
+        align-items: flex-start;
+    }
+
+    .navLogo .logoText {
+        font-size: 15px;
+    }
+}
+
+/* MOTION/A11Y: visible focus ring for keyboard nav, all interactive controls */
+.viewTab:focus-visible,
+.themeToggle:focus-visible,
+.createBtn:focus-visible,
+.navArrow:focus-visible,
+.catPill:focus-visible,
+.catSeg:focus-visible,
+.colorSwatch:focus-visible,
+.agendaBtn:focus-visible,
+.detailClose:focus-visible,
+.modalClose:focus-visible,
+.cancelBtn:focus-visible,
+.saveBtn:focus-visible,
+.eventActionBtn:focus-visible,
+.detailEditBtn:focus-visible,
+.detailICSBtn:focus-visible,
+.detailDeleteBtn:focus-visible,
+.agendaCreateLink:focus-visible {
+    outline: 2px solid var(--theme-purple);
+    outline-offset: 2px;
+}
