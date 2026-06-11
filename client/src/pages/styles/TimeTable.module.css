@@ -7,31 +7,31 @@
 
 /* ── Local layout tokens ────────────────────────────────────── */
 :root {
-    --navbar-h: 58px;
-    --subheader-h: 52px;
+  --navbar-h: 58px;
+  --subheader-h: 52px;
 
-    /* ── Motion scale tokens ───────────────────────────────────
+  /* ── Motion scale tokens ───────────────────────────────────
        All timings and easings defined here.
        Components reference these — never hardcode durations.
     ─────────────────────────────────────────────────────────── */
-    --duration-fast: 150ms;
-    /* micro: button press, swatch hover */
-    --duration-base: 250ms;
-    /* standard: most transitions        */
-    --duration-slow: 400ms;
-    /* panels, modals sliding in         */
-    --duration-slower: 600ms;
-    /* page entrance, stagger sequences  */
+  --duration-fast: 150ms;
+  /* micro: button press, swatch hover */
+  --duration-base: 250ms;
+  /* standard: most transitions        */
+  --duration-slow: 400ms;
+  /* panels, modals sliding in         */
+  --duration-slower: 600ms;
+  /* page entrance, stagger sequences  */
 
-    /* Easing curves — no plain ease/linear anywhere */
-    --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
-    /* natural decel   */
-    --ease-in-out: cubic-bezier(0.45, 0, 0.55, 1);
-    /* symmetric swing */
-    --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
-    /* spring overshoot for lift */
-    --ease-enter: cubic-bezier(0.0, 0.0, 0.2, 1);
-    /* entrance: fast settle */
+  /* Easing curves — no plain ease/linear anywhere */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  /* natural decel   */
+  --ease-in-out: cubic-bezier(0.45, 0, 0.55, 1);
+  /* symmetric swing */
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  /* spring overshoot for lift */
+  --ease-enter: cubic-bezier(0, 0, 0.2, 1);
+  /* entrance: fast settle */
 }
 
 /* ── Reduced-motion override ────────────────────────────────
@@ -39,2101 +39,2137 @@
    Layout and colors preserved. Only motion disabled.
 ─────────────────────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
-
-    *,
-    *::before,
-    *::after {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
-    }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 /* ── Root ──────────────────────────────────────────────────── */
 .root {
-    font-family: var(--font-body);
-    background: var(--theme-bg);
-    color: var(--theme-text);
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    position: relative;
-    overflow: hidden;
-    /* Smooth scroll for anchor jumps inside the page */
-    scroll-behavior: smooth;
+  font-family: var(--font-body);
+  background: var(--theme-bg);
+  color: var(--theme-text);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  /* Smooth scroll for anchor jumps inside the page */
+  scroll-behavior: smooth;
 }
 
 /* Subtle star-field effect */
 .root::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image:
-        radial-gradient(1px 1px at 20% 30%, rgba(255, 255, 255, 0.15) 0%, transparent 100%),
-        radial-gradient(1px 1px at 70% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 100%),
-        radial-gradient(1px 1px at 50% 80%, rgba(255, 255, 255, 0.12) 0%, transparent 100%),
-        radial-gradient(1px 1px at 85% 60%, rgba(255, 255, 255, 0.08) 0%, transparent 100%),
-        radial-gradient(300px 300px at 10% 10%, var(--theme-purple-dim) 0%, transparent 70%),
-        radial-gradient(400px 400px at 90% 90%, rgba(34, 197, 94, 0.04) 0%, transparent 70%);
-    pointer-events: none;
-    z-index: 0;
-    /* Starfield slowly drifts — extremely subtle parallax feel */
-    animation: starfield-drift 60s var(--ease-in-out) infinite alternate;
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image:
+    radial-gradient(
+      1px 1px at 20% 30%,
+      rgba(255, 255, 255, 0.15) 0%,
+      transparent 100%
+    ),
+    radial-gradient(
+      1px 1px at 70% 20%,
+      rgba(255, 255, 255, 0.1) 0%,
+      transparent 100%
+    ),
+    radial-gradient(
+      1px 1px at 50% 80%,
+      rgba(255, 255, 255, 0.12) 0%,
+      transparent 100%
+    ),
+    radial-gradient(
+      1px 1px at 85% 60%,
+      rgba(255, 255, 255, 0.08) 0%,
+      transparent 100%
+    ),
+    radial-gradient(
+      300px 300px at 10% 10%,
+      var(--theme-purple-dim) 0%,
+      transparent 70%
+    ),
+    radial-gradient(
+      400px 400px at 90% 90%,
+      rgba(34, 197, 94, 0.04) 0%,
+      transparent 70%
+    );
+  pointer-events: none;
+  z-index: 0;
+  /* Starfield slowly drifts — extremely subtle parallax feel */
+  animation: starfield-drift 60s var(--ease-in-out) infinite alternate;
 }
 
 /* Starfield moves only via opacity fade — no position shift = GPU safe */
 @keyframes starfield-drift {
-    from {
-        opacity: 0.8;
-    }
+  from {
+    opacity: 0.8;
+  }
 
-    to {
-        opacity: 1;
-    }
+  to {
+    opacity: 1;
+  }
 }
 
 /* ── Navbar ────────────────────────────────────────────────── */
 .navbar {
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    height: var(--navbar-h);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 24px;
-    background: var(--theme-navbar-bg);
-    backdrop-filter: var(--theme-navbar-blur);
-    -webkit-backdrop-filter: var(--theme-navbar-blur);
-    border-bottom: 1px solid var(--theme-border);
-    gap: 16px;
-    /* Navbar slides down + fades on first mount */
-    animation: navbar-enter var(--duration-slow) var(--ease-out) both;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  height: var(--navbar-h);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  background: var(--theme-navbar-bg);
+  backdrop-filter: var(--theme-navbar-blur);
+  -webkit-backdrop-filter: var(--theme-navbar-blur);
+  border-bottom: 1px solid var(--theme-border);
+  gap: 16px;
+  /* Navbar slides down + fades on first mount */
+  animation: navbar-enter var(--duration-slow) var(--ease-out) both;
 }
 
 @keyframes navbar-enter {
-    from {
-        opacity: 0;
-        transform: translateY(-100%);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
 
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .navLogo {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
 }
 
 .logoIcon {
-    font-size: 20px;
-    filter: drop-shadow(0 0 8px var(--theme-accent-glow));
-    /* Pulse uses opacity + filter — no layout shift */
-    animation: pulse-logo 3s var(--ease-in-out) infinite;
-    will-change: filter;
-    /* filter-pulse is the only genuine will-change candidate */
+  font-size: 20px;
+  filter: drop-shadow(0 0 8px var(--theme-accent-glow));
+  /* Pulse uses opacity + filter — no layout shift */
+  animation: pulse-logo 3s var(--ease-in-out) infinite;
+  will-change: filter;
+  /* filter-pulse is the only genuine will-change candidate */
 }
 
 @keyframes pulse-logo {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 8px var(--theme-accent-glow));
+  }
 
-    0%,
-    100% {
-        filter: drop-shadow(0 0 8px var(--theme-accent-glow));
-    }
-
-    50% {
-        filter: drop-shadow(0 0 14px var(--theme-accent-glow));
-    }
+  50% {
+    filter: drop-shadow(0 0 14px var(--theme-accent-glow));
+  }
 }
 
 .logoText {
-    font-family: var(--font-display);
-    font-weight: 800;
-    font-size: 20px;
-    letter-spacing: -0.5px;
-    color: var(--theme-text);
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 20px;
+  letter-spacing: -0.5px;
+  color: var(--theme-text);
 }
 
 .logoAccent {
-    color: var(--theme-purple);
+  color: var(--theme-purple);
 }
 
 .viewSwitcher {
-    display: flex;
-    align-items: center;
-    background: var(--theme-surface);
-    border: 1px solid var(--theme-border);
-    border-radius: var(--r-full);
-    padding: 3px;
-    gap: 2px;
-    /* Entrance: staggered after navbar — slight delay */
-    animation: fade-up var(--duration-slow) var(--ease-out) 100ms both;
+  display: flex;
+  align-items: center;
+  background: var(--theme-surface);
+  border: 1px solid var(--theme-border);
+  border-radius: var(--r-full);
+  padding: 3px;
+  gap: 2px;
+  /* Entrance: staggered after navbar — slight delay */
+  animation: fade-up var(--duration-slow) var(--ease-out) 100ms both;
 }
 
 .viewTab {
-    font-family: var(--font-body);
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--theme-text-secondary);
-    background: transparent;
-    border: none;
-    border-radius: var(--r-full);
-    padding: 6px 18px;
-    cursor: pointer;
-    /* Smooth background + color swap */
-    transition:
-        color var(--duration-fast) var(--ease-out),
-        background var(--duration-fast) var(--ease-out),
-        box-shadow var(--duration-base) var(--ease-out);
-    white-space: nowrap;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--theme-text-secondary);
+  background: transparent;
+  border: none;
+  border-radius: var(--r-full);
+  padding: 6px 18px;
+  cursor: pointer;
+  /* Smooth background + color swap */
+  transition:
+    color var(--duration-fast) var(--ease-out),
+    background var(--duration-fast) var(--ease-out),
+    box-shadow var(--duration-base) var(--ease-out);
+  white-space: nowrap;
 }
 
 .viewTab:hover {
-    color: var(--theme-text);
-    background: var(--theme-purple-dim);
+  color: var(--theme-text);
+  background: var(--theme-purple-dim);
 }
 
 /* Active tab: spring-scale gives satisfying click feedback */
 .viewTabActive {
-    background: var(--theme-purple);
-    color: #fff !important;
-    font-weight: 600;
-    box-shadow: 0 0 16px var(--theme-purple-dim);
-    /* Scale on activation — spring easing feels snappy */
-    animation: tab-activate var(--duration-base) var(--ease-spring);
+  background: var(--theme-purple);
+  color: #fff !important;
+  font-weight: 600;
+  box-shadow: 0 0 16px var(--theme-purple-dim);
+  /* Scale on activation — spring easing feels snappy */
+  animation: tab-activate var(--duration-base) var(--ease-spring);
 }
 
 @keyframes tab-activate {
-    from {
-        transform: scale(0.92);
-    }
+  from {
+    transform: scale(0.92);
+  }
 
-    to {
-        transform: scale(1);
-    }
+  to {
+    transform: scale(1);
+  }
 }
 
 .navRight {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex-shrink: 0;
-    /* Entrance: mirror viewSwitcher stagger */
-    animation: fade-up var(--duration-slow) var(--ease-out) 150ms both;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+  /* Entrance: mirror viewSwitcher stagger */
+  animation: fade-up var(--duration-slow) var(--ease-out) 150ms both;
 }
 
 .themeToggle {
-    background: var(--theme-surface);
-    border: 1px solid var(--theme-border);
-    border-radius: 50%;
-    width: 34px;
-    height: 34px;
-    font-size: 14px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    /* Rotate icon on hover — transform only, GPU safe */
-    transition:
-        border-color var(--duration-fast) var(--ease-out),
-        transform var(--duration-base) var(--ease-spring);
+  background: var(--theme-surface);
+  border: 1px solid var(--theme-border);
+  border-radius: 50%;
+  width: 34px;
+  height: 34px;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Rotate icon on hover — transform only, GPU safe */
+  transition:
+    border-color var(--duration-fast) var(--ease-out),
+    transform var(--duration-base) var(--ease-spring);
 }
 
 .themeToggle:hover {
-    border-color: var(--theme-purple);
-    /* Slight rotation hints "toggle" affordance */
-    transform: rotate(20deg) scale(1.08);
+  border-color: var(--theme-purple);
+  /* Slight rotation hints "toggle" affordance */
+  transform: rotate(20deg) scale(1.08);
 }
 
 .themeToggle:active {
-    /* Press feedback: scale down */
-    transform: scale(0.9);
-    transition-duration: var(--duration-fast);
+  /* Press feedback: scale down */
+  transform: scale(0.9);
+  transition-duration: var(--duration-fast);
 }
 
 .createBtn {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    background: var(--theme-purple);
-    color: #fff;
-    border: none;
-    border-radius: var(--r-full);
-    padding: 8px 20px;
-    font-family: var(--font-body);
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    box-shadow: 0 0 20px var(--theme-purple-dim);
-    white-space: nowrap;
-    /* Compound transition: lift + glow */
-    transition:
-        transform var(--duration-base) var(--ease-spring),
-        box-shadow var(--duration-base) var(--ease-out),
-        opacity var(--duration-fast) var(--ease-out);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--theme-purple);
+  color: #fff;
+  border: none;
+  border-radius: var(--r-full);
+  padding: 8px 20px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 0 20px var(--theme-purple-dim);
+  white-space: nowrap;
+  /* Compound transition: lift + glow */
+  transition:
+    transform var(--duration-base) var(--ease-spring),
+    box-shadow var(--duration-base) var(--ease-out),
+    opacity var(--duration-fast) var(--ease-out);
 }
 
 .createBtn:hover {
-    transform: translateY(-2px) scale(1.02);
-    box-shadow: 0 6px 28px var(--theme-purple-dim);
-    opacity: 0.92;
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 6px 28px var(--theme-purple-dim);
+  opacity: 0.92;
 }
 
 .createBtn:active {
-    /* Press: dip below baseline */
-    transform: translateY(1px) scale(0.97);
-    box-shadow: 0 2px 10px var(--theme-purple-dim);
-    transition-duration: var(--duration-fast);
+  /* Press: dip below baseline */
+  transform: translateY(1px) scale(0.97);
+  box-shadow: 0 2px 10px var(--theme-purple-dim);
+  transition-duration: var(--duration-fast);
 }
 
 .createPlus {
-    font-size: 16px;
-    font-weight: 300;
-    /* Plus icon rotates on hover for "add" affordance */
-    display: inline-block;
-    transition: transform var(--duration-base) var(--ease-spring);
+  font-size: 16px;
+  font-weight: 300;
+  /* Plus icon rotates on hover for "add" affordance */
+  display: inline-block;
+  transition: transform var(--duration-base) var(--ease-spring);
 }
 
 .createBtn:hover .createPlus {
-    transform: rotate(90deg);
+  transform: rotate(90deg);
 }
 
 /* ── Sub-header ─────────────────────────────────────────────── */
 .subHeader {
-    height: var(--subheader-h);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 24px;
-    border-bottom: 1px solid var(--theme-border);
-    background: var(--theme-surface);
-    gap: 16px;
-    flex-shrink: 0;
-    position: relative;
-    z-index: 10;
-    /* Entrance: after navbar */
-    animation: subheader-enter var(--duration-slow) var(--ease-out) 80ms both;
+  height: var(--subheader-h);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  border-bottom: 1px solid var(--theme-border);
+  background: var(--theme-surface);
+  gap: 16px;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 10;
+  /* Entrance: after navbar */
+  animation: subheader-enter var(--duration-slow) var(--ease-out) 80ms both;
 }
 
 @keyframes subheader-enter {
-    from {
-        opacity: 0;
-        transform: translateY(-8px);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
 
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .dateNav {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
 }
 
 .navArrow {
-    background: transparent;
-    border: 1px solid var(--theme-border);
-    color: var(--theme-text-secondary);
-    border-radius: var(--r-sm);
-    padding: 5px 10px;
-    font-size: 13px;
-    cursor: pointer;
-    font-family: var(--font-body);
-    transition:
-        border-color var(--duration-fast) var(--ease-out),
-        color var(--duration-fast) var(--ease-out),
-        background var(--duration-fast) var(--ease-out),
-        transform var(--duration-base) var(--ease-spring);
+  background: transparent;
+  border: 1px solid var(--theme-border);
+  color: var(--theme-text-secondary);
+  border-radius: var(--r-sm);
+  padding: 5px 10px;
+  font-size: 13px;
+  cursor: pointer;
+  font-family: var(--font-body);
+  transition:
+    border-color var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out),
+    background var(--duration-fast) var(--ease-out),
+    transform var(--duration-base) var(--ease-spring);
 }
 
 .navArrow:hover {
-    border-color: var(--theme-purple);
-    color: var(--theme-purple);
-    background: var(--theme-purple-dim);
+  border-color: var(--theme-purple);
+  color: var(--theme-purple);
+  background: var(--theme-purple-dim);
 }
 
 .navArrow:active {
-    /* Arrows nudge in their travel direction — purely via scale for now */
-    transform: scale(0.92);
-    transition-duration: var(--duration-fast);
+  /* Arrows nudge in their travel direction — purely via scale for now */
+  transform: scale(0.92);
+  transition-duration: var(--duration-fast);
 }
 
 .dateLabel {
-    font-family: var(--font-display);
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--theme-text);
-    margin-left: 8px;
-    white-space: nowrap;
-    /* Date text flips when navigating — parent JS swaps content,
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--theme-text);
+  margin-left: 8px;
+  white-space: nowrap;
+  /* Date text flips when navigating — parent JS swaps content,
        this ensures the color doesn't flash */
-    transition: opacity var(--duration-fast) var(--ease-out);
+  transition: opacity var(--duration-fast) var(--ease-out);
 }
 
 .categoryRow {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    overflow-x: auto;
-    scrollbar-width: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
 }
 
 .categoryRow::-webkit-scrollbar {
-    display: none;
+  display: none;
 }
 
 /* Stagger pill entrance — nth-child delays via inline style fallback.
    JS should set --pill-i on each pill; CSS uses it below. */
 .catPill {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    padding: 4px 12px;
-    border-radius: var(--r-full);
-    font-size: 12px;
-    font-weight: 500;
-    font-family: var(--font-body);
-    cursor: pointer;
-    border: 1px solid var(--cat-color, var(--theme-purple));
-    color: var(--cat-color, var(--theme-purple));
-    background: transparent;
-    white-space: nowrap;
-    /* Stagger via --pill-i custom prop (set inline in JSX):
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 12px;
+  border-radius: var(--r-full);
+  font-size: 12px;
+  font-weight: 500;
+  font-family: var(--font-body);
+  cursor: pointer;
+  border: 1px solid var(--cat-color, var(--theme-purple));
+  color: var(--cat-color, var(--theme-purple));
+  background: transparent;
+  white-space: nowrap;
+  /* Stagger via --pill-i custom prop (set inline in JSX):
        animation-delay: calc(var(--pill-i, 0) * 40ms)               */
-    animation: pill-enter var(--duration-base) var(--ease-out) calc(var(--pill-i, 0) * 40ms) both;
-    transition:
-        background var(--duration-fast) var(--ease-out),
-        box-shadow var(--duration-fast) var(--ease-out),
-        transform var(--duration-base) var(--ease-spring);
+  animation: pill-enter var(--duration-base) var(--ease-out)
+    calc(var(--pill-i, 0) * 40ms) both;
+  transition:
+    background var(--duration-fast) var(--ease-out),
+    box-shadow var(--duration-fast) var(--ease-out),
+    transform var(--duration-base) var(--ease-spring);
 }
 
 @keyframes pill-enter {
-    from {
-        opacity: 0;
-        transform: translateY(6px) scale(0.92);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.92);
+  }
 
-    to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 .catPill:hover {
-    background: var(--cat-bg, var(--theme-purple-dim));
-    transform: translateY(-1px);
+  background: var(--cat-bg, var(--theme-purple-dim));
+  transform: translateY(-1px);
 }
 
 .catPill:active {
-    transform: scale(0.95);
-    transition-duration: var(--duration-fast);
+  transform: scale(0.95);
+  transition-duration: var(--duration-fast);
 }
 
 .catPillActive {
-    background: var(--cat-bg, var(--theme-purple-dim)) !important;
-    font-weight: 600;
-    box-shadow: 0 0 0 1px var(--cat-color, var(--theme-purple));
+  background: var(--cat-bg, var(--theme-purple-dim)) !important;
+  font-weight: 600;
+  box-shadow: 0 0 0 1px var(--cat-color, var(--theme-purple));
 }
 
 .catDot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--cat-color, var(--theme-purple));
-    flex-shrink: 0;
-    /* Pulse when pill is active — shows selection is live */
-    transition: transform var(--duration-base) var(--ease-spring);
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--cat-color, var(--theme-purple));
+  flex-shrink: 0;
+  /* Pulse when pill is active — shows selection is live */
+  transition: transform var(--duration-base) var(--ease-spring);
 }
 
 .catPillActive .catDot {
-    transform: scale(1.4);
+  transform: scale(1.4);
 }
 
 /* ── Canvas ─────────────────────────────────────────────────── */
 .canvas {
-    flex: 1;
-    overflow: hidden;
-    position: relative;
-    z-index: 1;
-    /* Canvas fades in after subheader settles */
-    animation: fade-in var(--duration-slower) var(--ease-out) 200ms both;
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+  z-index: 1;
+  /* Canvas fades in after subheader settles */
+  animation: fade-in var(--duration-slower) var(--ease-out) 200ms both;
 }
 
 .loadingOverlay {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    background: rgba(10, 12, 20, 0.7);
-    z-index: 50;
-    font-size: 14px;
-    color: var(--theme-text-secondary);
-    /* Overlay fades in/out cleanly */
-    animation: fade-in var(--duration-base) var(--ease-out);
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: rgba(10, 12, 20, 0.7);
+  z-index: 50;
+  font-size: 14px;
+  color: var(--theme-text-secondary);
+  /* Overlay fades in/out cleanly */
+  animation: fade-in var(--duration-base) var(--ease-out);
 }
 
 .spinner {
-    width: 32px;
-    height: 32px;
-    border: 2px solid var(--theme-border);
-    border-top-color: var(--theme-purple);
-    border-radius: 50%;
-    /* Spin only transform — GPU layer */
-    animation: spin 0.8s cubic-bezier(0.45, 0, 0.55, 1) infinite;
-    will-change: transform;
-    /* continuous rotation — justified will-change */
+  width: 32px;
+  height: 32px;
+  border: 2px solid var(--theme-border);
+  border-top-color: var(--theme-purple);
+  border-radius: 50%;
+  /* Spin only transform — GPU layer */
+  animation: spin 0.8s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+  will-change: transform;
+  /* continuous rotation — justified will-change */
 }
 
 @keyframes spin {
-    to {
-        transform: rotate(360deg);
-    }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* ── Day View ───────────────────────────────────────────────── */
 .dayView {
-    display: flex;
-    height: calc(100vh - var(--navbar-h) - var(--subheader-h));
-    overflow-y: auto;
-    scrollbar-width: thin;
-    scrollbar-color: var(--theme-surface-2) transparent;
+  display: flex;
+  height: calc(100vh - var(--navbar-h) - var(--subheader-h));
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--theme-surface-2) transparent;
 }
 
 .timeLabels {
-    width: 64px;
-    flex-shrink: 0;
-    padding-top: 2px;
+  width: 64px;
+  flex-shrink: 0;
+  padding-top: 2px;
 }
 
 .timeLabel {
-    height: 64px;
-    display: flex;
-    align-items: flex-start;
-    justify-content: flex-end;
-    padding-right: 10px;
-    font-size: 11px;
-    color: var(--theme-text-muted);
-    font-family: var(--font-body);
+  height: 64px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding-right: 10px;
+  font-size: 11px;
+  color: var(--theme-text-muted);
+  font-family: var(--font-body);
 }
 
 .dayGrid {
-    flex: 1;
-    position: relative;
-    border-left: 1px solid var(--theme-border);
-    cursor: crosshair;
+  flex: 1;
+  position: relative;
+  border-left: 1px solid var(--theme-border);
+  cursor: crosshair;
 }
 
 .hourRow {
-    height: 64px;
-    position: relative;
-    /* Background swap — only opacity-based via the theme color, layout safe */
-    transition: background var(--duration-fast) var(--ease-out);
+  height: 64px;
+  position: relative;
+  /* Background swap — only opacity-based via the theme color, layout safe */
+  transition: background var(--duration-fast) var(--ease-out);
 }
 
 .hourRow:hover {
-    background: var(--theme-purple-dim);
+  background: var(--theme-purple-dim);
 }
 
 .hourLine {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 1px;
-    background: var(--theme-border);
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--theme-border);
 }
 
 .dragPreview {
-    position: absolute;
-    left: 4px;
-    right: 4px;
-    border-radius: var(--r-sm);
-    background: var(--theme-purple-dim);
-    border: 2px dashed var(--theme-purple);
-    pointer-events: none;
-    z-index: 5;
-    /* Only opacity transition — height controlled by JS drag math */
-    transition: opacity var(--duration-fast) var(--ease-out);
-    animation: drag-preview-appear var(--duration-base) var(--ease-out);
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  border-radius: var(--r-sm);
+  background: var(--theme-purple-dim);
+  border: 2px dashed var(--theme-purple);
+  pointer-events: none;
+  z-index: 5;
+  /* Only opacity transition — height controlled by JS drag math */
+  transition: opacity var(--duration-fast) var(--ease-out);
+  animation: drag-preview-appear var(--duration-base) var(--ease-out);
 }
 
 @keyframes drag-preview-appear {
-    from {
-        opacity: 0;
-        transform: scaleX(0.96);
-    }
+  from {
+    opacity: 0;
+    transform: scaleX(0.96);
+  }
 
-    to {
-        opacity: 1;
-        transform: scaleX(1);
-    }
+  to {
+    opacity: 1;
+    transform: scaleX(1);
+  }
 }
 
 /* Event blocks: lift + brightness on hover.
    transform only — no top/left changes. */
 .eventBlock {
-    position: absolute;
-    left: 8px;
-    right: 8px;
-    border-radius: var(--r-sm);
-    padding: 6px 10px;
-    cursor: pointer;
-    overflow: hidden;
-    z-index: 10;
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    /* Entrance: each block floats up */
-    animation: event-enter var(--duration-base) var(--ease-out) both;
-    transition:
-        filter var(--duration-fast) var(--ease-out),
-        transform var(--duration-base) var(--ease-spring),
-        box-shadow var(--duration-base) var(--ease-out);
-    will-change: transform;
-    /* active dragging targets — justified */
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  border-radius: var(--r-sm);
+  padding: 6px 10px;
+  cursor: pointer;
+  overflow: hidden;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  /* Entrance: each block floats up */
+  animation: event-enter var(--duration-base) var(--ease-out) both;
+  transition:
+    filter var(--duration-fast) var(--ease-out),
+    transform var(--duration-base) var(--ease-spring),
+    box-shadow var(--duration-base) var(--ease-out);
+  will-change: transform;
+  /* active dragging targets — justified */
 }
 
 @keyframes event-enter {
-    from {
-        opacity: 0;
-        transform: translateY(4px) scaleX(0.97);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(4px) scaleX(0.97);
+  }
 
-    to {
-        opacity: 1;
-        transform: translateY(0) scaleX(1);
-    }
+  to {
+    opacity: 1;
+    transform: translateY(0) scaleX(1);
+  }
 }
 
 .eventBlock:hover {
-    filter: brightness(1.2);
-    transform: scaleX(1.015) translateY(-1px);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+  filter: brightness(1.2);
+  transform: scaleX(1.015) translateY(-1px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
 }
 
 .eventBlock:hover .eventActions {
-    opacity: 1;
-    transform: translateY(0);
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .eventTitle {
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--theme-text);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--theme-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .eventTime {
-    font-size: 10px;
-    color: var(--theme-text-secondary);
+  font-size: 10px;
+  color: var(--theme-text-secondary);
 }
 
 .eventActions {
-    position: absolute;
-    top: 4px;
-    right: 6px;
-    display: flex;
-    gap: 4px;
-    opacity: 0;
-    /* Actions slide down into view — transform only */
-    transform: translateY(-4px);
-    transition:
-        opacity var(--duration-fast) var(--ease-out),
-        transform var(--duration-base) var(--ease-out);
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  display: flex;
+  gap: 4px;
+  opacity: 0;
+  /* Actions slide down into view — transform only */
+  transform: translateY(-4px);
+  transition:
+    opacity var(--duration-fast) var(--ease-out),
+    transform var(--duration-base) var(--ease-out);
 }
 
 .eventActionBtn {
-    background: rgba(10, 12, 20, 0.7);
-    border: none;
-    border-radius: 4px;
-    padding: 2px 5px;
-    font-size: 11px;
-    cursor: pointer;
-    color: var(--theme-text);
-    transition:
-        background var(--duration-fast) var(--ease-out),
-        transform var(--duration-fast) var(--ease-spring);
+  background: rgba(10, 12, 20, 0.7);
+  border: none;
+  border-radius: 4px;
+  padding: 2px 5px;
+  font-size: 11px;
+  cursor: pointer;
+  color: var(--theme-text);
+  transition:
+    background var(--duration-fast) var(--ease-out),
+    transform var(--duration-fast) var(--ease-spring);
 }
 
 .eventActionBtn:hover {
-    background: rgba(10, 12, 20, 0.95);
-    transform: scale(1.1);
+  background: rgba(10, 12, 20, 0.95);
+  transform: scale(1.1);
 }
 
 .eventActionBtn:active {
-    transform: scale(0.9);
+  transform: scale(0.9);
 }
 
 /* ── Week View ──────────────────────────────────────────────── */
 .weekView {
-    display: flex;
-    flex-direction: column;
-    height: calc(100vh - var(--navbar-h) - var(--subheader-h));
-    overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - var(--navbar-h) - var(--subheader-h));
+  overflow: hidden;
 }
 
 .weekHeader {
-    display: grid;
-    grid-template-columns: 56px repeat(7, 1fr);
-    border-bottom: 1px solid var(--theme-border);
-    flex-shrink: 0;
-    /* Header row slides down */
-    animation: fade-down var(--duration-base) var(--ease-out) both;
+  display: grid;
+  grid-template-columns: 56px repeat(7, 1fr);
+  border-bottom: 1px solid var(--theme-border);
+  flex-shrink: 0;
+  /* Header row slides down */
+  animation: fade-down var(--duration-base) var(--ease-out) both;
 }
 
 @keyframes fade-down {
-    from {
-        opacity: 0;
-        transform: translateY(-6px);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
 
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .weekTimeGutter {
-    /* empty corner */
+  /* empty corner */
 }
 
 .weekDayHeader {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 10px 0;
-    border-left: 1px solid var(--theme-border);
-    cursor: pointer;
-    transition: background var(--duration-fast) var(--ease-out);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px 0;
+  border-left: 1px solid var(--theme-border);
+  cursor: pointer;
+  transition: background var(--duration-fast) var(--ease-out);
 }
 
 .weekDayHeader:hover {
-    background: var(--theme-purple-dim);
+  background: var(--theme-purple-dim);
 }
 
 .weekDayToday .weekDayNum {
-    background: var(--theme-purple);
-    color: #fff;
-    border-radius: 50%;
-    width: 28px;
-    height: 28px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 0 12px var(--theme-purple-dim);
-    /* Today badge pulses once on load to draw attention */
-    animation: today-badge-pulse var(--duration-slower) var(--ease-spring) both;
+  background: var(--theme-purple);
+  color: #fff;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 12px var(--theme-purple-dim);
+  /* Today badge pulses once on load to draw attention */
+  animation: today-badge-pulse var(--duration-slower) var(--ease-spring) both;
 }
 
 @keyframes today-badge-pulse {
-    0% {
-        transform: scale(0.6);
-        opacity: 0;
-    }
+  0% {
+    transform: scale(0.6);
+    opacity: 0;
+  }
 
-    70% {
-        transform: scale(1.1);
-    }
+  70% {
+    transform: scale(1.1);
+  }
 
-    100% {
-        transform: scale(1);
-        opacity: 1;
-    }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 .weekDayName {
-    font-size: 11px;
-    font-weight: 500;
-    color: var(--theme-text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--theme-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .weekDayNum {
-    font-family: var(--font-display);
-    font-size: 18px;
-    font-weight: 700;
-    color: var(--theme-text);
-    width: 28px;
-    height: 28px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--theme-text);
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
 }
 
 .weekBody {
-    display: grid;
-    grid-template-columns: 56px repeat(7, 1fr);
-    flex: 1;
-    overflow-y: auto;
-    scrollbar-width: thin;
-    scrollbar-color: var(--theme-surface-2) transparent;
+  display: grid;
+  grid-template-columns: 56px repeat(7, 1fr);
+  flex: 1;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--theme-surface-2) transparent;
 }
 
 .weekTimeCol {
-    flex-shrink: 0;
+  flex-shrink: 0;
 }
 
 .weekTimeLabel {
-    height: 48px;
-    display: flex;
-    align-items: flex-start;
-    justify-content: flex-end;
-    padding-right: 8px;
-    padding-top: 4px;
-    font-size: 10px;
-    color: var(--theme-text-muted);
+  height: 48px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding-right: 8px;
+  padding-top: 4px;
+  font-size: 10px;
+  color: var(--theme-text-muted);
 }
 
 .weekDayCol {
-    position: relative;
-    border-left: 1px solid var(--theme-border);
+  position: relative;
+  border-left: 1px solid var(--theme-border);
 }
 
 .weekHourCell {
-    height: 48px;
-    border-top: 1px solid var(--theme-border);
-    transition: background var(--duration-fast) var(--ease-out);
+  height: 48px;
+  border-top: 1px solid var(--theme-border);
+  transition: background var(--duration-fast) var(--ease-out);
 }
 
 .weekHourCell:hover {
-    background: var(--theme-purple-dim);
+  background: var(--theme-purple-dim);
 }
 
 /* Week chips: entrance stagger via --chip-i (set inline in JSX) */
 .weekEventChip {
-    position: absolute;
-    left: 2px;
-    right: 2px;
-    border-radius: var(--r-sm);
-    padding: 3px 6px;
-    font-size: 11px;
-    font-weight: 500;
-    color: var(--theme-text);
-    cursor: pointer;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    z-index: 5;
-    animation: event-enter var(--duration-base) var(--ease-out) calc(var(--chip-i, 0) * 30ms) both;
-    transition:
-        filter var(--duration-fast) var(--ease-out),
-        transform var(--duration-base) var(--ease-spring);
+  position: absolute;
+  left: 2px;
+  right: 2px;
+  border-radius: var(--r-sm);
+  padding: 3px 6px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--theme-text);
+  cursor: pointer;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  z-index: 5;
+  animation: event-enter var(--duration-base) var(--ease-out)
+    calc(var(--chip-i, 0) * 30ms) both;
+  transition:
+    filter var(--duration-fast) var(--ease-out),
+    transform var(--duration-base) var(--ease-spring);
 }
 
 .weekEventChip:hover {
-    filter: brightness(1.25);
-    transform: scaleX(1.015);
+  filter: brightness(1.25);
+  transform: scaleX(1.015);
 }
 
 /* ── Month View ─────────────────────────────────────────────── */
 .monthView {
-    height: calc(100vh - var(--navbar-h) - var(--subheader-h));
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
+  height: calc(100vh - var(--navbar-h) - var(--subheader-h));
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 .monthWeekRow {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    border-bottom: 1px solid var(--theme-border);
-    flex-shrink: 0;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  border-bottom: 1px solid var(--theme-border);
+  flex-shrink: 0;
 }
 
 .monthWeekLabel {
-    text-align: center;
-    padding: 8px 0;
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--theme-text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+  text-align: center;
+  padding: 8px 0;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--theme-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .monthGrid {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    flex: 1;
-    overflow: hidden;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  flex: 1;
+  overflow: hidden;
 }
 
 /* Month cells stagger in via --cell-i (set inline in JSX):
    creates a wave effect across the grid */
 .monthCell {
-    border-right: 1px solid var(--theme-border);
-    border-bottom: 1px solid var(--theme-border);
-    padding: 8px;
-    cursor: pointer;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    min-height: 80px;
-    animation: cell-enter var(--duration-base) var(--ease-out) calc(var(--cell-i, 0) * 15ms) both;
-    transition: background var(--duration-fast) var(--ease-out);
+  border-right: 1px solid var(--theme-border);
+  border-bottom: 1px solid var(--theme-border);
+  padding: 8px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-height: 80px;
+  animation: cell-enter var(--duration-base) var(--ease-out)
+    calc(var(--cell-i, 0) * 15ms) both;
+  transition: background var(--duration-fast) var(--ease-out);
 }
 
 @keyframes cell-enter {
-    from {
-        opacity: 0;
-        transform: scale(0.97);
-    }
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
 
-    to {
-        opacity: 1;
-        transform: scale(1);
-    }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .monthCell:hover {
-    background: var(--theme-purple-dim);
+  background: var(--theme-purple-dim);
 }
 
 .monthCellOut {
-    opacity: 0.3;
+  opacity: 0.3;
 }
 
 .monthCellToday .monthDayNum {
-    background: var(--theme-purple);
-    color: #fff;
-    border-radius: 50%;
-    width: 24px;
-    height: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 700;
-    box-shadow: 0 0 10px var(--theme-purple-dim);
-    /* Today inherits the same badge pop as week view */
-    animation: today-badge-pulse var(--duration-slower) var(--ease-spring) both;
+  background: var(--theme-purple);
+  color: #fff;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  box-shadow: 0 0 10px var(--theme-purple-dim);
+  /* Today inherits the same badge pop as week view */
+  animation: today-badge-pulse var(--duration-slower) var(--ease-spring) both;
 }
 
 .monthDayNum {
-    font-family: var(--font-display);
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--theme-text);
-    width: 24px;
-    height: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: transform var(--duration-fast) var(--ease-spring);
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--theme-text);
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform var(--duration-fast) var(--ease-spring);
 }
 
 .monthCell:hover .monthDayNum {
-    transform: scale(1.1);
+  transform: scale(1.1);
 }
 
 .monthDots {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 3px;
-    align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  align-items: center;
 }
 
 .monthDot {
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    flex-shrink: 0;
-    /* Dots pop in when cell renders */
-    animation: dot-pop var(--duration-base) var(--ease-spring) both;
-    transition: transform var(--duration-fast) var(--ease-spring);
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  /* Dots pop in when cell renders */
+  animation: dot-pop var(--duration-base) var(--ease-spring) both;
+  transition: transform var(--duration-fast) var(--ease-spring);
 }
 
 @keyframes dot-pop {
-    from {
-        transform: scale(0);
-        opacity: 0;
-    }
+  from {
+    transform: scale(0);
+    opacity: 0;
+  }
 
-    to {
-        transform: scale(1);
-        opacity: 1;
-    }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 .monthCell:hover .monthDot {
-    transform: scale(1.3);
+  transform: scale(1.3);
 }
 
 .monthMore {
-    font-size: 10px;
-    color: var(--theme-text-muted);
-    transition: color var(--duration-fast) var(--ease-out);
+  font-size: 10px;
+  color: var(--theme-text-muted);
+  transition: color var(--duration-fast) var(--ease-out);
 }
 
 .monthCell:hover .monthMore {
-    color: var(--theme-purple);
+  color: var(--theme-purple);
 }
 
 /* ── Agenda View ────────────────────────────────────────────── */
 .agendaView {
-    height: calc(100vh - var(--navbar-h) - var(--subheader-h));
-    overflow-y: auto;
-    padding: 24px;
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-    scrollbar-width: thin;
-    scrollbar-color: var(--theme-surface-2) transparent;
+  height: calc(100vh - var(--navbar-h) - var(--subheader-h));
+  overflow-y: auto;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--theme-surface-2) transparent;
 }
 
 .agendaEmpty {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 200px;
-    color: var(--theme-text-muted);
-    font-size: 15px;
-    animation: fade-up var(--duration-slow) var(--ease-out) both;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  color: var(--theme-text-muted);
+  font-size: 15px;
+  animation: fade-up var(--duration-slow) var(--ease-out) both;
 }
 
 .agendaCreateLink {
-    background: none;
-    border: none;
-    color: var(--theme-purple);
-    cursor: pointer;
-    font-size: 15px;
-    font-family: var(--font-body);
-    text-decoration: underline;
-    transition: opacity var(--duration-fast) var(--ease-out);
+  background: none;
+  border: none;
+  color: var(--theme-purple);
+  cursor: pointer;
+  font-size: 15px;
+  font-family: var(--font-body);
+  text-decoration: underline;
+  transition: opacity var(--duration-fast) var(--ease-out);
 }
 
 .agendaCreateLink:hover {
-    opacity: 0.75;
+  opacity: 0.75;
 }
 
 /* Agenda groups stagger in via --group-i */
 .agendaGroup {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    animation: fade-up var(--duration-slow) var(--ease-out) calc(var(--group-i, 0) * 60ms) both;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  animation: fade-up var(--duration-slow) var(--ease-out)
+    calc(var(--group-i, 0) * 60ms) both;
 }
 
 .agendaDateHeader {
-    font-family: var(--font-display);
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--theme-text-muted);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    padding-bottom: 4px;
-    border-bottom: 1px solid var(--theme-border);
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--theme-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--theme-border);
 }
 
 /* Agenda items: stagger via --item-i within each group */
 .agendaItem {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    background: var(--theme-surface);
-    border-radius: var(--r-md);
-    padding: 14px 16px;
-    cursor: pointer;
-    border: 1px solid var(--theme-border);
-    animation: fade-up var(--duration-base) var(--ease-out) calc(var(--item-i, 0) * 40ms) both;
-    transition:
-        border-color var(--duration-base) var(--ease-out),
-        background var(--duration-base) var(--ease-out),
-        transform var(--duration-base) var(--ease-spring),
-        box-shadow var(--duration-base) var(--ease-out);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: var(--theme-surface);
+  border-radius: var(--r-md);
+  padding: 14px 16px;
+  cursor: pointer;
+  border: 1px solid var(--theme-border);
+  animation: fade-up var(--duration-base) var(--ease-out)
+    calc(var(--item-i, 0) * 40ms) both;
+  transition:
+    border-color var(--duration-base) var(--ease-out),
+    background var(--duration-base) var(--ease-out),
+    transform var(--duration-base) var(--ease-spring),
+    box-shadow var(--duration-base) var(--ease-out);
 }
 
 .agendaItem:hover {
-    border-color: var(--ev-color, var(--theme-purple));
-    background: var(--theme-surface-2);
-    /* Slide right on hover — transform only, GPU safe */
-    transform: translateX(5px);
-    box-shadow: -3px 0 0 0 var(--ev-color, var(--theme-purple));
+  border-color: var(--ev-color, var(--theme-purple));
+  background: var(--theme-surface-2);
+  /* Slide right on hover — transform only, GPU safe */
+  transform: translateX(5px);
+  box-shadow: -3px 0 0 0 var(--ev-color, var(--theme-purple));
 }
 
 .agendaItem:active {
-    transform: translateX(2px) scale(0.99);
-    transition-duration: var(--duration-fast);
+  transform: translateX(2px) scale(0.99);
+  transition-duration: var(--duration-fast);
 }
 
 .agendaItemLeft {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
 }
 
 .agendaItemTitle {
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--theme-text);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--theme-text);
 }
 
 .agendaItemMeta {
-    font-size: 12px;
-    color: var(--theme-text-secondary);
+  font-size: 12px;
+  color: var(--theme-text-secondary);
 }
 
 .agendaItemRight {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
 }
 
 .agendaItemTime {
-    font-size: 12px;
-    color: var(--theme-text-secondary);
-    white-space: nowrap;
+  font-size: 12px;
+  color: var(--theme-text-secondary);
+  white-space: nowrap;
 }
 
 .agendaCat {
-    font-size: 10px;
-    font-weight: 600;
-    padding: 2px 8px;
-    border-radius: var(--r-full);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: var(--r-full);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .agendaActions {
-    display: flex;
-    gap: 6px;
+  display: flex;
+  gap: 6px;
 }
 
 .agendaBtn {
-    font-size: 11px;
-    font-weight: 500;
-    font-family: var(--font-body);
-    padding: 4px 10px;
-    border-radius: var(--r-sm);
-    border: 1px solid var(--theme-border);
-    background: var(--theme-surface-2);
-    color: var(--theme-text-secondary);
-    cursor: pointer;
-    transition:
-        border-color var(--duration-fast) var(--ease-out),
-        color var(--duration-fast) var(--ease-out),
-        transform var(--duration-fast) var(--ease-spring);
+  font-size: 11px;
+  font-weight: 500;
+  font-family: var(--font-body);
+  padding: 4px 10px;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--theme-border);
+  background: var(--theme-surface-2);
+  color: var(--theme-text-secondary);
+  cursor: pointer;
+  transition:
+    border-color var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out),
+    transform var(--duration-fast) var(--ease-spring);
 }
 
 .agendaBtn:hover {
-    border-color: var(--theme-purple);
-    color: var(--theme-purple);
-    transform: translateY(-1px);
+  border-color: var(--theme-purple);
+  color: var(--theme-purple);
+  transform: translateY(-1px);
 }
 
 .agendaBtn:active {
-    transform: scale(0.94);
+  transform: scale(0.94);
 }
 
 .agendaBtnDanger:hover {
-    border-color: var(--theme-red);
-    color: var(--theme-red);
+  border-color: var(--theme-red);
+  color: var(--theme-red);
 }
 
 /* ── Detail Panel ───────────────────────────────────────────── */
 .detailBackdrop {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.3);
-    z-index: 200;
-    display: flex;
-    align-items: flex-start;
-    justify-content: flex-end;
-    padding: 80px 24px 24px;
-    animation: fade-in var(--duration-base) var(--ease-out);
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: 200;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding: 80px 24px 24px;
+  animation: fade-in var(--duration-base) var(--ease-out);
 }
 
 .detailPanel {
-    background: var(--theme-surface);
-    border: 1px solid var(--theme-border);
-    border-radius: var(--r-md);
-    box-shadow: var(--theme-card-shadow);
-    padding: 24px;
-    width: 280px;
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    /* Slides in from right — transform only */
-    animation: slide-in-right var(--duration-slow) var(--ease-out);
-    will-change: transform;
-    /* single shot entrance — remove after animation via JS if desired */
+  background: var(--theme-surface);
+  border: 1px solid var(--theme-border);
+  border-radius: var(--r-md);
+  box-shadow: var(--theme-card-shadow);
+  padding: 24px;
+  width: 280px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  /* Slides in from right — transform only */
+  animation: slide-in-right var(--duration-slow) var(--ease-out);
+  will-change: transform;
+  /* single shot entrance — remove after animation via JS if desired */
 }
 
 @keyframes slide-in-right {
-    from {
-        transform: translateX(28px);
-        opacity: 0;
-    }
+  from {
+    transform: translateX(28px);
+    opacity: 0;
+  }
 
-    to {
-        transform: translateX(0);
-        opacity: 1;
-    }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
 }
 
 .detailColorBar {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-    border-radius: var(--r-md) var(--r-md) 0 0;
-    /* Bar width animates from 0 to full on open */
-    animation: bar-grow var(--duration-slow) var(--ease-out) 100ms both;
-    transform-origin: left;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  border-radius: var(--r-md) var(--r-md) 0 0;
+  /* Bar width animates from 0 to full on open */
+  animation: bar-grow var(--duration-slow) var(--ease-out) 100ms both;
+  transform-origin: left;
 }
 
 @keyframes bar-grow {
-    from {
-        transform: scaleX(0);
-    }
+  from {
+    transform: scaleX(0);
+  }
 
-    to {
-        transform: scaleX(1);
-    }
+  to {
+    transform: scaleX(1);
+  }
 }
 
 .detailClose {
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    background: var(--theme-surface-2);
-    border: 1px solid var(--theme-border);
-    border-radius: var(--r-sm);
-    width: 26px;
-    height: 26px;
-    font-size: 11px;
-    cursor: pointer;
-    color: var(--theme-text-secondary);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition:
-        border-color var(--duration-fast) var(--ease-out),
-        transform var(--duration-base) var(--ease-spring),
-        color var(--duration-fast) var(--ease-out);
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: var(--theme-surface-2);
+  border: 1px solid var(--theme-border);
+  border-radius: var(--r-sm);
+  width: 26px;
+  height: 26px;
+  font-size: 11px;
+  cursor: pointer;
+  color: var(--theme-text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    border-color var(--duration-fast) var(--ease-out),
+    transform var(--duration-base) var(--ease-spring),
+    color var(--duration-fast) var(--ease-out);
 }
 
 .detailClose:hover {
-    border-color: var(--theme-red);
-    color: var(--theme-red);
-    /* X icon rotates on hover — obvious close affordance */
-    transform: rotate(90deg) scale(1.1);
+  border-color: var(--theme-red);
+  color: var(--theme-red);
+  /* X icon rotates on hover — obvious close affordance */
+  transform: rotate(90deg) scale(1.1);
 }
 
 .detailClose:active {
-    transform: scale(0.88);
+  transform: scale(0.88);
 }
 
 .detailTitle {
-    font-family: var(--font-display);
-    font-size: 16px;
-    font-weight: 700;
-    color: var(--theme-text);
-    margin: 0;
-    padding-top: 8px;
-    animation: fade-up var(--duration-base) var(--ease-out) 80ms both;
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--theme-text);
+  margin: 0;
+  padding-top: 8px;
+  animation: fade-up var(--duration-base) var(--ease-out) 80ms both;
 }
 
 .detailTopic {
-    font-size: 13px;
-    color: var(--theme-text-secondary);
-    margin: 0;
-    animation: fade-up var(--duration-base) var(--ease-out) 120ms both;
+  font-size: 13px;
+  color: var(--theme-text-secondary);
+  margin: 0;
+  animation: fade-up var(--duration-base) var(--ease-out) 120ms both;
 }
 
 .detailRow {
-    display: flex;
-    align-items: flex-start;
-    gap: 8px;
-    font-size: 13px;
-    color: var(--theme-text-secondary);
-    animation: fade-up var(--duration-base) var(--ease-out) 160ms both;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--theme-text-secondary);
+  animation: fade-up var(--duration-base) var(--ease-out) 160ms both;
 }
 
 .detailActions {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    margin-top: 4px;
-    animation: fade-up var(--duration-base) var(--ease-out) 200ms both;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 4px;
+  animation: fade-up var(--duration-base) var(--ease-out) 200ms both;
 }
 
 .detailEditBtn,
 .detailICSBtn,
 .detailDeleteBtn {
-    font-family: var(--font-body);
-    font-size: 13px;
-    font-weight: 500;
-    border-radius: var(--r-sm);
-    padding: 8px 14px;
-    cursor: pointer;
-    border: 1px solid var(--theme-border);
-    text-align: center;
-    transition:
-        opacity var(--duration-fast) var(--ease-out),
-        transform var(--duration-base) var(--ease-spring),
-        border-color var(--duration-fast) var(--ease-out),
-        background var(--duration-fast) var(--ease-out),
-        color var(--duration-fast) var(--ease-out);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: var(--r-sm);
+  padding: 8px 14px;
+  cursor: pointer;
+  border: 1px solid var(--theme-border);
+  text-align: center;
+  transition:
+    opacity var(--duration-fast) var(--ease-out),
+    transform var(--duration-base) var(--ease-spring),
+    border-color var(--duration-fast) var(--ease-out),
+    background var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out);
 }
 
 .detailEditBtn {
-    background: var(--theme-purple);
-    color: #fff;
-    border-color: var(--theme-purple);
+  background: var(--theme-purple);
+  color: #fff;
+  border-color: var(--theme-purple);
 }
 
 .detailEditBtn:hover {
-    opacity: 0.85;
-    transform: translateY(-1px);
+  opacity: 0.85;
+  transform: translateY(-1px);
 }
 
 .detailEditBtn:active {
-    transform: scale(0.96);
+  transform: scale(0.96);
 }
 
 .detailICSBtn {
-    background: var(--theme-surface-2);
-    color: var(--theme-text-secondary);
+  background: var(--theme-surface-2);
+  color: var(--theme-text-secondary);
 }
 
 .detailICSBtn:hover {
-    border-color: var(--theme-purple);
-    color: var(--theme-purple);
-    transform: translateY(-1px);
+  border-color: var(--theme-purple);
+  color: var(--theme-purple);
+  transform: translateY(-1px);
 }
 
 .detailICSBtn:active {
-    transform: scale(0.96);
+  transform: scale(0.96);
 }
 
 .detailDeleteBtn {
-    background: transparent;
-    color: var(--theme-red);
-    border-color: transparent;
+  background: transparent;
+  color: var(--theme-red);
+  border-color: transparent;
 }
 
 .detailDeleteBtn:hover {
-    border-color: var(--theme-red);
-    background: rgba(239, 68, 68, 0.08);
-    /* Shake hint on hover — transform only */
-    animation: delete-hint var(--duration-slow) var(--ease-in-out);
+  border-color: var(--theme-red);
+  background: rgba(239, 68, 68, 0.08);
+  /* Shake hint on hover — transform only */
+  animation: delete-hint var(--duration-slow) var(--ease-in-out);
 }
 
 @keyframes delete-hint {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
 
-    0%,
-    100% {
-        transform: translateX(0);
-    }
+  20% {
+    transform: translateX(-3px);
+  }
 
-    20% {
-        transform: translateX(-3px);
-    }
+  40% {
+    transform: translateX(3px);
+  }
 
-    40% {
-        transform: translateX(3px);
-    }
+  60% {
+    transform: translateX(-2px);
+  }
 
-    60% {
-        transform: translateX(-2px);
-    }
-
-    80% {
-        transform: translateX(2px);
-    }
+  80% {
+    transform: translateX(2px);
+  }
 }
 
 .detailDeleteBtn:active {
-    transform: scale(0.94);
-    transition-duration: var(--duration-fast);
+  transform: scale(0.94);
+  transition-duration: var(--duration-fast);
 }
 
 /* ── Modal ──────────────────────────────────────────────────── */
 .modalBackdrop {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.55);
-    backdrop-filter: blur(4px);
-    z-index: 300;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 24px;
-    animation: fade-in var(--duration-base) var(--ease-out);
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(4px);
+  z-index: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  animation: fade-in var(--duration-base) var(--ease-out);
 }
 
 .modal {
-    background: var(--theme-surface);
-    border: 1px solid var(--theme-border);
-    border-radius: var(--r-lg);
-    box-shadow: var(--theme-card-shadow);
-    width: 100%;
-    max-width: 480px;
-    max-height: 90vh;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    /* Spring up — transform + opacity only */
-    animation: modal-up var(--duration-slow) var(--ease-spring);
-    will-change: transform;
-    /* single shot entrance */
+  background: var(--theme-surface);
+  border: 1px solid var(--theme-border);
+  border-radius: var(--r-lg);
+  box-shadow: var(--theme-card-shadow);
+  width: 100%;
+  max-width: 480px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  /* Spring up — transform + opacity only */
+  animation: modal-up var(--duration-slow) var(--ease-spring);
+  will-change: transform;
+  /* single shot entrance */
 }
 
 @keyframes modal-up {
-    from {
-        transform: translateY(20px) scale(0.96);
-        opacity: 0;
-    }
+  from {
+    transform: translateY(20px) scale(0.96);
+    opacity: 0;
+  }
 
-    to {
-        transform: translateY(0) scale(1);
-        opacity: 1;
-    }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
 }
 
 .modalHeader {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 20px 24px 16px;
-    border-bottom: 1px solid var(--theme-border);
-    flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--theme-border);
+  flex-shrink: 0;
 }
 
 .modalTitle {
-    font-family: var(--font-display);
-    font-size: 16px;
-    font-weight: 700;
-    color: var(--theme-text);
-    margin: 0;
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--theme-text);
+  margin: 0;
 }
 
 .modalClose {
-    background: var(--theme-surface-2);
-    border: 1px solid var(--theme-border);
-    border-radius: var(--r-sm);
-    width: 30px;
-    height: 30px;
-    font-size: 12px;
-    cursor: pointer;
-    color: var(--theme-text-secondary);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition:
-        border-color var(--duration-fast) var(--ease-out),
-        color var(--duration-fast) var(--ease-out),
-        transform var(--duration-base) var(--ease-spring);
+  background: var(--theme-surface-2);
+  border: 1px solid var(--theme-border);
+  border-radius: var(--r-sm);
+  width: 30px;
+  height: 30px;
+  font-size: 12px;
+  cursor: pointer;
+  color: var(--theme-text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    border-color var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out),
+    transform var(--duration-base) var(--ease-spring);
 }
 
 .modalClose:hover {
-    border-color: var(--theme-purple);
-    color: var(--theme-purple);
-    /* Rotate matches detailClose */
-    transform: rotate(90deg) scale(1.1);
+  border-color: var(--theme-purple);
+  color: var(--theme-purple);
+  /* Rotate matches detailClose */
+  transform: rotate(90deg) scale(1.1);
 }
 
 .modalClose:active {
-    transform: scale(0.88);
+  transform: scale(0.88);
 }
 
 .modalBody {
-    flex: 1;
-    overflow-y: auto;
-    padding: 20px 24px;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    scrollbar-width: thin;
-    scrollbar-color: var(--theme-surface-2) transparent;
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--theme-surface-2) transparent;
 }
 
 /* Field groups cascade in — stagger via --field-i */
 .fieldGroup {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    animation: fade-up var(--duration-base) var(--ease-out) calc(var(--field-i, 0) * 40ms + 100ms) both;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  animation: fade-up var(--duration-base) var(--ease-out)
+    calc(var(--field-i, 0) * 40ms + 100ms) both;
 }
 
 .fieldRow {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
 }
 
 .fieldLabel {
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--theme-text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--theme-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .fieldInput,
 .fieldSelect {
-    background: var(--theme-input-bg);
-    border: 1px solid var(--theme-input-border);
-    border-radius: var(--r-sm);
-    padding: 9px 12px;
-    font-size: 14px;
-    font-family: var(--font-body);
-    color: var(--theme-text);
-    width: 100%;
-    box-sizing: border-box;
-    outline: none;
-    appearance: none;
-    /* Glow ring grows from zero — no layout shift */
-    transition:
-        border-color var(--duration-fast) var(--ease-out),
-        box-shadow var(--duration-base) var(--ease-out);
+  background: var(--theme-input-bg);
+  border: 1px solid var(--theme-input-border);
+  border-radius: var(--r-sm);
+  padding: 9px 12px;
+  font-size: 14px;
+  font-family: var(--font-body);
+  color: var(--theme-text);
+  width: 100%;
+  box-sizing: border-box;
+  outline: none;
+  appearance: none;
+  /* Glow ring grows from zero — no layout shift */
+  transition:
+    border-color var(--duration-fast) var(--ease-out),
+    box-shadow var(--duration-base) var(--ease-out);
 }
 
 .fieldInput::placeholder {
-    color: var(--theme-text-muted);
+  color: var(--theme-text-muted);
 }
 
 .fieldInput:focus,
 .fieldSelect:focus {
-    border-color: var(--theme-purple);
-    /* Focus glow expands — only box-shadow changes */
-    box-shadow: 0 0 0 3px var(--theme-purple-dim);
+  border-color: var(--theme-purple);
+  /* Focus glow expands — only box-shadow changes */
+  box-shadow: 0 0 0 3px var(--theme-purple-dim);
 }
 
 .fieldSelect {
-    cursor: pointer;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238a8a9a' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 12px center;
-    padding-right: 32px;
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238a8a9a' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 32px;
 }
 
 .fieldTextarea {
-    background: var(--theme-input-bg);
-    border: 1px solid var(--theme-input-border);
-    border-radius: var(--r-sm);
-    padding: 9px 12px;
-    font-size: 14px;
-    font-family: var(--font-body);
-    color: var(--theme-text);
-    width: 100%;
-    box-sizing: border-box;
-    resize: vertical;
-    min-height: 72px;
-    outline: none;
-    transition:
-        border-color var(--duration-fast) var(--ease-out),
-        box-shadow var(--duration-base) var(--ease-out);
+  background: var(--theme-input-bg);
+  border: 1px solid var(--theme-input-border);
+  border-radius: var(--r-sm);
+  padding: 9px 12px;
+  font-size: 14px;
+  font-family: var(--font-body);
+  color: var(--theme-text);
+  width: 100%;
+  box-sizing: border-box;
+  resize: vertical;
+  min-height: 72px;
+  outline: none;
+  transition:
+    border-color var(--duration-fast) var(--ease-out),
+    box-shadow var(--duration-base) var(--ease-out);
 }
 
 .fieldTextarea::placeholder {
-    color: var(--theme-text-muted);
+  color: var(--theme-text-muted);
 }
 
 .fieldTextarea:focus {
-    border-color: var(--theme-purple);
-    box-shadow: 0 0 0 3px var(--theme-purple-dim);
+  border-color: var(--theme-purple);
+  box-shadow: 0 0 0 3px var(--theme-purple-dim);
 }
 
 /* Category segmented */
 .catSegmented {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
 }
 
 .catSeg {
-    font-family: var(--font-body);
-    font-size: 12px;
-    font-weight: 500;
-    padding: 5px 12px;
-    border-radius: var(--r-full);
-    border: 1px solid var(--cat-color, var(--theme-purple));
-    color: var(--cat-color, var(--theme-purple));
-    background: transparent;
-    cursor: pointer;
-    transition:
-        background var(--duration-fast) var(--ease-out),
-        box-shadow var(--duration-fast) var(--ease-out),
-        transform var(--duration-base) var(--ease-spring);
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 500;
+  padding: 5px 12px;
+  border-radius: var(--r-full);
+  border: 1px solid var(--cat-color, var(--theme-purple));
+  color: var(--cat-color, var(--theme-purple));
+  background: transparent;
+  cursor: pointer;
+  transition:
+    background var(--duration-fast) var(--ease-out),
+    box-shadow var(--duration-fast) var(--ease-out),
+    transform var(--duration-base) var(--ease-spring);
 }
 
 .catSeg:hover {
-    background: color-mix(in srgb, var(--cat-color, var(--theme-purple)) 15%, transparent);
-    transform: translateY(-1px);
+  background: color-mix(
+    in srgb,
+    var(--cat-color, var(--theme-purple)) 15%,
+    transparent
+  );
+  transform: translateY(-1px);
 }
 
 .catSeg:active {
-    transform: scale(0.93);
-    transition-duration: var(--duration-fast);
+  transform: scale(0.93);
+  transition-duration: var(--duration-fast);
 }
 
 .catSegActive {
-    background: color-mix(in srgb, var(--cat-color, var(--theme-purple)) 20%, transparent) !important;
-    font-weight: 700;
-    box-shadow: 0 0 0 1px var(--cat-color, var(--theme-purple));
-    animation: tab-activate var(--duration-base) var(--ease-spring);
+  background: color-mix(
+    in srgb,
+    var(--cat-color, var(--theme-purple)) 20%,
+    transparent
+  ) !important;
+  font-weight: 700;
+  box-shadow: 0 0 0 1px var(--cat-color, var(--theme-purple));
+  animation: tab-activate var(--duration-base) var(--ease-spring);
 }
 
 /* Color swatches */
 .colorRow {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 /* Swatch pops in with stagger via --swatch-i */
 .colorSwatch {
-    width: 26px;
-    height: 26px;
-    border-radius: 50%;
-    border: 2px solid transparent;
-    cursor: pointer;
-    outline: none;
-    position: relative;
-    animation: dot-pop var(--duration-base) var(--ease-spring) calc(var(--swatch-i, 0) * 25ms) both;
-    transition:
-        transform var(--duration-base) var(--ease-spring),
-        box-shadow var(--duration-base) var(--ease-out),
-        border-color var(--duration-fast) var(--ease-out);
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  outline: none;
+  position: relative;
+  animation: dot-pop var(--duration-base) var(--ease-spring)
+    calc(var(--swatch-i, 0) * 25ms) both;
+  transition:
+    transform var(--duration-base) var(--ease-spring),
+    box-shadow var(--duration-base) var(--ease-out),
+    border-color var(--duration-fast) var(--ease-out);
 }
 
 .colorSwatch:hover {
-    transform: scale(1.2);
-    /* Soft glow on hover — box-shadow only */
-    box-shadow: 0 0 8px 2px rgba(255, 255, 255, 0.15);
+  transform: scale(1.2);
+  /* Soft glow on hover — box-shadow only */
+  box-shadow: 0 0 8px 2px rgba(255, 255, 255, 0.15);
 }
 
 .colorSwatch:active {
-    transform: scale(0.9);
-    transition-duration: var(--duration-fast);
+  transform: scale(0.9);
+  transition-duration: var(--duration-fast);
 }
 
 .colorSwatchActive {
-    border-color: var(--theme-text);
-    box-shadow: 0 0 0 2px var(--theme-purple), 0 0 8px var(--theme-purple-dim);
-    transform: scale(1.1);
-    /* Scale bounce on selection */
-    animation: swatch-select var(--duration-base) var(--ease-spring);
+  border-color: var(--theme-text);
+  box-shadow:
+    0 0 0 2px var(--theme-purple),
+    0 0 8px var(--theme-purple-dim);
+  transform: scale(1.1);
+  /* Scale bounce on selection */
+  animation: swatch-select var(--duration-base) var(--ease-spring);
 }
 
 @keyframes swatch-select {
-    0% {
-        transform: scale(0.85);
-    }
+  0% {
+    transform: scale(0.85);
+  }
 
-    60% {
-        transform: scale(1.2);
-    }
+  60% {
+    transform: scale(1.2);
+  }
 
-    100% {
-        transform: scale(1.1);
-    }
+  100% {
+    transform: scale(1.1);
+  }
 }
 
 /* Form error */
 .formError {
-    font-size: 12px;
-    color: var(--theme-red);
-    background: rgba(239, 68, 68, 0.1);
-    border: 1px solid rgba(239, 68, 68, 0.3);
-    border-radius: var(--r-sm);
-    padding: 8px 12px;
-    margin: 0;
-    /* Error shakes in — grabs attention without being jarring */
-    animation: error-shake var(--duration-slow) var(--ease-out);
+  font-size: 12px;
+  color: var(--theme-red);
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: var(--r-sm);
+  padding: 8px 12px;
+  margin: 0;
+  /* Error shakes in — grabs attention without being jarring */
+  animation: error-shake var(--duration-slow) var(--ease-out);
 }
 
 @keyframes error-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
 
-    0%,
-    100% {
-        transform: translateX(0);
-    }
+  15% {
+    transform: translateX(-6px);
+  }
 
-    15% {
-        transform: translateX(-6px);
-    }
+  30% {
+    transform: translateX(5px);
+  }
 
-    30% {
-        transform: translateX(5px);
-    }
+  45% {
+    transform: translateX(-4px);
+  }
 
-    45% {
-        transform: translateX(-4px);
-    }
+  60% {
+    transform: translateX(3px);
+  }
 
-    60% {
-        transform: translateX(3px);
-    }
+  75% {
+    transform: translateX(-2px);
+  }
 
-    75% {
-        transform: translateX(-2px);
-    }
-
-    90% {
-        transform: translateX(1px);
-    }
+  90% {
+    transform: translateX(1px);
+  }
 }
 
 /* Modal footer */
 .modalFooter {
-    padding: 14px 24px 20px;
-    border-top: 1px solid var(--theme-border);
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    flex-shrink: 0;
+  padding: 14px 24px 20px;
+  border-top: 1px solid var(--theme-border);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex-shrink: 0;
 }
 
 .modalTip {
-    font-size: 11px;
-    color: var(--theme-text-muted);
-    margin: 0;
+  font-size: 11px;
+  color: var(--theme-text-muted);
+  margin: 0;
 }
 
 .modalFooterBtns {
-    display: flex;
-    gap: 10px;
-    justify-content: flex-end;
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
 }
 
 .cancelBtn {
-    font-family: var(--font-body);
-    font-size: 13px;
-    font-weight: 500;
-    padding: 9px 20px;
-    border-radius: var(--r-full);
-    border: 1px solid var(--theme-border);
-    background: transparent;
-    color: var(--theme-text-secondary);
-    cursor: pointer;
-    transition:
-        border-color var(--duration-fast) var(--ease-out),
-        color var(--duration-fast) var(--ease-out),
-        transform var(--duration-base) var(--ease-spring);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 9px 20px;
+  border-radius: var(--r-full);
+  border: 1px solid var(--theme-border);
+  background: transparent;
+  color: var(--theme-text-secondary);
+  cursor: pointer;
+  transition:
+    border-color var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out),
+    transform var(--duration-base) var(--ease-spring);
 }
 
 .cancelBtn:hover {
-    border-color: var(--theme-purple);
-    color: var(--theme-purple);
-    transform: translateY(-1px);
+  border-color: var(--theme-purple);
+  color: var(--theme-purple);
+  transform: translateY(-1px);
 }
 
 .cancelBtn:active {
-    transform: scale(0.95);
-    transition-duration: var(--duration-fast);
+  transform: scale(0.95);
+  transition-duration: var(--duration-fast);
 }
 
 .saveBtn {
-    font-family: var(--font-body);
-    font-size: 13px;
-    font-weight: 600;
-    padding: 9px 24px;
-    border-radius: var(--r-full);
-    border: none;
-    background: var(--theme-purple);
-    color: #fff;
-    cursor: pointer;
-    box-shadow: 0 0 16px var(--theme-purple-dim);
-    will-change: transform;
-    /* active interaction element — justified */
-    transition:
-        transform var(--duration-base) var(--ease-spring),
-        box-shadow var(--duration-base) var(--ease-out),
-        opacity var(--duration-fast) var(--ease-out);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 9px 24px;
+  border-radius: var(--r-full);
+  border: none;
+  background: var(--theme-purple);
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 0 0 16px var(--theme-purple-dim);
+  will-change: transform;
+  /* active interaction element — justified */
+  transition:
+    transform var(--duration-base) var(--ease-spring),
+    box-shadow var(--duration-base) var(--ease-out),
+    opacity var(--duration-fast) var(--ease-out);
 }
 
 .saveBtn:hover:not(:disabled) {
-    transform: translateY(-2px) scale(1.02);
-    box-shadow: 0 6px 24px var(--theme-purple-dim);
-    opacity: 0.92;
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 6px 24px var(--theme-purple-dim);
+  opacity: 0.92;
 }
 
 .saveBtn:active:not(:disabled) {
-    transform: translateY(1px) scale(0.97);
-    box-shadow: 0 2px 8px var(--theme-purple-dim);
-    transition-duration: var(--duration-fast);
+  transform: translateY(1px) scale(0.97);
+  box-shadow: 0 2px 8px var(--theme-purple-dim);
+  transition-duration: var(--duration-fast);
 }
 
 .saveBtn:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    will-change: auto;
-    /* remove hint when disabled — no interaction */
+  opacity: 0.6;
+  cursor: not-allowed;
+  will-change: auto;
+  /* remove hint when disabled — no interaction */
 }
 
 /* ── Shared keyframes ───────────────────────────────────────── */
 
 /* fade-in: opacity only — for overlays */
 @keyframes fade-in {
-    from {
-        opacity: 0;
-    }
+  from {
+    opacity: 0;
+  }
 
-    to {
-        opacity: 1;
-    }
+  to {
+    opacity: 1;
+  }
 }
 
 /* fade-up: used by most content cards + list items */
 @keyframes fade-up {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
 
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* ── Responsive ─────────────────────────────────────────────── */
 @media (max-width: 900px) {
-    .navbar {
-        padding: 0 14px;
-    }
+  .navbar {
+    padding: 0 14px;
+  }
 
-    .subHeader {
-        padding: 8px 14px;
-        flex-wrap: wrap;
-        height: auto;
-    }
+  .subHeader {
+    padding: 8px 14px;
+    flex-wrap: wrap;
+    height: auto;
+  }
 
-    .dateLabel {
-        font-size: 13px;
-    }
+  .dateLabel {
+    font-size: 13px;
+  }
 
-    .createBtn {
-        padding: 7px 14px;
-        font-size: 12px;
-    }
+  .createBtn {
+    padding: 7px 14px;
+    font-size: 12px;
+  }
 
-    .modal {
-        max-width: 100%;
-    }
+  .modal {
+    max-width: 100%;
+  }
 }
 
 @media (max-width: 640px) {
-    .viewSwitcher {
-        display: none;
-    }
+  .viewSwitcher {
+    display: none;
+  }
 
-    .logoText {
-        font-size: 17px;
-    }
+  .logoText {
+    font-size: 17px;
+  }
 
-    .dayView,
-    .weekView,
-    .monthView,
-    .agendaView {
-        height: calc(100vh - 120px);
-    }
+  .dayView,
+  .weekView,
+  .monthView,
+  .agendaView {
+    height: calc(100vh - 120px);
+  }
 
-    .agendaView {
-        padding: 14px;
-    }
+  .agendaView {
+    padding: 14px;
+  }
 
-    .fieldRow {
-        grid-template-columns: 1fr;
-    }
+  .fieldRow {
+    grid-template-columns: 1fr;
+  }
 
-    .weekBody {
-        overflow-x: auto;
-    }
+  .weekBody {
+    overflow-x: auto;
+  }
 
-    .weekHeader {
-        min-width: 560px;
-    }
+  .weekHeader {
+    min-width: 560px;
+  }
 
-    .detailPanel {
-        width: 100%;
-    }
+  .detailPanel {
+    width: 100%;
+  }
 
-    .detailBackdrop {
-        padding: 60px 0 0;
-        align-items: flex-end;
-    }
+  .detailBackdrop {
+    padding: 60px 0 0;
+    align-items: flex-end;
+  }
 
-    .detailPanel {
-        border-radius: var(--r-lg) var(--r-lg) 0 0;
-    }
+  .detailPanel {
+    border-radius: var(--r-lg) var(--r-lg) 0 0;
+  }
 }
 
 @media (hover: none) {
-    .eventActions {
-        opacity: 1;
-        transform: translateY(0);
-        /* Slightly smaller so they don't crowd short blocks */
-        gap: 2px;
-    }
+  .eventActions {
+    opacity: 1;
+    transform: translateY(0);
+    /* Slightly smaller so they don't crowd short blocks */
+    gap: 2px;
+  }
 
-    .eventActionBtn {
-        font-size: 10px;
-        padding: 2px 4px;
-    }
+  .eventActionBtn {
+    font-size: 10px;
+    padding: 2px 4px;
+  }
 }
 
 /* ── 2. themeToggle / createBtn — kill hover transforms on touch ──── */
 /* Hover transforms on touch cause stuck :hover state after tap.       */
 @media (hover: none) {
-    .themeToggle:hover {
-        transform: none;
-        border-color: var(--theme-border);
-    }
+  .themeToggle:hover {
+    transform: none;
+    border-color: var(--theme-border);
+  }
 
-    .createBtn:hover {
-        transform: none;
-        box-shadow: 0 0 20px var(--theme-purple-dim);
-        opacity: 1;
-    }
+  .createBtn:hover {
+    transform: none;
+    box-shadow: 0 0 20px var(--theme-purple-dim);
+    opacity: 1;
+  }
 
-    .createBtn:hover .createPlus {
-        transform: none;
-    }
+  .createBtn:hover .createPlus {
+    transform: none;
+  }
 
-    /* Active states still work fine — touch fires :active */
-    .themeToggle:active {
-        transform: scale(0.9);
-    }
+  /* Active states still work fine — touch fires :active */
+  .themeToggle:active {
+    transform: scale(0.9);
+  }
 
-    .createBtn:active {
-        transform: translateY(1px) scale(0.97);
-        box-shadow: 0 2px 10px var(--theme-purple-dim);
-    }
+  .createBtn:active {
+    transform: translateY(1px) scale(0.97);
+    box-shadow: 0 2px 10px var(--theme-purple-dim);
+  }
 }
 
 /* ── 3. Agenda translateX hover — hover-only, dead on touch ───────── */
 @media (hover: none) {
-    .agendaItem:hover {
-        transform: none;
-        box-shadow: none;
-    }
+  .agendaItem:hover {
+    transform: none;
+    box-shadow: none;
+  }
 
-    .agendaItem:active {
-        transform: translateX(2px) scale(0.99);
-    }
+  .agendaItem:active {
+    transform: translateX(2px) scale(0.99);
+  }
 }
 
 /* ── 4. Month cells — cramped on small screens ─────────────────────  */
 @media (max-width: 640px) {
-    .monthCell {
-        min-height: 52px;
-        padding: 5px;
-        gap: 2px;
-    }
+  .monthCell {
+    min-height: 52px;
+    padding: 5px;
+    gap: 2px;
+  }
 
-    .monthDayNum {
-        font-size: 11px;
-        width: 20px;
-        height: 20px;
-    }
+  .monthDayNum {
+    font-size: 11px;
+    width: 20px;
+    height: 20px;
+  }
 
-    .monthCellToday .monthDayNum {
-        width: 20px;
-        height: 20px;
-        font-size: 11px;
-    }
+  .monthCellToday .monthDayNum {
+    width: 20px;
+    height: 20px;
+    font-size: 11px;
+  }
 
-    .monthDots {
-        gap: 2px;
-    }
+  .monthDots {
+    gap: 2px;
+  }
 
-    .monthDot {
-        width: 5px;
-        height: 5px;
-    }
+  .monthDot {
+    width: 5px;
+    height: 5px;
+  }
 
-    .monthMore {
-        font-size: 9px;
-    }
+  .monthMore {
+    font-size: 9px;
+  }
 
-    .monthWeekLabel {
-        font-size: 9px;
-        padding: 5px 0;
-        letter-spacing: 0.2px;
-    }
+  .monthWeekLabel {
+    font-size: 9px;
+    padding: 5px 0;
+    letter-spacing: 0.2px;
+  }
 }
 
 /* ── 5. Week horizontal scroll — add touch-scroll momentum ─────────  */
 @media (max-width: 640px) {
+  .weekBody,
+  .weekHeader {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+  }
 
-    .weekBody,
-    .weekHeader {
-        -webkit-overflow-scrolling: touch;
-        overscroll-behavior-x: contain;
-    }
+  /* Visual hint: faint fade at right edge signals scrollability */
+  .weekView {
+    position: relative;
+  }
 
-    /* Visual hint: faint fade at right edge signals scrollability */
-    .weekView {
-        position: relative;
-    }
-
-    .weekView::after {
-        content: '';
-        position: absolute;
-        top: 0;
-        right: 0;
-        bottom: 0;
-        width: 24px;
-        background: linear-gradient(to right, transparent, var(--theme-bg));
-        pointer-events: none;
-        z-index: 5;
-    }
+  .weekView::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 24px;
+    background: linear-gradient(to right, transparent, var(--theme-bg));
+    pointer-events: none;
+    z-index: 5;
+  }
 }
 
 /* ── 6. Drag grid — prevent pinch-zoom conflict ──────────────────── */
 .dayGrid {
-    touch-action: pan-y;
-    /* allow vertical scroll, block pinch on grid */
+  touch-action: pan-y;
+  /* allow vertical scroll, block pinch on grid */
 }
 
 .weekDayCol {
-    touch-action: pan-y;
+  touch-action: pan-y;
 }
 
 /* ── 7. Modal safe-area inset — iPhone notch / home bar ─────────── */
 .modalBackdrop {
-    padding: 24px;
-    padding-bottom: max(24px, env(safe-area-inset-bottom));
+  padding: 24px;
+  padding-bottom: max(24px, env(safe-area-inset-bottom));
 }
 
 .modal {
-    max-height: calc(90vh - env(safe-area-inset-bottom));
+  max-height: calc(90vh - env(safe-area-inset-bottom));
 }
 
 /* Detail panel bottom-sheet on mobile also needs safe area */
 @media (max-width: 640px) {
-    .detailBackdrop {
-        padding-bottom: max(0px, env(safe-area-inset-bottom));
-    }
+  .detailBackdrop {
+    padding-bottom: max(0px, env(safe-area-inset-bottom));
+  }
 
-    .detailPanel {
-        padding-bottom: max(24px, env(safe-area-inset-bottom));
-    }
+  .detailPanel {
+    padding-bottom: max(24px, env(safe-area-inset-bottom));
+  }
 }
 
 /* ── 8. General touch tap targets — 44px minimum ─────────────────── */
 @media (hover: none) {
-    .navArrow {
-        min-width: 44px;
-        min-height: 44px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
+  .navArrow {
+    min-width: 44px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 
-    .themeToggle {
-        width: 44px;
-        height: 44px;
-    }
+  .themeToggle {
+    width: 44px;
+    height: 44px;
+  }
 
-    .eventActionBtn {
-        min-height: 28px;
-        min-width: 28px;
-    }
+  .eventActionBtn {
+    min-height: 28px;
+    min-width: 28px;
+  }
 
-    .agendaBtn {
-        min-height: 36px;
-        padding: 6px 12px;
-    }
+  .agendaBtn {
+    min-height: 36px;
+    padding: 6px 12px;
+  }
 
-    .catPill {
-        min-height: 36px;
-        padding: 6px 14px;
-    }
+  .catPill {
+    min-height: 36px;
+    padding: 6px 14px;
+  }
 }
 /* RESPONSIVE: dropdown view-switcher for mobile, replaces hidden viewSwitcher */
 .mobileViewSelect {
-    display: none;
+  display: none;
 }
 
 @media (max-width: 640px) {
-    .mobileViewSelect {
-        display: block;
-        font-family: var(--font-body);
-        font-size: 13px;
-        font-weight: 500;
-        color: var(--theme-text);
-        background: var(--theme-surface);
-        border: 1px solid var(--theme-border);
-        border-radius: var(--r-full);
-        padding: 6px 28px 6px 14px;
-        cursor: pointer;
-        appearance: none;
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238a8a9a' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
-        background-repeat: no-repeat;
-        background-position: right 10px center;
-        transition: border-color var(--duration-fast) var(--ease-out);
-    }
+  .mobileViewSelect {
+    display: block;
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--theme-text);
+    background: var(--theme-surface);
+    border: 1px solid var(--theme-border);
+    border-radius: var(--r-full);
+    padding: 6px 28px 6px 14px;
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238a8a9a' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    transition: border-color var(--duration-fast) var(--ease-out);
+  }
 
-    .mobileViewSelect:focus-visible {
-        outline: none;
-        border-color: var(--theme-purple);
-        box-shadow: 0 0 0 3px var(--theme-purple-dim);
-    }
+  .mobileViewSelect:focus-visible {
+    outline: none;
+    border-color: var(--theme-purple);
+    box-shadow: 0 0 0 3px var(--theme-purple-dim);
+  }
 }
 
 /* RESPONSIVE: stack subHeader rows, full-width category scroll */
 @media (max-width: 640px) {
-    .subHeader {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 8px;
-    }
+  .subHeader {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
 
-    .dateNav {
-        justify-content: space-between;
-    }
+  .dateNav {
+    justify-content: space-between;
+  }
 
-    .categoryRow {
-        width: 100%;
-    }
+  .categoryRow {
+    width: 100%;
+  }
 }
 
 /* RESPONSIVE: ultra-small phones — icon-only create btn, stack agenda rows */
 @media (max-width: 380px) {
-    .createBtn {
-        padding: 8px 12px;
-    }
+  .createBtn {
+    padding: 8px 12px;
+  }
 
-    .createBtnLabel {
-        display: none;
-    }
+  .createBtnLabel {
+    display: none;
+  }
 
-    .agendaItem {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 8px;
-    }
+  .agendaItem {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
 
-    .agendaItemRight {
-        align-items: flex-start;
-    }
+  .agendaItemRight {
+    align-items: flex-start;
+  }
 
-    .navLogo .logoText {
-        font-size: 15px;
-    }
+  .navLogo .logoText {
+    font-size: 15px;
+  }
 }
 
 /* MOTION/A11Y: visible focus ring for keyboard nav, all interactive controls */
@@ -2154,6 +2190,6 @@
 .detailICSBtn:focus-visible,
 .detailDeleteBtn:focus-visible,
 .agendaCreateLink:focus-visible {
-    outline: 2px solid var(--theme-purple);
-    outline-offset: 2px;
+  outline: 2px solid var(--theme-purple);
+  outline-offset: 2px;
 }

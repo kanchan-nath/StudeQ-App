@@ -34,7 +34,9 @@
   position: sticky;
   top: 0;
   z-index: 40;
-  transition: background var(--t-slow), border-color var(--t-slow);
+  transition:
+    background var(--t-slow),
+    border-color var(--t-slow);
 }
 
 .topbar__left {
@@ -122,7 +124,9 @@
   overflow-x: hidden;
   z-index: 50;
   position: relative;
-  transition: background var(--t-slow), border-color var(--t-slow);
+  transition:
+    background var(--t-slow),
+    border-color var(--t-slow);
 }
 
 /* glowing right edge line */
@@ -133,11 +137,13 @@
   right: 0;
   bottom: 0;
   width: 1px;
-  background: linear-gradient(180deg,
-      transparent 0%,
-      var(--theme-border-hover) 30%,
-      var(--theme-border-hover) 70%,
-      transparent 100%);
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    var(--theme-border-hover) 30%,
+    var(--theme-border-hover) 70%,
+    transparent 100%
+  );
   pointer-events: none;
 }
 
@@ -386,7 +392,9 @@
   overflow: hidden;
   flex-shrink: 0;
   box-shadow: var(--theme-card-shadow);
-  transition: background var(--t-slow), border-color var(--t-slow);
+  transition:
+    background var(--t-slow),
+    border-color var(--t-slow);
 }
 
 .upgrade-card::before {
@@ -397,9 +405,11 @@
   width: 140px;
   height: 140px;
   border-radius: 50%;
-  background: radial-gradient(circle,
-      var(--theme-purple-dim) 0%,
-      transparent 70%);
+  background: radial-gradient(
+    circle,
+    var(--theme-purple-dim) 0%,
+    transparent 70%
+  );
   pointer-events: none;
 }
 
@@ -411,10 +421,12 @@
   left: 0;
   right: 0;
   height: 1px;
-  background: linear-gradient(90deg,
-      transparent,
-      var(--theme-border-hover),
-      transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--theme-border-hover),
+    transparent
+  );
 }
 
 .upgrade-card__header {

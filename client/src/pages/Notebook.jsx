@@ -57,7 +57,7 @@ const SidebarItem = ({ chat, isActive, onSelect, onDelete }) => {
   const menuRef = useRef(null);
 
   const title = chat.messages?.[0]?.content || "Study Session";
-  const msgCount = (chat.messages?.length || 0);
+  const msgCount = chat.messages?.length || 0;
   const date = chat.createdAt
     ? new Date(chat.createdAt).toLocaleDateString("en-GB")
     : "";
@@ -82,10 +82,16 @@ const SidebarItem = ({ chat, isActive, onSelect, onDelete }) => {
           {msgCount} q · {date}
         </span>
       </div>
-      <div className={styles.historyCardMenu} ref={menuRef}>
+      <div
+        className={styles.historyCardMenu}
+        ref={menuRef}
+      >
         <button
           className={styles.historyDots}
-          onClick={(e) => { e.stopPropagation(); setMenuOpen((v) => !v); }}
+          onClick={(e) => {
+            e.stopPropagation();
+            setMenuOpen((v) => !v);
+          }}
           aria-label="Options"
         >
           ···
@@ -138,7 +144,9 @@ const Notebook = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   const [toasts, setToasts] = useState([]);
-  const [theme, setTheme] = useState(() => localStorage.getItem("sparke-theme") || "dark");
+  const [theme, setTheme] = useState(
+    () => localStorage.getItem("sparke-theme") || "dark",
+  );
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const inputRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -406,11 +414,14 @@ const Notebook = () => {
     <div className={styles.root}>
       {/* Theme toggle */}
 
-      <Toast toasts={toasts} removeToast={removeToast} />
+      <Toast
+        toasts={toasts}
+        removeToast={removeToast}
+      />
 
       {/* FIX: appShell wraps both views and fills remaining width */}
       <div className={styles.appShell}>
-{/* ── NEW: mobile topbar — sticky, visible only on ≤768px via CSS ── */}
+        {/* ── NEW: mobile topbar — sticky, visible only on ≤768px via CSS ── */}
         {/* ── SINGLE mobile topbar — first child, always in DOM ── */}
         {!chatRoom && (
           <div className={styles.mobileTopbar}>
@@ -427,7 +438,6 @@ const Notebook = () => {
         {/* ── VIEW 1: Upload ── */}
         {!chatRoom && (
           <main className={styles.uploadPage}>
-
             {/* Mobile topbar strip for upload/home page */}
             {/* <div className={styles.mobileTopbar}>
               <button
@@ -440,8 +450,18 @@ const Notebook = () => {
             </div> */}
             <header className={styles.uploadHeader}>
               <div className={styles.logoMark}>
-                <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
-                  <rect width="36" height="36" rx="10" fill="var(--accent)" />
+                <svg
+                  width="36"
+                  height="36"
+                  viewBox="0 0 36 36"
+                  fill="none"
+                >
+                  <rect
+                    width="36"
+                    height="36"
+                    rx="10"
+                    fill="var(--accent)"
+                  />
                   <path
                     d="M10 18h16M18 10v16"
                     stroke="#fff"
@@ -470,7 +490,10 @@ const Notebook = () => {
                 { icon: "📝", label: "Word" },
                 { icon: "📃", label: "Text" },
               ].map((f) => (
-                <li key={f.label} className={styles.formatChip}>
+                <li
+                  key={f.label}
+                  className={styles.formatChip}
+                >
                   <span>{f.icon}</span>
                   <span>{f.label}</span>
                 </li>
@@ -480,7 +503,10 @@ const Notebook = () => {
             {/* Drop zone */}
             <div
               className={`${styles.dropZone} ${dragOver ? styles.dropZoneActive : ""} ${inputFile ? styles.dropZoneHasFile : ""}`}
-              onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+              onDragOver={(e) => {
+                e.preventDefault();
+                setDragOver(true);
+              }}
               onDragLeave={() => setDragOver(false)}
               onDrop={handleDrop}
               onClick={() => fileInputRef.current?.click()}
@@ -498,7 +524,10 @@ const Notebook = () => {
                   <span className={styles.fileName}>{inputFile.name}</span>
                   <button
                     className={styles.fileRemove}
-                    onClick={(e) => { e.stopPropagation(); setInputFile(null); }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setInputFile(null);
+                    }}
                   >
                     ×
                   </button>
@@ -506,8 +535,12 @@ const Notebook = () => {
               ) : (
                 <div className={styles.dropHint}>
                   <span className={styles.dropIcon}>⬆</span>
-                  <p>Drag & drop your file here, or <u>browse</u></p>
-                  <p className={styles.dropMeta}>Max 20 MB · PDF, PPT, Excel, Word, Images</p>
+                  <p>
+                    Drag & drop your file here, or <u>browse</u>
+                  </p>
+                  <p className={styles.dropMeta}>
+                    Max 20 MB · PDF, PPT, Excel, Word, Images
+                  </p>
                 </div>
               )}
             </div>
@@ -521,7 +554,16 @@ const Notebook = () => {
                 disabled={!inputFile}
               >
                 <span>Start Studying</span>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
                   <path d="M5 12h14M12 5l7 7-7 7" />
                 </svg>
               </button>
@@ -541,7 +583,13 @@ const Notebook = () => {
                 <div className={styles.chatHeaderInner}>
                   <span className={styles.chatHeaderDot} />
                   <h2 className={styles.chatTitle}>{chatTitle}</h2>
-                  <button className={styles.hamburgerBtn}  onClick={() => navigate("/notebook")}> +</button>
+                  <button
+                    className={styles.hamburgerBtn}
+                    onClick={() => navigate("/notebook")}
+                  >
+                    {" "}
+                    +
+                  </button>
                   {/* Mobile hamburger — hidden on desktop via CSS */}
                   <button
                     className={styles.hamburgerBtn}
@@ -568,29 +616,43 @@ const Notebook = () => {
                     >
                       {!isUser && (
                         <div className={styles.aiAvatar}>
-                          <img src="/favicon.svg" alt="AI" width={15} height={15} />
+                          <img
+                            src="/favicon.svg"
+                            alt="AI"
+                            width={15}
+                            height={15}
+                          />
                         </div>
                       )}
                       <div
                         className={`${styles.messageBubble} ${isUser ? styles.bubbleUser : styles.bubbleAI} ${editingMessageId === msg._id ? styles.bubbleEditing : ""}`}
-                        onMouseEnter={() => isUser && setEditingMessageId(msg._id)}
+                        onMouseEnter={() =>
+                          isUser && setEditingMessageId(msg._id)
+                        }
                         onMouseLeave={() => isUser && setEditingMessageId(null)}
                       >
                         {isUser ? (
                           <p className={styles.messageContent}>{msg.content}</p>
                         ) : (
                           <div className={styles.aiContent}>
-                            <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>
+                            <ReactMarkdown
+                              remarkPlugins={[remarkGfm, remarkMath]}
+                              rehypePlugins={[rehypeRaw, rehypeKatex]}
+                            >
                               {msg.content}
                             </ReactMarkdown>
                           </div>
                         )}
-                        <span className={styles.messageTime}>{fmtTime(msg.createdAt)}</span>
+                        <span className={styles.messageTime}>
+                          {fmtTime(msg.createdAt)}
+                        </span>
 
                         {isUser && editingMessageId === msg._id && (
                           <button
                             className={styles.editBtn}
-                            onClick={() => handleClickEdit(msg._id, msg.content)}
+                            onClick={() =>
+                              handleClickEdit(msg._id, msg.content)
+                            }
                           >
                             ✏ Edit
                           </button>
@@ -602,7 +664,9 @@ const Notebook = () => {
                 })}
 
                 {loadingSendQuery && (
-                  <div className={`${styles.messageRow} ${styles.messageRowAI}`}>
+                  <div
+                    className={`${styles.messageRow} ${styles.messageRowAI}`}
+                  >
                     <div className={styles.aiAvatar}>AI</div>
                     <ThinkingBubble />
                   </div>
@@ -627,7 +691,10 @@ const Notebook = () => {
                     </button>
                   </div>
                 )}
-                <form className={styles.inputForm} onSubmit={handleSubmitQuery}>
+                <form
+                  className={styles.inputForm}
+                  onSubmit={handleSubmitQuery}
+                >
                   <input
                     ref={inputRef}
                     type="text"
@@ -643,7 +710,16 @@ const Notebook = () => {
                     disabled={loadingSendQuery || !query.trim()}
                     aria-label="Send"
                   >
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
                       <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" />
                     </svg>
                   </button>
@@ -652,12 +728,11 @@ const Notebook = () => {
             </div>
           </div>
         )}
-
-      </div>{/* end appShell */}
+      </div>
+      {/* end appShell */}
 
       {/* FIX: Right sidebar is NOW outside chatRoom block — always visible */}
       {/* ── MOBILE TOPBAR ── */}
-     
 
       {/* ── BACKDROP OVERLAY ── */}
       {mobileSidebarOpen && (
@@ -700,7 +775,10 @@ const Notebook = () => {
                     key={chat.id || chat._id}
                     chat={chat}
                     isActive={chatId === (chat.id || chat._id)}
-                    onSelect={(c) => { handleSelectChat(c); setMobileSidebarOpen(false); }}
+                    onSelect={(c) => {
+                      handleSelectChat(c);
+                      setMobileSidebarOpen(false);
+                    }}
                     onDelete={handleDeleteChat}
                     chatTitle={chatTitle}
                   />
@@ -710,7 +788,6 @@ const Notebook = () => {
           </div>
         )}
       </div>
-
     </div>
   );
 };

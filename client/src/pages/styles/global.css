@@ -124,7 +124,9 @@ body {
   background: var(--theme-bg);
   color: var(--theme-text);
   line-height: 1.6;
-  transition: background 0.3s ease, color 0.3s ease;
+  transition:
+    background 0.3s ease,
+    color 0.3s ease;
 }
 
 a {
@@ -166,7 +168,7 @@ ol {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-/* hover */
+  /* hover */
   background: var(--theme-text-muted);
 }
 

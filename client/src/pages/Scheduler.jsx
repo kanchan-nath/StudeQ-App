@@ -35,8 +35,7 @@ const Scheduler = () => {
     goalDescription: "",
     eminderEnabled: "",
     reminderMinutesBefore: "",
-
-  })
+  });
 
   const token = localStorage.getItem("token");
 
@@ -131,13 +130,12 @@ const Scheduler = () => {
   };
 
   const handleTimeTableSubmit = async (e) => {
-    e.preventDefault()
-    
-  }
+    e.preventDefault();
+  };
 
   const handleChangeTimeTable = async (e) => {
-    setTimeTableForm({ ...timeTableForm, [e.target.name]: e.target.value })
-  }
+    setTimeTableForm({ ...timeTableForm, [e.target.name]: e.target.value });
+  };
 
   useEffect(() => {
     fetchData();
