@@ -1,4 +1,6 @@
 import React from "react";
+import ErrorPage, { RouteErrorPage } from "./errors/components/ErrorPage.jsx";
+import { ERROR_TYPES } from "./errors/config/errorConfig.js";
 import "../src/index.css"
 import "./pages/styles/global.css";
 import { Routes, Route } from "react-router-dom";
@@ -50,7 +52,7 @@ const App = () => {
           element={<Login />}
         />
 
-        <Route element={<AppShell />}>
+        <Route element={<AppShell />} errorElement={<RouteErrorPage />}>
           {/* <Route path='/dashboard' element={<ProtectedRoute component={<Dashboard/>}/>} /> */}
           <Route
             path="/dashboard"

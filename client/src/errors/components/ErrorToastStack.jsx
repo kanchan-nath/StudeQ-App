@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { ErrorContext } from "../hooks/useErrorHandler.js";
+import { ErrorContext } from "../hooks/useErrorHandler.jsx";
 import styles from "../Error.module.css";
 
 /**
