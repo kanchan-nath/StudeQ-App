@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import BASE_URL from "../lib/api.js";
 import styles from "./styles/Dashboard.module.css";
@@ -17,6 +17,11 @@ import {
 } from "hugeicons-react";
 import useLoader from "../ContextApi/useLoader.js";
 
+// ── Error system imports ───────────────────────────────────────────────────────
+import ErrorPage from "../errors/components/ErrorPage.jsx";
+import { ERROR_TYPES, resolveErrorType } from "../errors/config/errorConfig.js";
+import useErrorHandler from "../errors/hooks/useErrorHandler.jsx";
+
 export const QUICK_ACTIONS = [
   { label: "Upload Material", icon: Upload01Icon, to: "/notes" },
   { label: "Create Quiz", icon: Quiz04Icon, to: "/quiz" },
@@ -25,7 +30,6 @@ export const QUICK_ACTIONS = [
   { label: "Image Analysis", icon: Image01Icon, to: "/image-analysis" },
   { label: "PDF Analysis", icon: Pdf02Icon, to: "/pdf-analysis" },
 ];
-
 export const NAV_ITEMS = [
   { id: "home", icon: Home01Icon, label: "Dashboard", to: "/" },
   { id: "notes", icon: Upload01Icon, label: "Upload Material", to: "/notes" },
@@ -62,7 +66,6 @@ export const NAV_ITEMS = [
     to: "/scheduler",
   },
 ];
-
 export const FEATURE_CARDS = [
   {
     icon: Cards01Icon,
@@ -114,11 +117,11 @@ export const FEATURE_CARDS = [
   },
 ];
 
-// ── Default values (shown when backend returns null/undefined or fetch not yet done) ──
+// ── Default values ─────────────────────────────────────────────────────────────
 const DEFAULT_USER = { name: "", email: "", grade: "" };
 const DEFAULT_QUIZ = { total: 0, lastScore: 0, avgScore: 0 };
 const DEFAULT_FLASH = { total: 0, dueToday: 0 };
-const DEFAULT_SCHEDULE = []; // empty → "No sessions" message
+const DEFAULT_SCHEDULE = [];
 const DEFAULT_PROFILE = {
   streak: 0,
   xp: 0,
@@ -129,98 +132,147 @@ const DEFAULT_PROFILE = {
 
 const Dashboard = () => {
   const { show, hide } = useLoader();
+  const navigate = useNavigate();
+  const token = localStorage.getItem("token");
+
+  // ── Error handler hook ───────────────────────────────────────────────────────
+  const { notifyError, notifySuccess } = useErrorHandler();
+
   const [activeNav, setActiveNav] = useState("home");
   const [userData, setUserData] = useState(DEFAULT_USER);
   const [userLoading, setUserLoading] = useState(true);
 
-  // ── Dynamic data states ──────────────────────────────────────────────────
+  // ── Blocking error state — replaces the whole page ──────────────────────────
+  // null = no error | ERROR_TYPES key = show full error page
+  const [pageError, setPageError] = useState(null);
+
+  // ── Dynamic data states ──────────────────────────────────────────────────────
   const [quizStats, setQuizStats] = useState(DEFAULT_QUIZ);
   const [flashcardStats, setFlashcardStats] = useState(DEFAULT_FLASH);
   const [scheduleItems, setScheduleItems] = useState(DEFAULT_SCHEDULE);
   const [profileStats, setProfileStats] = useState(DEFAULT_PROFILE);
 
-  const navigate = useNavigate();
-  const token = localStorage.getItem("token");
+  // ── Fetch ────────────────────────────────────────────────────────────────────
+  const fetchData = useCallback(async () => {
+    show("Fetching data…");
+    setPageError(null);
+
+    try {
+      const res = await fetch(`${BASE_URL}/api/user/userinfo`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      // ── Auth errors → redirect + toast ──────────────────────────────────────
+      if (res.status === 401) {
+        notifyError("Session expired. Sign in again.");
+        navigate("/login");
+        return;
+      }
+
+      if (res.status === 403) {
+        setPageError(ERROR_TYPES.FORBIDDEN);
+        return;
+      }
+
+      // ── Server errors → full-page error ─────────────────────────────────────
+      if (res.status >= 500) {
+        setPageError(ERROR_TYPES.SERVER_ERROR);
+        return;
+      }
+
+      if (!res.ok) {
+        setPageError(ERROR_TYPES.UNKNOWN);
+        return;
+      }
+
+      const data = await res.json();
+      setUserData({
+        name: data?.data?.name ?? "",
+        email: data?.data?.email ?? "",
+        grade: data?.data?.grade ?? "",
+      });
+
+      // ── Quiz stats (uncomment when route ready) ────────────────────────────
+      // const quizRes  = await fetch(`${BASE_URL}/api/quiz/stats`, {
+      //   headers: { Authorization: `Bearer ${token}` },
+      // });
+      // const quizData = await quizRes.json();
+      // setQuizStats({
+      //   total:     quizData?.data?.total     ?? DEFAULT_QUIZ.total,
+      //   lastScore: quizData?.data?.lastScore ?? DEFAULT_QUIZ.lastScore,
+      //   avgScore:  quizData?.data?.avgScore  ?? DEFAULT_QUIZ.avgScore,
+      // });
+
+      // ── Flashcard stats (uncomment when route ready) ───────────────────────
+      // const flashRes  = await fetch(`${BASE_URL}/api/flashcards/stats`, {
+      //   headers: { Authorization: `Bearer ${token}` },
+      // });
+      // const flashData = await flashRes.json();
+      // setFlashcardStats({
+      //   total:    flashData?.data?.total    ?? DEFAULT_FLASH.total,
+      //   dueToday: flashData?.data?.dueToday ?? DEFAULT_FLASH.dueToday,
+      // });
+
+      // ── Today's schedule (uncomment when route ready) ──────────────────────
+      // const schedRes  = await fetch(`${BASE_URL}/api/schedule/today`, {
+      //   headers: { Authorization: `Bearer ${token}` },
+      // });
+      // const schedData = await schedRes.json();
+      // setScheduleItems(schedData?.data ?? DEFAULT_SCHEDULE);
+
+      // ── Profile / gamification stats (uncomment when route ready) ─────────
+      // const profileRes  = await fetch(`${BASE_URL}/api/user/stats`, {
+      //   headers: { Authorization: `Bearer ${token}` },
+      // });
+      // const profileData = await profileRes.json();
+      // setProfileStats({
+      //   streak:      profileData?.data?.streak      ?? DEFAULT_PROFILE.streak,
+      //   xp:          profileData?.data?.xp          ?? DEFAULT_PROFILE.xp,
+      //   level:       profileData?.data?.level       ?? DEFAULT_PROFILE.level,
+      //   xpPercent:   profileData?.data?.xpPercent   ?? DEFAULT_PROFILE.xpPercent,
+      //   xpNextLevel: profileData?.data?.xpNextLevel ?? DEFAULT_PROFILE.xpNextLevel,
+      // });
+
+    } catch (err) {
+      // ── Network / TypeError (no connection) ─────────────────────────────────
+      const type = resolveErrorType(err);
+      if (type === ERROR_TYPES.NETWORK) {
+        setPageError(ERROR_TYPES.NETWORK);
+      } else {
+        setPageError(ERROR_TYPES.UNKNOWN);
+      }
+    } finally {
+      setUserLoading(false);
+      hide();
+    }
+  }, [token, navigate, notifyError, show, hide]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      show("Fetching data…");
-      try {
-        // ── User info (active) ───────────────────────────────────────────
-        const res = await fetch(`${BASE_URL}/api/user/userinfo`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        if (!res.ok) throw new Error(`Request failed: ${res.status}`);
-        const data = await res.json();
-        setUserData({
-          name: data?.data?.name ?? "",
-          email: data?.data?.email ?? "",
-          grade: data?.data?.grade ?? "",
-        });
-
-        // ── Quiz stats (uncomment when route ready) ──────────────────────
-        // const quizRes  = await fetch(`${BASE_URL}/api/quiz/stats`, {
-        //   headers: { Authorization: `Bearer ${token}` },
-        // });
-        // const quizData = await quizRes.json();
-        // setQuizStats({
-        //   total:     quizData?.data?.total     ?? DEFAULT_QUIZ.total,
-        //   lastScore: quizData?.data?.lastScore ?? DEFAULT_QUIZ.lastScore,
-        //   avgScore:  quizData?.data?.avgScore  ?? DEFAULT_QUIZ.avgScore,
-        // });
-
-        // ── Flashcard stats (uncomment when route ready) ─────────────────
-        // const flashRes  = await fetch(`${BASE_URL}/api/flashcards/stats`, {
-        //   headers: { Authorization: `Bearer ${token}` },
-        // });
-        // const flashData = await flashRes.json();
-        // setFlashcardStats({
-        //   total:    flashData?.data?.total    ?? DEFAULT_FLASH.total,
-        //   dueToday: flashData?.data?.dueToday ?? DEFAULT_FLASH.dueToday,
-        // });
-
-        // ── Today's schedule (uncomment when route ready) ────────────────
-        // Expected shape: [{ title: string, time: string, color: "Purple"|"Amber"|"Blue"|... }]
-        // const schedRes  = await fetch(`${BASE_URL}/api/schedule/today`, {
-        //   headers: { Authorization: `Bearer ${token}` },
-        // });
-        // const schedData = await schedRes.json();
-        // setScheduleItems(schedData?.data ?? DEFAULT_SCHEDULE);
-
-        // ── Profile / gamification stats (uncomment when route ready) ────
-        // const profileRes  = await fetch(`${BASE_URL}/api/user/stats`, {
-        //   headers: { Authorization: `Bearer ${token}` },
-        // });
-        // const profileData = await profileRes.json();
-        // setProfileStats({
-        //   streak:     profileData?.data?.streak     ?? DEFAULT_PROFILE.streak,
-        //   xp:         profileData?.data?.xp         ?? DEFAULT_PROFILE.xp,
-        //   level:      profileData?.data?.level      ?? DEFAULT_PROFILE.level,
-        //   xpPercent:  profileData?.data?.xpPercent  ?? DEFAULT_PROFILE.xpPercent,
-        //   xpNextLevel:profileData?.data?.xpNextLevel?? DEFAULT_PROFILE.xpNextLevel,
-        // });
-      } catch (err) {
-        console.error(err);
-      } finally { 
-        setUserLoading(false);
-        hide()
-      }
-    };
-
     fetchData();
   }, []);
 
+  // ── Full-page error — replaces dashboard entirely ───────────────────────────
+  if (pageError) {
+    return (
+      <ErrorPage
+        type={pageError}
+        onRetry={fetchData}
+      />
+    );
+  }
+
+  // ── Derived values ───────────────────────────────────────────────────────────
   const initials = userData?.name
     ? userData.name
-        .split(" ")
-        .map((w) => w[0])
-        .join("")
-        .slice(0, 2)
-        .toUpperCase()
+      .split(" ")
+      .map((w) => w[0])
+      .join("")
+      .slice(0, 2)
+      .toUpperCase()
     : "YOU";
 
   const today = new Date().toLocaleDateString("en-US", {
@@ -604,9 +656,7 @@ const Dashboard = () => {
                 )}
               </div>
             </div>
-
             <div className={styles.profileDivider} />
-
             <div className={styles.profileStats}>
               <div className={styles.profileStat}>
                 <span className={styles.profileStatLabel}>Grade</span>
@@ -633,7 +683,6 @@ const Dashboard = () => {
                 </span>
               </div>
             </div>
-
             <div className={styles.xpTrack}>
               <div
                 className={styles.xpBar}
