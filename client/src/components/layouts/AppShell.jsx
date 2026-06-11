@@ -19,7 +19,7 @@ import {
 import { disConnectSocket } from "../../lib/socket.js";
 
 const NAV_MAIN = [
-  { to: "/dashboard", label: "Home", icon: Home03Icon, color: "blue" },
+  { to: "/dashboard", label: "Dashboard", icon: Home03Icon, color: "blue" },
   { to: "/notes", label: "Notes", icon: NoteEditIcon, color: "teal" },
   { to: "/quiz", label: "Quiz", icon: Quiz03Icon, color: "purple" },
   {
@@ -29,23 +29,38 @@ const NAV_MAIN = [
     color: "purple",
   },
   {
-    to: "/event-scheduling",
-    label: "Event",
+    to: "/study-room",
+    label: "Study Room",
     icon: Book01Icon,
     color: "green",
   },
-  // {
-  //   to: "/study-room",
-  //   label: "Study Room",
-  //   icon: Book01Icon,
-  //   color: "green",
-  // },
+  { to: "/notebook", label: "Notebook", icon: Notebook01Icon, color: "blue" },
+  
+];
+
+const NAV_AI = [
   {
     to: "/search",
     label: "Search",
     icon: Calendar03Icon,
     color: "orange",
   },
+  {
+    to: "/image-analysis",
+    label: "Image Analysis",
+    icon: SearchList01Icon,
+    color: "pink",
+  },
+  {
+    to: "/pdf-analysis",
+    label: "PDF Analysis",
+    icon: Pdf02Icon,
+    color: "teal",
+  },
+  { to: "/tutor", label: "AI Tutor", icon: TeachingIcon, color: "purple" },
+];
+
+const NAV_EVENT = [
   {
     to: "/time-table",
     label: "Time Table",
@@ -70,22 +85,11 @@ const NAV_MAIN = [
     icon: Calendar03Icon,
     color: "orange",
   },
-  { to: "/notebook", label: "Notebook", icon: Notebook01Icon, color: "blue" },
-];
-
-const NAV_AI = [
-  { to: "/tutor", label: "AI Tutor", icon: TeachingIcon, color: "purple" },
   {
-    to: "/image-analysis",
-    label: "Image Analysis",
-    icon: SearchList01Icon,
-    color: "pink",
-  },
-  {
-    to: "/pdf-analysis",
-    label: "PDF Analysis",
-    icon: Pdf02Icon,
-    color: "teal",
+    to: "/event-scheduling",
+    label: "Event",
+    icon: Book01Icon,
+    color: "green",
   },
 ];
 
@@ -280,6 +284,28 @@ const AppShell = ({ userName = "" }) => {
           <span className={styles["sidebar__section-label"]}>AI Tools</span>
 
           {NAV_AI.map(({ to, label, icon: Icon, color }) => (
+            <Link
+              key={to}
+              to={to}
+              className={`${styles["sidebar__link"]}${location.pathname === to ? ` ${styles.active}` : ""}`}
+              data-color={color}
+            >
+              <span
+                className={styles["sidebar__link-icon"]}
+                aria-hidden="true"
+              >
+                <Icon
+                  size={20}
+                  color="white"
+                />
+              </span>
+              {label}
+            </Link>
+          ))}
+
+          <span className={styles["sidebar__section-label"]}>Events</span>
+
+          {NAV_EVENT.map(({ to, label, icon: Icon, color }) => (
             <Link
               key={to}
               to={to}

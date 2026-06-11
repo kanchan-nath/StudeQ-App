@@ -1,5 +1,5 @@
 /* ─── CSS Variables ────────────────────────────────────────────────────────── */
-:root {
+/* :root {
   --es-bg: #f4f6fb;
   --es-surface: #ffffff;
   --es-surface-2: #f8f9fc;
@@ -64,7 +64,7 @@
   --es-shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.25);
   --es-shadow-md: 0 4px 16px rgba(0, 0, 0, 0.35);
   --es-shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.45);
-}
+} */
 
 /* ─── Page Shell ────────────────────────────────────────────────────────────── */
 .page {
