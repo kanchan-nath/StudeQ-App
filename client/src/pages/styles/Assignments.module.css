@@ -1,7 +1,8 @@
 /* ─── Assignments.module.css ──────────────────────────────────────────── */
 
 /* ─────────────────────────────────────────────────────────────────────────
-   MOTION: Global animation kill-switch for reduced-motion preference
+   MOTION: Global kill-switch — reduced-motion collapses all durations to
+   near-zero. Transition/animation still fire (avoids flash), just instant.
    ───────────────────────────────────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
 
@@ -15,7 +16,17 @@
     }
 }
 
+/* ─────────────────────────────────────────────────────────────────────────
+   DESIGN TOKENS
+   Duration scale: fast=150ms  base=250ms  slow=400ms  slower=600ms
+   Easing: all cubic-bezier — no plain `ease` or `linear` anywhere.
+     --ease-out-quart  : standard decelerate (most UI motion)
+     --ease-spring     : overshoot for bouncy interactive feedback
+     --ease-in-quart   : accelerate for exits/collapses
+     --ease-in-out     : symmetric for toggles / continuous motion
+   ───────────────────────────────────────────────────────────────────────── */
 :root {
+    /* ── Colors ── */
     --orange: #f97316;
     --orange-light: #fff7ed;
     --orange-hover: #ea6c10;
@@ -42,15 +53,27 @@
     --radius-md: 10px;
     --radius-lg: 16px;
     --radius-pill: 999px;
-
-    /* RESPONSIVE: sidebar width token — swap to 0 on mobile via JS class */
     --sidebar-width: 220px;
-    /* MOTION: timing tokens for consistent feel */
-    --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+
+    /* ── Duration scale ── */
+    --duration-fast: 150ms;
+    /* micro-interactions: hover bg, color swap      */
+    --duration-base: 250ms;
+    /* most transitions: cards, inputs, buttons       */
+    --duration-slow: 400ms;
+    /* entrance animations, sidebar slide             */
+    --duration-slower: 600ms;
+    /* page-level fades, backdrop                     */
+
+    /* ── Easing library — all cubic-bezier ── */
+    --ease-out-quart: cubic-bezier(0.22, 1, 0.36, 1);
+    /* fast decelerate   */
     --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
-    --dur-fast: 140ms;
-    --dur-normal: 220ms;
-    --dur-slow: 320ms;
+    /* bouncy overshoot  */
+    --ease-in-quart: cubic-bezier(0.5, 0, 0.75, 0);
+    /* fast accelerate   */
+    --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+    /* symmetric/toggle  */
 }
 
 [data-theme="dark"] {
@@ -69,23 +92,22 @@
     --purple: #a78bfa;
 }
 
-/* ─── MOTION: smooth scroll on content area ──────────────────────────────── */
+/* ── Smooth scroll on scroll container ── */
 html {
     scroll-behavior: smooth;
 }
 
 /* ─── Layout ─────────────────────────────────────────────────────────────── */
+/* MOTION: whole page fades in on mount — opacity only, zero layout shift */
 .layout {
     display: flex;
     min-height: 100vh;
     background: var(--bg-page);
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     position: relative;
-    /* MOTION: fade the whole page in on mount */
-    animation: pageFadeIn var(--dur-normal) var(--ease-out) both;
+    animation: pageFadeIn var(--duration-slow) var(--ease-out-quart) both;
 }
 
-/* MOTION: page-level fade-in — no layout shift, just opacity */
 @keyframes pageFadeIn {
     from {
         opacity: 0;
@@ -97,6 +119,7 @@ html {
 }
 
 /* ─── Sidebar ────────────────────────────────────────────────────────────── */
+/* MOTION: slides in from left on load — translateX only (GPU layer) */
 .sidebar {
     width: var(--sidebar-width);
     min-width: var(--sidebar-width);
@@ -109,18 +132,17 @@ html {
     top: 0;
     height: 100vh;
     overflow: hidden;
-    /* MOTION: sidebar slides in from left on page load */
-    animation: sidebarSlideIn var(--dur-slow) var(--ease-out) both;
-    /* RESPONSIVE: will-change helps GPU-composite the drawer slide */
-    will-change: transform;
     z-index: 300;
     flex-shrink: 0;
+    /* will-change: sidebar slides via transform → promote to GPU layer */
+    will-change: transform;
+    animation: sidebarSlideIn var(--duration-slow) var(--ease-out-quart) both;
 }
 
-/* MOTION: sidebar entrance */
+/* MOTION: entrance — translateX + opacity (both composited) */
 @keyframes sidebarSlideIn {
     from {
-        transform: translateX(-16px);
+        transform: translateX(-20px);
         opacity: 0;
     }
 
@@ -180,6 +202,7 @@ html {
     padding: 0 12px;
 }
 
+/* MOTION: nav items nudge right on hover — translateX only, spring easing */
 .navItem {
     display: flex;
     align-items: center;
@@ -189,19 +212,19 @@ html {
     font-size: 13.5px;
     color: var(--sidebar-sub);
     cursor: pointer;
-    /* MOTION: smooth bg + color transitions on hover */
-    transition:
-        background var(--dur-fast) ease,
-        color var(--dur-fast) ease,
-        transform var(--dur-fast) var(--ease-spring);
     user-select: none;
+    /* Separate transitions so each property gets its own curve */
+    transition:
+        background var(--duration-fast) var(--ease-out-quart),
+        color var(--duration-fast) var(--ease-out-quart),
+        transform var(--duration-base) var(--ease-spring);
 }
 
 .navItem:hover {
     background: rgba(255, 255, 255, 0.07);
     color: var(--sidebar-text);
-    transform: translateX(2px);
-    /* MOTION: subtle nudge */
+    transform: translateX(3px);
+    /* subtle nudge signals depth */
 }
 
 .navActive {
@@ -248,7 +271,7 @@ html {
     margin: 0;
 }
 
-/* RESPONSIVE: Hamburger button — hidden on desktop */
+/* RESPONSIVE: hamburger hidden on desktop */
 .hamburger {
     display: none;
     align-items: center;
@@ -260,35 +283,35 @@ html {
     border-radius: var(--radius-sm);
     cursor: pointer;
     color: var(--text-primary);
-    /* MOTION: hover lift */
+    /* MOTION: scale spring on hover — scale is GPU-composited */
     transition:
-        background var(--dur-fast) ease,
-        border-color var(--dur-fast) ease,
-        transform var(--dur-fast) var(--ease-spring);
+        background var(--duration-fast) var(--ease-out-quart),
+        border-color var(--duration-fast) var(--ease-out-quart),
+        transform var(--duration-base) var(--ease-spring);
 }
 
 .hamburger:hover {
     background: var(--bg-white);
     border-color: var(--orange);
-    transform: scale(1.05);
+    transform: scale(1.06);
+    /* scale spring gives tactile feel */
 }
 
-/* RESPONSIVE: Drawer backdrop overlay */
+/* RESPONSIVE: backdrop overlay */
 .drawerBackdrop {
     display: none;
     position: fixed;
     inset: 0;
     background: rgba(0, 0, 0, 0);
     z-index: 250;
-    /* MOTION: fade in backdrop */
-    transition: background var(--dur-normal) ease;
     pointer-events: none;
+    /* MOTION: fade backdrop — opacity only */
+    transition: background var(--duration-base) var(--ease-in-out);
 }
 
 .drawerBackdrop.open {
     background: rgba(0, 0, 0, 0.45);
     pointer-events: all;
-    /* MOTION: allow click-through when closed */
 }
 
 /* ─── Main ───────────────────────────────────────────────────────────────── */
@@ -297,7 +320,6 @@ html {
     padding: 36px 40px 120px;
     min-width: 0;
     overflow-y: auto;
-    /* MOTION: content area scrolls smoothly */
     scroll-behavior: smooth;
 }
 
@@ -317,7 +339,6 @@ html {
     letter-spacing: -0.4px;
 }
 
-/* RESPONSIVE: header left = hamburger + title stacked on mobile */
 .headerLeft {
     display: flex;
     align-items: center;
@@ -325,6 +346,7 @@ html {
     min-width: 0;
 }
 
+/* MOTION: lift + shadow on hover; press snaps back with scale */
 .newBtn {
     display: flex;
     align-items: center;
@@ -337,29 +359,31 @@ html {
     font-size: 13.5px;
     font-weight: 600;
     cursor: pointer;
-    /* MOTION: lift + color on hover, press feedback */
-    transition:
-        background var(--dur-fast) ease,
-        transform var(--dur-fast) var(--ease-spring),
-        box-shadow var(--dur-fast) ease;
-    box-shadow: 0 2px 8px rgba(249, 115, 22, 0.3);
     white-space: nowrap;
     flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(249, 115, 22, 0.3);
+    /* All three props on separate transitions for precise control */
+    transition:
+        background var(--duration-fast) var(--ease-out-quart),
+        transform var(--duration-base) var(--ease-spring),
+        box-shadow var(--duration-base) var(--ease-out-quart);
 }
 
 .newBtn:hover {
     background: var(--orange-hover);
     transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(249, 115, 22, 0.35);
+    /* lift */
+    box-shadow: 0 6px 20px rgba(249, 115, 22, 0.4);
 }
 
+/* MOTION: press — snaps down instantly, scale creates "click" sensation */
 .newBtn:active {
-    transform: translateY(0) scale(0.97);
-    /* MOTION: press feedback */
-    box-shadow: 0 1px 4px rgba(249, 115, 22, 0.25);
+    transform: translateY(0) scale(0.96);
+    box-shadow: 0 1px 4px rgba(249, 115, 22, 0.2);
+    transition-duration: 80ms;
+    /* faster on press for snappy feel */
 }
 
-/* MOTION: focus rings — keyboard users get clear outline */
 .newBtn:focus-visible {
     outline: 2px solid var(--orange);
     outline-offset: 3px;
@@ -371,18 +395,17 @@ html {
     gap: 6px;
     margin-bottom: 28px;
     flex-wrap: wrap;
-    /* RESPONSIVE: allow horizontal scroll on very small screens */
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
     padding-bottom: 2px;
-    /* prevent clipping focus rings */
 }
 
 .filters::-webkit-scrollbar {
     display: none;
 }
 
+/* MOTION: lift + border color on hover, faster press feedback */
 .filterTab {
     padding: 7px 16px;
     border-radius: var(--radius-pill);
@@ -392,25 +415,24 @@ html {
     font-size: 13px;
     font-weight: 500;
     cursor: pointer;
-    /* MOTION: smooth all transitional states */
-    transition:
-        border-color var(--dur-fast) ease,
-        color var(--dur-fast) ease,
-        background var(--dur-fast) ease,
-        transform var(--dur-fast) var(--ease-spring);
     white-space: nowrap;
     flex-shrink: 0;
+    transition:
+        border-color var(--duration-fast) var(--ease-out-quart),
+        color var(--duration-fast) var(--ease-out-quart),
+        background var(--duration-fast) var(--ease-out-quart),
+        transform var(--duration-base) var(--ease-spring);
 }
 
 .filterTab:hover {
     border-color: var(--orange);
     color: var(--orange);
     transform: translateY(-1px);
-    /* MOTION: lift on hover */
 }
 
+/* MOTION: press collapses spring overshoot */
 .filterTab:active {
-    transform: translateY(0) scale(0.97);
+    transform: translateY(0) scale(0.96);
 }
 
 .filterTab:focus-visible {
@@ -423,7 +445,7 @@ html {
     border-color: var(--orange) !important;
     color: #fff !important;
     transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(249, 115, 22, 0.25);
+    box-shadow: 0 2px 10px rgba(249, 115, 22, 0.3);
 }
 
 /* ─── List Area ──────────────────────────────────────────────────────────── */
@@ -444,13 +466,16 @@ html {
     font-size: 14px;
 }
 
+/* MOTION: spinner uses rotate — only transform, never layout props */
 .spinner {
     width: 28px;
     height: 28px;
     border: 2.5px solid var(--card-border);
     border-top-color: var(--orange);
     border-radius: 50%;
-    animation: spin 0.7s linear infinite;
+    /* will-change: rotate is composited, declare it to avoid paint on first frame */
+    will-change: transform;
+    animation: spin 0.75s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
 @keyframes spin {
@@ -460,43 +485,44 @@ html {
 }
 
 /* ─── Group ──────────────────────────────────────────────────────────────── */
+/* MOTION: groups slide up as they paint — translateY + opacity only */
 .group {
     display: flex;
     flex-direction: column;
     gap: 8px;
-    /* MOTION: groups slide up as they mount */
-    animation: groupMount var(--dur-normal) var(--ease-out) both;
+    /* Base animation — delay overridden per child below */
+    animation: groupMount var(--duration-base) var(--ease-out-quart) both;
 }
 
-/* stagger via nth-child — up to 6 groups */
+/* Stagger: each group delayed 60ms more than previous */
 .group:nth-child(1) {
     animation-delay: 0ms;
 }
 
 .group:nth-child(2) {
-    animation-delay: 40ms;
+    animation-delay: 60ms;
 }
 
 .group:nth-child(3) {
-    animation-delay: 80ms;
-}
-
-.group:nth-child(4) {
     animation-delay: 120ms;
 }
 
+.group:nth-child(4) {
+    animation-delay: 180ms;
+}
+
 .group:nth-child(5) {
-    animation-delay: 160ms;
+    animation-delay: 240ms;
 }
 
 .group:nth-child(6) {
-    animation-delay: 200ms;
+    animation-delay: 300ms;
 }
 
 @keyframes groupMount {
     from {
         opacity: 0;
-        transform: translateY(10px);
+        transform: translateY(12px);
     }
 
     to {
@@ -565,31 +591,79 @@ html {
 }
 
 /* ─── Row ────────────────────────────────────────────────────────────────── */
+/* MOTION: card lift on hover — shadow + translateY (composited).
+   Rows also stagger their entrance via nth-child inside groups. */
 .row {
     background: var(--bg-white);
     border: 1.5px solid var(--card-border);
     border-radius: var(--radius-md);
     overflow: hidden;
-    /* MOTION: shadow + border transitions on hover */
-    transition:
-        box-shadow var(--dur-fast) ease,
-        border-color var(--dur-fast) ease,
-        transform var(--dur-fast) var(--ease-out);
     box-shadow: var(--shadow-sm);
+    /* Entrance: each row fades+slides in, delayed by nth-child */
+    animation: rowMount var(--duration-base) var(--ease-out-quart) both;
+    transition:
+        box-shadow var(--duration-base) var(--ease-out-quart),
+        border-color var(--duration-fast) var(--ease-out-quart),
+        transform var(--duration-base) var(--ease-out-quart);
+}
+
+/* Row stagger — up to 8 rows per group */
+.row:nth-child(1) {
+    animation-delay: 30ms;
+}
+
+.row:nth-child(2) {
+    animation-delay: 60ms;
+}
+
+.row:nth-child(3) {
+    animation-delay: 90ms;
+}
+
+.row:nth-child(4) {
+    animation-delay: 120ms;
+}
+
+.row:nth-child(5) {
+    animation-delay: 150ms;
+}
+
+.row:nth-child(6) {
+    animation-delay: 180ms;
+}
+
+.row:nth-child(7) {
+    animation-delay: 210ms;
+}
+
+.row:nth-child(8) {
+    animation-delay: 240ms;
+}
+
+@keyframes rowMount {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .row:hover {
     box-shadow: var(--shadow-md);
     border-color: #d1d5db;
-    transform: translateY(-1px);
-    /* MOTION: subtle card lift */
+    transform: translateY(-2px);
+    /* lift — perceivable but not dramatic */
 }
 
+/* Selected row stays grounded — override hover lift */
 .rowSelected {
     border-color: var(--orange) !important;
     box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.15) !important;
     transform: none !important;
-    /* selected rows stay grounded */
 }
 
 .rowMain {
@@ -599,6 +673,7 @@ html {
     padding: 14px 16px;
 }
 
+/* MOTION: accent-color drives browser's native check animation */
 .checkbox {
     width: 16px;
     height: 16px;
@@ -606,8 +681,7 @@ html {
     accent-color: var(--orange);
     cursor: pointer;
     flex-shrink: 0;
-    /* MOTION: scale on check via browser accent-color — no custom animation needed */
-    transition: transform var(--dur-fast) var(--ease-spring);
+    transition: transform var(--duration-base) var(--ease-spring);
 }
 
 .checkbox:focus-visible {
@@ -675,6 +749,7 @@ html {
     color: var(--text-secondary);
 }
 
+/* MOTION: chevron button — bg fade + icon rotation */
 .chevronBtn {
     background: none;
     border: none;
@@ -684,10 +759,9 @@ html {
     display: flex;
     align-items: center;
     border-radius: 4px;
-    /* MOTION: smooth bg + rotate for chevron icon */
     transition:
-        background var(--dur-fast) ease,
-        color var(--dur-fast) ease;
+        background var(--duration-fast) var(--ease-out-quart),
+        color var(--duration-fast) var(--ease-out-quart);
 }
 
 .chevronBtn:hover {
@@ -700,9 +774,11 @@ html {
     outline-offset: 2px;
 }
 
-/* MOTION: rotate the chevron svg when expanded */
+/* MOTION: chevron icon rotates 90° to signal expanded state */
 .chevronBtn svg {
-    transition: transform var(--dur-fast) var(--ease-out);
+    /* will-change: rotate is GPU — declare to avoid repaint flash */
+    will-change: transform;
+    transition: transform var(--duration-base) var(--ease-out-quart);
 }
 
 .chevronBtnExpanded svg {
@@ -710,17 +786,17 @@ html {
 }
 
 /* ─── Expanded Content ───────────────────────────────────────────────────── */
+/* MOTION: reveal slides down from top edge — translateY + opacity, no height */
 .expanded {
     border-top: 1.5px solid var(--card-border);
     padding: 14px 16px 14px 52px;
-    /* MOTION: expand from top with opacity + slight slide */
-    animation: expandIn var(--dur-fast) var(--ease-out) both;
+    animation: expandIn var(--duration-base) var(--ease-out-quart) both;
 }
 
 @keyframes expandIn {
     from {
         opacity: 0;
-        transform: translateY(-6px);
+        transform: translateY(-8px);
     }
 
     to {
@@ -751,6 +827,7 @@ html {
     color: var(--text-secondary);
 }
 
+/* MOTION: rubric link fades opacity — avoids layout shift from color change */
 .viewRubric {
     display: flex;
     align-items: center;
@@ -759,12 +836,11 @@ html {
     color: var(--orange);
     font-weight: 500;
     cursor: pointer;
-    /* MOTION: opacity micro-interaction */
-    transition: opacity var(--dur-fast) ease;
+    transition: opacity var(--duration-fast) var(--ease-out-quart);
 }
 
 .viewRubric:hover {
-    opacity: 0.75;
+    opacity: 0.7;
 }
 
 .rubricDot {
@@ -775,6 +851,7 @@ html {
     display: inline-block;
 }
 
+/* MOTION: delete button — scale grows slightly (danger signals intent) */
 .deleteSmall {
     margin-left: auto;
     display: flex;
@@ -789,20 +866,21 @@ html {
     border-radius: var(--radius-sm);
     cursor: pointer;
     transition:
-        background var(--dur-fast) ease,
-        border-color var(--dur-fast) ease,
-        transform var(--dur-fast) var(--ease-spring);
+        background var(--duration-fast) var(--ease-out-quart),
+        border-color var(--duration-fast) var(--ease-out-quart),
+        transform var(--duration-base) var(--ease-spring);
 }
 
 .deleteSmall:hover {
     background: var(--red-light);
     border-color: var(--red);
-    transform: scale(1.03);
-    /* MOTION: slight grow signals destructive */
+    transform: scale(1.04);
+    /* small grow signals destructive action */
 }
 
+/* MOTION: press snaps to slightly smaller — confirms click registered */
 .deleteSmall:active {
-    transform: scale(0.97);
+    transform: scale(0.96);
 }
 
 .deleteSmall:focus-visible {
@@ -811,6 +889,7 @@ html {
 }
 
 /* ─── Bulk Action Bar ────────────────────────────────────────────────────── */
+/* MOTION: bar slides up from below on mount — translateY only (composited) */
 .bulkBar {
     position: fixed;
     bottom: 28px;
@@ -825,14 +904,15 @@ html {
     gap: 14px;
     box-shadow: var(--shadow-lg);
     z-index: 100;
-    /* MOTION: slide up from below + fade in */
-    animation: slideUp var(--dur-normal) var(--ease-out) both;
+    /* will-change: bar animates via translate → GPU layer */
+    will-change: transform, opacity;
+    animation: bulkBarIn var(--duration-slow) var(--ease-out-quart) both;
 }
 
-@keyframes slideUp {
+@keyframes bulkBarIn {
     from {
         opacity: 0;
-        transform: translateX(-50%) translateY(16px);
+        transform: translateX(-50%) translateY(20px);
     }
 
     to {
@@ -850,6 +930,7 @@ html {
     white-space: nowrap;
 }
 
+/* Shared bulk button base — hover lift + press snap */
 .bulkComplete {
     display: flex;
     align-items: center;
@@ -862,10 +943,10 @@ html {
     font-size: 13px;
     font-weight: 600;
     cursor: pointer;
-    transition:
-        background var(--dur-fast) ease,
-        transform var(--dur-fast) var(--ease-spring);
     white-space: nowrap;
+    transition:
+        background var(--duration-fast) var(--ease-out-quart),
+        transform var(--duration-base) var(--ease-spring);
 }
 
 .bulkComplete:hover {
@@ -874,7 +955,7 @@ html {
 }
 
 .bulkComplete:active {
-    transform: scale(0.97);
+    transform: scale(0.96);
 }
 
 .bulkReassign {
@@ -889,15 +970,19 @@ html {
     font-size: 13px;
     font-weight: 500;
     cursor: pointer;
-    transition:
-        border-color var(--dur-fast) ease,
-        transform var(--dur-fast) var(--ease-spring);
     white-space: nowrap;
+    transition:
+        border-color var(--duration-fast) var(--ease-out-quart),
+        transform var(--duration-base) var(--ease-spring);
 }
 
 .bulkReassign:hover {
     border-color: var(--text-secondary);
     transform: translateY(-1px);
+}
+
+.bulkReassign:active {
+    transform: scale(0.96);
 }
 
 .bulkDelete {
@@ -912,11 +997,11 @@ html {
     font-size: 13px;
     font-weight: 500;
     cursor: pointer;
-    transition:
-        background var(--dur-fast) ease,
-        border-color var(--dur-fast) ease,
-        transform var(--dur-fast) var(--ease-spring);
     white-space: nowrap;
+    transition:
+        background var(--duration-fast) var(--ease-out-quart),
+        border-color var(--duration-fast) var(--ease-out-quart),
+        transform var(--duration-base) var(--ease-spring);
 }
 
 .bulkDelete:hover {
@@ -925,14 +1010,20 @@ html {
     transform: translateY(-1px);
 }
 
-.bulkDelete:focus-visible,
+.bulkDelete:active {
+    transform: scale(0.96);
+}
+
+/* Shared focus ring */
 .bulkComplete:focus-visible,
-.bulkReassign:focus-visible {
+.bulkReassign:focus-visible,
+.bulkDelete:focus-visible {
     outline: 2px solid var(--orange);
     outline-offset: 3px;
 }
 
 /* ─── Modal Overlay ──────────────────────────────────────────────────────── */
+/* MOTION: overlay fades in, modal scales up from 96% — both GPU-composited */
 .overlay {
     position: fixed;
     inset: 0;
@@ -942,11 +1033,10 @@ html {
     justify-content: center;
     z-index: 200;
     padding: 24px;
-    /* MOTION: overlay fades in behind modal */
-    animation: fadeIn var(--dur-fast) ease both;
+    animation: overlayFadeIn var(--duration-base) var(--ease-out-quart) both;
 }
 
-@keyframes fadeIn {
+@keyframes overlayFadeIn {
     from {
         opacity: 0;
     }
@@ -965,16 +1055,17 @@ html {
     max-height: 90vh;
     overflow-y: auto;
     box-shadow: var(--shadow-lg);
-    /* MOTION: scale up from 97% with slight y-lift */
-    animation: modalIn var(--dur-normal) var(--ease-out) both;
-    /* Prevent jitter when content grows */
     overscroll-behavior: contain;
+    /* will-change: modal enters via scale+translate → compositor layer */
+    will-change: transform, opacity;
+    animation: modalIn var(--duration-slow) var(--ease-out-quart) both;
 }
 
+/* MOTION: modal scales up from slightly small — depth cue of z-arrival */
 @keyframes modalIn {
     from {
         opacity: 0;
-        transform: scale(0.96) translateY(10px);
+        transform: scale(0.94) translateY(12px);
     }
 
     to {
@@ -1004,6 +1095,7 @@ html {
     margin: 0;
 }
 
+/* MOTION: close button spins 90° on hover — unmistakable "close" signal */
 .closeBtn {
     background: none;
     border: none;
@@ -1011,23 +1103,22 @@ html {
     color: var(--text-muted);
     padding: 4px;
     border-radius: 6px;
-    transition:
-        background var(--dur-fast) ease,
-        color var(--dur-fast) ease,
-        transform var(--dur-fast) var(--ease-spring);
     display: flex;
     align-items: center;
+    transition:
+        background var(--duration-fast) var(--ease-out-quart),
+        color var(--duration-fast) var(--ease-out-quart),
+        transform var(--duration-base) var(--ease-spring);
 }
 
 .closeBtn:hover {
     background: var(--theme-surface-2);
     color: var(--text-primary);
     transform: rotate(90deg);
-    /* MOTION: satisfying close-button spin */
 }
 
 .closeBtn:active {
-    transform: rotate(90deg) scale(0.9);
+    transform: rotate(90deg) scale(0.88);
 }
 
 .closeBtn:focus-visible {
@@ -1062,6 +1153,8 @@ html {
     letter-spacing: 0.2px;
 }
 
+/* MOTION: input glow on focus — box-shadow is GPU-composited via the
+   compositor's opacity layer. border-color also transitions smoothly. */
 .input {
     background: var(--bg-white);
     border: 1.5px solid var(--card-border);
@@ -1072,16 +1165,16 @@ html {
     outline: none;
     width: 100%;
     box-sizing: border-box;
-    /* MOTION: border + glow on focus */
-    transition:
-        border-color var(--dur-fast) ease,
-        box-shadow var(--dur-fast) ease;
     font-family: inherit;
+    transition:
+        border-color var(--duration-fast) var(--ease-out-quart),
+        box-shadow var(--duration-base) var(--ease-out-quart);
 }
 
+/* MOTION: orange glow ring on focus — depth cue that field is active */
 .input:focus {
     border-color: var(--orange);
-    box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.12);
+    box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.14);
 }
 
 .input::placeholder {
@@ -1100,6 +1193,7 @@ html {
     gap: 8px;
 }
 
+/* MOTION: pills lift + recolor on hover, spring on select */
 .radioPill {
     padding: 7px 18px;
     border-radius: var(--radius-pill);
@@ -1109,12 +1203,12 @@ html {
     cursor: pointer;
     color: var(--text-secondary);
     background: var(--bg-white);
-    transition:
-        border-color var(--dur-fast) ease,
-        color var(--dur-fast) ease,
-        background var(--dur-fast) ease,
-        transform var(--dur-fast) var(--ease-spring);
     user-select: none;
+    transition:
+        border-color var(--duration-fast) var(--ease-out-quart),
+        color var(--duration-fast) var(--ease-out-quart),
+        background var(--duration-fast) var(--ease-out-quart),
+        transform var(--duration-base) var(--ease-spring);
 }
 
 .radioPill input[type="radio"] {
@@ -1132,10 +1226,11 @@ html {
     border-color: var(--orange) !important;
     color: #fff !important;
     transform: translateY(-1px) !important;
-    box-shadow: 0 2px 8px rgba(249, 115, 22, 0.25);
+    box-shadow: 0 2px 10px rgba(249, 115, 22, 0.3);
 }
 
 /* ─── Drop Zone ──────────────────────────────────────────────────────────── */
+/* MOTION: subtle scale expand on hover — scale only (composited) */
 .dropZone {
     border: 2px dashed var(--card-border);
     border-radius: var(--radius-md);
@@ -1145,18 +1240,18 @@ html {
     align-items: center;
     gap: 8px;
     color: var(--text-muted);
-    transition:
-        border-color var(--dur-fast) ease,
-        background var(--dur-fast) ease,
-        transform var(--dur-fast) var(--ease-out);
     cursor: pointer;
+    transition:
+        border-color var(--duration-fast) var(--ease-out-quart),
+        background var(--duration-fast) var(--ease-out-quart),
+        transform var(--duration-base) var(--ease-out-quart);
 }
 
 .dropZone:hover {
     border-color: var(--orange);
     background: var(--orange-light);
-    transform: scale(1.01);
-    /* MOTION: subtle expand on hover */
+    transform: scale(1.015);
+    /* slight expand invites drag */
 }
 
 .dropText {
@@ -1211,6 +1306,8 @@ html {
     height: 0;
 }
 
+/* MOTION: track color cross-fades — background transitions via ease-in-out
+   which feels like a physical switch snapping through center */
 .toggleTrack {
     width: 42px;
     height: 24px;
@@ -1219,23 +1316,24 @@ html {
     display: flex;
     align-items: center;
     padding: 2px;
-    /* MOTION: smooth color change on toggle */
-    transition: background var(--dur-normal) ease;
     position: relative;
+    transition: background var(--duration-base) var(--ease-in-out);
 }
 
 .toggle input:checked~.toggleTrack {
     background: #3b82f6;
 }
 
+/* MOTION: thumb slides with spring — overshoot simulates physical momentum */
 .toggleThumb {
     width: 20px;
     height: 20px;
     background: #fff;
     border-radius: 50%;
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
-    /* MOTION: thumb slides with spring */
-    transition: transform var(--dur-normal) var(--ease-spring);
+    /* will-change: thumb animates translateX every toggle */
+    will-change: transform;
+    transition: transform var(--duration-base) var(--ease-spring);
     position: relative;
 }
 
@@ -1255,15 +1353,15 @@ html {
     padding: 9px 20px;
     background: none;
     border: 1.5px solid var(--card-border);
-    border-radius: var(--radius-pill);
     color: var(--text-secondary);
+    border-radius: var(--radius-pill);
     font-size: 13.5px;
     font-weight: 500;
     cursor: pointer;
     transition:
-        border-color var(--dur-fast) ease,
-        color var(--dur-fast) ease,
-        transform var(--dur-fast) var(--ease-spring);
+        border-color var(--duration-fast) var(--ease-out-quart),
+        color var(--duration-fast) var(--ease-out-quart),
+        transform var(--duration-base) var(--ease-spring);
 }
 
 .cancelBtn:hover {
@@ -1277,6 +1375,7 @@ html {
     outline-offset: 3px;
 }
 
+/* MOTION: same lift + press pattern as primary .newBtn */
 .saveBtn {
     display: flex;
     align-items: center;
@@ -1289,22 +1388,23 @@ html {
     font-size: 13.5px;
     font-weight: 600;
     cursor: pointer;
-    transition:
-        background var(--dur-fast) ease,
-        transform var(--dur-fast) var(--ease-spring),
-        box-shadow var(--dur-fast) ease;
     box-shadow: 0 2px 8px rgba(249, 115, 22, 0.3);
+    transition:
+        background var(--duration-fast) var(--ease-out-quart),
+        transform var(--duration-base) var(--ease-spring),
+        box-shadow var(--duration-base) var(--ease-out-quart);
 }
 
 .saveBtn:hover {
     background: var(--orange-hover);
     transform: translateY(-1px);
-    box-shadow: 0 6px 16px rgba(249, 115, 22, 0.35);
+    box-shadow: 0 6px 20px rgba(249, 115, 22, 0.4);
 }
 
 .saveBtn:active {
-    transform: scale(0.97);
-    box-shadow: 0 1px 4px rgba(249, 115, 22, 0.25);
+    transform: scale(0.96);
+    box-shadow: 0 1px 4px rgba(249, 115, 22, 0.2);
+    transition-duration: 80ms;
 }
 
 .saveBtn:disabled {
@@ -1320,58 +1420,51 @@ html {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   RESPONSIVE — Mobile-first breakpoints
-   320px → base (mobile)
-   600px → tablet portrait
-   768px → tablet landscape / small desktop
-   1024px+ → desktop (existing layout)
+   RESPONSIVE — breakpoints
+   <768px      → mobile (off-canvas sidebar)
+   600-767px   → tablet portrait
+   768-1023px  → tablet landscape
+   ≥1280px     → large desktop
    ═══════════════════════════════════════════════════════════════════════════ */
 
-/* ─── RESPONSIVE: Base mobile (320px+) ─────────────────────────────────── */
 @media (max-width: 767px) {
 
-    /* Sidebar becomes off-canvas drawer */
+    /* MOTION: sidebar becomes off-canvas drawer, slides in via translate */
     .sidebar {
         position: fixed;
         top: 0;
         left: 0;
         height: 100vh;
         width: 260px;
-        /* RESPONSIVE: wider drawer for thumb reach */
-        /* MOTION: slide in from left */
         transform: translateX(-100%);
-        transition: transform var(--dur-slow) var(--ease-out);
+        /* will-change already declared above */
+        transition: transform var(--duration-slow) var(--ease-out-quart);
         animation: none;
-        /* disable page-load animation on mobile */
+        /* disable page-load animation — replaced by drawer slide */
         box-shadow: none;
         z-index: 300;
     }
 
-    /* RESPONSIVE: open state applied via JS class */
     .sidebar.sidebarOpen {
         transform: translateX(0);
-        box-shadow: 4px 0 32px rgba(0, 0, 0, 0.25);
+        box-shadow: 4px 0 40px rgba(0, 0, 0, 0.3);
     }
 
-    /* Backdrop shown on mobile */
     .drawerBackdrop {
         display: block;
     }
 
-    /* Hamburger shown on mobile */
     .hamburger {
         display: flex;
     }
 
     .main {
         padding: 20px 16px 100px;
-        /* RESPONSIVE: no sidebar offset on mobile */
     }
 
     .pageTitle {
         font-size: 20px;
         letter-spacing: -0.3px;
-        /* RESPONSIVE: truncate on very small screens */
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -1382,16 +1475,10 @@ html {
         font-size: 13px;
     }
 
-    .newBtn span {
-        /* RESPONSIVE: hide text on tiny screens, keep + icon */
-    }
-
-    /* RESPONSIVE: filter tabs scroll horizontally */
     .filters {
         margin-bottom: 20px;
     }
 
-    /* RESPONSIVE: assignment rows get tighter */
     .rowMain {
         padding: 12px 12px;
         gap: 8px;
@@ -1401,22 +1488,20 @@ html {
         font-size: 13px;
     }
 
-    /* RESPONSIVE: hide initials avatar on small mobile to save space */
     .initials {
         display: none;
     }
 
-    /* RESPONSIVE: expanded section loses left indent on mobile */
+    /* save horizontal space */
     .expanded {
-        padding: 12px 12px 12px 12px;
+        padding: 12px;
     }
 
-    /* RESPONSIVE: meta items wrap tighter */
     .expandedMeta {
         gap: 12px;
     }
 
-    /* RESPONSIVE: bulk bar goes full width on mobile */
+    /* MOTION: bulk bar slides up from screen bottom — full-width sheet on mobile */
     .bulkBar {
         bottom: 0;
         left: 0;
@@ -1429,7 +1514,7 @@ html {
         padding: 12px 16px;
         gap: 8px;
         flex-wrap: wrap;
-        animation: bulkBarMobile var(--dur-normal) var(--ease-out) both;
+        animation: bulkBarMobile var(--duration-base) var(--ease-out-quart) both;
     }
 
     @keyframes bulkBarMobile {
@@ -1457,31 +1542,29 @@ html {
         flex: 1;
         justify-content: center;
         min-width: 0;
-        padding: 8px 8px;
+        padding: 8px;
         font-size: 12px;
     }
 
-    /* RESPONSIVE: modal full-screen on mobile */
+    /* MOTION: modal becomes bottom sheet — slides up from below */
     .overlay {
         padding: 0;
         align-items: flex-end;
         padding-top: 60px;
-        /* sheet slides up from bottom */
     }
 
     .modal {
         max-width: 100%;
-        max-height: calc(100vh - 60px - 64px - env(safe-area-inset-bottom, 0px));
+        max-height: calc(100vh - 60px - env(safe-area-inset-bottom, 0px));
         border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-        animation: sheetUp var(--dur-normal) var(--ease-out) both;
-        padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 64px)
+        padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 16px);
+        animation: sheetUp var(--duration-slow) var(--ease-out-quart) both;
     }
 
-    /* MOTION: bottom-sheet enter on mobile */
     @keyframes sheetUp {
         from {
             opacity: 0;
-            transform: translateY(40px);
+            transform: translateY(48px);
         }
 
         to {
@@ -1496,23 +1579,22 @@ html {
 
     .modalForm {
         padding: 0 20px 20px;
-        /* extra bottom pad for home indicator */
     }
 
     .formRow {
         grid-template-columns: 1fr;
-        /* RESPONSIVE: stack form columns */
     }
 
+    /* stack on mobile */
     .radioGroup {
         flex-wrap: wrap;
     }
 
     .modalFooter {
         flex-direction: column-reverse;
-        /* RESPONSIVE: CTA on top on mobile */
     }
 
+    /* CTA on top */
     .saveBtn,
     .cancelBtn {
         width: 100%;
@@ -1520,7 +1602,6 @@ html {
     }
 }
 
-/* ─── RESPONSIVE: Tablet portrait (600px–767px) ─────────────────────────── */
 @media (min-width: 600px) and (max-width: 767px) {
     .main {
         padding: 24px 24px 120px;
@@ -1530,17 +1611,15 @@ html {
         font-size: 22px;
     }
 
-    /* RESPONSIVE: restore form grid on wider tablet */
     .formRow {
         grid-template-columns: 1fr 1fr;
     }
 
-    /* RESPONSIVE: restore initials on tablet */
+    /* restore 2-col on wider mobile */
     .initials {
         display: flex;
     }
 
-    /* RESPONSIVE: modal as centered card on tablet portrait */
     .overlay {
         padding: 24px;
         align-items: center;
@@ -1550,7 +1629,7 @@ html {
         max-width: 520px;
         max-height: 90vh;
         border-radius: var(--radius-lg);
-        animation: modalIn var(--dur-normal) var(--ease-out) both;
+        animation: modalIn var(--duration-slow) var(--ease-out-quart) both;
     }
 
     .modalFooter {
@@ -1563,7 +1642,6 @@ html {
     }
 }
 
-/* ─── RESPONSIVE: Tablet landscape / small desktop (768px–1023px) ───────── */
 @media (min-width: 768px) and (max-width: 1023px) {
     .sidebar {
         width: 180px;
@@ -1581,9 +1659,9 @@ html {
     .logoName,
     .logoSub {
         display: none;
-        /* RESPONSIVE: icon-only logo at this breakpoint */
     }
 
+    /* icon-only sidebar at mid-width */
     .logo {
         justify-content: center;
         padding: 0 12px;
@@ -1595,7 +1673,6 @@ html {
     }
 }
 
-/* ─── RESPONSIVE: Large desktop (1280px+) ───────────────────────────────── */
 @media (min-width: 1280px) {
     .main {
         padding: 40px 56px 120px;
