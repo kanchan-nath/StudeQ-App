@@ -25,72 +25,7 @@
      --ease-in-quart   : accelerate for exits/collapses
      --ease-in-out     : symmetric for toggles / continuous motion
    ───────────────────────────────────────────────────────────────────────── */
-:root {
-    /* ── Colors ── */
-    --orange: #f97316;
-    --orange-light: #fff7ed;
-    --orange-hover: #ea6c10;
-    --sidebar-bg: #1e2636;
-    --sidebar-text: #ffffff;
-    --sidebar-sub: #8b93a7;
-    --sidebar-active-bg: rgba(255, 255, 255, 0.12);
-    --card-border: var(--theme-border);
-    --red: #ef4444;
-    --red-light: #fef2f2;
-    --teal: #14b8a6;
-    --teal-light: #f0fdfa;
-    --blue: #3b82f6;
-    --purple: #8b5cf6;
-    --bg-page: var(--theme-bg);
-    --bg-white: var(--theme-surface);
-    --text-primary: var(--theme-text);
-    --text-secondary: var(--theme-text-secondary);
-    --text-muted: var(--theme-text-muted);
-    --shadow-sm: var(--shadow-xs);
-    --shadow-md: var(--shadow-md);
-    --shadow-lg: var(--theme-card-shadow);
-    --radius-sm: 6px;
-    --radius-md: 10px;
-    --radius-lg: 16px;
-    --radius-pill: 999px;
-    --sidebar-width: 220px;
 
-    /* ── Duration scale ── */
-    --duration-fast: 150ms;
-    /* micro-interactions: hover bg, color swap      */
-    --duration-base: 250ms;
-    /* most transitions: cards, inputs, buttons       */
-    --duration-slow: 400ms;
-    /* entrance animations, sidebar slide             */
-    --duration-slower: 600ms;
-    /* page-level fades, backdrop                     */
-
-    /* ── Easing library — all cubic-bezier ── */
-    --ease-out-quart: cubic-bezier(0.22, 1, 0.36, 1);
-    /* fast decelerate   */
-    --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
-    /* bouncy overshoot  */
-    --ease-in-quart: cubic-bezier(0.5, 0, 0.75, 0);
-    /* fast accelerate   */
-    --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
-    /* symmetric/toggle  */
-}
-
-[data-theme="dark"] {
-    --orange: #fb923c;
-    --orange-light: #431407;
-    --orange-hover: #f97316;
-    --sidebar-bg: #0f1420;
-    --sidebar-text: #f1f5f9;
-    --sidebar-sub: #64748b;
-    --sidebar-active-bg: rgba(249, 115, 22, 0.18);
-    --red: #f87171;
-    --red-light: #1c0a0a;
-    --teal: #2dd4bf;
-    --teal-light: #042f2e;
-    --blue: #60a5fa;
-    --purple: #a78bfa;
-}
 
 /* ── Smooth scroll on scroll container ── */
 html {
@@ -102,8 +37,8 @@ html {
 .layout {
     display: flex;
     min-height: 100vh;
-    background: var(--bg-page);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--theme-bg);
+    font-family: var(--font-body);
     position: relative;
     animation: pageFadeIn var(--duration-slow) var(--ease-out-quart) both;
 }
@@ -123,7 +58,7 @@ html {
 .sidebar {
     width: var(--sidebar-width);
     min-width: var(--sidebar-width);
-    background: var(--sidebar-bg);
+    background: var(--theme-surface);
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -168,8 +103,8 @@ html {
 .logoIcon {
     width: 36px;
     height: 36px;
-    background: var(--orange);
-    border-radius: var(--radius-sm);
+    background: #f97316;
+    border-radius: var(--r-sm);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -183,7 +118,7 @@ html {
 .logoName {
     font-weight: 700;
     font-size: 14px;
-    color: var(--sidebar-text);
+    color: var(--theme-text);
     margin: 0;
     line-height: 1.2;
 }
@@ -208,7 +143,7 @@ html {
     align-items: center;
     gap: 10px;
     padding: 9px 12px;
-    border-radius: var(--radius-sm);
+    border-radius: var(--r-sm);
     font-size: 13.5px;
     color: var(--sidebar-sub);
     cursor: pointer;
@@ -222,18 +157,18 @@ html {
 
 .navItem:hover {
     background: rgba(255, 255, 255, 0.07);
-    color: var(--sidebar-text);
+    color: var(--theme-text);
     transform: translateX(3px);
     /* subtle nudge signals depth */
 }
 
 .navActive {
     background: var(--sidebar-active-bg);
-    color: var(--sidebar-text) !important;
+    color: var(--theme-text) !important;
 }
 
 .navActive svg {
-    color: var(--orange);
+    color: #f97316;
 }
 
 .sidebarUser {
@@ -247,7 +182,7 @@ html {
     width: 36px;
     height: 36px;
     border-radius: 50%;
-    background: var(--orange);
+    background: #f97316;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -260,7 +195,7 @@ html {
 .userName {
     font-weight: 600;
     font-size: 13px;
-    color: var(--sidebar-text);
+    color: var(--theme-text);
     margin: 0;
     line-height: 1.3;
 }
@@ -279,10 +214,10 @@ html {
     width: 40px;
     height: 40px;
     background: none;
-    border: 1.5px solid var(--card-border);
-    border-radius: var(--radius-sm);
+    border: 1.5px solid var(--theme-border);
+    border-radius: var(--r-sm);
     cursor: pointer;
-    color: var(--text-primary);
+    color: var(--theme-text);
     /* MOTION: scale spring on hover — scale is GPU-composited */
     transition:
         background var(--duration-fast) var(--ease-out-quart),
@@ -291,8 +226,8 @@ html {
 }
 
 .hamburger:hover {
-    background: var(--bg-white);
-    border-color: var(--orange);
+    background: var(--theme-surface);
+    border-color: #f97316;
     transform: scale(1.06);
     /* scale spring gives tactile feel */
 }
@@ -334,7 +269,7 @@ html {
 .pageTitle {
     font-size: 26px;
     font-weight: 700;
-    color: var(--text-primary);
+    color: var(--theme-text);
     margin: 0;
     letter-spacing: -0.4px;
 }
@@ -351,10 +286,10 @@ html {
     display: flex;
     align-items: center;
     gap: 6px;
-    background: var(--orange);
+    background: #f97316;
     color: #fff;
     border: none;
-    border-radius: var(--radius-pill);
+    border-radius: var(--r-full);
     padding: 9px 20px;
     font-size: 13.5px;
     font-weight: 600;
@@ -385,7 +320,7 @@ html {
 }
 
 .newBtn:focus-visible {
-    outline: 2px solid var(--orange);
+    outline: 2px solid #f97316;
     outline-offset: 3px;
 }
 
@@ -408,10 +343,10 @@ html {
 /* MOTION: lift + border color on hover, faster press feedback */
 .filterTab {
     padding: 7px 16px;
-    border-radius: var(--radius-pill);
-    border: 1.5px solid var(--card-border);
-    background: var(--bg-white);
-    color: var(--text-secondary);
+    border-radius: var(--r-full);
+    border: 1.5px solid var(--theme-border);
+    background: var(--theme-surface);
+    color: var(--theme-text-secondary);
     font-size: 13px;
     font-weight: 500;
     cursor: pointer;
@@ -425,8 +360,8 @@ html {
 }
 
 .filterTab:hover {
-    border-color: var(--orange);
-    color: var(--orange);
+    border-color: #f97316;
+    color: #f97316;
     transform: translateY(-1px);
 }
 
@@ -436,13 +371,13 @@ html {
 }
 
 .filterTab:focus-visible {
-    outline: 2px solid var(--orange);
+    outline: 2px solid #f97316;
     outline-offset: 2px;
 }
 
 .filterActive {
-    background: var(--orange) !important;
-    border-color: var(--orange) !important;
+    background: #f97316 !important;
+    border-color: #f97316 !important;
     color: #fff !important;
     transform: translateY(-1px);
     box-shadow: 0 2px 10px rgba(249, 115, 22, 0.3);
@@ -462,7 +397,7 @@ html {
     justify-content: center;
     gap: 12px;
     padding: 60px 0;
-    color: var(--text-muted);
+    color: var(--theme-text-muted);
     font-size: 14px;
 }
 
@@ -470,8 +405,8 @@ html {
 .spinner {
     width: 28px;
     height: 28px;
-    border: 2.5px solid var(--card-border);
-    border-top-color: var(--orange);
+    border: 2.5px solid var(--theme-border);
+    border-top-color: #f97316;
     border-radius: 50%;
     /* will-change: rotate is composited, declare it to avoid paint on first frame */
     will-change: transform;
@@ -536,7 +471,7 @@ html {
     align-items: center;
     justify-content: space-between;
     background: var(--theme-surface-2);
-    border-radius: var(--radius-sm);
+    border-radius: var(--r-sm);
     padding: 8px 14px;
 }
 
@@ -549,16 +484,16 @@ html {
 .groupName {
     font-size: 13px;
     font-weight: 600;
-    color: var(--text-primary);
+    color: var(--theme-text);
 }
 
 .groupBadge {
-    background: var(--card-border);
-    color: var(--text-secondary);
+    background: var(--theme-border);
+    color: var(--theme-text-secondary);
     font-size: 11px;
     font-weight: 600;
     padding: 1px 7px;
-    border-radius: var(--radius-pill);
+    border-radius: var(--r-full);
 }
 
 /* ─── Dots ───────────────────────────────────────────────────────────────── */
@@ -571,7 +506,7 @@ html {
 }
 
 .dot_orange {
-    background: var(--orange);
+    background: #f97316;
 }
 
 .dot_teal {
@@ -594,9 +529,9 @@ html {
 /* MOTION: card lift on hover — shadow + translateY (composited).
    Rows also stagger their entrance via nth-child inside groups. */
 .row {
-    background: var(--bg-white);
-    border: 1.5px solid var(--card-border);
-    border-radius: var(--radius-md);
+    background: var(--theme-surface);
+    border: 1.5px solid var(--theme-border);
+    border-radius: var(--r-md);
     overflow: hidden;
     box-shadow: var(--shadow-sm);
     /* Entrance: each row fades+slides in, delayed by nth-child */
@@ -661,7 +596,7 @@ html {
 
 /* Selected row stays grounded — override hover lift */
 .rowSelected {
-    border-color: var(--orange) !important;
+    border-color: #f97316 !important;
     box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.15) !important;
     transform: none !important;
 }
@@ -678,14 +613,14 @@ html {
     width: 16px;
     height: 16px;
     border-radius: 4px;
-    accent-color: var(--orange);
+    accent-color: #f97316;
     cursor: pointer;
     flex-shrink: 0;
     transition: transform var(--duration-base) var(--ease-spring);
 }
 
 .checkbox:focus-visible {
-    outline: 2px solid var(--orange);
+    outline: 2px solid #f97316;
     outline-offset: 2px;
 }
 
@@ -697,7 +632,7 @@ html {
 .rowTitle {
     font-size: 14px;
     font-weight: 600;
-    color: var(--text-primary);
+    color: var(--theme-text);
     margin: 0 0 3px;
     white-space: nowrap;
     overflow: hidden;
@@ -706,7 +641,7 @@ html {
 
 .dueDate {
     font-size: 12px;
-    color: var(--text-secondary);
+    color: var(--theme-text-secondary);
     margin: 0;
 }
 
@@ -728,11 +663,11 @@ html {
 
 .priorityBadge {
     background: var(--orange-light);
-    color: var(--orange);
+    color: #f97316;
     font-size: 11px;
     font-weight: 600;
     padding: 3px 9px;
-    border-radius: var(--radius-pill);
+    border-radius: var(--r-full);
 }
 
 .initials {
@@ -740,13 +675,13 @@ html {
     height: 28px;
     border-radius: 50%;
     background: #f3f4f6;
-    border: 1.5px solid var(--card-border);
+    border: 1.5px solid var(--theme-border);
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 10px;
     font-weight: 600;
-    color: var(--text-secondary);
+    color: var(--theme-text-secondary);
 }
 
 /* MOTION: chevron button — bg fade + icon rotation */
@@ -755,7 +690,7 @@ html {
     border: none;
     padding: 4px;
     cursor: pointer;
-    color: var(--text-muted);
+    color: var(--theme-text-muted);
     display: flex;
     align-items: center;
     border-radius: 4px;
@@ -766,11 +701,11 @@ html {
 
 .chevronBtn:hover {
     background: var(--theme-surface-2);
-    color: var(--text-primary);
+    color: var(--theme-text);
 }
 
 .chevronBtn:focus-visible {
-    outline: 2px solid var(--orange);
+    outline: 2px solid #f97316;
     outline-offset: 2px;
 }
 
@@ -788,7 +723,7 @@ html {
 /* ─── Expanded Content ───────────────────────────────────────────────────── */
 /* MOTION: reveal slides down from top edge — translateY + opacity, no height */
 .expanded {
-    border-top: 1.5px solid var(--card-border);
+    border-top: 1.5px solid var(--theme-border);
     padding: 14px 16px 14px 52px;
     animation: expandIn var(--duration-base) var(--ease-out-quart) both;
 }
@@ -807,7 +742,7 @@ html {
 
 .expandedDesc {
     font-size: 13px;
-    color: var(--text-secondary);
+    color: var(--theme-text-secondary);
     margin: 0 0 12px;
     line-height: 1.6;
 }
@@ -824,7 +759,7 @@ html {
     align-items: center;
     gap: 5px;
     font-size: 12.5px;
-    color: var(--text-secondary);
+    color: var(--theme-text-secondary);
 }
 
 /* MOTION: rubric link fades opacity — avoids layout shift from color change */
@@ -833,7 +768,7 @@ html {
     align-items: center;
     gap: 5px;
     font-size: 12.5px;
-    color: var(--orange);
+    color: #f97316;
     font-weight: 500;
     cursor: pointer;
     transition: opacity var(--duration-fast) var(--ease-out-quart);
@@ -846,7 +781,7 @@ html {
 .rubricDot {
     width: 10px;
     height: 10px;
-    background: var(--orange);
+    background: #f97316;
     border-radius: 2px;
     display: inline-block;
 }
@@ -858,12 +793,12 @@ html {
     align-items: center;
     gap: 4px;
     background: none;
-    border: 1.5px solid var(--card-border);
+    border: 1.5px solid var(--theme-border);
     color: var(--red);
     font-size: 12px;
     font-weight: 500;
     padding: 4px 10px;
-    border-radius: var(--radius-sm);
+    border-radius: var(--r-sm);
     cursor: pointer;
     transition:
         background var(--duration-fast) var(--ease-out-quart),
@@ -895,14 +830,14 @@ html {
     bottom: 28px;
     left: 50%;
     transform: translateX(-50%);
-    background: var(--bg-white);
-    border: 1.5px solid var(--card-border);
-    border-radius: var(--radius-pill);
+    background: var(--theme-surface);
+    border: 1.5px solid var(--theme-border);
+    border-radius: var(--r-full);
     padding: 12px 24px;
     display: flex;
     align-items: center;
     gap: 14px;
-    box-shadow: var(--shadow-lg);
+    box-shadow: var(--theme-card-shadow);
     z-index: 100;
     /* will-change: bar animates via translate → GPU layer */
     will-change: transform, opacity;
@@ -923,10 +858,10 @@ html {
 
 .bulkCount {
     font-size: 13px;
-    color: var(--text-secondary);
+    color: var(--theme-text-secondary);
     font-weight: 500;
     padding-right: 6px;
-    border-right: 1.5px solid var(--card-border);
+    border-right: 1.5px solid var(--theme-border);
     white-space: nowrap;
 }
 
@@ -935,10 +870,10 @@ html {
     display: flex;
     align-items: center;
     gap: 6px;
-    background: var(--orange);
+    background: #f97316;
     color: #fff;
     border: none;
-    border-radius: var(--radius-pill);
+    border-radius: var(--r-full);
     padding: 7px 16px;
     font-size: 13px;
     font-weight: 600;
@@ -963,9 +898,9 @@ html {
     align-items: center;
     gap: 6px;
     background: none;
-    border: 1.5px solid var(--card-border);
-    color: var(--text-primary);
-    border-radius: var(--radius-pill);
+    border: 1.5px solid var(--theme-border);
+    color: var(--theme-text);
+    border-radius: var(--r-full);
     padding: 7px 16px;
     font-size: 13px;
     font-weight: 500;
@@ -977,7 +912,7 @@ html {
 }
 
 .bulkReassign:hover {
-    border-color: var(--text-secondary);
+    border-color: var(--theme-text-secondary);
     transform: translateY(-1px);
 }
 
@@ -990,9 +925,9 @@ html {
     align-items: center;
     gap: 6px;
     background: none;
-    border: 1.5px solid var(--card-border);
+    border: 1.5px solid var(--theme-border);
     color: var(--red);
-    border-radius: var(--radius-pill);
+    border-radius: var(--r-full);
     padding: 7px 16px;
     font-size: 13px;
     font-weight: 500;
@@ -1018,7 +953,7 @@ html {
 .bulkComplete:focus-visible,
 .bulkReassign:focus-visible,
 .bulkDelete:focus-visible {
-    outline: 2px solid var(--orange);
+    outline: 2px solid #f97316;
     outline-offset: 3px;
 }
 
@@ -1048,13 +983,13 @@ html {
 
 /* ─── Modal Card ─────────────────────────────────────────────────────────── */
 .modal {
-    background: var(--bg-white);
-    border-radius: var(--radius-lg);
+    background: var(--theme-surface);
+    border-radius: var(--r-lg);
     width: 100%;
     max-width: 580px;
     max-height: 90vh;
     overflow-y: auto;
-    box-shadow: var(--shadow-lg);
+    box-shadow: var(--theme-card-shadow);
     overscroll-behavior: contain;
     /* will-change: modal enters via scale+translate → compositor layer */
     will-change: transform, opacity;
@@ -1085,13 +1020,13 @@ html {
 .modalTitle {
     font-size: 19px;
     font-weight: 700;
-    color: var(--text-primary);
+    color: var(--theme-text);
     margin: 0 0 4px;
 }
 
 .modalSub {
     font-size: 13px;
-    color: var(--text-secondary);
+    color: var(--theme-text-secondary);
     margin: 0;
 }
 
@@ -1100,7 +1035,7 @@ html {
     background: none;
     border: none;
     cursor: pointer;
-    color: var(--text-muted);
+    color: var(--theme-text-muted);
     padding: 4px;
     border-radius: 6px;
     display: flex;
@@ -1113,7 +1048,7 @@ html {
 
 .closeBtn:hover {
     background: var(--theme-surface-2);
-    color: var(--text-primary);
+    color: var(--theme-text);
     transform: rotate(90deg);
 }
 
@@ -1122,7 +1057,7 @@ html {
 }
 
 .closeBtn:focus-visible {
-    outline: 2px solid var(--orange);
+    outline: 2px solid #f97316;
     outline-offset: 2px;
 }
 
@@ -1149,19 +1084,19 @@ html {
 .label {
     font-size: 12.5px;
     font-weight: 600;
-    color: var(--text-primary);
+    color: var(--theme-text);
     letter-spacing: 0.2px;
 }
 
 /* MOTION: input glow on focus — box-shadow is GPU-composited via the
    compositor's opacity layer. border-color also transitions smoothly. */
 .input {
-    background: var(--bg-white);
-    border: 1.5px solid var(--card-border);
-    border-radius: var(--radius-sm);
+    background: var(--theme-surface);
+    border: 1.5px solid var(--theme-border);
+    border-radius: var(--r-sm);
     padding: 9px 12px;
     font-size: 13.5px;
-    color: var(--text-primary);
+    color: var(--theme-text);
     outline: none;
     width: 100%;
     box-sizing: border-box;
@@ -1173,12 +1108,12 @@ html {
 
 /* MOTION: orange glow ring on focus — depth cue that field is active */
 .input:focus {
-    border-color: var(--orange);
+    border-color: #f97316;
     box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.14);
 }
 
 .input::placeholder {
-    color: var(--text-muted);
+    color: var(--theme-text-muted);
 }
 
 .textarea {
@@ -1196,13 +1131,13 @@ html {
 /* MOTION: pills lift + recolor on hover, spring on select */
 .radioPill {
     padding: 7px 18px;
-    border-radius: var(--radius-pill);
-    border: 1.5px solid var(--card-border);
+    border-radius: var(--r-full);
+    border: 1.5px solid var(--theme-border);
     font-size: 13px;
     font-weight: 500;
     cursor: pointer;
-    color: var(--text-secondary);
-    background: var(--bg-white);
+    color: var(--theme-text-secondary);
+    background: var(--theme-surface);
     user-select: none;
     transition:
         border-color var(--duration-fast) var(--ease-out-quart),
@@ -1216,14 +1151,14 @@ html {
 }
 
 .radioPill:hover {
-    border-color: var(--orange);
-    color: var(--orange);
+    border-color: #f97316;
+    color: #f97316;
     transform: translateY(-1px);
 }
 
 .radioPillActive {
-    background: var(--orange) !important;
-    border-color: var(--orange) !important;
+    background: #f97316 !important;
+    border-color: #f97316 !important;
     color: #fff !important;
     transform: translateY(-1px) !important;
     box-shadow: 0 2px 10px rgba(249, 115, 22, 0.3);
@@ -1232,14 +1167,14 @@ html {
 /* ─── Drop Zone ──────────────────────────────────────────────────────────── */
 /* MOTION: subtle scale expand on hover — scale only (composited) */
 .dropZone {
-    border: 2px dashed var(--card-border);
-    border-radius: var(--radius-md);
+    border: 2px dashed var(--theme-border);
+    border-radius: var(--r-md);
     padding: 24px;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 8px;
-    color: var(--text-muted);
+    color: var(--theme-text-muted);
     cursor: pointer;
     transition:
         border-color var(--duration-fast) var(--ease-out-quart),
@@ -1248,7 +1183,7 @@ html {
 }
 
 .dropZone:hover {
-    border-color: var(--orange);
+    border-color: #f97316;
     background: var(--orange-light);
     transform: scale(1.015);
     /* slight expand invites drag */
@@ -1257,11 +1192,11 @@ html {
 .dropText {
     font-size: 13px;
     margin: 0;
-    color: var(--text-secondary);
+    color: var(--theme-text-secondary);
 }
 
 .browseLink {
-    color: var(--orange);
+    color: #f97316;
     font-weight: 600;
     cursor: pointer;
 }
@@ -1273,20 +1208,20 @@ html {
     justify-content: space-between;
     gap: 16px;
     padding: 12px 0;
-    border-top: 1.5px solid var(--card-border);
-    border-bottom: 1.5px solid var(--card-border);
+    border-top: 1.5px solid var(--theme-border);
+    border-bottom: 1.5px solid var(--theme-border);
 }
 
 .notifyLabel {
     font-size: 13.5px;
     font-weight: 600;
-    color: var(--text-primary);
+    color: var(--theme-text);
     margin: 0 0 2px;
 }
 
 .notifySub {
     font-size: 12px;
-    color: var(--text-muted);
+    color: var(--theme-text-muted);
     margin: 0;
 }
 
@@ -1312,7 +1247,7 @@ html {
     width: 42px;
     height: 24px;
     background: var(--toggle-track-bg);
-    border-radius: var(--radius-pill);
+    border-radius: var(--r-full);
     display: flex;
     align-items: center;
     padding: 2px;
@@ -1352,9 +1287,9 @@ html {
 .cancelBtn {
     padding: 9px 20px;
     background: none;
-    border: 1.5px solid var(--card-border);
-    color: var(--text-secondary);
-    border-radius: var(--radius-pill);
+    border: 1.5px solid var(--theme-border);
+    color: var(--theme-text-secondary);
+    border-radius: var(--r-full);
     font-size: 13.5px;
     font-weight: 500;
     cursor: pointer;
@@ -1365,13 +1300,13 @@ html {
 }
 
 .cancelBtn:hover {
-    border-color: var(--text-secondary);
-    color: var(--text-primary);
+    border-color: var(--theme-text-secondary);
+    color: var(--theme-text);
     transform: translateY(-1px);
 }
 
 .cancelBtn:focus-visible {
-    outline: 2px solid var(--orange);
+    outline: 2px solid #f97316;
     outline-offset: 3px;
 }
 
@@ -1381,9 +1316,9 @@ html {
     align-items: center;
     gap: 6px;
     padding: 9px 22px;
-    background: var(--orange);
+    background: #f97316;
     border: none;
-    border-radius: var(--radius-pill);
+    border-radius: var(--r-full);
     color: #fff;
     font-size: 13.5px;
     font-weight: 600;
@@ -1415,7 +1350,7 @@ html {
 }
 
 .saveBtn:focus-visible {
-    outline: 2px solid var(--orange);
+    outline: 2px solid #f97316;
     outline-offset: 3px;
 }
 
@@ -1507,7 +1442,7 @@ html {
         left: 0;
         right: 0;
         transform: none;
-        border-radius: var(--radius-md) var(--radius-md) 0 0;
+        border-radius: var(--r-md) var(--r-md) 0 0;
         border-left: none;
         border-right: none;
         border-bottom: none;
@@ -1532,7 +1467,7 @@ html {
     .bulkCount {
         flex: 0 0 100%;
         border-right: none;
-        border-bottom: 1.5px solid var(--card-border);
+        border-bottom: 1.5px solid var(--theme-border);
         padding: 0 0 8px;
     }
 
@@ -1556,7 +1491,7 @@ html {
     .modal {
         max-width: 100%;
         max-height: calc(100vh - 60px - env(safe-area-inset-bottom, 0px));
-        border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+        border-radius: var(--r-lg) var(--r-lg) 0 0;
         padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 16px);
         animation: sheetUp var(--duration-slow) var(--ease-out-quart) both;
     }
@@ -1628,7 +1563,7 @@ html {
     .modal {
         max-width: 520px;
         max-height: 90vh;
-        border-radius: var(--radius-lg);
+        border-radius: var(--r-lg);
         animation: modalIn var(--duration-slow) var(--ease-out-quart) both;
     }
 
@@ -1681,4 +1616,4 @@ html {
     .pageTitle {
         font-size: 28px;
     }
-}
+}   
