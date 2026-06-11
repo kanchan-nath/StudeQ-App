@@ -81,30 +81,56 @@ const App = () => {
           <Route
             path="/tutor"
             element={<ProtectedRoute component={
-              <ComingSoon label="Tutor Chat" eta="July 2025">
+              <ComingSoon label="Tutor Chat" eta="July 2026">
                 <Tutor />
               </ComingSoon>
           } />}
           />
           <Route
             path="/study-room"
-            element={<ProtectedRoute component={<StudyRoom />} />}
+            element={<ProtectedRoute component={
+              <ComingSoon label="Your Collaboraive Study Room" eta="August 2026">
+
+                <StudyRoom />
+              </ComingSoon>
+          } />}
           />
           <Route
             path="/study-room/:roomId"
-            element={<ProtectedRoute component={<RoomChat />} />}
+            element={<ProtectedRoute component={
+              <ComingSoon label="Room Chat" eta="July 2026">
+
+                <RoomChat />
+              </ComingSoon>
+          } />}
           />
           <Route
             path="/image-analysis"
-            element={<ProtectedRoute component={<ImageAnalysis />} />}
+            element={<ProtectedRoute component={
+              <ComingSoon label="Image Analysis" eta="July 2026">
+
+                <ImageAnalysis />
+              </ComingSoon>
+          } />}
           />
           <Route
             path="/pdf-analysis"
-            element={<ProtectedRoute component={<PDFSummary />} />}
+            element={<ProtectedRoute component={
+              <ComingSoon label="Pdf Analysis" eta="July 2026">
+
+                <PDFSummary />
+              </ComingSoon>
+          } />}
+
           />
           <Route
             path="/scheduler"
-            element={<ProtectedRoute component={<Scheduler />} />}
+            element={<ProtectedRoute component={
+              <ComingSoon label="Event Schedule" eta="July 2025">
+
+                <Scheduler />
+              </ComingSoon>
+          } />}
           />
 
           <Route path="/time-table" element={<ProtectedRoute component={<TimeTable />} />} />
@@ -112,13 +138,24 @@ const App = () => {
           <Route path="/time-table/:view/event/:id" element={<ProtectedRoute component={<TimeTable />} />} />
           <Route path="/time-table/:view/create" element={<ProtectedRoute component={<TimeTable />} />} />
           <Route path="/time-table/:view/edit/:id" element={<ProtectedRoute component={<TimeTable />} />} />
+
           <Route
             path="/event-scheduling"
-            element={<ProtectedRoute component={<EventScheduling />} />}
+            element={<ProtectedRoute component={
+              <ComingSoon label="Event Scheduling" eta="July 2026">
+
+                <EventScheduling />
+              </ComingSoon>
+          } />}
           />
           <Route
             path="/scheduler/generate-plan"
-            element={<ProtectedRoute component={<GeneratePlanView />} />}
+            element={<ProtectedRoute component={
+              <ComingSoon label="AI Generated Study Plan" eta="July 2026">
+
+                <GeneratePlanView />
+              </ComingSoon>
+          } />}
           />
           <Route
             path="/notebook"
