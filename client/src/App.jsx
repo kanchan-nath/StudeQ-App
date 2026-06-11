@@ -29,6 +29,7 @@ import ExamSchedule from "./pages/ExamSchedule.jsx";
 import ProjectSubmissionScheduler from "./pages/Projectsubmissionscheduler.jsx";
 import Assignments from "./pages/Assignments.jsx";
 import SearchResults from "./pages/Searchresults.jsx";
+import ComingSoon from "./components/ComingSoon/Index.jsx";
 
 const App = () => {
   const token = localStorage.getItem("token");
@@ -76,9 +77,14 @@ const App = () => {
           <Route path="/flashcards/create/topic" element={<ProtectedRoute component={<Flashcards />} />} />
           <Route path="/flashcards/create/scratch" element={<ProtectedRoute component={<Flashcards />} />} />
           <Route path="/flashcards/create/pdf" element={<ProtectedRoute component={<Flashcards />} />} />
+
           <Route
             path="/tutor"
-            element={<ProtectedRoute component={<Tutor />} />}
+            element={<ProtectedRoute component={
+              <ComingSoon label="Tutor Chat" eta="July 2025">
+                <Tutor />
+              </ComingSoon>
+          } />}
           />
           <Route
             path="/study-room"
