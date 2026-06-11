@@ -283,7 +283,7 @@ const App = () => {
 
                 <ExamSchedule />
               </ComingSoon>
-          } />}
+            } />}
           />
           <Route
             path="/event-scheduling/projects"
@@ -296,7 +296,7 @@ const App = () => {
 
                   <ProjectSubmissionScheduler />
                 </ComingSoon>
-            } />
+              } />
             }
           />
           <Route
