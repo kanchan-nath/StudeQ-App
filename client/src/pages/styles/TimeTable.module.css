@@ -5,10 +5,48 @@
    Remove any local font import — global handles it.
 ═══════════════════════════════════════════════════════════════ */
 
-/* ── Local layout tokens (not in global, page-specific) ─────── */
+/* ── Local layout tokens ────────────────────────────────────── */
 :root {
     --navbar-h: 58px;
     --subheader-h: 52px;
+
+    /* ── Motion scale tokens ───────────────────────────────────
+       All timings and easings defined here.
+       Components reference these — never hardcode durations.
+    ─────────────────────────────────────────────────────────── */
+    --duration-fast: 150ms;
+    /* micro: button press, swatch hover */
+    --duration-base: 250ms;
+    /* standard: most transitions        */
+    --duration-slow: 400ms;
+    /* panels, modals sliding in         */
+    --duration-slower: 600ms;
+    /* page entrance, stagger sequences  */
+
+    /* Easing curves — no plain ease/linear anywhere */
+    --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+    /* natural decel   */
+    --ease-in-out: cubic-bezier(0.45, 0, 0.55, 1);
+    /* symmetric swing */
+    --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+    /* spring overshoot for lift */
+    --ease-enter: cubic-bezier(0.0, 0.0, 0.2, 1);
+    /* entrance: fast settle */
+}
+
+/* ── Reduced-motion override ────────────────────────────────
+   All animations/transitions stripped for accessibility.
+   Layout and colors preserved. Only motion disabled.
+─────────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
 }
 
 /* ── Root ──────────────────────────────────────────────────── */
@@ -21,6 +59,8 @@
     flex-direction: column;
     position: relative;
     overflow: hidden;
+    /* Smooth scroll for anchor jumps inside the page */
+    scroll-behavior: smooth;
 }
 
 /* Subtle star-field effect */
@@ -37,6 +77,19 @@
         radial-gradient(400px 400px at 90% 90%, rgba(34, 197, 94, 0.04) 0%, transparent 70%);
     pointer-events: none;
     z-index: 0;
+    /* Starfield slowly drifts — extremely subtle parallax feel */
+    animation: starfield-drift 60s var(--ease-in-out) infinite alternate;
+}
+
+/* Starfield moves only via opacity fade — no position shift = GPU safe */
+@keyframes starfield-drift {
+    from {
+        opacity: 0.8;
+    }
+
+    to {
+        opacity: 1;
+    }
 }
 
 /* ── Navbar ────────────────────────────────────────────────── */
@@ -54,6 +107,20 @@
     -webkit-backdrop-filter: var(--theme-navbar-blur);
     border-bottom: 1px solid var(--theme-border);
     gap: 16px;
+    /* Navbar slides down + fades on first mount */
+    animation: navbar-enter var(--duration-slow) var(--ease-out) both;
+}
+
+@keyframes navbar-enter {
+    from {
+        opacity: 0;
+        transform: translateY(-100%);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .navLogo {
@@ -66,7 +133,10 @@
 .logoIcon {
     font-size: 20px;
     filter: drop-shadow(0 0 8px var(--theme-accent-glow));
-    animation: pulse-logo 3s ease-in-out infinite;
+    /* Pulse uses opacity + filter — no layout shift */
+    animation: pulse-logo 3s var(--ease-in-out) infinite;
+    will-change: filter;
+    /* filter-pulse is the only genuine will-change candidate */
 }
 
 @keyframes pulse-logo {
@@ -101,6 +171,8 @@
     border-radius: var(--r-full);
     padding: 3px;
     gap: 2px;
+    /* Entrance: staggered after navbar — slight delay */
+    animation: fade-up var(--duration-slow) var(--ease-out) 100ms both;
 }
 
 .viewTab {
@@ -113,7 +185,11 @@
     border-radius: var(--r-full);
     padding: 6px 18px;
     cursor: pointer;
-    transition: all 0.2s ease;
+    /* Smooth background + color swap */
+    transition:
+        color var(--duration-fast) var(--ease-out),
+        background var(--duration-fast) var(--ease-out),
+        box-shadow var(--duration-base) var(--ease-out);
     white-space: nowrap;
 }
 
@@ -122,11 +198,24 @@
     background: var(--theme-purple-dim);
 }
 
+/* Active tab: spring-scale gives satisfying click feedback */
 .viewTabActive {
     background: var(--theme-purple);
     color: #fff !important;
     font-weight: 600;
     box-shadow: 0 0 16px var(--theme-purple-dim);
+    /* Scale on activation — spring easing feels snappy */
+    animation: tab-activate var(--duration-base) var(--ease-spring);
+}
+
+@keyframes tab-activate {
+    from {
+        transform: scale(0.92);
+    }
+
+    to {
+        transform: scale(1);
+    }
 }
 
 .navRight {
@@ -134,6 +223,8 @@
     align-items: center;
     gap: 10px;
     flex-shrink: 0;
+    /* Entrance: mirror viewSwitcher stagger */
+    animation: fade-up var(--duration-slow) var(--ease-out) 150ms both;
 }
 
 .themeToggle {
@@ -147,11 +238,22 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: border-color 0.2s;
+    /* Rotate icon on hover — transform only, GPU safe */
+    transition:
+        border-color var(--duration-fast) var(--ease-out),
+        transform var(--duration-base) var(--ease-spring);
 }
 
 .themeToggle:hover {
     border-color: var(--theme-purple);
+    /* Slight rotation hints "toggle" affordance */
+    transform: rotate(20deg) scale(1.08);
+}
+
+.themeToggle:active {
+    /* Press feedback: scale down */
+    transform: scale(0.9);
+    transition-duration: var(--duration-fast);
 }
 
 .createBtn {
@@ -167,24 +269,38 @@
     font-size: 13px;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.2s ease;
     box-shadow: 0 0 20px var(--theme-purple-dim);
     white-space: nowrap;
+    /* Compound transition: lift + glow */
+    transition:
+        transform var(--duration-base) var(--ease-spring),
+        box-shadow var(--duration-base) var(--ease-out),
+        opacity var(--duration-fast) var(--ease-out);
 }
 
 .createBtn:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 24px var(--theme-purple-dim);
-    opacity: 0.9;
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 6px 28px var(--theme-purple-dim);
+    opacity: 0.92;
 }
 
 .createBtn:active {
-    transform: translateY(0);
+    /* Press: dip below baseline */
+    transform: translateY(1px) scale(0.97);
+    box-shadow: 0 2px 10px var(--theme-purple-dim);
+    transition-duration: var(--duration-fast);
 }
 
 .createPlus {
     font-size: 16px;
     font-weight: 300;
+    /* Plus icon rotates on hover for "add" affordance */
+    display: inline-block;
+    transition: transform var(--duration-base) var(--ease-spring);
+}
+
+.createBtn:hover .createPlus {
+    transform: rotate(90deg);
 }
 
 /* ── Sub-header ─────────────────────────────────────────────── */
@@ -200,6 +316,20 @@
     flex-shrink: 0;
     position: relative;
     z-index: 10;
+    /* Entrance: after navbar */
+    animation: subheader-enter var(--duration-slow) var(--ease-out) 80ms both;
+}
+
+@keyframes subheader-enter {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .dateNav {
@@ -217,14 +347,24 @@
     padding: 5px 10px;
     font-size: 13px;
     cursor: pointer;
-    transition: all 0.15s;
     font-family: var(--font-body);
+    transition:
+        border-color var(--duration-fast) var(--ease-out),
+        color var(--duration-fast) var(--ease-out),
+        background var(--duration-fast) var(--ease-out),
+        transform var(--duration-base) var(--ease-spring);
 }
 
 .navArrow:hover {
     border-color: var(--theme-purple);
     color: var(--theme-purple);
     background: var(--theme-purple-dim);
+}
+
+.navArrow:active {
+    /* Arrows nudge in their travel direction — purely via scale for now */
+    transform: scale(0.92);
+    transition-duration: var(--duration-fast);
 }
 
 .dateLabel {
@@ -234,6 +374,9 @@
     color: var(--theme-text);
     margin-left: 8px;
     white-space: nowrap;
+    /* Date text flips when navigating — parent JS swaps content,
+       this ensures the color doesn't flash */
+    transition: opacity var(--duration-fast) var(--ease-out);
 }
 
 .categoryRow {
@@ -248,6 +391,8 @@
     display: none;
 }
 
+/* Stagger pill entrance — nth-child delays via inline style fallback.
+   JS should set --pill-i on each pill; CSS uses it below. */
 .catPill {
     display: flex;
     align-items: center;
@@ -261,12 +406,36 @@
     border: 1px solid var(--cat-color, var(--theme-purple));
     color: var(--cat-color, var(--theme-purple));
     background: transparent;
-    transition: all 0.2s ease;
     white-space: nowrap;
+    /* Stagger via --pill-i custom prop (set inline in JSX):
+       animation-delay: calc(var(--pill-i, 0) * 40ms)               */
+    animation: pill-enter var(--duration-base) var(--ease-out) calc(var(--pill-i, 0) * 40ms) both;
+    transition:
+        background var(--duration-fast) var(--ease-out),
+        box-shadow var(--duration-fast) var(--ease-out),
+        transform var(--duration-base) var(--ease-spring);
+}
+
+@keyframes pill-enter {
+    from {
+        opacity: 0;
+        transform: translateY(6px) scale(0.92);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
 }
 
 .catPill:hover {
     background: var(--cat-bg, var(--theme-purple-dim));
+    transform: translateY(-1px);
+}
+
+.catPill:active {
+    transform: scale(0.95);
+    transition-duration: var(--duration-fast);
 }
 
 .catPillActive {
@@ -281,6 +450,12 @@
     border-radius: 50%;
     background: var(--cat-color, var(--theme-purple));
     flex-shrink: 0;
+    /* Pulse when pill is active — shows selection is live */
+    transition: transform var(--duration-base) var(--ease-spring);
+}
+
+.catPillActive .catDot {
+    transform: scale(1.4);
 }
 
 /* ── Canvas ─────────────────────────────────────────────────── */
@@ -289,6 +464,8 @@
     overflow: hidden;
     position: relative;
     z-index: 1;
+    /* Canvas fades in after subheader settles */
+    animation: fade-in var(--duration-slower) var(--ease-out) 200ms both;
 }
 
 .loadingOverlay {
@@ -303,6 +480,8 @@
     z-index: 50;
     font-size: 14px;
     color: var(--theme-text-secondary);
+    /* Overlay fades in/out cleanly */
+    animation: fade-in var(--duration-base) var(--ease-out);
 }
 
 .spinner {
@@ -311,7 +490,10 @@
     border: 2px solid var(--theme-border);
     border-top-color: var(--theme-purple);
     border-radius: 50%;
-    animation: spin 0.8s linear infinite;
+    /* Spin only transform — GPU layer */
+    animation: spin 0.8s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+    will-change: transform;
+    /* continuous rotation — justified will-change */
 }
 
 @keyframes spin {
@@ -356,6 +538,8 @@
 .hourRow {
     height: 64px;
     position: relative;
+    /* Background swap — only opacity-based via the theme color, layout safe */
+    transition: background var(--duration-fast) var(--ease-out);
 }
 
 .hourRow:hover {
@@ -380,9 +564,25 @@
     border: 2px dashed var(--theme-purple);
     pointer-events: none;
     z-index: 5;
-    transition: height 0.05s;
+    /* Only opacity transition — height controlled by JS drag math */
+    transition: opacity var(--duration-fast) var(--ease-out);
+    animation: drag-preview-appear var(--duration-base) var(--ease-out);
 }
 
+@keyframes drag-preview-appear {
+    from {
+        opacity: 0;
+        transform: scaleX(0.96);
+    }
+
+    to {
+        opacity: 1;
+        transform: scaleX(1);
+    }
+}
+
+/* Event blocks: lift + brightness on hover.
+   transform only — no top/left changes. */
 .eventBlock {
     position: absolute;
     left: 8px;
@@ -392,19 +592,40 @@
     cursor: pointer;
     overflow: hidden;
     z-index: 10;
-    transition: filter 0.15s, transform 0.15s;
     display: flex;
     flex-direction: column;
     gap: 2px;
+    /* Entrance: each block floats up */
+    animation: event-enter var(--duration-base) var(--ease-out) both;
+    transition:
+        filter var(--duration-fast) var(--ease-out),
+        transform var(--duration-base) var(--ease-spring),
+        box-shadow var(--duration-base) var(--ease-out);
+    will-change: transform;
+    /* active dragging targets — justified */
+}
+
+@keyframes event-enter {
+    from {
+        opacity: 0;
+        transform: translateY(4px) scaleX(0.97);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scaleX(1);
+    }
 }
 
 .eventBlock:hover {
     filter: brightness(1.2);
-    transform: scaleX(1.01);
+    transform: scaleX(1.015) translateY(-1px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
 }
 
 .eventBlock:hover .eventActions {
     opacity: 1;
+    transform: translateY(0);
 }
 
 .eventTitle {
@@ -428,7 +649,11 @@
     display: flex;
     gap: 4px;
     opacity: 0;
-    transition: opacity 0.15s;
+    /* Actions slide down into view — transform only */
+    transform: translateY(-4px);
+    transition:
+        opacity var(--duration-fast) var(--ease-out),
+        transform var(--duration-base) var(--ease-out);
 }
 
 .eventActionBtn {
@@ -439,11 +664,18 @@
     font-size: 11px;
     cursor: pointer;
     color: var(--theme-text);
-    transition: background 0.15s;
+    transition:
+        background var(--duration-fast) var(--ease-out),
+        transform var(--duration-fast) var(--ease-spring);
 }
 
 .eventActionBtn:hover {
     background: rgba(10, 12, 20, 0.95);
+    transform: scale(1.1);
+}
+
+.eventActionBtn:active {
+    transform: scale(0.9);
 }
 
 /* ── Week View ──────────────────────────────────────────────── */
@@ -459,6 +691,20 @@
     grid-template-columns: 56px repeat(7, 1fr);
     border-bottom: 1px solid var(--theme-border);
     flex-shrink: 0;
+    /* Header row slides down */
+    animation: fade-down var(--duration-base) var(--ease-out) both;
+}
+
+@keyframes fade-down {
+    from {
+        opacity: 0;
+        transform: translateY(-6px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .weekTimeGutter {
@@ -472,7 +718,7 @@
     padding: 10px 0;
     border-left: 1px solid var(--theme-border);
     cursor: pointer;
-    transition: background 0.15s;
+    transition: background var(--duration-fast) var(--ease-out);
 }
 
 .weekDayHeader:hover {
@@ -489,6 +735,24 @@
     align-items: center;
     justify-content: center;
     box-shadow: 0 0 12px var(--theme-purple-dim);
+    /* Today badge pulses once on load to draw attention */
+    animation: today-badge-pulse var(--duration-slower) var(--ease-spring) both;
+}
+
+@keyframes today-badge-pulse {
+    0% {
+        transform: scale(0.6);
+        opacity: 0;
+    }
+
+    70% {
+        transform: scale(1.1);
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
 }
 
 .weekDayName {
@@ -544,8 +808,14 @@
 .weekHourCell {
     height: 48px;
     border-top: 1px solid var(--theme-border);
+    transition: background var(--duration-fast) var(--ease-out);
 }
 
+.weekHourCell:hover {
+    background: var(--theme-purple-dim);
+}
+
+/* Week chips: entrance stagger via --chip-i (set inline in JSX) */
 .weekEventChip {
     position: absolute;
     left: 2px;
@@ -560,11 +830,15 @@
     white-space: nowrap;
     text-overflow: ellipsis;
     z-index: 5;
-    transition: filter 0.15s;
+    animation: event-enter var(--duration-base) var(--ease-out) calc(var(--chip-i, 0) * 30ms) both;
+    transition:
+        filter var(--duration-fast) var(--ease-out),
+        transform var(--duration-base) var(--ease-spring);
 }
 
 .weekEventChip:hover {
     filter: brightness(1.25);
+    transform: scaleX(1.015);
 }
 
 /* ── Month View ─────────────────────────────────────────────── */
@@ -599,16 +873,31 @@
     overflow: hidden;
 }
 
+/* Month cells stagger in via --cell-i (set inline in JSX):
+   creates a wave effect across the grid */
 .monthCell {
     border-right: 1px solid var(--theme-border);
     border-bottom: 1px solid var(--theme-border);
     padding: 8px;
     cursor: pointer;
-    transition: background 0.15s;
     display: flex;
     flex-direction: column;
     gap: 4px;
     min-height: 80px;
+    animation: cell-enter var(--duration-base) var(--ease-out) calc(var(--cell-i, 0) * 15ms) both;
+    transition: background var(--duration-fast) var(--ease-out);
+}
+
+@keyframes cell-enter {
+    from {
+        opacity: 0;
+        transform: scale(0.97);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
 
 .monthCell:hover {
@@ -630,6 +919,8 @@
     justify-content: center;
     font-weight: 700;
     box-shadow: 0 0 10px var(--theme-purple-dim);
+    /* Today inherits the same badge pop as week view */
+    animation: today-badge-pulse var(--duration-slower) var(--ease-spring) both;
 }
 
 .monthDayNum {
@@ -642,6 +933,11 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: transform var(--duration-fast) var(--ease-spring);
+}
+
+.monthCell:hover .monthDayNum {
+    transform: scale(1.1);
 }
 
 .monthDots {
@@ -656,11 +952,35 @@
     height: 7px;
     border-radius: 50%;
     flex-shrink: 0;
+    /* Dots pop in when cell renders */
+    animation: dot-pop var(--duration-base) var(--ease-spring) both;
+    transition: transform var(--duration-fast) var(--ease-spring);
+}
+
+@keyframes dot-pop {
+    from {
+        transform: scale(0);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.monthCell:hover .monthDot {
+    transform: scale(1.3);
 }
 
 .monthMore {
     font-size: 10px;
     color: var(--theme-text-muted);
+    transition: color var(--duration-fast) var(--ease-out);
+}
+
+.monthCell:hover .monthMore {
+    color: var(--theme-purple);
 }
 
 /* ── Agenda View ────────────────────────────────────────────── */
@@ -682,6 +1002,7 @@
     height: 200px;
     color: var(--theme-text-muted);
     font-size: 15px;
+    animation: fade-up var(--duration-slow) var(--ease-out) both;
 }
 
 .agendaCreateLink {
@@ -692,12 +1013,19 @@
     font-size: 15px;
     font-family: var(--font-body);
     text-decoration: underline;
+    transition: opacity var(--duration-fast) var(--ease-out);
 }
 
+.agendaCreateLink:hover {
+    opacity: 0.75;
+}
+
+/* Agenda groups stagger in via --group-i */
 .agendaGroup {
     display: flex;
     flex-direction: column;
     gap: 8px;
+    animation: fade-up var(--duration-slow) var(--ease-out) calc(var(--group-i, 0) * 60ms) both;
 }
 
 .agendaDateHeader {
@@ -711,6 +1039,7 @@
     border-bottom: 1px solid var(--theme-border);
 }
 
+/* Agenda items: stagger via --item-i within each group */
 .agendaItem {
     display: flex;
     align-items: center;
@@ -719,14 +1048,26 @@
     border-radius: var(--r-md);
     padding: 14px 16px;
     cursor: pointer;
-    transition: all 0.2s;
     border: 1px solid var(--theme-border);
+    animation: fade-up var(--duration-base) var(--ease-out) calc(var(--item-i, 0) * 40ms) both;
+    transition:
+        border-color var(--duration-base) var(--ease-out),
+        background var(--duration-base) var(--ease-out),
+        transform var(--duration-base) var(--ease-spring),
+        box-shadow var(--duration-base) var(--ease-out);
 }
 
 .agendaItem:hover {
     border-color: var(--ev-color, var(--theme-purple));
     background: var(--theme-surface-2);
-    transform: translateX(4px);
+    /* Slide right on hover — transform only, GPU safe */
+    transform: translateX(5px);
+    box-shadow: -3px 0 0 0 var(--ev-color, var(--theme-purple));
+}
+
+.agendaItem:active {
+    transform: translateX(2px) scale(0.99);
+    transition-duration: var(--duration-fast);
 }
 
 .agendaItemLeft {
@@ -784,12 +1125,20 @@
     background: var(--theme-surface-2);
     color: var(--theme-text-secondary);
     cursor: pointer;
-    transition: all 0.15s;
+    transition:
+        border-color var(--duration-fast) var(--ease-out),
+        color var(--duration-fast) var(--ease-out),
+        transform var(--duration-fast) var(--ease-spring);
 }
 
 .agendaBtn:hover {
     border-color: var(--theme-purple);
     color: var(--theme-purple);
+    transform: translateY(-1px);
+}
+
+.agendaBtn:active {
+    transform: scale(0.94);
 }
 
 .agendaBtnDanger:hover {
@@ -807,7 +1156,7 @@
     align-items: flex-start;
     justify-content: flex-end;
     padding: 80px 24px 24px;
-    animation: fade-in 0.15s ease;
+    animation: fade-in var(--duration-base) var(--ease-out);
 }
 
 .detailPanel {
@@ -818,15 +1167,18 @@
     padding: 24px;
     width: 280px;
     position: relative;
-    animation: slide-in-right 0.2s ease;
     display: flex;
     flex-direction: column;
     gap: 12px;
+    /* Slides in from right — transform only */
+    animation: slide-in-right var(--duration-slow) var(--ease-out);
+    will-change: transform;
+    /* single shot entrance — remove after animation via JS if desired */
 }
 
 @keyframes slide-in-right {
     from {
-        transform: translateX(20px);
+        transform: translateX(28px);
         opacity: 0;
     }
 
@@ -843,6 +1195,19 @@
     right: 0;
     height: 3px;
     border-radius: var(--r-md) var(--r-md) 0 0;
+    /* Bar width animates from 0 to full on open */
+    animation: bar-grow var(--duration-slow) var(--ease-out) 100ms both;
+    transform-origin: left;
+}
+
+@keyframes bar-grow {
+    from {
+        transform: scaleX(0);
+    }
+
+    to {
+        transform: scaleX(1);
+    }
 }
 
 .detailClose {
@@ -860,6 +1225,21 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    transition:
+        border-color var(--duration-fast) var(--ease-out),
+        transform var(--duration-base) var(--ease-spring),
+        color var(--duration-fast) var(--ease-out);
+}
+
+.detailClose:hover {
+    border-color: var(--theme-red);
+    color: var(--theme-red);
+    /* X icon rotates on hover — obvious close affordance */
+    transform: rotate(90deg) scale(1.1);
+}
+
+.detailClose:active {
+    transform: scale(0.88);
 }
 
 .detailTitle {
@@ -869,12 +1249,14 @@
     color: var(--theme-text);
     margin: 0;
     padding-top: 8px;
+    animation: fade-up var(--duration-base) var(--ease-out) 80ms both;
 }
 
 .detailTopic {
     font-size: 13px;
     color: var(--theme-text-secondary);
     margin: 0;
+    animation: fade-up var(--duration-base) var(--ease-out) 120ms both;
 }
 
 .detailRow {
@@ -883,6 +1265,7 @@
     gap: 8px;
     font-size: 13px;
     color: var(--theme-text-secondary);
+    animation: fade-up var(--duration-base) var(--ease-out) 160ms both;
 }
 
 .detailActions {
@@ -890,6 +1273,7 @@
     flex-direction: column;
     gap: 8px;
     margin-top: 4px;
+    animation: fade-up var(--duration-base) var(--ease-out) 200ms both;
 }
 
 .detailEditBtn,
@@ -902,8 +1286,13 @@
     padding: 8px 14px;
     cursor: pointer;
     border: 1px solid var(--theme-border);
-    transition: all 0.15s;
     text-align: center;
+    transition:
+        opacity var(--duration-fast) var(--ease-out),
+        transform var(--duration-base) var(--ease-spring),
+        border-color var(--duration-fast) var(--ease-out),
+        background var(--duration-fast) var(--ease-out),
+        color var(--duration-fast) var(--ease-out);
 }
 
 .detailEditBtn {
@@ -914,6 +1303,11 @@
 
 .detailEditBtn:hover {
     opacity: 0.85;
+    transform: translateY(-1px);
+}
+
+.detailEditBtn:active {
+    transform: scale(0.96);
 }
 
 .detailICSBtn {
@@ -924,6 +1318,11 @@
 .detailICSBtn:hover {
     border-color: var(--theme-purple);
     color: var(--theme-purple);
+    transform: translateY(-1px);
+}
+
+.detailICSBtn:active {
+    transform: scale(0.96);
 }
 
 .detailDeleteBtn {
@@ -935,6 +1334,37 @@
 .detailDeleteBtn:hover {
     border-color: var(--theme-red);
     background: rgba(239, 68, 68, 0.08);
+    /* Shake hint on hover — transform only */
+    animation: delete-hint var(--duration-slow) var(--ease-in-out);
+}
+
+@keyframes delete-hint {
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    20% {
+        transform: translateX(-3px);
+    }
+
+    40% {
+        transform: translateX(3px);
+    }
+
+    60% {
+        transform: translateX(-2px);
+    }
+
+    80% {
+        transform: translateX(2px);
+    }
+}
+
+.detailDeleteBtn:active {
+    transform: scale(0.94);
+    transition-duration: var(--duration-fast);
 }
 
 /* ── Modal ──────────────────────────────────────────────────── */
@@ -948,17 +1378,7 @@
     align-items: center;
     justify-content: center;
     padding: 24px;
-    animation: fade-in 0.15s ease;
-}
-
-@keyframes fade-in {
-    from {
-        opacity: 0;
-    }
-
-    to {
-        opacity: 1;
-    }
+    animation: fade-in var(--duration-base) var(--ease-out);
 }
 
 .modal {
@@ -971,13 +1391,16 @@
     max-height: 90vh;
     display: flex;
     flex-direction: column;
-    animation: modal-up 0.2s ease;
     overflow: hidden;
+    /* Spring up — transform + opacity only */
+    animation: modal-up var(--duration-slow) var(--ease-spring);
+    will-change: transform;
+    /* single shot entrance */
 }
 
 @keyframes modal-up {
     from {
-        transform: translateY(16px) scale(0.98);
+        transform: translateY(20px) scale(0.96);
         opacity: 0;
     }
 
@@ -1016,12 +1439,21 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.15s;
+    transition:
+        border-color var(--duration-fast) var(--ease-out),
+        color var(--duration-fast) var(--ease-out),
+        transform var(--duration-base) var(--ease-spring);
 }
 
 .modalClose:hover {
     border-color: var(--theme-purple);
     color: var(--theme-purple);
+    /* Rotate matches detailClose */
+    transform: rotate(90deg) scale(1.1);
+}
+
+.modalClose:active {
+    transform: scale(0.88);
 }
 
 .modalBody {
@@ -1035,10 +1467,12 @@
     scrollbar-color: var(--theme-surface-2) transparent;
 }
 
+/* Field groups cascade in — stagger via --field-i */
 .fieldGroup {
     display: flex;
     flex-direction: column;
     gap: 6px;
+    animation: fade-up var(--duration-base) var(--ease-out) calc(var(--field-i, 0) * 40ms + 100ms) both;
 }
 
 .fieldRow {
@@ -1066,9 +1500,12 @@
     color: var(--theme-text);
     width: 100%;
     box-sizing: border-box;
-    transition: border-color 0.15s, box-shadow 0.15s;
     outline: none;
     appearance: none;
+    /* Glow ring grows from zero — no layout shift */
+    transition:
+        border-color var(--duration-fast) var(--ease-out),
+        box-shadow var(--duration-base) var(--ease-out);
 }
 
 .fieldInput::placeholder {
@@ -1078,6 +1515,7 @@
 .fieldInput:focus,
 .fieldSelect:focus {
     border-color: var(--theme-purple);
+    /* Focus glow expands — only box-shadow changes */
     box-shadow: 0 0 0 3px var(--theme-purple-dim);
 }
 
@@ -1102,7 +1540,9 @@
     resize: vertical;
     min-height: 72px;
     outline: none;
-    transition: border-color 0.15s, box-shadow 0.15s;
+    transition:
+        border-color var(--duration-fast) var(--ease-out),
+        box-shadow var(--duration-base) var(--ease-out);
 }
 
 .fieldTextarea::placeholder {
@@ -1131,17 +1571,27 @@
     color: var(--cat-color, var(--theme-purple));
     background: transparent;
     cursor: pointer;
-    transition: all 0.15s;
+    transition:
+        background var(--duration-fast) var(--ease-out),
+        box-shadow var(--duration-fast) var(--ease-out),
+        transform var(--duration-base) var(--ease-spring);
 }
 
 .catSeg:hover {
     background: color-mix(in srgb, var(--cat-color, var(--theme-purple)) 15%, transparent);
+    transform: translateY(-1px);
+}
+
+.catSeg:active {
+    transform: scale(0.93);
+    transition-duration: var(--duration-fast);
 }
 
 .catSegActive {
     background: color-mix(in srgb, var(--cat-color, var(--theme-purple)) 20%, transparent) !important;
     font-weight: 700;
     box-shadow: 0 0 0 1px var(--cat-color, var(--theme-purple));
+    animation: tab-activate var(--duration-base) var(--ease-spring);
 }
 
 /* Color swatches */
@@ -1151,25 +1601,53 @@
     gap: 8px;
 }
 
+/* Swatch pops in with stagger via --swatch-i */
 .colorSwatch {
     width: 26px;
     height: 26px;
     border-radius: 50%;
     border: 2px solid transparent;
     cursor: pointer;
-    transition: all 0.15s;
     outline: none;
     position: relative;
+    animation: dot-pop var(--duration-base) var(--ease-spring) calc(var(--swatch-i, 0) * 25ms) both;
+    transition:
+        transform var(--duration-base) var(--ease-spring),
+        box-shadow var(--duration-base) var(--ease-out),
+        border-color var(--duration-fast) var(--ease-out);
 }
 
 .colorSwatch:hover {
-    transform: scale(1.15);
+    transform: scale(1.2);
+    /* Soft glow on hover — box-shadow only */
+    box-shadow: 0 0 8px 2px rgba(255, 255, 255, 0.15);
+}
+
+.colorSwatch:active {
+    transform: scale(0.9);
+    transition-duration: var(--duration-fast);
 }
 
 .colorSwatchActive {
     border-color: var(--theme-text);
     box-shadow: 0 0 0 2px var(--theme-purple), 0 0 8px var(--theme-purple-dim);
     transform: scale(1.1);
+    /* Scale bounce on selection */
+    animation: swatch-select var(--duration-base) var(--ease-spring);
+}
+
+@keyframes swatch-select {
+    0% {
+        transform: scale(0.85);
+    }
+
+    60% {
+        transform: scale(1.2);
+    }
+
+    100% {
+        transform: scale(1.1);
+    }
 }
 
 /* Form error */
@@ -1181,6 +1659,40 @@
     border-radius: var(--r-sm);
     padding: 8px 12px;
     margin: 0;
+    /* Error shakes in — grabs attention without being jarring */
+    animation: error-shake var(--duration-slow) var(--ease-out);
+}
+
+@keyframes error-shake {
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    15% {
+        transform: translateX(-6px);
+    }
+
+    30% {
+        transform: translateX(5px);
+    }
+
+    45% {
+        transform: translateX(-4px);
+    }
+
+    60% {
+        transform: translateX(3px);
+    }
+
+    75% {
+        transform: translateX(-2px);
+    }
+
+    90% {
+        transform: translateX(1px);
+    }
 }
 
 /* Modal footer */
@@ -1215,12 +1727,21 @@
     background: transparent;
     color: var(--theme-text-secondary);
     cursor: pointer;
-    transition: all 0.15s;
+    transition:
+        border-color var(--duration-fast) var(--ease-out),
+        color var(--duration-fast) var(--ease-out),
+        transform var(--duration-base) var(--ease-spring);
 }
 
 .cancelBtn:hover {
     border-color: var(--theme-purple);
     color: var(--theme-purple);
+    transform: translateY(-1px);
+}
+
+.cancelBtn:active {
+    transform: scale(0.95);
+    transition-duration: var(--duration-fast);
 }
 
 .saveBtn {
@@ -1233,19 +1754,58 @@
     background: var(--theme-purple);
     color: #fff;
     cursor: pointer;
-    transition: all 0.2s;
     box-shadow: 0 0 16px var(--theme-purple-dim);
+    will-change: transform;
+    /* active interaction element — justified */
+    transition:
+        transform var(--duration-base) var(--ease-spring),
+        box-shadow var(--duration-base) var(--ease-out),
+        opacity var(--duration-fast) var(--ease-out);
 }
 
 .saveBtn:hover:not(:disabled) {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 20px var(--theme-purple-dim);
-    opacity: 0.9;
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 6px 24px var(--theme-purple-dim);
+    opacity: 0.92;
+}
+
+.saveBtn:active:not(:disabled) {
+    transform: translateY(1px) scale(0.97);
+    box-shadow: 0 2px 8px var(--theme-purple-dim);
+    transition-duration: var(--duration-fast);
 }
 
 .saveBtn:disabled {
     opacity: 0.6;
     cursor: not-allowed;
+    will-change: auto;
+    /* remove hint when disabled — no interaction */
+}
+
+/* ── Shared keyframes ───────────────────────────────────────── */
+
+/* fade-in: opacity only — for overlays */
+@keyframes fade-in {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+/* fade-up: used by most content cards + list items */
+@keyframes fade-up {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* ── Responsive ─────────────────────────────────────────────── */
