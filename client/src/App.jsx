@@ -132,10 +132,8 @@ const App = () => {
             path="/event-scheduling/assignments"
             element={<ProtectedRoute component={<Assignments />} />}
           />
-          <Route
-            path="/search"
-            element={<ProtectedRoute component={<SearchResults />} />}
-          />
+          <Route path="/search" element={<ProtectedRoute component={<SearchResults />} />} />
+          <Route path="/search/:tab" element={<ProtectedRoute component={<SearchResults />} />} />
         </Route>
          
       </Routes>
