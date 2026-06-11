@@ -249,7 +249,7 @@ const AppShell = ({ userName = "" }) => {
         aria-label="Main navigation"
       >
         <Link
-          to="/"
+          to="/dashboard"
           className={styles["sidebar__logo"]}
           aria-label="SPARK.E home"
         >
