@@ -1,54 +1,21 @@
 /* ═══════════════════════════════════════════════════════════════
    Spark.E – TimeTable.module.css
-   Dark space theme with glassmorphism + neon accents
-   Fonts: 'Syne' (display) + 'DM Sans' (body) — add to index.html:
-   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+   Synced to global.css theme tokens (--theme-*, --r-*, --shadow-*)
+   Fonts: global.css already imports Sora + DM Sans
+   Remove any local font import — global handles it.
 ═══════════════════════════════════════════════════════════════ */
 
-/* ── CSS Variables ─────────────────────────────────────────── */
+/* ── Local layout tokens (not in global, page-specific) ─────── */
 :root {
-    --bg: #0d0f1a;
-    --surface: #1a1d2e;
-    --surface2: #22263a;
-    --border: rgba(255, 255, 255, 0.07);
-    --border-hover: rgba(108, 99, 255, 0.4);
-    --accent: #6c63ff;
-    --accent-glow: rgba(108, 99, 255, 0.25);
-    --accent-dim: rgba(108, 99, 255, 0.15);
-    --text-primary: #e8eaf6;
-    --text-secondary: #8b8fa8;
-    --text-muted: #555874;
-    --red: #f87171;
-    --success: #34d399;
-    --radius: 12px;
-    --radius-sm: 8px;
-    --shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-    --shadow-sm: 0 2px 12px rgba(0, 0, 0, 0.3);
-    --font-display: 'Syne', sans-serif;
-    --font-body: 'DM Sans', sans-serif;
     --navbar-h: 58px;
     --subheader-h: 52px;
-}
-
-[data-theme="light"] {
-    --bg: #f0f2ff;
-    --surface: #ffffff;
-    --surface2: #f5f6fe;
-    --border: rgba(0, 0, 0, 0.08);
-    --border-hover: rgba(108, 99, 255, 0.3);
-    --text-primary: #1a1d2e;
-    --text-secondary: #555874;
-    --text-muted: #9094b0;
-    --shadow: 0 8px 32px rgba(108, 99, 255, 0.12);
-    --shadow-sm: 0 2px 12px rgba(0, 0, 0, 0.08);
-    --accent-dim: rgba(108, 99, 255, 0.08);
 }
 
 /* ── Root ──────────────────────────────────────────────────── */
 .root {
     font-family: var(--font-body);
-    background: var(--bg);
-    color: var(--text-primary);
+    background: var(--theme-bg);
+    color: var(--theme-text);
     min-height: 100vh;
     display: flex;
     flex-direction: column;
@@ -66,8 +33,8 @@
         radial-gradient(1px 1px at 70% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 100%),
         radial-gradient(1px 1px at 50% 80%, rgba(255, 255, 255, 0.12) 0%, transparent 100%),
         radial-gradient(1px 1px at 85% 60%, rgba(255, 255, 255, 0.08) 0%, transparent 100%),
-        radial-gradient(300px 300px at 10% 10%, rgba(108, 99, 255, 0.06) 0%, transparent 70%),
-        radial-gradient(400px 400px at 90% 90%, rgba(52, 211, 153, 0.04) 0%, transparent 70%);
+        radial-gradient(300px 300px at 10% 10%, var(--theme-purple-dim) 0%, transparent 70%),
+        radial-gradient(400px 400px at 90% 90%, rgba(34, 197, 94, 0.04) 0%, transparent 70%);
     pointer-events: none;
     z-index: 0;
 }
@@ -82,15 +49,11 @@
     align-items: center;
     justify-content: space-between;
     padding: 0 24px;
-    background: rgba(13, 15, 26, 0.85);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-bottom: 1px solid var(--border);
+    background: var(--theme-navbar-bg);
+    backdrop-filter: var(--theme-navbar-blur);
+    -webkit-backdrop-filter: var(--theme-navbar-blur);
+    border-bottom: 1px solid var(--theme-border);
     gap: 16px;
-}
-
-[data-theme="light"] .navbar {
-    background: rgba(240, 242, 255, 0.88);
 }
 
 .navLogo {
@@ -102,7 +65,7 @@
 
 .logoIcon {
     font-size: 20px;
-    filter: drop-shadow(0 0 8px rgba(108, 99, 255, 0.7));
+    filter: drop-shadow(0 0 8px var(--theme-accent-glow));
     animation: pulse-logo 3s ease-in-out infinite;
 }
 
@@ -110,11 +73,11 @@
 
     0%,
     100% {
-        filter: drop-shadow(0 0 8px rgba(108, 99, 255, 0.7));
+        filter: drop-shadow(0 0 8px var(--theme-accent-glow));
     }
 
     50% {
-        filter: drop-shadow(0 0 14px rgba(108, 99, 255, 1));
+        filter: drop-shadow(0 0 14px var(--theme-accent-glow));
     }
 }
 
@@ -123,19 +86,19 @@
     font-weight: 800;
     font-size: 20px;
     letter-spacing: -0.5px;
-    color: var(--text-primary);
+    color: var(--theme-text);
 }
 
 .logoAccent {
-    color: var(--accent);
+    color: var(--theme-purple);
 }
 
 .viewSwitcher {
     display: flex;
     align-items: center;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 40px;
+    background: var(--theme-surface);
+    border: 1px solid var(--theme-border);
+    border-radius: var(--r-full);
     padding: 3px;
     gap: 2px;
 }
@@ -144,10 +107,10 @@
     font-family: var(--font-body);
     font-size: 13px;
     font-weight: 500;
-    color: var(--text-secondary);
+    color: var(--theme-text-secondary);
     background: transparent;
     border: none;
-    border-radius: 30px;
+    border-radius: var(--r-full);
     padding: 6px 18px;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -155,15 +118,15 @@
 }
 
 .viewTab:hover {
-    color: var(--text-primary);
-    background: var(--accent-dim);
+    color: var(--theme-text);
+    background: var(--theme-purple-dim);
 }
 
 .viewTabActive {
-    background: var(--accent);
+    background: var(--theme-purple);
     color: #fff !important;
     font-weight: 600;
-    box-shadow: 0 0 16px var(--accent-glow);
+    box-shadow: 0 0 16px var(--theme-purple-dim);
 }
 
 .navRight {
@@ -174,8 +137,8 @@
 }
 
 .themeToggle {
-    background: var(--surface);
-    border: 1px solid var(--border);
+    background: var(--theme-surface);
+    border: 1px solid var(--theme-border);
     border-radius: 50%;
     width: 34px;
     height: 34px;
@@ -188,30 +151,31 @@
 }
 
 .themeToggle:hover {
-    border-color: var(--accent);
+    border-color: var(--theme-purple);
 }
 
 .createBtn {
     display: flex;
     align-items: center;
     gap: 6px;
-    background: var(--accent);
+    background: var(--theme-purple);
     color: #fff;
     border: none;
-    border-radius: 30px;
+    border-radius: var(--r-full);
     padding: 8px 20px;
     font-family: var(--font-body);
     font-size: 13px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s ease;
-    box-shadow: 0 0 20px var(--accent-glow);
+    box-shadow: 0 0 20px var(--theme-purple-dim);
     white-space: nowrap;
 }
 
 .createBtn:hover {
     transform: translateY(-1px);
-    box-shadow: 0 4px 24px rgba(108, 99, 255, 0.45);
+    box-shadow: 0 4px 24px var(--theme-purple-dim);
+    opacity: 0.9;
 }
 
 .createBtn:active {
@@ -230,8 +194,8 @@
     align-items: center;
     justify-content: space-between;
     padding: 0 24px;
-    border-bottom: 1px solid var(--border);
-    background: var(--surface);
+    border-bottom: 1px solid var(--theme-border);
+    background: var(--theme-surface);
     gap: 16px;
     flex-shrink: 0;
     position: relative;
@@ -247,9 +211,9 @@
 
 .navArrow {
     background: transparent;
-    border: 1px solid var(--border);
-    color: var(--text-secondary);
-    border-radius: 8px;
+    border: 1px solid var(--theme-border);
+    color: var(--theme-text-secondary);
+    border-radius: var(--r-sm);
     padding: 5px 10px;
     font-size: 13px;
     cursor: pointer;
@@ -258,16 +222,16 @@
 }
 
 .navArrow:hover {
-    border-color: var(--accent);
-    color: var(--accent);
-    background: var(--accent-dim);
+    border-color: var(--theme-purple);
+    color: var(--theme-purple);
+    background: var(--theme-purple-dim);
 }
 
 .dateLabel {
     font-family: var(--font-display);
     font-size: 14px;
     font-weight: 600;
-    color: var(--text-primary);
+    color: var(--theme-text);
     margin-left: 8px;
     white-space: nowrap;
 }
@@ -289,33 +253,33 @@
     align-items: center;
     gap: 5px;
     padding: 4px 12px;
-    border-radius: 20px;
+    border-radius: var(--r-full);
     font-size: 12px;
     font-weight: 500;
     font-family: var(--font-body);
     cursor: pointer;
-    border: 1px solid var(--cat-color, var(--accent));
-    color: var(--cat-color, var(--accent));
+    border: 1px solid var(--cat-color, var(--theme-purple));
+    color: var(--cat-color, var(--theme-purple));
     background: transparent;
     transition: all 0.2s ease;
     white-space: nowrap;
 }
 
 .catPill:hover {
-    background: var(--cat-bg, var(--accent-dim));
+    background: var(--cat-bg, var(--theme-purple-dim));
 }
 
 .catPillActive {
-    background: var(--cat-bg, var(--accent-dim)) !important;
+    background: var(--cat-bg, var(--theme-purple-dim)) !important;
     font-weight: 600;
-    box-shadow: 0 0 0 1px var(--cat-color, var(--accent));
+    box-shadow: 0 0 0 1px var(--cat-color, var(--theme-purple));
 }
 
 .catDot {
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    background: var(--cat-color, var(--accent));
+    background: var(--cat-color, var(--theme-purple));
     flex-shrink: 0;
 }
 
@@ -335,17 +299,17 @@
     align-items: center;
     justify-content: center;
     gap: 12px;
-    background: rgba(13, 15, 26, 0.7);
+    background: rgba(10, 12, 20, 0.7);
     z-index: 50;
     font-size: 14px;
-    color: var(--text-secondary);
+    color: var(--theme-text-secondary);
 }
 
 .spinner {
     width: 32px;
     height: 32px;
-    border: 2px solid var(--border);
-    border-top-color: var(--accent);
+    border: 2px solid var(--theme-border);
+    border-top-color: var(--theme-purple);
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
 }
@@ -362,7 +326,7 @@
     height: calc(100vh - var(--navbar-h) - var(--subheader-h));
     overflow-y: auto;
     scrollbar-width: thin;
-    scrollbar-color: var(--surface2) transparent;
+    scrollbar-color: var(--theme-surface-2) transparent;
 }
 
 .timeLabels {
@@ -378,14 +342,14 @@
     justify-content: flex-end;
     padding-right: 10px;
     font-size: 11px;
-    color: var(--text-muted);
+    color: var(--theme-text-muted);
     font-family: var(--font-body);
 }
 
 .dayGrid {
     flex: 1;
     position: relative;
-    border-left: 1px solid var(--border);
+    border-left: 1px solid var(--theme-border);
     cursor: crosshair;
 }
 
@@ -395,7 +359,7 @@
 }
 
 .hourRow:hover {
-    background: rgba(108, 99, 255, 0.025);
+    background: var(--theme-purple-dim);
 }
 
 .hourLine {
@@ -404,16 +368,16 @@
     left: 0;
     right: 0;
     height: 1px;
-    background: var(--border);
+    background: var(--theme-border);
 }
 
 .dragPreview {
     position: absolute;
     left: 4px;
     right: 4px;
-    border-radius: var(--radius-sm);
-    background: var(--accent-dim);
-    border: 2px dashed var(--accent);
+    border-radius: var(--r-sm);
+    background: var(--theme-purple-dim);
+    border: 2px dashed var(--theme-purple);
     pointer-events: none;
     z-index: 5;
     transition: height 0.05s;
@@ -423,7 +387,7 @@
     position: absolute;
     left: 8px;
     right: 8px;
-    border-radius: var(--radius-sm);
+    border-radius: var(--r-sm);
     padding: 6px 10px;
     cursor: pointer;
     overflow: hidden;
@@ -446,7 +410,7 @@
 .eventTitle {
     font-size: 12px;
     font-weight: 600;
-    color: var(--text-primary);
+    color: var(--theme-text);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -454,7 +418,7 @@
 
 .eventTime {
     font-size: 10px;
-    color: var(--text-secondary);
+    color: var(--theme-text-secondary);
 }
 
 .eventActions {
@@ -468,18 +432,18 @@
 }
 
 .eventActionBtn {
-    background: rgba(13, 15, 26, 0.7);
+    background: rgba(10, 12, 20, 0.7);
     border: none;
     border-radius: 4px;
     padding: 2px 5px;
     font-size: 11px;
     cursor: pointer;
-    color: var(--text-primary);
+    color: var(--theme-text);
     transition: background 0.15s;
 }
 
 .eventActionBtn:hover {
-    background: rgba(13, 15, 26, 0.95);
+    background: rgba(10, 12, 20, 0.95);
 }
 
 /* ── Week View ──────────────────────────────────────────────── */
@@ -493,7 +457,7 @@
 .weekHeader {
     display: grid;
     grid-template-columns: 56px repeat(7, 1fr);
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid var(--theme-border);
     flex-shrink: 0;
 }
 
@@ -506,17 +470,17 @@
     flex-direction: column;
     align-items: center;
     padding: 10px 0;
-    border-left: 1px solid var(--border);
+    border-left: 1px solid var(--theme-border);
     cursor: pointer;
     transition: background 0.15s;
 }
 
 .weekDayHeader:hover {
-    background: var(--accent-dim);
+    background: var(--theme-purple-dim);
 }
 
 .weekDayToday .weekDayNum {
-    background: var(--accent);
+    background: var(--theme-purple);
     color: #fff;
     border-radius: 50%;
     width: 28px;
@@ -524,13 +488,13 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 0 12px var(--accent-glow);
+    box-shadow: 0 0 12px var(--theme-purple-dim);
 }
 
 .weekDayName {
     font-size: 11px;
     font-weight: 500;
-    color: var(--text-muted);
+    color: var(--theme-text-muted);
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
@@ -539,7 +503,7 @@
     font-family: var(--font-display);
     font-size: 18px;
     font-weight: 700;
-    color: var(--text-primary);
+    color: var(--theme-text);
     width: 28px;
     height: 28px;
     display: flex;
@@ -554,7 +518,7 @@
     flex: 1;
     overflow-y: auto;
     scrollbar-width: thin;
-    scrollbar-color: var(--surface2) transparent;
+    scrollbar-color: var(--theme-surface-2) transparent;
 }
 
 .weekTimeCol {
@@ -569,28 +533,28 @@
     padding-right: 8px;
     padding-top: 4px;
     font-size: 10px;
-    color: var(--text-muted);
+    color: var(--theme-text-muted);
 }
 
 .weekDayCol {
     position: relative;
-    border-left: 1px solid var(--border);
+    border-left: 1px solid var(--theme-border);
 }
 
 .weekHourCell {
     height: 48px;
-    border-top: 1px solid var(--border);
+    border-top: 1px solid var(--theme-border);
 }
 
 .weekEventChip {
     position: absolute;
     left: 2px;
     right: 2px;
-    border-radius: 6px;
+    border-radius: var(--r-sm);
     padding: 3px 6px;
     font-size: 11px;
     font-weight: 500;
-    color: var(--text-primary);
+    color: var(--theme-text);
     cursor: pointer;
     overflow: hidden;
     white-space: nowrap;
@@ -614,7 +578,7 @@
 .monthWeekRow {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid var(--theme-border);
     flex-shrink: 0;
 }
 
@@ -623,7 +587,7 @@
     padding: 8px 0;
     font-size: 11px;
     font-weight: 600;
-    color: var(--text-muted);
+    color: var(--theme-text-muted);
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
@@ -636,8 +600,8 @@
 }
 
 .monthCell {
-    border-right: 1px solid var(--border);
-    border-bottom: 1px solid var(--border);
+    border-right: 1px solid var(--theme-border);
+    border-bottom: 1px solid var(--theme-border);
     padding: 8px;
     cursor: pointer;
     transition: background 0.15s;
@@ -648,7 +612,7 @@
 }
 
 .monthCell:hover {
-    background: var(--accent-dim);
+    background: var(--theme-purple-dim);
 }
 
 .monthCellOut {
@@ -656,7 +620,7 @@
 }
 
 .monthCellToday .monthDayNum {
-    background: var(--accent);
+    background: var(--theme-purple);
     color: #fff;
     border-radius: 50%;
     width: 24px;
@@ -665,14 +629,14 @@
     align-items: center;
     justify-content: center;
     font-weight: 700;
-    box-shadow: 0 0 10px var(--accent-glow);
+    box-shadow: 0 0 10px var(--theme-purple-dim);
 }
 
 .monthDayNum {
     font-family: var(--font-display);
     font-size: 13px;
     font-weight: 600;
-    color: var(--text-primary);
+    color: var(--theme-text);
     width: 24px;
     height: 24px;
     display: flex;
@@ -696,7 +660,7 @@
 
 .monthMore {
     font-size: 10px;
-    color: var(--text-muted);
+    color: var(--theme-text-muted);
 }
 
 /* ── Agenda View ────────────────────────────────────────────── */
@@ -708,7 +672,7 @@
     flex-direction: column;
     gap: 24px;
     scrollbar-width: thin;
-    scrollbar-color: var(--surface2) transparent;
+    scrollbar-color: var(--theme-surface-2) transparent;
 }
 
 .agendaEmpty {
@@ -716,14 +680,14 @@
     align-items: center;
     justify-content: center;
     height: 200px;
-    color: var(--text-muted);
+    color: var(--theme-text-muted);
     font-size: 15px;
 }
 
 .agendaCreateLink {
     background: none;
     border: none;
-    color: var(--accent);
+    color: var(--theme-purple);
     cursor: pointer;
     font-size: 15px;
     font-family: var(--font-body);
@@ -740,28 +704,28 @@
     font-family: var(--font-display);
     font-size: 13px;
     font-weight: 700;
-    color: var(--text-muted);
+    color: var(--theme-text-muted);
     text-transform: uppercase;
     letter-spacing: 1px;
     padding-bottom: 4px;
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid var(--theme-border);
 }
 
 .agendaItem {
     display: flex;
     align-items: center;
     gap: 16px;
-    background: var(--surface);
-    border-radius: var(--radius);
+    background: var(--theme-surface);
+    border-radius: var(--r-md);
     padding: 14px 16px;
     cursor: pointer;
     transition: all 0.2s;
-    border: 1px solid var(--border);
+    border: 1px solid var(--theme-border);
 }
 
 .agendaItem:hover {
-    border-color: var(--ev-color, var(--accent));
-    background: var(--surface2);
+    border-color: var(--ev-color, var(--theme-purple));
+    background: var(--theme-surface-2);
     transform: translateX(4px);
 }
 
@@ -775,12 +739,12 @@
 .agendaItemTitle {
     font-size: 14px;
     font-weight: 600;
-    color: var(--text-primary);
+    color: var(--theme-text);
 }
 
 .agendaItemMeta {
     font-size: 12px;
-    color: var(--text-secondary);
+    color: var(--theme-text-secondary);
 }
 
 .agendaItemRight {
@@ -792,7 +756,7 @@
 
 .agendaItemTime {
     font-size: 12px;
-    color: var(--text-secondary);
+    color: var(--theme-text-secondary);
     white-space: nowrap;
 }
 
@@ -800,7 +764,7 @@
     font-size: 10px;
     font-weight: 600;
     padding: 2px 8px;
-    border-radius: 10px;
+    border-radius: var(--r-full);
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
@@ -815,22 +779,22 @@
     font-weight: 500;
     font-family: var(--font-body);
     padding: 4px 10px;
-    border-radius: 6px;
-    border: 1px solid var(--border);
-    background: var(--surface2);
-    color: var(--text-secondary);
+    border-radius: var(--r-sm);
+    border: 1px solid var(--theme-border);
+    background: var(--theme-surface-2);
+    color: var(--theme-text-secondary);
     cursor: pointer;
     transition: all 0.15s;
 }
 
 .agendaBtn:hover {
-    border-color: var(--accent);
-    color: var(--accent);
+    border-color: var(--theme-purple);
+    color: var(--theme-purple);
 }
 
 .agendaBtnDanger:hover {
-    border-color: var(--red);
-    color: var(--red);
+    border-color: var(--theme-red);
+    color: var(--theme-red);
 }
 
 /* ── Detail Panel ───────────────────────────────────────────── */
@@ -847,10 +811,10 @@
 }
 
 .detailPanel {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
+    background: var(--theme-surface);
+    border: 1px solid var(--theme-border);
+    border-radius: var(--r-md);
+    box-shadow: var(--theme-card-shadow);
     padding: 24px;
     width: 280px;
     position: relative;
@@ -878,21 +842,21 @@
     left: 0;
     right: 0;
     height: 3px;
-    border-radius: var(--radius) var(--radius) 0 0;
+    border-radius: var(--r-md) var(--r-md) 0 0;
 }
 
 .detailClose {
     position: absolute;
     top: 12px;
     right: 12px;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 6px;
+    background: var(--theme-surface-2);
+    border: 1px solid var(--theme-border);
+    border-radius: var(--r-sm);
     width: 26px;
     height: 26px;
     font-size: 11px;
     cursor: pointer;
-    color: var(--text-secondary);
+    color: var(--theme-text-secondary);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -902,14 +866,14 @@
     font-family: var(--font-display);
     font-size: 16px;
     font-weight: 700;
-    color: var(--text-primary);
+    color: var(--theme-text);
     margin: 0;
     padding-top: 8px;
 }
 
 .detailTopic {
     font-size: 13px;
-    color: var(--text-secondary);
+    color: var(--theme-text-secondary);
     margin: 0;
 }
 
@@ -918,7 +882,7 @@
     align-items: flex-start;
     gap: 8px;
     font-size: 13px;
-    color: var(--text-secondary);
+    color: var(--theme-text-secondary);
 }
 
 .detailActions {
@@ -934,18 +898,18 @@
     font-family: var(--font-body);
     font-size: 13px;
     font-weight: 500;
-    border-radius: var(--radius-sm);
+    border-radius: var(--r-sm);
     padding: 8px 14px;
     cursor: pointer;
-    border: 1px solid var(--border);
+    border: 1px solid var(--theme-border);
     transition: all 0.15s;
     text-align: center;
 }
 
 .detailEditBtn {
-    background: var(--accent);
+    background: var(--theme-purple);
     color: #fff;
-    border-color: var(--accent);
+    border-color: var(--theme-purple);
 }
 
 .detailEditBtn:hover {
@@ -953,24 +917,24 @@
 }
 
 .detailICSBtn {
-    background: var(--surface2);
-    color: var(--text-secondary);
+    background: var(--theme-surface-2);
+    color: var(--theme-text-secondary);
 }
 
 .detailICSBtn:hover {
-    border-color: var(--accent);
-    color: var(--accent);
+    border-color: var(--theme-purple);
+    color: var(--theme-purple);
 }
 
 .detailDeleteBtn {
     background: transparent;
-    color: var(--red);
+    color: var(--theme-red);
     border-color: transparent;
 }
 
 .detailDeleteBtn:hover {
-    border-color: var(--red);
-    background: rgba(248, 113, 113, 0.08);
+    border-color: var(--theme-red);
+    background: rgba(239, 68, 68, 0.08);
 }
 
 /* ── Modal ──────────────────────────────────────────────────── */
@@ -998,10 +962,10 @@
 }
 
 .modal {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    box-shadow: var(--shadow);
+    background: var(--theme-surface);
+    border: 1px solid var(--theme-border);
+    border-radius: var(--r-lg);
+    box-shadow: var(--theme-card-shadow);
     width: 100%;
     max-width: 480px;
     max-height: 90vh;
@@ -1028,7 +992,7 @@
     align-items: center;
     justify-content: space-between;
     padding: 20px 24px 16px;
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid var(--theme-border);
     flex-shrink: 0;
 }
 
@@ -1036,19 +1000,19 @@
     font-family: var(--font-display);
     font-size: 16px;
     font-weight: 700;
-    color: var(--text-primary);
+    color: var(--theme-text);
     margin: 0;
 }
 
 .modalClose {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 8px;
+    background: var(--theme-surface-2);
+    border: 1px solid var(--theme-border);
+    border-radius: var(--r-sm);
     width: 30px;
     height: 30px;
     font-size: 12px;
     cursor: pointer;
-    color: var(--text-secondary);
+    color: var(--theme-text-secondary);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1056,8 +1020,8 @@
 }
 
 .modalClose:hover {
-    border-color: var(--accent);
-    color: var(--accent);
+    border-color: var(--theme-purple);
+    color: var(--theme-purple);
 }
 
 .modalBody {
@@ -1068,7 +1032,7 @@
     flex-direction: column;
     gap: 16px;
     scrollbar-width: thin;
-    scrollbar-color: var(--surface2) transparent;
+    scrollbar-color: var(--theme-surface-2) transparent;
 }
 
 .fieldGroup {
@@ -1086,20 +1050,20 @@
 .fieldLabel {
     font-size: 12px;
     font-weight: 600;
-    color: var(--text-secondary);
+    color: var(--theme-text-secondary);
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
 
 .fieldInput,
 .fieldSelect {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
+    background: var(--theme-input-bg);
+    border: 1px solid var(--theme-input-border);
+    border-radius: var(--r-sm);
     padding: 9px 12px;
     font-size: 14px;
     font-family: var(--font-body);
-    color: var(--text-primary);
+    color: var(--theme-text);
     width: 100%;
     box-sizing: border-box;
     transition: border-color 0.15s, box-shadow 0.15s;
@@ -1108,31 +1072,31 @@
 }
 
 .fieldInput::placeholder {
-    color: var(--text-muted);
+    color: var(--theme-text-muted);
 }
 
 .fieldInput:focus,
 .fieldSelect:focus {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px var(--accent-dim);
+    border-color: var(--theme-purple);
+    box-shadow: 0 0 0 3px var(--theme-purple-dim);
 }
 
 .fieldSelect {
     cursor: pointer;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238b8fa8' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238a8a9a' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 12px center;
     padding-right: 32px;
 }
 
 .fieldTextarea {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
+    background: var(--theme-input-bg);
+    border: 1px solid var(--theme-input-border);
+    border-radius: var(--r-sm);
     padding: 9px 12px;
     font-size: 14px;
     font-family: var(--font-body);
-    color: var(--text-primary);
+    color: var(--theme-text);
     width: 100%;
     box-sizing: border-box;
     resize: vertical;
@@ -1142,12 +1106,12 @@
 }
 
 .fieldTextarea::placeholder {
-    color: var(--text-muted);
+    color: var(--theme-text-muted);
 }
 
 .fieldTextarea:focus {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px var(--accent-dim);
+    border-color: var(--theme-purple);
+    box-shadow: 0 0 0 3px var(--theme-purple-dim);
 }
 
 /* Category segmented */
@@ -1162,22 +1126,22 @@
     font-size: 12px;
     font-weight: 500;
     padding: 5px 12px;
-    border-radius: 20px;
-    border: 1px solid var(--cat-color, var(--accent));
-    color: var(--cat-color, var(--accent));
+    border-radius: var(--r-full);
+    border: 1px solid var(--cat-color, var(--theme-purple));
+    color: var(--cat-color, var(--theme-purple));
     background: transparent;
     cursor: pointer;
     transition: all 0.15s;
 }
 
 .catSeg:hover {
-    background: color-mix(in srgb, var(--cat-color, var(--accent)) 15%, transparent);
+    background: color-mix(in srgb, var(--cat-color, var(--theme-purple)) 15%, transparent);
 }
 
 .catSegActive {
-    background: color-mix(in srgb, var(--cat-color, var(--accent)) 20%, transparent) !important;
+    background: color-mix(in srgb, var(--cat-color, var(--theme-purple)) 20%, transparent) !important;
     font-weight: 700;
-    box-shadow: 0 0 0 1px var(--cat-color, var(--accent));
+    box-shadow: 0 0 0 1px var(--cat-color, var(--theme-purple));
 }
 
 /* Color swatches */
@@ -1203,18 +1167,18 @@
 }
 
 .colorSwatchActive {
-    border-color: #fff;
-    box-shadow: 0 0 0 2px var(--accent), 0 0 8px rgba(108, 99, 255, 0.4);
+    border-color: var(--theme-text);
+    box-shadow: 0 0 0 2px var(--theme-purple), 0 0 8px var(--theme-purple-dim);
     transform: scale(1.1);
 }
 
 /* Form error */
 .formError {
     font-size: 12px;
-    color: var(--red);
-    background: rgba(248, 113, 113, 0.1);
-    border: 1px solid rgba(248, 113, 113, 0.3);
-    border-radius: var(--radius-sm);
+    color: var(--theme-red);
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-radius: var(--r-sm);
     padding: 8px 12px;
     margin: 0;
 }
@@ -1222,7 +1186,7 @@
 /* Modal footer */
 .modalFooter {
     padding: 14px 24px 20px;
-    border-top: 1px solid var(--border);
+    border-top: 1px solid var(--theme-border);
     display: flex;
     flex-direction: column;
     gap: 12px;
@@ -1231,7 +1195,7 @@
 
 .modalTip {
     font-size: 11px;
-    color: var(--text-muted);
+    color: var(--theme-text-muted);
     margin: 0;
 }
 
@@ -1246,17 +1210,17 @@
     font-size: 13px;
     font-weight: 500;
     padding: 9px 20px;
-    border-radius: 30px;
-    border: 1px solid var(--border);
+    border-radius: var(--r-full);
+    border: 1px solid var(--theme-border);
     background: transparent;
-    color: var(--text-secondary);
+    color: var(--theme-text-secondary);
     cursor: pointer;
     transition: all 0.15s;
 }
 
 .cancelBtn:hover {
-    border-color: var(--accent);
-    color: var(--accent);
+    border-color: var(--theme-purple);
+    color: var(--theme-purple);
 }
 
 .saveBtn {
@@ -1264,18 +1228,19 @@
     font-size: 13px;
     font-weight: 600;
     padding: 9px 24px;
-    border-radius: 30px;
+    border-radius: var(--r-full);
     border: none;
-    background: var(--accent);
+    background: var(--theme-purple);
     color: #fff;
     cursor: pointer;
     transition: all 0.2s;
-    box-shadow: 0 0 16px var(--accent-glow);
+    box-shadow: 0 0 16px var(--theme-purple-dim);
 }
 
 .saveBtn:hover:not(:disabled) {
     transform: translateY(-1px);
-    box-shadow: 0 4px 20px rgba(108, 99, 255, 0.45);
+    box-shadow: 0 4px 20px var(--theme-purple-dim);
+    opacity: 0.9;
 }
 
 .saveBtn:disabled {
@@ -1290,10 +1255,9 @@
     }
 
     .subHeader {
-        padding: 0 14px;
+        padding: 8px 14px;
         flex-wrap: wrap;
         height: auto;
-        padding: 8px 14px;
     }
 
     .dateLabel {
@@ -1319,20 +1283,14 @@
         font-size: 17px;
     }
 
-    .dayView {
-        height: calc(100vh - 120px);
-    }
-
-    .weekView {
-        height: calc(100vh - 120px);
-    }
-
-    .monthView {
+    .dayView,
+    .weekView,
+    .monthView,
+    .agendaView {
         height: calc(100vh - 120px);
     }
 
     .agendaView {
-        height: calc(100vh - 120px);
         padding: 14px;
     }
 
@@ -1358,6 +1316,6 @@
     }
 
     .detailPanel {
-        border-radius: 16px 16px 0 0;
+        border-radius: var(--r-lg) var(--r-lg) 0 0;
     }
 }
