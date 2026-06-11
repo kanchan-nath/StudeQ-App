@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import BASE_URL from "../lib/api.js";
 import styles from "./styles/SearchResults.module.css";
 
@@ -110,23 +111,6 @@ function SearchBar({ onSearch, loading, initialQuery = "", activeTab, onTabChang
                 ) : "Search"}
             </button>
         </form>
-    );
-}
-
-function FilterChips({ active, onChange }) {
-    const chips = ["All", "News", "Images", "Videos", "Shopping", "Books", "More", "Tools"];
-    return (
-        <div className={styles.filterChips}>
-            {chips.map((c) => (
-                <button
-                    key={c}
-                    className={`${styles.chip} ${active === c ? styles.chipActive : ""}`}
-                    onClick={() => onChange(c)}
-                >
-                    {c}
-                </button>
-            ))}
-        </div>
     );
 }
 
@@ -453,18 +437,20 @@ function ShortsRow({ shorts }) {
 // ─── Main Page ─────────────────────────────────────────────────
 
 export default function SearchResults() {
+    const { tab } = useParams();
+    const navigate = useNavigate();
+    const [searchParams, setSearchParams] = useSearchParams();
+
+    const activeTab = tab && tab.toLowerCase() === "youtube" ? "YouTube" : "Google";
+    const urlQuery = searchParams.get("q") || "";
+
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-    const [query, setQuery] = useState("");
-    const [activeTab, setActiveTab] = useState("Google");
+    const [query, setQuery] = useState(urlQuery);
     const [filterChip, setFilterChip] = useState("All");
     const [dark, setDark] = useState(() => {
-        if (typeof window !== "undefined") {
-            return localStorage.getItem("sparke-theme") === "dark" ||
-                window.matchMedia("(prefers-color-scheme: dark)").matches;
-        }
-        return false;
+        localStorage.getItem("sparke-theme")
     });
     const [savedLinks, setSavedLinks] = useState(() => {
         try { return JSON.parse(localStorage.getItem("saved_links") || "[]"); }
@@ -516,6 +502,12 @@ export default function SearchResults() {
         setError(null);
         setData(null);
         setActiveResultIndex(-1);
+
+        // sync ?q= into URL without adding history entry
+        const params = new URLSearchParams(searchParams);
+        params.set("q", q);
+        setSearchParams(params, { replace: true });
+
         try {
             const result = await fetchSearch(q, token);
             setData(result);
@@ -526,10 +518,24 @@ export default function SearchResults() {
         }
     }
 
+    // Restore search on mount/reload from ?q= param
+    useEffect(() => {
+        if (urlQuery && !data && !loading) {
+            handleSearch(urlQuery);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
     function toggleSave(link) {
         setSavedLinks((prev) =>
             prev.includes(link) ? prev.filter((l) => l !== link) : [...prev, link]
         );
+    }
+
+    function handleTabChange(t) {
+        const path = t === "Google" ? "/search" : "/search/youtube";
+        const qs = query ? `?q=${encodeURIComponent(query)}` : "";
+        navigate(`${path}${qs}`);
     }
 
     const google = data?.googleResponse;
@@ -542,19 +548,6 @@ export default function SearchResults() {
 
     return (
         <div className={styles.page}>
-            {/* Top bar */}
-            <header className={styles.topBar}>
-                <div className={styles.logoWrap}>
-                    <span className={styles.logoText}>Lumina</span>
-                    <span className={styles.logoSub}>Search</span>
-                </div>
-                <div className={styles.topBarRight}>
-                    {savedLinks.length > 0 && (
-                        <span className={styles.savedCount}>★ {savedLinks.length} saved</span>
-                    )}
-                    <ThemeToggle dark={dark} onToggle={() => setDark((v) => !v)} />
-                </div>
-            </header>
 
             {/* Search bar */}
             <div className={styles.searchWrap}>
@@ -568,7 +561,7 @@ export default function SearchResults() {
                         <button
                             key={t}
                             className={`${styles.tab} ${activeTab === t ? styles.tabActive : ""}`}
-                            onClick={() => setActiveTab(t)}
+                            onClick={() => handleTabChange(t)}
                         >
                             {t === "Google" ? (
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style={{ marginRight: 5 }}>
@@ -641,7 +634,6 @@ export default function SearchResults() {
                 <div className={styles.contentLayout}>
                     <main className={styles.mainCol}>
                         {/* Filter chips */}
-                        <FilterChips active={filterChip} onChange={setFilterChip} />
 
                         {/* Result count row */}
                         <div className={styles.resultCountRow}>
