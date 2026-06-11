@@ -68,10 +68,12 @@ const App = () => {
           <Route path="/quiz/take/:id" element={<ProtectedRoute component={<Quiz />} />} />
           <Route path="/quiz/results/:id" element={<ProtectedRoute component={<Quiz />} />} />
           <Route path="/quiz/history" element={<ProtectedRoute component={<Quiz />} />} />
-          <Route
-            path="/flashcards"
-            element={<ProtectedRoute component={<Flashcards />} />}
-          />
+          <Route path="/flashcards" element={<ProtectedRoute component={<Flashcards />} />} />
+          <Route path="/flashcards/viewer/:id" element={<ProtectedRoute component={<Flashcards />} />} />
+          <Route path="/flashcards/create" element={<ProtectedRoute component={<Flashcards />} />} />
+          <Route path="/flashcards/create/topic" element={<ProtectedRoute component={<Flashcards />} />} />
+          <Route path="/flashcards/create/scratch" element={<ProtectedRoute component={<Flashcards />} />} />
+          <Route path="/flashcards/create/pdf" element={<ProtectedRoute component={<Flashcards />} />} />
           <Route
             path="/tutor"
             element={<ProtectedRoute component={<Tutor />} />}
@@ -97,10 +99,11 @@ const App = () => {
             element={<ProtectedRoute component={<Scheduler />} />}
           />
 
-          <Route
-            path="/time-table"
-            element={<ProtectedRoute component={<TimeTable />} />}
-          />
+          <Route path="/time-table" element={<ProtectedRoute component={<TimeTable />} />} />
+          <Route path="/time-table/:view" element={<ProtectedRoute component={<TimeTable />} />} />
+          <Route path="/time-table/:view/event/:id" element={<ProtectedRoute component={<TimeTable />} />} />
+          <Route path="/time-table/:view/create" element={<ProtectedRoute component={<TimeTable />} />} />
+          <Route path="/time-table/:view/edit/:id" element={<ProtectedRoute component={<TimeTable />} />} />
           <Route
             path="/event-scheduling"
             element={<ProtectedRoute component={<EventScheduling />} />}

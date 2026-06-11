@@ -167,7 +167,7 @@ const allChats = asyncHandler(async(req,res)=>{
         {
             userId
         }
-    ).select({ docId: 1, chatRoomKey: 1, messages:{$slice: 1} })
+    ).select({ docId: 1, chatRoomKey: 1, messages: { $slice: 1 }, createdAt:1 })
 
     return res
     .status(200)

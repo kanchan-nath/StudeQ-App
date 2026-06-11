@@ -461,7 +461,7 @@ export default function SearchResults() {
     const [filterChip, setFilterChip] = useState("All");
     const [dark, setDark] = useState(() => {
         if (typeof window !== "undefined") {
-            return localStorage.getItem("search_theme") === "dark" ||
+            return localStorage.getItem("sparke-theme") === "dark" ||
                 window.matchMedia("(prefers-color-scheme: dark)").matches;
         }
         return false;

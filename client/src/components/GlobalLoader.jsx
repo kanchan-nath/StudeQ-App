@@ -9,8 +9,8 @@ const Lottie =
     LottieModule?.default ??
     LottieModule;
 
-const SHOW_DELAY_MS = 200;   // don't show if fetch finishes before this
-const MIN_VISIBLE_MS = 500;  // once shown, stay at least this long
+const SHOW_DELAY_MS = 200;   // don't show if fetch finishes before this 200
+const MIN_VISIBLE_MS = 500;  // once shown, stay at least this long 500
 
 const GlobalLoader = ({ visible, label }) => {
     const [shouldRender, setShouldRender] = useState(false);

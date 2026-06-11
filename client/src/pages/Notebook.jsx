@@ -52,16 +52,20 @@ const UploadLoader = () => (
 );
 
 // ── Sidebar chat item ──────────────────────────────────────────────────────────
-const SidebarItem = ({ chat, isActive, onSelect, onDelete, chatTitle }) => {
+const SidebarItem = ({ chat, isActive, onSelect, onDelete }) => {
   const [menuOpen, setMenuOpen] = useState(false);
-  const title = chat.messages[0]?.content || chatTitle;
   const menuRef = useRef(null);
+
+  const title = chat.messages?.[0]?.content || "Study Session";
+  const msgCount = (chat.messages?.length || 0);
+  const date = chat.createdAt
+    ? new Date(chat.createdAt).toLocaleDateString("en-GB")
+    : "";
 
   useEffect(() => {
     const close = (e) => {
-      if (menuRef.current && !menuRef.current.contains(e.target)) {
+      if (menuRef.current && !menuRef.current.contains(e.target))
         setMenuOpen(false);
-      }
     };
     document.addEventListener("click", close);
     return () => document.removeEventListener("click", close);
@@ -69,34 +73,38 @@ const SidebarItem = ({ chat, isActive, onSelect, onDelete, chatTitle }) => {
 
   return (
     <li
-      className={`${styles.sidebarItem} ${isActive ? styles.sidebarItemActive : ""}`}
+      className={`${styles.historyCard} ${isActive ? styles.historyCardActive : ""}`}
       onClick={() => onSelect(chat)}
     >
-      <span className={styles.sidebarTitle}>{title}</span>
-      <button
-        className={styles.sidebarDots}
-        onClick={(e) => {
-          e.stopPropagation();
-          setMenuOpen((v) => !v);
-        }}
-        aria-label="Options"
-      >
-        ⋯
-      </button>
-      {menuOpen && (
-        <div className={styles.sidebarMenu} ref={menuRef}>
-          <button
-            className={styles.sidebarMenuDelete}
-            onClick={(e) => {
-              e.stopPropagation();
-              setMenuOpen(false);
-              onDelete(chat);
-            }}
-          >
-            🗑 Delete
-          </button>
-        </div>
-      )}
+      <div className={styles.historyCardBody}>
+        <p className={styles.historyCardTitle}>{title}</p>
+        <span className={styles.historyCardMeta}>
+          {msgCount} q · {date}
+        </span>
+      </div>
+      <div className={styles.historyCardMenu} ref={menuRef}>
+        <button
+          className={styles.historyDots}
+          onClick={(e) => { e.stopPropagation(); setMenuOpen((v) => !v); }}
+          aria-label="Options"
+        >
+          ···
+        </button>
+        {menuOpen && (
+          <div className={styles.sidebarMenu}>
+            <button
+              className={styles.sidebarMenuDelete}
+              onClick={(e) => {
+                e.stopPropagation();
+                setMenuOpen(false);
+                onDelete(chat);
+              }}
+            >
+              🗑 Delete
+            </button>
+          </div>
+        )}
+      </div>
     </li>
   );
 };
@@ -130,8 +138,8 @@ const Notebook = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   const [toasts, setToasts] = useState([]);
-  const [theme, setTheme] = useState("light");
-
+  const [theme, setTheme] = useState(() => localStorage.getItem("sparke-theme") || "dark");
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const inputRef = useRef(null);
   const fileInputRef = useRef(null);
   const messagesEndRef = useRef(null);
@@ -325,7 +333,6 @@ const Notebook = () => {
       });
       if (!res.ok) throw new Error("Failed to load chat history.");
       const data = await res.json();
-      console.log(data.data);
 
       setAllChats(data.data || []);
     } catch (err) {
@@ -398,22 +405,39 @@ const Notebook = () => {
     // FIX: root is now a flex row containing appShell + rightSidebar
     <div className={styles.root}>
       {/* Theme toggle */}
-      <button
-        className={styles.themeToggle}
-        onClick={() => setTheme((t) => (t === "light" ? "dark" : "light"))}
-        aria-label="Toggle theme"
-      >
-        {theme === "light" ? "🌙" : "☀️"}
-      </button>
 
       <Toast toasts={toasts} removeToast={removeToast} />
 
       {/* FIX: appShell wraps both views and fills remaining width */}
       <div className={styles.appShell}>
-
+{/* ── NEW: mobile topbar — sticky, visible only on ≤768px via CSS ── */}
+        {/* ── SINGLE mobile topbar — first child, always in DOM ── */}
+        {!chatRoom && (
+          <div className={styles.mobileTopbar}>
+            <span className={styles.mobileTopbarTitle}>Notebook</span>
+            <button
+              className={styles.hamburgerBtn}
+              onClick={() => setMobileSidebarOpen(true)}
+              aria-label="Open history"
+            >
+              ☰
+            </button>
+          </div>
+        )}
         {/* ── VIEW 1: Upload ── */}
         {!chatRoom && (
           <main className={styles.uploadPage}>
+
+            {/* Mobile topbar strip for upload/home page */}
+            {/* <div className={styles.mobileTopbar}>
+              <button
+                className={styles.hamburgerBtn}
+                onClick={() => setMobileSidebarOpen(true)}
+                aria-label="Open history"
+              >
+                ☰
+              </button>
+            </div> */}
             <header className={styles.uploadHeader}>
               <div className={styles.logoMark}>
                 <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
@@ -517,6 +541,15 @@ const Notebook = () => {
                 <div className={styles.chatHeaderInner}>
                   <span className={styles.chatHeaderDot} />
                   <h2 className={styles.chatTitle}>{chatTitle}</h2>
+                  <button className={styles.hamburgerBtn}  onClick={() => navigate("/notebook")}> +</button>
+                  {/* Mobile hamburger — hidden on desktop via CSS */}
+                  <button
+                    className={styles.hamburgerBtn}
+                    onClick={() => setMobileSidebarOpen(true)}
+                    aria-label="Open history"
+                  >
+                    ☰
+                  </button>
                 </div>
               </header>
 
@@ -623,12 +656,35 @@ const Notebook = () => {
       </div>{/* end appShell */}
 
       {/* FIX: Right sidebar is NOW outside chatRoom block — always visible */}
-      <div className={`${styles.rightSidebar} ${rightSidebarOpen ? styles.rightSidebarOpen : styles.rightSidebarClosed}`}>
+      {/* ── MOBILE TOPBAR ── */}
+     
+
+      {/* ── BACKDROP OVERLAY ── */}
+      {mobileSidebarOpen && (
+        <div
+          className={styles.overlay}
+          onClick={() => setMobileSidebarOpen(false)}
+        />
+      )}
+
+      {/* ── RIGHT SIDEBAR / DRAWER ── */}
+      <div
+        className={`${styles.rightSidebar} ${rightSidebarOpen ? styles.rightSidebarOpen : styles.rightSidebarClosed} ${mobileSidebarOpen ? styles.mobileSidebarOpen : ""}`}
+      >
         <button
           className={styles.rightSidebarToggleBtn}
           onClick={() => setRightSidebarOpen((o) => !o)}
         >
           {rightSidebarOpen ? "→" : "←"}
+        </button>
+
+        {/* Mobile close btn — hidden on desktop via CSS */}
+        <button
+          className={styles.sidebarCloseBtn}
+          onClick={() => setMobileSidebarOpen(false)}
+          aria-label="Close sidebar"
+        >
+          ✕
         </button>
 
         {rightSidebarOpen && (
@@ -644,7 +700,7 @@ const Notebook = () => {
                     key={chat.id || chat._id}
                     chat={chat}
                     isActive={chatId === (chat.id || chat._id)}
-                    onSelect={handleSelectChat}
+                    onSelect={(c) => { handleSelectChat(c); setMobileSidebarOpen(false); }}
                     onDelete={handleDeleteChat}
                     chatTitle={chatTitle}
                   />

@@ -1,259 +1,255 @@
 /* ═══════════════════════════════════════════════════════════════════
-   Notebook.module.css
-   EdTech palette · dark/light · CSS Modules · fully scoped
+   Notebook.module.css — Motion Refactor
+   Theming via global.css --theme-* tokens only.
+   Local --n-* tokens bridge gaps; defined on :root per theme.
    ═══════════════════════════════════════════════════════════════════ */
 
-/* ── Design tokens ──────────────────────────────────────────────────
-   Light mode (default)
-   ─────────────────────────────────────────────────────────────────── */
-.root {
-  --bg: #f5f6fa;
-  --bg-surface: #ffffff;
-  --bg-input: #f0f1f7;
-  --border: #e2e4ef;
-  --text: #1a1d2e;
-  --text-muted: #6b7193;
-  --text-faint: #a0a4bc;
-  --accent: #5b5fef;
-  --accent-hover: #4749d4;
-  --accent-glow: rgba(91, 95, 239, 0.22);
-  --bubble-user-bg: #5b5fef;
-  --bubble-user-fg: #ffffff;
-  --bubble-ai-bg: #eef0fb;
-  --bubble-ai-fg: #1a1d2e;
-  --sidebar-bg: #ffffff;
-  --sidebar-active: #ededfd;
-  --sidebar-hover: #f4f4fd;
-  --toast-success-bg: #e6f9f0;
-  --toast-success-fg: #1a7a4a;
-  --toast-error-bg: #fdecea;
-  --toast-error-fg: #b0190e;
-  --shadow-sm: 0 1px 4px rgba(30, 32, 60, 0.07);
-  --shadow-md: 0 4px 20px rgba(30, 32, 60, 0.1);
-  --shadow-lg: 0 8px 40px rgba(30, 32, 60, 0.14);
-  --radius: 14px;
-  --radius-sm: 8px;
-  --radius-pill: 999px;
-  --font-display: "DM Serif Display", "Georgia", serif;
-  --font-body: "DM Sans", "Helvetica Neue", sans-serif;
-  --sidebar-w: 260px;
-  --transition: 0.2s ease;
+:root {
+  --n-bg: var(--theme-bg);
+  --n-surface: var(--theme-surface);
+  --n-input-bg: var(--theme-input-bg);
+  --n-border: var(--theme-border);
+  --n-text: var(--theme-text);
+  --n-text-muted: var(--theme-text-secondary);
+  --n-text-faint: var(--theme-text-muted);
+  --n-accent: var(--theme-purple);
+  --n-accent-hover: var(--theme-purple-light);
+  --n-accent-glow: var(--theme-purple-dim);
+  --n-bubble-user-bg: var(--theme-purple);
+  --n-bubble-user-fg: #ffffff;
+  --n-bubble-ai-bg: var(--theme-surface-2);
+  --n-bubble-ai-fg: var(--theme-text);
+  --n-sidebar-bg: var(--theme-surface);
+  --n-sidebar-active: var(--theme-purple-dim);
+  --n-sidebar-hover: var(--theme-surface-2);
+  --n-toast-ok-bg: #e6f9f0;
+  --n-toast-ok-fg: #1a7a4a;
+  --n-toast-err-bg: #fdecea;
+  --n-toast-err-fg: #b0190e;
+  --n-shadow-sm: var(--shadow-sm);
+  --n-shadow-md: var(--shadow-md);
+  --n-shadow-lg: 0 8px 40px rgba(30, 32, 60, 0.14);
+  --n-radius: 14px;
+  --n-radius-sm: 8px;
+  --n-radius-pill: 999px;
+  --n-font-display: "DM Serif Display", "Georgia", serif;
+  --n-sidebar-w: 260px;
+
+  /* ── Duration scale ──────────────────────────────────────────── */
+  --n-duration-fast: 150ms;
+  /* micro: hover color, opacity flicks   */
+  --n-duration-base: 250ms;
+  /* default interactive: buttons, inputs  */
+  --n-duration-slow: 400ms;
+  /* entrances, sidebar slide              */
+  --n-duration-slower: 600ms;
+  /* page-level, stagger parents           */
+
+  /* ── Easing library ──────────────────────────────────────────── */
+  --n-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  /* overshoot-free decelerate */
+  --n-ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  /* playful spring pop        */
+  --n-ease-in: cubic-bezier(0.55, 0, 1, 0.45);
+  /* accelerate into dismiss   */
+  --n-ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+  /* material-style standard   */
+
+  /* Legacy alias kept for one-liner properties */
+  --n-transition: var(--n-duration-base) var(--n-ease-smooth);
 }
 
-/* ── Dark mode ────────────────────────────────────────────────────── */
 [data-theme="dark"] {
-  --bg: #0f1017;
-  --bg-surface: #181924;
-  --bg-input: #232536;
-  --border: #2a2d42;
-  --text: #e8eaf5;
-  --text-muted: #8d90b0;
-  --text-faint: #555874;
-  --accent: #7b80ff;
-  --accent-hover: #9195ff;
-  --accent-glow: rgba(123, 128, 255, 0.28);
-  --bubble-user-bg: #7b80ff;
-  --bubble-user-fg: #ffffff;
-  --bubble-ai-bg: #1e2035;
-  --bubble-ai-fg: #e8eaf5;
-  --sidebar-bg: #13141f;
-  --sidebar-active: #23254a;
-  --sidebar-hover: #1c1e31;
-  --toast-success-bg: #0d2a1e;
-  --toast-success-fg: #4ade80;
-  --toast-error-bg: #2a0f0c;
-  --toast-error-fg: #f87171;
-  --shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.55);
+  --n-bg: var(--theme-bg);
+  --n-surface: var(--theme-surface);
+  --n-input-bg: var(--theme-input-bg);
+  --n-border: var(--theme-border);
+  --n-text: var(--theme-text);
+  --n-text-muted: var(--theme-text-secondary);
+  --n-text-faint: var(--theme-text-muted);
+  --n-accent: var(--theme-purple-light);
+  --n-accent-hover: #9195ff;
+  --n-accent-glow: var(--theme-purple-dim);
+  --n-bubble-user-bg: var(--theme-purple-light);
+  --n-bubble-user-fg: #ffffff;
+  --n-bubble-ai-bg: var(--theme-surface-2);
+  --n-bubble-ai-fg: var(--theme-text);
+  --n-sidebar-bg: var(--theme-bg-secondary);
+  --n-sidebar-active: var(--theme-purple-dim);
+  --n-sidebar-hover: var(--theme-surface);
+  --n-toast-ok-bg: #0d2a1e;
+  --n-toast-ok-fg: #4ade80;
+  --n-toast-err-bg: #2a0f0c;
+  --n-toast-err-fg: #f87171;
+  --n-shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.3);
+  --n-shadow-md: 0 4px 20px rgba(0, 0, 0, 0.4);
+  --n-shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.55);
+}
+
+/* ── Accessibility: kill all motion for prefers-reduced-motion ── */
+@media (prefers-reduced-motion: reduce) {
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-delay: 0ms !important;
+    transition-duration: 1ms !important;
+    transition-delay: 0ms !important;
+  }
 }
 
 /* ══════════════════════════════════════════════════════════════════
-   FIX 1 & 2: Root shell — flex row, fixed 100vh, no overflow
-   This is the key structural fix for both bugs.
+   KEYFRAMES
 ══════════════════════════════════════════════════════════════════ */
-.root {
-  height: 100%;
-  overflow: hidden;
-  /* FIX: no page-level scroll */
-  background: var(--bg);
-  color: var(--text);
-  font-family: var(--font-body);
-  position: relative;
-  display: flex;
-  /* FIX: flex row — appShell + rightSidebar side by side */
-  flex-direction: row;
-  transition:
-    background var(--transition),
-    color var(--transition);
+
+/* Page-level fade+lift entrance — used on uploadPage, chatroom shells */
+@keyframes pageEnter {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-/* ══════════════════════════════════════════════════════════════════
-   FIX: appShell — takes all remaining width, full height, clips overflow
-   Wraps both upload page and chatroom view.
-══════════════════════════════════════════════════════════════════ */
-.appShell {
-  flex: 1;
-  min-width: 0;
-  /* prevent flex blowout */
-  height: 100%;
-  overflow: hidden;
-  /* children manage their own scroll */
-  display: flex;
-  flex-direction: column;
+/* Card/item stagger entrance — shorter travel for subtlety */
+@keyframes itemEnter {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-/* ── Theme toggle ─────────────────────────────────────────────────── */
-.themeToggle {
-  position: fixed;
-  top: 16px;
-  right: 16px;
-  z-index: 200;
-  width: 40px;
-  height: 40px;
-  border-radius: var(--radius-pill);
-  border: 1px solid var(--border);
-  background: var(--bg-surface);
-  box-shadow: var(--shadow-sm);
-  font-size: 18px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition:
-    transform 0.2s,
-    box-shadow 0.2s;
+/* Sidebar slide-in from right */
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
-.themeToggle:hover {
-  transform: scale(1.1);
-  box-shadow: var(--shadow-md);
+/* Message bubble pop-in */
+@keyframes msgFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-/* ══════════════════════════════════════════════════════════════════
-   FIX: RIGHT SIDEBAR — always visible, full height, independent scroll
-══════════════════════════════════════════════════════════════════ */
-.rightSidebar {
-  height: 100%;
-  /* FIX: always full viewport height */
-  background: var(--bg-surface);
-  border-left: 1px solid var(--border);
-  display: flex;
-  flex-direction: row;
-  flex-shrink: 0;
-  overflow: hidden;
-  transition: width 0.3s ease;
-  position: relative;
+/* Floating upload icon */
+@keyframes floatUp {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-7px);
+  }
 }
 
-.rightSidebarOpen {
-  width: 280px;
+/* Morph blob loader */
+@keyframes morphBlob {
+  0% {
+    border-radius: 50%;
+    transform: scale(1);
+    box-shadow: 0 0 0 0 var(--n-accent-glow);
+  }
+
+  30% {
+    border-radius: 40% 60% 60% 40% / 50% 40% 60% 50%;
+    transform: scale(1.08);
+  }
+
+  60% {
+    border-radius: 60% 40% 40% 60% / 40% 60% 50% 40%;
+    transform: scale(0.96);
+    box-shadow: 0 0 0 14px transparent;
+  }
+
+  100% {
+    border-radius: 50%;
+    transform: scale(1);
+    box-shadow: 0 0 0 0 var(--n-accent-glow);
+  }
 }
 
-.rightSidebarClosed {
-  width: 36px;
+/* Text pulse for loader label */
+@keyframes pulse {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.45;
+  }
 }
 
-.rightSidebarToggleBtn {
-  position: absolute;
-  left: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 36px;
-  height: 48px;
-  background: var(--bg-input);
-  border: 1px solid var(--border);
-  border-left: none;
-  border-radius: 0 8px 8px 0;
-  cursor: pointer;
-  font-size: 14px;
-  color: var(--text-muted);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 10;
-  transition: background 0.2s;
+/* Live dot pulse on chat header */
+@keyframes dotPulse {
+
+  0%,
+  100% {
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.25);
+  }
+
+  50% {
+    box-shadow: 0 0 0 6px rgba(34, 197, 94, 0.1);
+  }
 }
 
-.rightSidebarToggleBtn:hover {
-  background: var(--accent-glow);
-  color: var(--accent);
+/* Dot bounce for "thinking" indicator */
+@keyframes dotBounce {
+
+  0%,
+  80%,
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 0.5;
+  }
+
+  40% {
+    transform: translateY(-7px) scale(1.1);
+    opacity: 1;
+  }
 }
 
-.rightSidebarContent {
-  padding: 24px 16px 24px 48px;
-  width: 100%;
-  height: 100%;
-  overflow-y: auto;
-  /* FIX: independent scroll */
-  scrollbar-width: thin;
-  scrollbar-color: var(--border) var(--bg-input);
+/* Context-menu spring pop */
+@keyframes menuPop {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(-4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
 }
 
-.rightSidebarContent::-webkit-scrollbar {
-  width: 4px;
-}
-
-.rightSidebarContent::-webkit-scrollbar-track {
-  background: var(--bg-input);
-}
-
-.rightSidebarContent::-webkit-scrollbar-thumb {
-  background: var(--border);
-  border-radius: 999px;
-}
-
-.rightSidebarContent::-webkit-scrollbar-thumb:hover {
-  background: var(--text-faint);
-}
-
-.rightSidebarTitle {
-  font-size: 15px;
-  font-weight: 700;
-  /* text-transform: capitalize; */
-  margin-bottom: 16px;
-  color: var(--text);
-}
-
-/* ══════════════════════════════════════════════════════════════════
-   TOAST
-══════════════════════════════════════════════════════════════════ */
-.toastStack {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  z-index: 999;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  pointer-events: none;
-}
-
-.toast {
-  pointer-events: all;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 12px 16px;
-  border-radius: var(--radius-sm);
-  font-size: 14px;
-  font-weight: 500;
-  box-shadow: var(--shadow-md);
-  max-width: 340px;
-  animation-duration: 0.32s;
-  animation-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);
-  animation-fill-mode: both;
-}
-
-.toastEnter {
-  animation-name: toastSlideIn;
-}
-
-.toastExit {
-  animation-name: toastSlideOut;
-  animation-timing-function: ease-in;
-}
-
+/* Toast slide in/out */
 @keyframes toastSlideIn {
   from {
     transform: translateX(110%);
@@ -278,15 +274,469 @@
   }
 }
 
+/* Mobile backdrop fade */
+@keyframes fadeInOverlay {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   Root shell
+══════════════════════════════════════════════════════════════════ */
+.root {
+  height: 100%;
+  overflow: hidden;
+  background: var(--n-bg);
+  color: var(--n-text);
+  font-family: var(--font-body);
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  /* Theme swap fades rather than jumps */
+  transition:
+    background var(--n-duration-slow) var(--n-ease-smooth),
+    color var(--n-duration-slow) var(--n-ease-smooth);
+}
+
+.appShell {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Theme toggle ──────────────────────────────────────────────── */
+.themeToggle {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 200;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--n-radius-pill);
+  border: 1px solid var(--n-border);
+  background: var(--n-surface);
+  box-shadow: var(--n-shadow-sm);
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* GPU: transform + box-shadow only */
+  transition:
+    transform var(--n-duration-base) var(--n-ease-spring),
+    box-shadow var(--n-duration-base) var(--n-ease-smooth),
+    border-color var(--n-duration-fast) var(--n-ease-smooth),
+    background var(--n-duration-fast) var(--n-ease-smooth);
+}
+
+.themeToggle:hover {
+  transform: scale(1.1) rotate(20deg);
+  /* icon spin hints at theme flip */
+  box-shadow: var(--n-shadow-md);
+}
+
+.themeToggle:active {
+  transform: scale(0.94) rotate(0deg);
+  /* press-down micro-interaction */
+  transition-duration: var(--n-duration-fast);
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   RIGHT SIDEBAR
+══════════════════════════════════════════════════════════════════ */
+.rightSidebar {
+  height: 100%;
+  background: var(--n-surface);
+  border-left: 1px solid var(--n-border);
+  display: flex;
+  flex-direction: row;
+  flex-shrink: 0;
+  overflow: hidden;
+  /* Width change → slide feel; avoid animating width directly but
+     sidebar uses overflow:hidden so content clips cleanly */
+  transition:
+    width var(--n-duration-slow) var(--n-ease-smooth),
+    background var(--n-duration-base) var(--n-ease-smooth);
+  position: relative;
+}
+
+.rightSidebarOpen {
+  width: 280px;
+}
+
+.rightSidebarClosed {
+  width: 36px;
+}
+
+/* Sidebar content entrance: slides in from right when panel opens */
+.rightSidebarOpen .rightSidebarContent {
+  animation: slideInRight var(--n-duration-slow) var(--n-ease-out) both;
+}
+
+.rightSidebarToggleBtn {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 36px;
+  height: 48px;
+  background: var(--n-input-bg);
+  border: 1px solid var(--n-border);
+  border-left: none;
+  border-radius: 0 8px 8px 0;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--n-text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  /* Animate colour + icon nudge — not position */
+  transition:
+    background var(--n-duration-fast) var(--n-ease-smooth),
+    color var(--n-duration-fast) var(--n-ease-smooth),
+    transform var(--n-duration-fast) var(--n-ease-spring);
+  /* already has translateY(-50%) */
+}
+
+.rightSidebarToggleBtn:hover {
+  background: var(--n-accent-glow);
+  color: var(--n-accent);
+  /* Subtle horizontal nudge draws eye to expand affordance */
+  transform: translateY(-50%) translateX(2px);
+}
+
+.rightSidebarToggleBtn:active {
+  transform: translateY(-50%) translateX(0px);
+  transition-duration: var(--n-duration-fast);
+}
+
+.rightSidebarContent {
+  padding: 24px 12px 24px 44px;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--n-border) transparent;
+}
+
+.rightSidebarContent::-webkit-scrollbar {
+  width: 4px;
+}
+
+.rightSidebarContent::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.rightSidebarContent::-webkit-scrollbar-thumb {
+  background: var(--n-border);
+  border-radius: 999px;
+}
+
+.rightSidebarContent::-webkit-scrollbar-thumb:hover {
+  background: var(--n-text-faint);
+}
+
+.rightSidebarTitle {
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 14px;
+  color: var(--n-text);
+  letter-spacing: 0.01em;
+  /* Entrance: title fades in slightly after content panel */
+  animation: itemEnter var(--n-duration-base) var(--n-ease-out) 80ms both;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   HISTORY CARD LIST
+══════════════════════════════════════════════════════════════════ */
+.sidebarList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: auto;
+}
+
+.sidebarEmpty {
+  font-size: 13px;
+  color: var(--n-text-faint);
+  padding: 12px 4px;
+  text-align: center;
+  animation: itemEnter var(--n-duration-base) var(--n-ease-out) both;
+}
+
+/* Stagger: each card delays by its DOM order via nth-child.
+   CSS-only stagger up to 8 cards; beyond that they share last delay. */
+.sidebarList>li:nth-child(1) {
+  animation-delay: 60ms;
+}
+
+.sidebarList>li:nth-child(2) {
+  animation-delay: 110ms;
+}
+
+.sidebarList>li:nth-child(3) {
+  animation-delay: 160ms;
+}
+
+.sidebarList>li:nth-child(4) {
+  animation-delay: 210ms;
+}
+
+.sidebarList>li:nth-child(5) {
+  animation-delay: 260ms;
+}
+
+.sidebarList>li:nth-child(6) {
+  animation-delay: 310ms;
+}
+
+.sidebarList>li:nth-child(7) {
+  animation-delay: 360ms;
+}
+
+.sidebarList>li:nth-child(n+8) {
+  animation-delay: 400ms;
+}
+
+/* Card */
+.historyCard {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 6px;
+  padding: 12px 12px 12px 14px;
+  border-radius: var(--r-md, 12px);
+  background: var(--theme-surface-2);
+  border: 1.5px solid transparent;
+  cursor: pointer;
+  position: relative;
+  /* Stagger parent drives the entrance; card handles its own hovers */
+  animation: itemEnter var(--n-duration-slow) var(--n-ease-out) both;
+  transition:
+    background var(--n-duration-fast) var(--n-ease-smooth),
+    border-color var(--n-duration-fast) var(--n-ease-smooth),
+    box-shadow var(--n-duration-base) var(--n-ease-smooth),
+    transform var(--n-duration-base) var(--n-ease-spring);
+  /* lift uses spring */
+}
+
+.historyCard:hover {
+  background: var(--theme-surface-2);
+  border-color: var(--n-border);
+  box-shadow: var(--theme-card-shadow);
+  transform: translateY(-2px);
+  /* lift: GPU transform only */
+}
+
+.historyCard:active {
+  transform: translateY(0px) scale(0.98);
+  /* press-down */
+  transition-duration: var(--n-duration-fast);
+}
+
+/* Active — layered border glow */
+.historyCardActive {
+  background: var(--n-accent-glow) !important;
+  border-color: var(--n-accent) !important;
+  box-shadow:
+    0 0 0 3px var(--n-accent-glow),
+    0 2px 12px var(--n-accent-glow),
+    var(--n-shadow-sm) !important;
+  transform: translateY(-1px);
+}
+
+.historyCardActive::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  border: 1.5px solid var(--n-accent);
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.historyCardBody {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.historyCardTitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--n-text);
+  line-height: 1.45;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-transform: capitalize;
+  margin: 0;
+  transition: color var(--n-duration-fast) var(--n-ease-smooth);
+}
+
+.historyCardActive .historyCardTitle {
+  color: var(--n-accent);
+}
+
+.historyCardMeta {
+  font-size: 11px;
+  color: var(--n-text-faint);
+  white-space: nowrap;
+  transition: color var(--n-duration-fast) var(--n-ease-smooth);
+}
+
+.historyCardActive .historyCardMeta {
+  color: var(--n-text-muted);
+}
+
+/* Three-dot menu */
+.historyCardMenu {
+  position: relative;
+  flex-shrink: 0;
+  align-self: flex-start;
+}
+
+.historyDots {
+  background: none;
+  border: none;
+  font-size: 15px;
+  color: var(--n-text-faint);
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: 4px;
+  opacity: 0;
+  line-height: 1;
+  transition:
+    opacity var(--n-duration-fast) var(--n-ease-smooth),
+    background var(--n-duration-fast) var(--n-ease-smooth),
+    transform var(--n-duration-fast) var(--n-ease-spring);
+}
+
+.historyCard:hover .historyDots,
+.historyCardActive .historyDots {
+  opacity: 1;
+}
+
+.historyDots:hover {
+  background: var(--n-border);
+  color: var(--n-text);
+  transform: scale(1.15);
+  /* subtle enlarge on hover */
+}
+
+.historyDots:active {
+  transform: scale(0.9);
+  transition-duration: var(--n-duration-fast);
+}
+
+/* Shared dropdown */
+.sidebarMenu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 4px);
+  z-index: 50;
+  background: var(--n-surface);
+  border: 1px solid var(--n-border);
+  border-radius: var(--n-radius-sm);
+  box-shadow: var(--n-shadow-md);
+  padding: 4px;
+  min-width: 110px;
+  /* Spring pop for delight */
+  animation: menuPop var(--n-duration-base) var(--n-ease-spring) both;
+  transform-origin: top right;
+}
+
+.sidebarMenuDelete {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 7px 12px;
+  background: none;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  color: var(--n-toast-err-fg);
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    background var(--n-duration-fast) var(--n-ease-smooth),
+    transform var(--n-duration-fast) var(--n-ease-spring);
+}
+
+.sidebarMenuDelete:hover {
+  background: var(--n-toast-err-bg);
+  transform: translateX(2px);
+  /* micro slide hint */
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   TOAST
+══════════════════════════════════════════════════════════════════ */
+.toastStack {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: none;
+}
+
+.toast {
+  pointer-events: all;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  border-radius: var(--n-radius-sm);
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: var(--n-shadow-md);
+  max-width: 340px;
+  animation-duration: var(--n-duration-slow);
+  animation-fill-mode: both;
+}
+
+.toastEnter {
+  animation-name: toastSlideIn;
+  animation-timing-function: var(--n-ease-spring);
+  /* spring = satisfying arrival */
+}
+
+.toastExit {
+  animation-name: toastSlideOut;
+  animation-timing-function: var(--n-ease-in);
+  /* accelerate = quick dismiss */
+  animation-duration: var(--n-duration-base);
+  /* exits faster than entrances */
+}
+
 .toast_success {
-  background: var(--toast-success-bg);
-  color: var(--toast-success-fg);
+  background: var(--n-toast-ok-bg);
+  color: var(--n-toast-ok-fg);
   border-left: 3px solid currentColor;
 }
 
 .toast_error {
-  background: var(--toast-error-bg);
-  color: var(--toast-error-fg);
+  background: var(--n-toast-err-bg);
+  color: var(--n-toast-err-fg);
   border-left: 3px solid currentColor;
 }
 
@@ -308,66 +758,73 @@
   opacity: 0.6;
   line-height: 1;
   padding: 0;
-  transition: opacity 0.15s;
+  transition:
+    opacity var(--n-duration-fast) var(--n-ease-smooth),
+    transform var(--n-duration-fast) var(--n-ease-spring);
 }
 
 .toastClose:hover {
   opacity: 1;
+  transform: scale(1.2) rotate(90deg);
+  /* × button rotates on hover */
 }
 
 /* ══════════════════════════════════════════════════════════════════
    VIEW 1 — UPLOAD PAGE
-   FIX: flex:1 + overflow-y:auto = fills appShell, scrolls independently
 ══════════════════════════════════════════════════════════════════ */
 .uploadPage {
   flex: 1;
-  /* FIX: fill appShell height */
   overflow-y: auto;
-  /* FIX: upload page scrolls independently */
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 80px 24px 60px;
   gap: 32px;
+  /* Whole page fades+lifts in */
+  animation: pageEnter var(--n-duration-slower) var(--n-ease-out) both;
 }
 
-/* Header */
 .uploadHeader {
   text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 16px;
+  /* Header lands slightly after page shell */
+  animation: itemEnter var(--n-duration-slow) var(--n-ease-out) 80ms both;
 }
 
 .logoMark {
   margin-bottom: 8px;
-  filter: drop-shadow(0 4px 12px var(--accent-glow));
+  filter: drop-shadow(0 4px 12px var(--n-accent-glow));
+  /* Logo scales up from nothing for a focal entrance */
+  animation: itemEnter var(--n-duration-slow) var(--n-ease-spring) 40ms both;
 }
 
 .uploadTitle {
-  font-family: var(--font-display);
+  font-family: var(--n-font-display);
   font-size: clamp(2rem, 5vw, 3.2rem);
   font-weight: 400;
   line-height: 1.2;
-  color: var(--text);
+  color: var(--n-text);
   margin: 0;
+  animation: itemEnter var(--n-duration-slow) var(--n-ease-out) 120ms both;
 }
 
 .uploadTitle em {
   font-style: italic;
-  color: var(--accent);
+  color: var(--n-accent);
 }
 
 .uploadSubtitle {
   font-size: 1rem;
-  color: var(--text-muted);
+  color: var(--n-text-muted);
   max-width: 480px;
   margin: 0;
   line-height: 1.6;
+  animation: itemEnter var(--n-duration-slow) var(--n-ease-out) 180ms both;
 }
 
-/* Format chips */
 .formatGrid {
   display: flex;
   flex-wrap: wrap;
@@ -377,6 +834,7 @@
   margin: 0;
   justify-content: center;
   max-width: 520px;
+  animation: itemEnter var(--n-duration-slow) var(--n-ease-out) 240ms both;
 }
 
 .formatChip {
@@ -384,57 +842,62 @@
   align-items: center;
   gap: 6px;
   padding: 6px 14px;
-  border-radius: var(--radius-pill);
-  border: 1px solid var(--border);
-  background: var(--bg-surface);
+  border-radius: var(--n-radius-pill);
+  border: 1px solid var(--n-border);
+  background: var(--n-surface);
   font-size: 13px;
   font-weight: 500;
-  color: var(--text-muted);
-  box-shadow: var(--shadow-sm);
+  color: var(--n-text-muted);
+  box-shadow: var(--n-shadow-sm);
   transition:
-    border-color 0.2s,
-    color 0.2s,
-    transform 0.15s;
+    border-color var(--n-duration-fast) var(--n-ease-smooth),
+    color var(--n-duration-fast) var(--n-ease-smooth),
+    transform var(--n-duration-base) var(--n-ease-spring),
+    box-shadow var(--n-duration-base) var(--n-ease-smooth);
 }
 
 .formatChip:hover {
-  border-color: var(--accent);
-  color: var(--accent);
-  transform: translateY(-1px);
+  border-color: var(--n-accent);
+  color: var(--n-accent);
+  transform: translateY(-2px);
+  box-shadow: var(--n-shadow-md);
 }
 
-/* Drop zone */
 .dropZone {
   width: 100%;
   max-width: 540px;
   min-height: 200px;
-  border: 2px dashed var(--border);
-  border-radius: var(--radius);
-  background: var(--bg-surface);
+  border: 2px dashed var(--n-border);
+  border-radius: var(--n-radius);
+  background: var(--n-surface);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition:
-    border-color 0.2s,
-    background 0.2s,
-    box-shadow 0.2s;
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--n-shadow-sm);
   position: relative;
+  /* entrance after chips */
+  animation: itemEnter var(--n-duration-slow) var(--n-ease-out) 300ms both;
+  transition:
+    border-color var(--n-duration-base) var(--n-ease-smooth),
+    background var(--n-duration-base) var(--n-ease-smooth),
+    box-shadow var(--n-duration-base) var(--n-ease-smooth),
+    transform var(--n-duration-base) var(--n-ease-spring);
+  /* slight lift on drag-over */
 }
 
 .dropZone:hover,
 .dropZoneActive {
-  border-color: var(--accent);
-  background: var(--accent-glow);
-  box-shadow:
-    0 0 0 4px var(--accent-glow),
-    var(--shadow-md);
+  border-color: var(--n-accent);
+  background: var(--n-accent-glow);
+  box-shadow: 0 0 0 4px var(--n-accent-glow), var(--n-shadow-md);
+  transform: scale(1.012);
+  /* subtle grow confirms drag target */
 }
 
 .dropZoneHasFile {
   border-style: solid;
-  border-color: var(--accent);
+  border-color: var(--n-accent);
 }
 
 .hiddenInput {
@@ -448,26 +911,15 @@
   gap: 8px;
   text-align: center;
   padding: 32px;
-  color: var(--text-muted);
+  color: var(--n-text-muted);
 }
 
 .dropIcon {
   font-size: 2.2rem;
   display: block;
   margin-bottom: 4px;
-  animation: floatUp 2.4s ease-in-out infinite;
-}
-
-@keyframes floatUp {
-
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-
-  50% {
-    transform: translateY(-7px);
-  }
+  animation: floatUp 2.4s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+  /* smooth sinusoidal float */
 }
 
 .dropHint p {
@@ -478,7 +930,7 @@
 
 .dropMeta {
   font-size: 12px !important;
-  color: var(--text-faint) !important;
+  color: var(--n-text-faint) !important;
 }
 
 .filePreview {
@@ -486,6 +938,8 @@
   align-items: center;
   gap: 12px;
   padding: 20px;
+  animation: itemEnter var(--n-duration-base) var(--n-ease-spring) both;
+  /* spring = file popped in */
 }
 
 .fileIcon {
@@ -495,7 +949,7 @@
 .fileName {
   font-size: 14px;
   font-weight: 600;
-  color: var(--text);
+  color: var(--n-text);
   max-width: 300px;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -507,17 +961,24 @@
   border: none;
   font-size: 20px;
   cursor: pointer;
-  color: var(--text-muted);
+  color: var(--n-text-muted);
   line-height: 1;
   padding: 0;
-  transition: color 0.15s;
+  transition:
+    color var(--n-duration-fast) var(--n-ease-smooth),
+    transform var(--n-duration-fast) var(--n-ease-spring);
 }
 
 .fileRemove:hover {
-  color: var(--toast-error-fg);
+  color: var(--n-toast-err-fg);
+  transform: scale(1.2) rotate(10deg);
+  /* × grows + tilts */
 }
 
-/* Upload loader */
+.fileRemove:active {
+  transform: scale(0.9) rotate(0deg);
+}
+
 .uploadLoader {
   display: flex;
   flex-direction: column;
@@ -529,331 +990,88 @@
 .morphBlob {
   width: 52px;
   height: 52px;
-  background: var(--accent);
+  background: var(--n-accent);
   border-radius: 50%;
-  animation: morphBlob 1.8s ease-in-out infinite;
-  box-shadow: 0 0 0 0 var(--accent-glow);
-}
-
-@keyframes morphBlob {
-  0% {
-    border-radius: 50%;
-    transform: scale(1);
-    box-shadow: 0 0 0 0 var(--accent-glow);
-  }
-
-  30% {
-    border-radius: 40% 60% 60% 40% / 50% 40% 60% 50%;
-    transform: scale(1.08);
-  }
-
-  60% {
-    border-radius: 60% 40% 40% 60% / 40% 60% 50% 40%;
-    transform: scale(0.96);
-    box-shadow: 0 0 0 14px transparent;
-  }
-
-  100% {
-    border-radius: 50%;
-    transform: scale(1);
-    box-shadow: 0 0 0 0 var(--accent-glow);
-  }
+  animation: morphBlob 1.8s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+  box-shadow: 0 0 0 0 var(--n-accent-glow);
+  /* will-change justified: morphBlob runs indefinitely on a visible loader */
+  will-change: border-radius, transform;
 }
 
 .uploadLoaderText {
   font-size: 14px;
-  color: var(--text-muted);
+  color: var(--n-text-muted);
   margin: 0;
-  animation: pulse 1.4s ease-in-out infinite;
+  animation: pulse 1.4s cubic-bezier(0.45, 0, 0.55, 1) infinite;
 }
 
-@keyframes pulse {
-
-  0%,
-  100% {
-    opacity: 1;
-  }
-
-  50% {
-    opacity: 0.45;
-  }
-}
-
-/* Submit button */
 .submitBtn {
   display: flex;
   align-items: center;
   gap: 10px;
   padding: 14px 32px;
-  border-radius: var(--radius-pill);
+  border-radius: var(--n-radius-pill);
   border: none;
-  background: var(--border);
-  color: var(--text-faint);
+  background: var(--n-border);
+  color: var(--n-text-faint);
   font-family: var(--font-body);
   font-size: 15px;
   font-weight: 600;
   cursor: not-allowed;
+  animation: itemEnter var(--n-duration-slow) var(--n-ease-out) 360ms both;
   transition:
-    background 0.2s,
-    color 0.2s,
-    box-shadow 0.2s,
-    transform 0.15s;
+    background var(--n-duration-base) var(--n-ease-smooth),
+    color var(--n-duration-base) var(--n-ease-smooth),
+    box-shadow var(--n-duration-base) var(--n-ease-smooth),
+    transform var(--n-duration-base) var(--n-ease-spring);
 }
 
 .submitBtnActive {
-  background: var(--accent);
+  background: var(--n-accent);
   color: #fff;
   cursor: pointer;
-  box-shadow: 0 4px 20px var(--accent-glow);
+  box-shadow: 0 4px 20px var(--n-accent-glow);
 }
 
 .submitBtnActive:hover {
-  background: var(--accent-hover);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 28px var(--accent-glow);
+  background: var(--n-accent-hover);
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 8px 28px var(--n-accent-glow);
 }
 
 .submitBtnActive:active {
-  transform: translateY(0);
+  transform: translateY(0) scale(0.97);
+  /* press-down feedback */
+  transition-duration: var(--n-duration-fast);
 }
 
 /* ══════════════════════════════════════════════════════════════════
    VIEW 2 — CHATROOM
-   FIX: height:100% (inherits from appShell), not 100vh
 ══════════════════════════════════════════════════════════════════ */
 .chatroomShell {
   display: flex;
   height: 100%;
-  /* FIX: was 100vh — now fills appShell */
   overflow: hidden;
+  /* Chatroom view transitions in from upload page */
+  animation: pageEnter var(--n-duration-slow) var(--n-ease-out) both;
 }
 
-/* ── Left Sidebar ───────────────────────────────────────────────── */
-.sidebar {
-  background: var(--sidebar-bg);
-  border-right: 1px solid var(--border);
-  display: flex;
-  flex-direction: column;
-  flex-shrink: 0;
-  transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  overflow: hidden;
-  position: relative;
-}
-
-.sidebarOpen {
-  width: var(--sidebar-w);
-}
-
-.sidebarClosed {
-  width: 44px;
-}
-
-.sidebarHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 20px 14px 12px;
-  flex-shrink: 0;
-  gap: 8px;
-}
-
-.sidebarHeading {
-  font-family: var(--font-display);
-  font-size: 15px;
-  font-weight: 400;
-  color: var(--text-muted);
-  margin: 0;
-  white-space: nowrap;
-  overflow: hidden;
-}
-
-.sidebarToggle {
-  background: none;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  width: 28px;
-  height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  color: var(--text-muted);
-  font-size: 12px;
-  flex-shrink: 0;
-  transition:
-    background 0.15s,
-    color 0.15s;
-}
-
-.sidebarToggle:hover {
-  background: var(--sidebar-hover);
-  color: var(--text);
-}
-
-.sidebarList {
-  list-style: none;
-  padding: 0 8px;
-  margin: 0;
-  flex: 1;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.sidebarEmpty {
-  font-size: 13px;
-  color: var(--text-faint);
-  padding: 12px 8px;
-  text-align: center;
-}
-
-.sidebarItem {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  padding: 9px 10px;
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  transition: background 0.15s;
-  position: relative;
-}
-
-.sidebarItem:hover {
-  background: var(--sidebar-hover);
-}
-
-.sidebarItemActive {
-  background: var(--sidebar-active) !important;
-}
-
-.sidebarItemActive .sidebarTitle {
-  color: var(--accent);
-  font-weight: 600;
-}
-
-.sidebarTitle {
-  font-size: 13px;
-  color: var(--text);
-  white-space: nowrap;
-  text-transform: capitalize;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  flex: 1;
-  line-height: 1.4;
-}
-
-.sidebarDots {
-  background: none;
-  border: none;
-  font-size: 16px;
-  color: var(--text-faint);
-  cursor: pointer;
-  padding: 2px 4px;
-  border-radius: 4px;
-  opacity: 0;
-  transition:
-    opacity 0.15s,
-    background 0.15s;
-  line-height: 1;
-}
-
-.sidebarItem:hover .sidebarDots {
-  opacity: 1;
-}
-
-.sidebarDots:hover {
-  background: var(--border);
-  color: var(--text);
-}
-
-.sidebarMenu {
-  position: absolute;
-  right: 8px;
-  top: 100%;
-  z-index: 50;
-  background: var(--bg-surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  box-shadow: var(--shadow-md);
-  padding: 4px;
-  animation: menuPop 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-@keyframes menuPop {
-  from {
-    opacity: 0;
-    transform: scale(0.9) translateY(-4px);
-  }
-
-  to {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
-}
-
-.sidebarMenuDelete {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  width: 100%;
-  padding: 7px 12px;
-  background: none;
-  border: none;
-  border-radius: 6px;
-  font-size: 13px;
-  color: var(--toast-error-fg);
-  cursor: pointer;
-  white-space: nowrap;
-  transition: background 0.15s;
-}
-
-.sidebarMenuDelete:hover {
-  background: var(--toast-error-bg);
-}
-
-.newChatBtn {
-  margin: 8px;
-  padding: 10px;
-  border-radius: var(--radius-sm);
-  border: 1px dashed var(--border);
-  background: none;
-  color: var(--text-muted);
-  font-family: var(--font-body);
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  transition:
-    border-color 0.2s,
-    color 0.2s,
-    background 0.2s;
-}
-
-.newChatBtn:hover {
-  border-color: var(--accent);
-  color: var(--accent);
-  background: var(--accent-glow);
-}
-
-/* ── Chat main ──────────────────────────────────────────────────── */
 .chatroomMain {
   flex: 1;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background: var(--bg);
+  background: var(--n-bg);
   min-width: 0;
-  min-height: 0; 
+  min-height: 0;
 }
 
-/* Chat header */
 .chatHeader {
   padding: 18px 28px;
-  border-bottom: 1px solid var(--border);
-  background: var(--bg-surface);
+  border-bottom: 1px solid var(--n-border);
+  background: var(--n-surface);
   flex-shrink: 0;
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--n-shadow-sm);
 }
 
 .chatHeaderInner {
@@ -869,38 +1087,25 @@
   background: #22c55e;
   box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.25);
   flex-shrink: 0;
-  animation: dotPulse 2s ease-in-out infinite;
-}
-
-@keyframes dotPulse {
-
-  0%,
-  100% {
-    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.25);
-  }
-
-  50% {
-    box-shadow: 0 0 0 6px rgba(34, 197, 94, 0.1);
-  }
+  /* Continuous ambient pulse signals live connection */
+  animation: dotPulse 2s cubic-bezier(0.45, 0, 0.55, 1) infinite;
 }
 
 .chatTitle {
-  font-family: var(--font-display);
+  font-family: var(--n-font-display);
   font-size: 1.1rem;
   font-weight: 400;
   text-transform: capitalize;
   margin: 0;
-  color: var(--text);
+  color: var(--n-text);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-/* Messages area — FIX: flex:1 + overflow-y:auto = independent scroll */
 .messagesArea {
   flex: 1;
   overflow-y: auto;
-  /* FIX: independent scroll */
   padding: 28px 28px 8px;
   display: flex;
   flex-direction: column;
@@ -909,24 +1114,12 @@
   min-height: 0;
 }
 
-/* Message rows */
+/* Message row entrance */
 .messageRow {
   display: flex;
   align-items: flex-end;
   gap: 10px;
-  animation: msgFadeUp 0.28s ease both;
-}
-
-@keyframes msgFadeUp {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  animation: msgFadeUp var(--n-duration-base) var(--n-ease-out) both;
 }
 
 .messageRowUser {
@@ -937,7 +1130,6 @@
   flex-direction: row;
 }
 
-/* Avatars */
 .aiAvatar,
 .userAvatar {
   width: 32px;
@@ -952,48 +1144,52 @@
 }
 
 .aiAvatar {
-  background: var(--accent);
+  background: var(--n-accent);
   color: #fff;
   letter-spacing: 0.02em;
 }
 
 .userAvatar {
-  background: var(--bg-input);
-  color: var(--text-muted);
+  background: var(--n-input-bg);
+  color: var(--n-text-muted);
 }
 
-/* Bubbles */
 .messageBubble {
   max-width: min(520px, 72%);
   padding: 12px 16px;
   border-radius: 16px;
   position: relative;
-  box-shadow: var(--shadow-sm);
-  transition: box-shadow 0.2s;
+  box-shadow: var(--n-shadow-sm);
+  transition:
+    box-shadow var(--n-duration-base) var(--n-ease-smooth),
+    transform var(--n-duration-fast) var(--n-ease-spring);
+}
+
+.messageBubble:hover {
+  transform: translateY(-1px);
+  /* subtle lift on hover reveals editability */
 }
 
 .bubbleUser {
-  background: var(--bubble-user-bg);
-  color: var(--bubble-user-fg);
+  background: var(--n-bubble-user-bg);
+  color: var(--n-bubble-user-fg);
   border-bottom-right-radius: 4px;
 }
 
-/* AI bubble — no background, wider, document-like */
 .bubbleAI {
   background: transparent;
-  color: var(--bubble-ai-fg);
+  color: var(--n-bubble-ai-fg);
   border-bottom-left-radius: 4px;
   box-shadow: none;
   max-width: 100%;
-  /* much wider */
   padding: 4px 0;
 }
 
-/* AI content typography */
+/* ── AI content rich formatting ─────────────────────────────── */
 .aiContent {
   font-size: 15px;
   line-height: 1.75;
-  color: var(--text);
+  color: var(--n-text);
 }
 
 .aiContent p {
@@ -1004,13 +1200,12 @@
   margin-bottom: 0;
 }
 
-/* Step headings — bold + accent color like Claude */
 .aiContent h1,
 .aiContent h2,
 .aiContent h3 {
   font-family: var(--font-body);
   font-weight: 700;
-  color: var(--text);
+  color: var(--n-text);
   margin: 20px 0 8px;
   line-height: 1.35;
 }
@@ -1025,7 +1220,7 @@
 
 .aiContent h3 {
   font-size: 0.98rem;
-  color: var(--accent);
+  color: var(--n-accent);
 }
 
 .aiContent ul,
@@ -1043,8 +1238,8 @@
 }
 
 .aiContent code {
-  background: rgba(91, 95, 239, 0.12);
-  color: var(--accent);
+  background: var(--n-accent-glow);
+  color: var(--n-accent);
   padding: 2px 6px;
   border-radius: 5px;
   font-size: 13px;
@@ -1052,9 +1247,9 @@
 }
 
 .aiContent pre {
-  background: var(--bg-input);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
+  background: var(--n-input-bg);
+  border: 1px solid var(--n-border);
+  border-radius: var(--n-radius-sm);
   padding: 14px 16px;
   overflow-x: auto;
   margin: 12px 0;
@@ -1062,34 +1257,32 @@
 
 .aiContent pre code {
   background: none;
-  color: var(--text);
+  color: var(--n-text);
   padding: 0;
 }
 
-/* Math blocks — distinct card with accent border */
 .aiContent .katex-display {
-  background: var(--bg-surface);
-  border: 1px solid var(--border);
-  border-left: 3px solid var(--accent);
-  border-radius: var(--radius-sm);
+  background: var(--n-surface);
+  border: 1px solid var(--n-border);
+  border-left: 3px solid var(--n-accent);
+  border-radius: var(--n-radius-sm);
   padding: 14px 18px;
   margin: 14px 0;
   overflow-x: auto;
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--n-shadow-sm);
 }
 
-/* Inline math */
 .aiContent .katex {
   font-size: 1em;
 }
 
 .aiContent blockquote {
-  border-left: 3px solid var(--accent);
+  border-left: 3px solid var(--n-accent);
   padding: 8px 16px;
   margin: 12px 0;
-  background: var(--accent-glow);
-  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
-  color: var(--text-muted);
+  background: var(--n-accent-glow);
+  border-radius: 0 var(--n-radius-sm) var(--n-radius-sm) 0;
+  color: var(--n-text-muted);
   font-style: italic;
 }
 
@@ -1098,12 +1291,12 @@
   border-collapse: collapse;
   font-size: 14px;
   margin: 12px 0;
-  border-radius: var(--radius-sm);
+  border-radius: var(--n-radius-sm);
   overflow: hidden;
 }
 
 .aiContent th {
-  background: var(--accent);
+  background: var(--n-accent);
   color: #fff;
   padding: 9px 14px;
   text-align: left;
@@ -1112,11 +1305,11 @@
 
 .aiContent td {
   padding: 8px 14px;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--n-border);
 }
 
 .aiContent tr:nth-child(even) td {
-  background: var(--bg-input);
+  background: var(--n-input-bg);
 }
 
 .aiContent strong {
@@ -1130,29 +1323,28 @@
 
 .aiContent hr {
   border: none;
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--n-border);
   margin: 16px 0;
 }
 
 .aiContent a {
-  color: var(--accent);
+  color: var(--n-accent);
   text-decoration: underline;
   text-underline-offset: 2px;
 }
 
 .bubbleEditing {
-  box-shadow:
-    0 0 0 2px var(--accent),
-    var(--shadow-sm);
+  box-shadow: 0 0 0 2px var(--n-accent), var(--n-shadow-sm);
 }
 
+/* ── User message content ─────────────────────────────────── */
 .messageContent {
   margin: 0 0 4px;
   font-size: 14px;
   line-height: 1.65;
   word-break: break-word;
 }
-/* ── Markdown inside AI bubble ───────────────────────────────────── */
+
 .messageContent p {
   margin: 0 0 8px;
   line-height: 1.7;
@@ -1165,10 +1357,10 @@
 .messageContent h1,
 .messageContent h2,
 .messageContent h3 {
-  font-family: var(--font-display);
+  font-family: var(--n-font-display);
   font-weight: 600;
   margin: 14px 0 6px;
-  color: var(--text);
+  color: var(--n-text);
   line-height: 1.3;
 }
 
@@ -1199,8 +1391,8 @@
 }
 
 .messageContent code {
-  background: rgba(91, 95, 239, 0.12);
-  color: var(--accent);
+  background: var(--n-accent-glow);
+  color: var(--n-accent);
   padding: 2px 6px;
   border-radius: 5px;
   font-size: 13px;
@@ -1208,29 +1400,29 @@
 }
 
 .messageContent pre {
-  background: var(--bg-input);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
+  background: var(--n-input-bg);
+  border: 1px solid var(--n-border);
+  border-radius: var(--n-radius-sm);
   padding: 14px 16px;
   overflow-x: auto;
   margin: 10px 0;
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--n-shadow-sm);
 }
 
 .messageContent pre code {
   background: none;
-  color: var(--text);
+  color: var(--n-text);
   padding: 0;
   font-size: 13px;
 }
 
 .messageContent blockquote {
-  border-left: 3px solid var(--accent);
+  border-left: 3px solid var(--n-accent);
   padding: 6px 14px;
   margin: 10px 0;
-  background: var(--accent-glow);
-  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
-  color: var(--text-muted);
+  background: var(--n-accent-glow);
+  border-radius: 0 var(--n-radius-sm) var(--n-radius-sm) 0;
+  color: var(--n-text-muted);
   font-style: italic;
 }
 
@@ -1239,12 +1431,12 @@
   border-collapse: collapse;
   font-size: 13px;
   margin: 10px 0;
-  border-radius: var(--radius-sm);
+  border-radius: var(--n-radius-sm);
   overflow: hidden;
 }
 
 .messageContent th {
-  background: var(--accent);
+  background: var(--n-accent);
   color: #fff;
   padding: 8px 12px;
   text-align: left;
@@ -1253,26 +1445,27 @@
 
 .messageContent td {
   padding: 7px 12px;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--n-border);
 }
 
 .messageContent tr:nth-child(even) td {
-  background: var(--bg-input);
+  background: var(--n-input-bg);
 }
 
 .messageContent a {
-  color: var(--accent);
+  color: var(--n-accent);
   text-decoration: underline;
   text-underline-offset: 2px;
+  transition: color var(--n-duration-fast) var(--n-ease-smooth);
 }
 
 .messageContent a:hover {
-  color: var(--accent-hover);
+  color: var(--n-accent-hover);
 }
 
 .messageContent hr {
   border: none;
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--n-border);
   margin: 12px 0;
 }
 
@@ -1292,45 +1485,55 @@
   margin-top: 2px;
 }
 
-/* Edit button */
+/* Edit button pops up below bubble */
 .editBtn {
   position: absolute;
   bottom: -30px;
   right: 0;
-  background: var(--bg-surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-pill);
+  background: var(--n-surface);
+  border: 1px solid var(--n-border);
+  border-radius: var(--n-radius-pill);
   font-size: 12px;
   padding: 4px 10px;
   cursor: pointer;
-  color: var(--accent);
+  color: var(--n-accent);
   font-weight: 600;
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--n-shadow-sm);
   white-space: nowrap;
-  animation: menuPop 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
   z-index: 10;
-  transition: background 0.15s;
+  animation: menuPop var(--n-duration-base) var(--n-ease-spring) both;
+  transition:
+    background var(--n-duration-fast) var(--n-ease-smooth),
+    transform var(--n-duration-fast) var(--n-ease-spring);
 }
 
 .editBtn:hover {
-  background: var(--sidebar-active);
+  background: var(--n-sidebar-active);
+  transform: scale(1.06);
+  /* subtle enlarge */
 }
 
-/* ── Thinking bubble ──────────────────────────────────────────── */
+.editBtn:active {
+  transform: scale(0.95);
+  transition-duration: var(--n-duration-fast);
+}
+
+/* Thinking indicator */
 .thinkingBubble {
   display: flex;
   align-items: center;
   gap: 10px;
-  background: var(--bubble-ai-bg);
+  background: var(--n-bubble-ai-bg);
   padding: 12px 18px;
   border-radius: 16px;
   border-bottom-left-radius: 4px;
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--n-shadow-sm);
+  animation: msgFadeUp var(--n-duration-base) var(--n-ease-out) both;
 }
 
 .thinkingLabel {
   font-size: 13px;
-  color: var(--text-muted);
+  color: var(--n-text-muted);
   font-style: italic;
 }
 
@@ -1344,8 +1547,8 @@
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: var(--accent);
-  animation: dotBounce 1.2s ease-in-out infinite;
+  background: var(--n-accent);
+  animation: dotBounce 1.2s cubic-bezier(0.45, 0, 0.55, 1) infinite;
   display: block;
 }
 
@@ -1357,26 +1560,11 @@
   animation-delay: 0.36s;
 }
 
-@keyframes dotBounce {
-
-  0%,
-  80%,
-  100% {
-    transform: translateY(0) scale(1);
-    opacity: 0.5;
-  }
-
-  40% {
-    transform: translateY(-7px) scale(1.1);
-    opacity: 1;
-  }
-}
-
-/* ── Input bar — flex-shrink:0 keeps it pinned at bottom ─────── */
+/* Input bar */
 .inputBar {
   padding: 16px 28px 20px;
-  background: var(--bg-surface);
-  border-top: 1px solid var(--border);
+  background: var(--n-surface);
+  border-top: 1px solid var(--n-border);
   flex-shrink: 0;
 }
 
@@ -1384,24 +1572,25 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: var(--accent-glow);
-  border-radius: var(--radius-sm);
+  background: var(--n-accent-glow);
+  border-radius: var(--n-radius-sm);
   padding: 6px 12px;
   font-size: 12px;
-  color: var(--accent);
+  color: var(--n-accent);
   font-weight: 600;
   margin-bottom: 10px;
+  animation: itemEnter var(--n-duration-base) var(--n-ease-spring) both;
 }
 
 .editBanner button {
   background: none;
   border: none;
-  color: var(--accent);
+  color: var(--n-accent);
   cursor: pointer;
   font-size: 12px;
   font-weight: 700;
   padding: 0;
-  transition: opacity 0.15s;
+  transition: opacity var(--n-duration-fast) var(--n-ease-smooth);
 }
 
 .editBanner button:hover {
@@ -1412,18 +1601,20 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  background: var(--bg-input);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-pill);
+  background: var(--n-input-bg);
+  border: 1px solid var(--n-border);
+  border-radius: var(--n-radius-pill);
   padding: 6px 6px 6px 18px;
+  /* Focus glow uses box-shadow — GPU composited, no layout */
   transition:
-    border-color 0.2s,
-    box-shadow 0.2s;
+    border-color var(--n-duration-base) var(--n-ease-smooth),
+    box-shadow var(--n-duration-base) var(--n-ease-smooth);
 }
 
 .inputForm:focus-within {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-glow);
+  border-color: var(--n-accent);
+  box-shadow: 0 0 0 3px var(--n-accent-glow);
+  /* ring expands in — satisfying focus signal */
 }
 
 .queryInput {
@@ -1433,12 +1624,12 @@
   outline: none;
   font-family: var(--font-body);
   font-size: 14px;
-  color: var(--text);
+  color: var(--n-text);
   min-width: 0;
 }
 
 .queryInput::placeholder {
-  color: var(--text-faint);
+  color: var(--n-text-faint);
 }
 
 .sendBtn {
@@ -1446,42 +1637,74 @@
   height: 40px;
   border-radius: 50%;
   border: none;
-  background: var(--border);
-  color: var(--text-faint);
+  background: var(--n-border);
+  color: var(--n-text-faint);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: not-allowed;
   flex-shrink: 0;
   transition:
-    background 0.2s,
-    color 0.2s,
-    transform 0.15s,
-    box-shadow 0.2s;
+    background var(--n-duration-base) var(--n-ease-smooth),
+    color var(--n-duration-base) var(--n-ease-smooth),
+    transform var(--n-duration-base) var(--n-ease-spring),
+    box-shadow var(--n-duration-base) var(--n-ease-smooth);
 }
 
 .sendBtnActive {
-  background: var(--accent);
+  background: var(--n-accent);
   color: #fff;
   cursor: pointer;
-  box-shadow: 0 2px 12px var(--accent-glow);
+  box-shadow: 0 2px 12px var(--n-accent-glow);
 }
 
 .sendBtnActive:hover {
-  background: var(--accent-hover);
-  transform: scale(1.07);
+  background: var(--n-accent-hover);
+  transform: scale(1.1);
+  /* send button bounces on hover = ready signal */
 }
 
 .sendBtnActive:active {
-  transform: scale(0.96);
+  transform: scale(0.92) rotate(-10deg);
+  /* press + slight rotation = "launched" */
+  transition-duration: var(--n-duration-fast);
 }
 
+.mobileTopbar {
+  display: none;
+}
 /* ══════════════════════════════════════════════════════════════════
    RESPONSIVE
 ══════════════════════════════════════════════════════════════════ */
 @media (max-width: 768px) {
+  .mobileTopbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    background: var(--n-surface);
+    border-bottom: 1px solid var(--n-border);
+    width: 100%;
+    box-sizing: border-box;
+    flex-shrink: 0;
+    position: sticky;
+    top: 0;
+    z-index: 60;
+  }
+
+  .mobileTopbarTitle {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--n-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: calc(100% - 52px);
+  }
+
   .uploadPage {
     padding: 48px 16px 40px;
+    padding-top: 24px;
     gap: 24px;
   }
 
@@ -1501,22 +1724,6 @@
     max-width: 100%;
   }
 
-  .sidebar {
-    position: fixed;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    z-index: 100;
-    box-shadow: var(--shadow-lg);
-  }
-
-  .sidebarClosed {
-    width: 0;
-    padding: 0;
-    border: none;
-  }
-
-  /* Hide right sidebar on small screens */
   .rightSidebar {
     display: none;
   }
@@ -1546,7 +1753,7 @@
   }
 }
 
-/* ── Scrollbar styling ───────────────────────────────────────────── */
+/* ── Scrollbar ─────────────────────────────────────────────────── */
 .messagesArea::-webkit-scrollbar,
 .sidebarList::-webkit-scrollbar {
   width: 4px;
@@ -1554,11 +1761,147 @@
 
 .messagesArea::-webkit-scrollbar-thumb,
 .sidebarList::-webkit-scrollbar-thumb {
-  background: var(--border);
+  background: var(--n-border);
   border-radius: 4px;
 }
 
 .messagesArea::-webkit-scrollbar-track,
 .sidebarList::-webkit-scrollbar-track {
   background: transparent;
+}
+
+.hamburgerBtn {
+  display: none;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   MOBILE SIDEBAR DRAWER
+══════════════════════════════════════════════════════════════════ */
+.overlay {
+  display: none;
+}
+
+.sidebarCloseBtn {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .chatHeaderInner {
+    justify-content: space-between;
+  }
+
+  .hamburgerBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border: 1px solid var(--n-border);
+    border-radius: var(--n-radius-sm);
+    background: var(--n-input-bg);
+    color: var(--n-text);
+    font-size: 18px;
+    cursor: pointer;
+    flex-shrink: 0;
+    margin-left: auto;
+    transition:
+      background var(--n-duration-fast) var(--n-ease-smooth),
+      color var(--n-duration-fast) var(--n-ease-smooth),
+      transform var(--n-duration-fast) var(--n-ease-spring);
+  }
+
+  .hamburgerBtn:active {
+    background: var(--n-accent-glow);
+    color: var(--n-accent);
+    transform: scale(0.92);
+    /* press feedback */
+  }
+
+  /* Backdrop */
+  .overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 299;
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+    animation: fadeInOverlay var(--n-duration-base) var(--n-ease-smooth) both;
+  }
+
+  /* Sidebar fixed right drawer */
+  .rightSidebar {
+    position: fixed !important;
+    top: 0;
+    right: 0;
+    height: 100% !important;
+    width: 85vw !important;
+    max-width: 320px !important;
+    z-index: 300;
+    box-shadow: -8px 0 32px rgba(0, 0, 0, 0.35);
+    transform: translateX(100%);
+    /* will-change: GPU layer ready before slide starts */
+    will-change: transform;
+    transition: transform var(--n-duration-slow) var(--n-ease-smooth) !important;
+    border-left: 1px solid var(--n-border);
+    overflow-y: auto;
+    display: flex !important;
+    flex-direction: column;
+  }
+
+  .rightSidebarOpen,
+  .rightSidebarClosed {
+    width: 85vw !important;
+  }
+
+  .mobileSidebarOpen {
+    transform: translateX(0) !important;
+  }
+
+  .rightSidebarToggleBtn {
+    display: none;
+  }
+
+  /* Close button inside drawer */
+  .sidebarCloseBtn {
+    display: flex;
+    position: absolute;
+    top: 16px;
+    right: 14px;
+    width: 28px;
+    height: 28px;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--n-border);
+    border-radius: 6px;
+    background: var(--n-input-bg);
+    color: var(--n-text-muted);
+    font-size: 13px;
+    cursor: pointer;
+    z-index: 10;
+    transition:
+      background var(--n-duration-fast) var(--n-ease-smooth),
+      color var(--n-duration-fast) var(--n-ease-smooth),
+      transform var(--n-duration-base) var(--n-ease-spring);
+  }
+
+  .sidebarCloseBtn:hover {
+    background: var(--n-toast-err-bg);
+    color: var(--n-toast-err-fg);
+    transform: rotate(90deg) scale(1.1);
+    /* × rotates closed = clear affordance */
+  }
+
+  .rightSidebarContent {
+    padding-top: 52px;
+  }
+}
+
+/* Safe area (iPhone notch / home bar) */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  @media (max-width: 768px) {
+    .rightSidebar {
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+  }
 }

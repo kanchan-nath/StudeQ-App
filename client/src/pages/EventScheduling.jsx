@@ -554,48 +554,12 @@ const EventScheduling = () => {
                 async
             />
 
-            <div className={styles.shell}>
-                {/* ── Sidebar ── */}
-                <aside className={styles.sidebar}>
-                    <div className={styles.sidebarLogo}>
-                        <div className={styles.logoMark}>
-                            <div className={styles.logoIcon}>S</div>
-                            <div className={styles.logoText}>
-                                <span className={styles.logoTitle}>Scholaris</span>
-                                <span className={styles.logoSub}>Academic Suite</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <nav className={styles.sidebarNav}>
-                        {NAV_ITEMS.map(item => (
-                            <button
-                                key={item.path}
-                                className={`${styles.navItem} ${activeNav === item.path || (item.path === "/dashboard" && activeNav === "/event-scheduling") ? styles.active : ""}`}
-                                onClick={() => { setActiveNav(item.path); navigate(item.path) }}
-                            >
-                                <span className={styles.navIcon}>
-                                    <i className={`ti ${item.icon}`} aria-hidden="true" />
-                                </span>
-                                {item.label}
-                            </button>
-                        ))}
-                    </nav>
-
-                    {/* User card — TODO: replace with /api/auth/me data */}
-                    <div className={styles.sidebarUser}>
-                        <div className={styles.userAvatar}>ST</div>
-                        <div className={styles.userInfo}>
-                            <span className={styles.userName}>Student</span>
-                            <span className={styles.userRole}>CS Major</span>
-                        </div>
-                    </div>
-                </aside>
+            <div className={styles.shell}>               
 
                 {/* ── Main ── */}
                 <main className={styles.main}>
                     <div className={styles.pageHeader}>
-                        <h1 className={styles.pageTitle}>Dashboard</h1>
+                        <h1 className={styles.pageTitle}>Schedule Your Events</h1>
                         <p className={styles.pageSubtitle}>
                             {now.toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}
                         </p>

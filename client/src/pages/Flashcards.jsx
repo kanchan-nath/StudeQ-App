@@ -1,4 +1,5 @@
 import React, { useRef, useState, useEffect, useCallback } from "react";
+import { useNavigate, useLocation, useParams } from "react-router-dom";
 import BASE_URL from "../lib/api.js";
 import { v4 as uuidv4 } from "uuid";
 import styles from "./styles/Flashcards.module.css";
@@ -448,7 +449,7 @@ const IconNote = () => (
 );
 
 const VIEW = {
-  HOME: "home", 
+  HOME: "home",
   VIEWER: "viewer",
   CREATE_STEP1: "create_step1",
   CREATE_STEP2_TOPIC: "create_step2_topic",
@@ -456,44 +457,91 @@ const VIEW = {
   CREATE_STEP2_PDF: "create_step2_pdf",
 };
 
+// ─── Path ↔ View maps ─────────────────────────────────────────────────────────
+const PATH_MAP = {
+  [VIEW.HOME]: "/flashcards",
+  [VIEW.VIEWER]: "/flashcards/viewer",
+  [VIEW.CREATE_STEP1]: "/flashcards/create",
+  [VIEW.CREATE_STEP2_TOPIC]: "/flashcards/create/topic",
+  [VIEW.CREATE_STEP2_SCRATCH]: "/flashcards/create/scratch",
+  [VIEW.CREATE_STEP2_PDF]: "/flashcards/create/pdf",
+};
+
+const PATH_TO_VIEW = Object.fromEntries(
+  Object.entries(PATH_MAP).map(([v, p]) => [p, v]),
+);
+
 // ─── RIGHT Sidebar ────────────────────────────────────────────────────────────
-const RightSidebar = ({ activeView, onNavigate, allFlashcards, onSelectSet, onDeleteSet }) => {
+// ADD mobileSidebarOpen + setMobileSidebarOpen props
+const RightSidebar = ({
+  activeView,
+  onNavigate,
+  allFlashcards,
+  onSelectSet,
+  onDeleteSet,
+  selectedSet,
+  mobileSidebarOpen,
+  setMobileSidebarOpen,
+}) => {
   const [openMenuId, setOpenMenuId] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
-
 
   useEffect(() => {
     const close = () => setOpenMenuId(null);
     document.addEventListener("click", close);
     return () => document.removeEventListener("click", close);
   }, []);
+
   return (
-    <aside className={`${styles.historySidebar} ${sidebarOpen ? styles.sidebarOpen : styles.sidebarClosed}`}>
-      <button
-        className={styles.sidebarToggleBtn}
-        onClick={() => setSidebarOpen((o) => !o)}
+    <>
+      {/* BACKDROP — mobile only, hidden via CSS on desktop */}
+      {mobileSidebarOpen && (
+        <div
+          className={styles.drawerOverlay}
+          onClick={() => setMobileSidebarOpen(false)}
+        />
+      )}
+
+      <aside
+        className={`${styles.historySidebar} ${sidebarOpen ? styles.sidebarOpen : styles.sidebarClosed} ${mobileSidebarOpen ? styles.mobileSidebarOpen : ""}`}
       >
-        {sidebarOpen ? "→" : "←"}
-      </button>
+        {/* Mobile close btn — hidden on desktop via CSS */}
+        <button
+          className={styles.drawerCloseBtn}
+          onClick={() => setMobileSidebarOpen(false)}
+          aria-label="Close sidebar"
+        >
+          ✕
+        </button>
 
-      {sidebarOpen && (
-        <div className={styles.sidebarContent}>
+        <button
+          className={styles.sidebarToggleBtn}
+          onClick={() => setSidebarOpen((o) => !o)}
+        >
+          {sidebarOpen ? "→" : "←"}
+        </button>
 
-          <h3 className={styles.sidebarTitle}>🕓 Recent Flashcards</h3>
+        {sidebarOpen && (
+          <div className={styles.sidebarContent}>
+            <h3 className={styles.sidebarTitle}>🕓 Recent Flashcards</h3>
 
-          {allFlashcards.length === 0 ? (
-            <p className={styles.sidebarEmpty}>No flashcards yet.</p>
-          ) : (
+            {allFlashcards.length === 0 ? (
+              <p className={styles.sidebarEmpty}>No flashcards yet.</p>
+            ) : (
               allFlashcards.map((set) => (
                 <div
                   key={set._id}
-                  className={styles.sidebarItem}
-                  onClick={() => { setOpenMenuId(null); onSelectSet(set); }}
+                  className={`${styles.sidebarItem} ${selectedSet?._id === set._id ? styles.sidebarItemActive : ""}`}
+                  onClick={() => {
+                    setOpenMenuId(null);
+                    onSelectSet(set);
+                    setMobileSidebarOpen(false);
+                  }}
                 >
                   <div className={styles.sidebarItemRow}>
                     <div className={styles.sidebarItemText}>
                       <div className={styles.sidebarItemTitle}>
-                        {set.topic || "Untitled"}
+                        {set.topic || "Untitled Flashcard"}
                       </div>
                       <div className={styles.sidebarItemMeta}>
                         {set.flashcards?.length || 0} cards
@@ -506,7 +554,9 @@ const RightSidebar = ({ activeView, onNavigate, allFlashcards, onSelectSet, onDe
                         className={styles.threeDotBtn}
                         onClick={(e) => {
                           e.stopPropagation();
-                          setOpenMenuId(openMenuId === set._id ? null : set._id);
+                          setOpenMenuId(
+                            openMenuId === set._id ? null : set._id,
+                          );
                         }}
                       >
                         ···
@@ -529,15 +579,16 @@ const RightSidebar = ({ activeView, onNavigate, allFlashcards, onSelectSet, onDe
                   </div>
                 </div>
               ))
-          )}
-        </div>
-      )}
-    </aside>
+            )}
+          </div>
+        )}
+      </aside>
+    </>
   );
 };
 
 // ─── Flashcard Viewer ─────────────────────────────────────────────────────────
-const FlashcardViewer = ({ allFlashcards, onNavigate }) => {
+const FlashcardViewer = ({ allFlashcards, onNavigate, onOpenSidebar }) => {
   const cards = allFlashcards.flatMap((set) => set.flashcards || []);
 
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -593,7 +644,6 @@ const FlashcardViewer = ({ allFlashcards, onNavigate }) => {
     <div className={styles.viewerLayout}>
       {/* Headbar */}
       <div className={styles.headbar}>
-
         <div className={styles.progressDots}>
           {cards.slice(0, Math.min(cards.length, 12)).map((_, i) => (
             <button
@@ -633,7 +683,6 @@ const FlashcardViewer = ({ allFlashcards, onNavigate }) => {
           <span className={styles.cardSideLabel}>
             {isFlipped ? "Definition" : "Term"}
           </span>
-
         </div>
 
         <div
@@ -1067,7 +1116,8 @@ const FlashcardHome = ({ onNavigate }) => (
       Build Flashcards from <span className={styles.accent}>Any Material</span>
     </h1>
     <p className={styles.flashHomeSub}>
-      Upload a PDF, enter a topic, or build manually — AI generates your study set in seconds.
+      Upload a PDF, enter a topic, or build manually — AI generates your study
+      set in seconds.
     </p>
     <button
       className={styles.flashHomeCard}
@@ -1078,7 +1128,9 @@ const FlashcardHome = ({ onNavigate }) => (
       </div>
       <div>
         <p className={styles.flashHomeCardTitle}>Create Your Flashcards</p>
-        <p className={styles.flashHomeCardSub}>Upload PDF, enter a topic, or build from scratch</p>
+        <p className={styles.flashHomeCardSub}>
+          Upload PDF, enter a topic, or build from scratch
+        </p>
       </div>
     </button>
   </div>
@@ -1086,6 +1138,10 @@ const FlashcardHome = ({ onNavigate }) => (
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 const Flashcards = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const [pdfFilePath, setPdfFilePath] = useState("");
   const [moreFlashId, setMoreFlashId] = useState("");
   const [input, setInput] = useState({ topic: "", subject: "" });
@@ -1093,11 +1149,18 @@ const Flashcards = () => {
   const [loading, setLoading] = useState(false);
   const [inputResult, setInputResult] = useState({});
   const [allFlashcards, setAllFlashcards] = useState([]);
-  const [currentView, setCurrentView] = useState(VIEW.HOME);
   const [selectedSet, setSelectedSet] = useState(null);
-
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const inputRef = useRef(null);
   const token = localStorage.getItem("token");
+
+  // Derive currentView from URL — reload always restores correct view
+  const currentView = location.pathname.startsWith("/flashcards/viewer")
+    ? VIEW.VIEWER
+    : (PATH_TO_VIEW[location.pathname] ?? VIEW.HOME);
+
+  const navigateTo = (view) => navigate(PATH_MAP[view] ?? "/flashcards");
+  const exitToViewer = () => navigate("/flashcards");
 
   const handleSubmit = async ({ topic, subject }) => {
     setLoading(true);
@@ -1141,7 +1204,7 @@ const Flashcards = () => {
         setInput({ topic: "", subject: "" });
         fetchFlashcards();
         setSelectedSet(null);
-        setCurrentView(VIEW.VIEWER);
+        navigate("/flashcards/viewer/" + data.data._id);
       } catch (error) {
         console.error(error);
       } finally {
@@ -1182,7 +1245,7 @@ const Flashcards = () => {
       setInputResult(data.data);
       fetchFlashcards();
       setSelectedSet(null);
-      setCurrentView(VIEW.VIEWER);
+      navigate("/flashcards/viewer/" + data.data._id);
     } catch (error) {
       console.error(error);
     }
@@ -1191,9 +1254,12 @@ const Flashcards = () => {
   useEffect(() => {
     fetchFlashcards();
   }, []);
-
-
-
+  useEffect(() => {
+    if (id && allFlashcards.length > 0 && !selectedSet) {
+      const found = allFlashcards.find((s) => s._id === id);
+      if (found) setSelectedSet(found);
+    }
+  }, [id, allFlashcards]);
   const handleDeleteSet = async (id) => {
     try {
       const res = await fetch(`${BASE_URL}/api/quiz/flashcards/${id}`, {
@@ -1207,29 +1273,34 @@ const Flashcards = () => {
       setAllFlashcards((prev) => prev.filter((s) => s._id !== id));
       if (selectedSet?._id === id) {
         setSelectedSet(null);
-        setCurrentView(VIEW.HOME);
+        navigate("/flashcards");
       }
     } catch (err) {
       console.error(err);
     }
   };
 
-  const navigateTo = (view) => setCurrentView(view);
-  const exitToViewer = () => setCurrentView(VIEW.HOME);
-
   return (
     <div className={styles.appShell}>
-      {/* Main scrollable content */}
+      {/* MOBILE HAMBURGER — floating, hidden on desktop via CSS */}
+      <button
+        className={styles.hamburgerBtn}
+        onClick={() => setMobileSidebarOpen(true)}
+        aria-label="Open history"
+      >
+        ☰
+      </button>
       <main className={styles.mainContent}>
         {currentView === VIEW.VIEWER && (
           <FlashcardViewer
-            allFlashcards={selectedSet ? [selectedSet] : allFlashcards}
+            allFlashcards={
+              id ? allFlashcards.filter((s) => s._id === id) : allFlashcards
+            }
             onNavigate={navigateTo}
+            onOpenSidebar={() => setMobileSidebarOpen(true)}
           />
         )}
-        {currentView === VIEW.HOME && (
-          <FlashcardHome onNavigate={navigateTo} />
-        )}
+        {currentView === VIEW.HOME && <FlashcardHome onNavigate={navigateTo} />}
         {currentView === VIEW.CREATE_STEP1 && (
           <CreateStep1
             onSelect={navigateTo}
@@ -1261,16 +1332,18 @@ const Flashcards = () => {
         )}
       </main>
 
-      {/* Single right sidebar — static, inner scrollable */}
       <RightSidebar
         activeView={currentView}
         onNavigate={navigateTo}
         allFlashcards={allFlashcards}
+        selectedSet={selectedSet}
         onSelectSet={(set) => {
           setSelectedSet(set);
-          navigateTo(VIEW.VIEWER);
+          navigate("/flashcards/viewer/" + set._id);
         }}
         onDeleteSet={handleDeleteSet}
+        mobileSidebarOpen={mobileSidebarOpen}
+        setMobileSidebarOpen={setMobileSidebarOpen}
       />
     </div>
   );

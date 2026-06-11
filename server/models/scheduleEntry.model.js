@@ -1,5 +1,5 @@
-import mongoose, { mongo, Schema } from "mongoose"
-import { userInfo } from "os"
+import mongoose, { Schema } from "mongoose"
+import { type, userInfo } from "os"
 
 const scheduleEntrySchema = new mongoose.Schema({
     userId: {
@@ -157,6 +157,12 @@ const timeTableSchema = mongoose.Schema({
     userId: {
         type: String,
         required: true
+    },
+    category:{
+        type:[String]
+    },
+    color:{
+        type:String
     },
     title: {
         type: String,

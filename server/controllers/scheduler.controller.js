@@ -537,7 +537,7 @@ const getAllTimeTables = asyncHandler(async (req, res) => {
             userId
         }
     )
-
+    
     return res
         .status(200)
         .json(new ApiResponse(200, data, "All time tables fetched"))
