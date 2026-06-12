@@ -5,7 +5,6 @@ import jwt from "jsonwebtoken"
 import { ApiError } from "./utils/Async.js"
 import { initSocket } from "./lib/socket.js"
 import { aiQueueEvents } from "./services/queueEvents.js"
-import { tryCatch } from "bullmq"
 import logger from "./logger/index.js"
 
 const isProd = process.env.NODE_ENV || "production"
