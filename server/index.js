@@ -6,9 +6,10 @@ import { ApiError } from "./utils/Async.js"
 import { initSocket } from "./lib/socket.js"
 import { aiQueueEvents } from "./services/queueEvents.js"
 import { tryCatch } from "bullmq"
+import logger from "./logger/index.js"
 
 const server = http.createServer(app)
-const userSocketMap = new Map()
+const userSocketMap = new Map() //Need to improve more using redis
 
 const io = initSocket(server)
 aiQueueEvents(userSocketMap, io)
@@ -35,17 +36,24 @@ io.use((socket, next)=>{
 })
 
 io.on("connection",(socket)=>{
-    console.log(`User is connected - ${socket.id}`);
-
     const {userId} = socket.data
+    logger.info(`User Id ${userId} is connected - ${socket.id}`);
     
-    userSocketMap.set(userId, socket.id)
-    console.log(userSocketMap);
+    if(!userSocketMap.has(userId)){
+        userSocketMap.set(userId, new Set())
+    }
+
+    userSocketMap.get(userId).add(socket.id)
     
     socket.on("join_room",async(data)=>{
-        await socket.join(data.roomId)
-        socket.data.roomId = data.roomId
-        socket.to(data.roomId).emit("join_room_notice", data)
+        try {
+            await socket.join(data.roomId)
+            socket.data.roomId = data.roomId
+            socket.to(data.roomId).emit("join_room_notice", { userId, roomId: data.roomId })
+        } catch (error) {
+            socket.emit("error", { message: "Failed to join room" })
+        }
+        
         
     })
 
