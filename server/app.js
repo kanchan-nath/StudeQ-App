@@ -18,20 +18,20 @@ import logger from "./logger/index.js"
 const app = express();
 
 app.set("trust proxy", 1)
+app.use(helmet())
+
+const allowOrigins = (process.env.CORS_ORIGINS || "").split(",").filter(Boolean)
+app.use(cors(
+    {
+        origin: allowOrigins.length ? allowOrigins : false,
+        credentials: true
+    }
+))
+
 app.use(express.json({ limit: "16kb" }))
 app.use(express.urlencoded({ extended: true, limit: "16kb" }))
 app.use(cookieParser());
-
-const allowOrigins = (process.env.CORS_ORIGINS || "").split(",").filter(Boolean)
-// app.use(cors(
-//     {
-//         origin:allowOrigins.length ? allowOrigins : false,
-//         credentials: true
-//     }
-// ))
-app.use(cors())
 app.use(limiter)
-app.use(helmet())
 
 
 import userRoute from "./routes/auth.route.js"
@@ -79,4 +79,5 @@ app.use((err, req, res, next)=>{
         }
     )
 })
+
 export { app }
