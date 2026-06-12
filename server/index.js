@@ -75,7 +75,12 @@ io.on("connection",(socket)=>{
         
     })
     socket.on("disconnect", () => {
-        userSocketMap.delete(userId)  // cleanup
+        const sockets = userSocketMap.get(userId)
+
+        if(sockets){
+            sockets.delete(socket.id)
+            if (sockets.size === 0) userSocketMap.delete(userId)
+        }
     })
     
 })
