@@ -4,9 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon index.js",
-    "dev-worker": "nodemon services/worker.js",
-    "start": "node index.js"
+    "dev": "NODE_ENV=development nodemon index.js",
+    "dev-worker": "NODE_ENV=development nodemon services/worker.js",
+    "start": "NODE_ENV=production node index.js"
   },
   "keywords": [],
   "author": "KANCHAN NATH",

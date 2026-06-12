@@ -1,4 +1,7 @@
-import "dotenv/config";
+import dotenv from "dotenv";
+dotenv.config({
+    path: `.env.${process.env.NODE_ENV || "development"}`
+});
 import express from "express"
 import prisma from "./lib/prisma.js"
 import cookieParser from "cookie-parser";
