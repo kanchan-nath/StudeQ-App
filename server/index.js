@@ -8,6 +8,8 @@ import { aiQueueEvents } from "./services/queueEvents.js"
 import { tryCatch } from "bullmq"
 import logger from "./logger/index.js"
 
+const isProd = process.env.NODE_ENV || "production"
+
 const server = http.createServer(app)
 const userSocketMap = new Map() //Need to improve more using redis
 
@@ -37,7 +39,10 @@ io.use((socket, next)=>{
 
 io.on("connection",(socket)=>{
     const {userId} = socket.data
-    logger.info(`User Id ${userId} is connected - ${socket.id}`);
+
+    if(isProd !== "production"){
+        logger.info(`User Id ${userId} is connected - ${socket.id}`);
+    }
     
     if(!userSocketMap.has(userId)){
         userSocketMap.set(userId, new Set())
@@ -47,20 +52,27 @@ io.on("connection",(socket)=>{
     
     socket.on("join_room",async(data)=>{
         try {
+            //Membership deltetion 
             await socket.join(data.roomId)
             socket.data.roomId = data.roomId
             socket.to(data.roomId).emit("join_room_notice", { userId, roomId: data.roomId })
         } catch (error) {
             socket.emit("error", { message: "Failed to join room" })
-        }
-        
-        
+        }  
     })
 
     socket.on("send_message",(data)=>{
-        console.log(data.roomId);
+        if(!socket.rooms.has(data.roomId)){
+            socket.emit("error", { message: "Not in this room" })
+            return
+        }
         
         io.to(data.roomId).emit("send_message", data)
+
+        if (isProd !== "production") {
+            logger.info(`Room Id: ${data.roomId}`);
+        }
+        
     })
     socket.on("disconnect", () => {
         userSocketMap.delete(userId)  // cleanup
