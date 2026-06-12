@@ -5,6 +5,7 @@ import jwt from "jsonwebtoken"
 import { ApiError } from "./utils/Async.js"
 import { initSocket } from "./lib/socket.js"
 import { aiQueueEvents } from "./services/queueEvents.js"
+import { tryCatch } from "bullmq"
 
 const server = http.createServer(app)
 const userSocketMap = new Map()
@@ -13,24 +14,31 @@ const io = initSocket(server)
 aiQueueEvents(userSocketMap, io)
 
 io.use((socket, next)=>{
-    const token = socket.handshake.auth.token
+    try {
+        const token = socket.handshake.auth?.token
 
-    if(!token){
-        throw new ApiError(404, "Unathorize access")
+        if(!token){
+            return next(new Error("Unauthorized: no token"))
+        }
+
+        const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET)
+
+        if(!decodedToken?.userId){
+            return next(new Error("Unauthorized: invalid token payload"))
+        }
+
+        socket.data.userId = decodedToken.userId
+        next()
+    } catch (error) {
+        next(new Error(`Unauthorized: ${err.message}`))
     }
-    next()
 })
 
 io.on("connection",(socket)=>{
     console.log(`User is connected - ${socket.id}`);
 
-    const token = socket.handshake.auth.token
-
-    const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET)
-
-    const {userId} = decodedToken
+    const {userId} = socket.data
     
-
     userSocketMap.set(userId, socket.id)
     console.log(userSocketMap);
     
