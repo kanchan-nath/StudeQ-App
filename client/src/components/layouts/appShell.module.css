@@ -1,17 +1,222 @@
-/* appShell.module.css — App shell layout (scoped) */
+/* appShell.module.css — App shell layout (scoped)
+   Motion system added. Duration scale via CSS vars.
+   All anim: transform/opacity only (GPU). will-change surgical.
+   prefers-reduced-motion block at bottom kills everything.
+*/
+
+/* ── DURATION SCALE ─────────────────────────────────────────── */
+:root {
+  --duration-fast: 150ms;
+  --duration-base: 250ms;
+  --duration-slow: 400ms;
+  --duration-slower: 600ms;
+
+  /* Named easings — no plain ease/linear anywhere */
+  --ease-out: cubic-bezier(0.0, 0.0, 0.2, 1);
+  --ease-in: cubic-bezier(0.4, 0.0, 1.0, 1);
+  --ease-inout: cubic-bezier(0.4, 0.0, 0.2, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  /* slight overshoot for tactile feel */
+  --ease-decel: cubic-bezier(0.0, 0.0, 0.2, 1);
+}
+
+/* ── KEYFRAMES ──────────────────────────────────────────────── */
+
+/* Shell entrance — entire grid fades up once from nothing */
+@keyframes shellEnter {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Sidebar slides in from left on mount */
+@keyframes sidebarEnter {
+  from {
+    opacity: 0;
+    transform: translateX(-16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Topbar drops in from top */
+@keyframes topbarEnter {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Page content fade-up (Outlet children) */
+@keyframes contentFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Right panel slides from right */
+@keyframes panelSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Nav link stagger — each link fades+slides left */
+@keyframes linkEnter {
+  from {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Section label fade-in */
+@keyframes labelEnter {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+/* Active indicator bar grows down from top */
+@keyframes indicatorGrow {
+  from {
+    transform: scaleY(0);
+    opacity: 0;
+  }
+
+  to {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+}
+
+/* Panel widgets stagger up */
+@keyframes widgetEnter {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Button press ripple scale */
+@keyframes pressRipple {
+  0% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+
+  100% {
+    transform: scale(2.4);
+    opacity: 0;
+  }
+}
+
+/* Focus ring pulse — draws attention on keyboard nav */
+@keyframes focusPulse {
+
+  0%,
+  100% {
+    box-shadow: 0 0 0 2px var(--theme-accent);
+  }
+
+  50% {
+    box-shadow: 0 0 0 4px var(--theme-accent);
+  }
+}
+
+/* Logo shimmer on mount */
+@keyframes logoShimmer {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Avatar spin-in on mount */
+@keyframes avatarIn {
+  from {
+    opacity: 0;
+    transform: scale(0.6) rotate(-20deg);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+/* Upgrade btn bounce in */
+@keyframes upgradeBounce {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
 
 /* ── APP SHELL GRID ─────────────────────────────────────────── */
 .app-shell {
   display: grid;
   grid-template-columns: var(--sidebar-w) 1fr 0px;
-  /* MOTION — grid column resize when right panel opens */
-  transition: grid-template-columns 500ms cubic-bezier(0.4, 0, 0.2, 1);
+  /* Grid column resize when right panel opens — transform not viable here,
+     layout change is necessary. Keep slow easing for smoothness. */
+  transition: grid-template-columns var(--duration-slow) var(--ease-inout);
   grid-template-rows: var(--topbar-h) 1fr;
   grid-template-areas:
     "sidebar topbar    topbar"
     "sidebar main      rightpanel";
   height: 100vh;
   overflow: hidden;
+  /* Shell entrance: entire layout fades up once */
+  animation: shellEnter var(--duration-slow) var(--ease-out) both;
 }
 
 .app-shell--panel-open {
@@ -36,8 +241,10 @@
   top: 0;
   z-index: 40;
   transition:
-    background var(--t-slow),
-    border-color var(--t-slow);
+    background var(--duration-slow) var(--ease-inout),
+    border-color var(--duration-slow) var(--ease-inout);
+  /* Topbar drops in after shell enter (80ms delay for cascade) */
+  animation: topbarEnter var(--duration-slow) var(--ease-decel) 80ms both;
 }
 
 .topbar__left {
@@ -47,7 +254,8 @@
   gap: var(--sp-3);
 }
 
-/* RESPONSIVE — hamburger trigger, hidden on desktop */
+/* ── HAMBURGER ──────────────────────────────────────────────── */
+/* RESPONSIVE — hidden on desktop */
 .topbar__hamburger {
   display: none;
   align-items: center;
@@ -59,11 +267,12 @@
   color: var(--theme-text-secondary);
   border: 1px solid transparent;
   flex-shrink: 0;
-  /* MOTION — icon swap feels instant; border fade is the signal */
+  /* Icon swap is instant visually; border/bg fade signals state */
   transition:
-    background var(--t-fast),
-    color var(--t-fast),
-    border-color var(--t-fast);
+    background var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out),
+    border-color var(--duration-fast) var(--ease-out),
+    transform var(--duration-fast) var(--ease-spring);
 }
 
 .topbar__hamburger:hover {
@@ -72,12 +281,18 @@
   color: var(--theme-text);
 }
 
-/* MOTION — focus rings on all interactive elements */
-.topbar__hamburger:focus-visible {
-  outline: 2px solid var(--theme-accent);
-  outline-offset: 2px;
+/* Spring scale on press — confirms tap */
+.topbar__hamburger:active {
+  transform: scale(0.88);
 }
 
+.topbar__hamburger:focus-visible {
+  outline: none;
+  /* Pulse ring for keyboard nav — more visible than static outline */
+  animation: focusPulse var(--duration-slow) var(--ease-inout) infinite;
+}
+
+/* ── ICON BUTTONS (generic) ─────────────────────────────────── */
 .topbar__icon-btn {
   display: flex;
   align-items: center;
@@ -88,8 +303,9 @@
   background: transparent;
   color: var(--theme-text-secondary);
   transition:
-    background var(--t-fast),
-    color var(--t-fast);
+    background var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out),
+    transform var(--duration-fast) var(--ease-spring);
 }
 
 .topbar__icon-btn:hover {
@@ -97,12 +313,16 @@
   color: var(--theme-text);
 }
 
+.topbar__icon-btn:active {
+  transform: scale(0.88);
+}
+
 .topbar__icon-btn:focus-visible {
   outline: 2px solid var(--theme-accent);
   outline-offset: 2px;
 }
 
-/* MOTION — theme toggle: was missing entirely from original CSS */
+/* ── THEME TOGGLE ───────────────────────────────────────────── */
 .topbar__theme-toggle {
   display: flex;
   align-items: center;
@@ -113,12 +333,12 @@
   background: transparent;
   color: var(--theme-text-secondary);
   border: 1px solid transparent;
+  /* Rotation encodes "switching" — earned metaphor for a toggle */
   transition:
-    background var(--t-fast),
-    color var(--t-fast),
-    border-color var(--t-fast),
-    /* MOTION — slight rotation signals "switching" state */
-    transform var(--t-fast);
+    background var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out),
+    border-color var(--duration-fast) var(--ease-out),
+    transform var(--duration-base) var(--ease-spring);
 }
 
 .topbar__theme-toggle:hover {
@@ -126,9 +346,9 @@
   border-color: var(--theme-border-hover);
   color: var(--theme-text);
   transform: rotate(14deg);
-  /* MOTION — earned: visually encodes "toggling" */
 }
 
+/* Extra rotation on press — satisfying spring snap */
 .topbar__theme-toggle:active {
   transform: rotate(30deg) scale(0.9);
 }
@@ -138,6 +358,7 @@
   outline-offset: 2px;
 }
 
+/* ── UPGRADE BUTTON ─────────────────────────────────────────── */
 .topbar__upgrade-btn {
   display: flex;
   align-items: center;
@@ -149,24 +370,28 @@
   font-size: 0.82rem;
   font-weight: 600;
   border-radius: var(--r-full);
-  /* MOTION — lift signals "primary CTA, tap me" */
+  /* Lift + shadow bloom = primary CTA affordance */
   transition:
-    background var(--t-fast),
-    transform var(--t-fast),
-    box-shadow var(--t-fast);
+    background var(--duration-fast) var(--ease-out),
+    transform var(--duration-fast) var(--ease-spring),
+    box-shadow var(--duration-fast) var(--ease-out);
   box-shadow: 0 2px 8px rgba(34, 197, 94, 0.3);
+  /* Bounce in after topbar settles */
+  animation: upgradeBounce var(--duration-slow) var(--ease-spring) 200ms both;
+  will-change: transform;
+  /* frequent hover target — worth it */
 }
 
 .topbar__upgrade-btn:hover {
   background: var(--clr-accent-dark);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 14px rgba(34, 197, 94, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(34, 197, 94, 0.45);
 }
 
-/* MOTION — press confirms the tap */
 .topbar__upgrade-btn:active {
-  transform: translateY(0) scale(0.97);
+  transform: translateY(0) scale(0.96);
   box-shadow: 0 2px 6px rgba(34, 197, 94, 0.25);
+  transition-duration: var(--duration-fast);
 }
 
 .topbar__upgrade-btn:focus-visible {
@@ -174,6 +399,7 @@
   outline-offset: 3px;
 }
 
+/* ── AVATAR ─────────────────────────────────────────────────── */
 .topbar__avatar {
   width: 34px;
   height: 34px;
@@ -188,18 +414,26 @@
   color: #fff;
   cursor: pointer;
   flex-shrink: 0;
-  /* MOTION — ring expand on hover signals "clickable identity" */
+  /* Ring expand on hover = clickable identity */
   transition:
-    box-shadow var(--t-fast),
-    transform var(--t-fast);
+    box-shadow var(--duration-fast) var(--ease-out),
+    transform var(--duration-fast) var(--ease-spring);
   box-shadow: 0 2px 8px rgba(124, 111, 224, 0.25);
+  /* Spin-in after topbar — playful but brief */
+  animation: avatarIn var(--duration-slow) var(--ease-spring) 160ms both;
+  will-change: transform;
 }
 
 .topbar__avatar:hover {
   box-shadow:
     0 0 0 3px var(--theme-purple-dim),
     0 2px 12px rgba(124, 111, 224, 0.3);
-  transform: scale(1.05);
+  transform: scale(1.08);
+}
+
+.topbar__avatar:active {
+  transform: scale(0.94);
+  transition-duration: var(--duration-fast);
 }
 
 .topbar__avatar:focus-visible {
@@ -219,11 +453,13 @@
   z-index: 50;
   position: relative;
   transition:
-    background var(--t-slow),
-    border-color var(--t-slow);
+    background var(--duration-slow) var(--ease-inout),
+    border-color var(--duration-slow) var(--ease-inout);
+  /* Sidebar slides in from left — counterpart to topbar's top entrance */
+  animation: sidebarEnter var(--duration-slow) var(--ease-decel) 40ms both;
 }
 
-/* glowing right edge line */
+/* Glowing right edge line — unchanged */
 .sidebar::after {
   content: "";
   position: absolute;
@@ -239,6 +475,7 @@
   pointer-events: none;
 }
 
+/* ── SIDEBAR LOGO ───────────────────────────────────────────── */
 .sidebar__logo {
   display: flex;
   align-items: center;
@@ -246,6 +483,8 @@
   padding: var(--sp-5) var(--sp-5) var(--sp-4);
   border-bottom: 1px solid var(--theme-border);
   text-decoration: none;
+  /* Logo settles after sidebar — slight delay for cascade */
+  animation: logoShimmer var(--duration-slow) var(--ease-spring) 200ms both;
 }
 
 .sidebar__logo-text {
@@ -260,6 +499,7 @@
   color: var(--theme-accent);
 }
 
+/* ── SIDEBAR NAV ────────────────────────────────────────────── */
 .sidebar__nav {
   padding: var(--sp-4) var(--sp-3);
   flex: 1;
@@ -275,8 +515,87 @@
   text-transform: uppercase;
   color: var(--theme-text-muted);
   padding: var(--sp-4) var(--sp-3) var(--sp-2);
+  /* Labels fade in — subtle, doesn't compete with links */
+  animation: labelEnter var(--duration-slow) var(--ease-out) 300ms both;
 }
 
+/* ── NAV LINKS — staggered entrance ─────────────────────────── */
+/* 14 nav items max across 3 groups. Stagger 30ms each.
+   Base delay 320ms (after sidebar+logo settle).
+   Using :nth-child on .sidebar__nav children to hit links + labels. */
+.sidebar__nav>*:nth-child(1) {
+  animation: linkEnter var(--duration-base) var(--ease-decel) calc(320ms + 0 * 30ms) both;
+}
+
+.sidebar__nav>*:nth-child(2) {
+  animation: linkEnter var(--duration-base) var(--ease-decel) calc(320ms + 1 * 30ms) both;
+}
+
+.sidebar__nav>*:nth-child(3) {
+  animation: linkEnter var(--duration-base) var(--ease-decel) calc(320ms + 2 * 30ms) both;
+}
+
+.sidebar__nav>*:nth-child(4) {
+  animation: linkEnter var(--duration-base) var(--ease-decel) calc(320ms + 3 * 30ms) both;
+}
+
+.sidebar__nav>*:nth-child(5) {
+  animation: linkEnter var(--duration-base) var(--ease-decel) calc(320ms + 4 * 30ms) both;
+}
+
+.sidebar__nav>*:nth-child(6) {
+  animation: linkEnter var(--duration-base) var(--ease-decel) calc(320ms + 5 * 30ms) both;
+}
+
+.sidebar__nav>*:nth-child(7) {
+  animation: linkEnter var(--duration-base) var(--ease-decel) calc(320ms + 6 * 30ms) both;
+}
+
+.sidebar__nav>*:nth-child(8) {
+  animation: linkEnter var(--duration-base) var(--ease-decel) calc(320ms + 7 * 30ms) both;
+}
+
+.sidebar__nav>*:nth-child(9) {
+  animation: linkEnter var(--duration-base) var(--ease-decel) calc(320ms + 8 * 30ms) both;
+}
+
+.sidebar__nav>*:nth-child(10) {
+  animation: linkEnter var(--duration-base) var(--ease-decel) calc(320ms + 9 * 30ms) both;
+}
+
+.sidebar__nav>*:nth-child(11) {
+  animation: linkEnter var(--duration-base) var(--ease-decel) calc(320ms + 10 * 30ms) both;
+}
+
+.sidebar__nav>*:nth-child(12) {
+  animation: linkEnter var(--duration-base) var(--ease-decel) calc(320ms + 11 * 30ms) both;
+}
+
+.sidebar__nav>*:nth-child(13) {
+  animation: linkEnter var(--duration-base) var(--ease-decel) calc(320ms + 12 * 30ms) both;
+}
+
+.sidebar__nav>*:nth-child(14) {
+  animation: linkEnter var(--duration-base) var(--ease-decel) calc(320ms + 13 * 30ms) both;
+}
+
+.sidebar__nav>*:nth-child(15) {
+  animation: linkEnter var(--duration-base) var(--ease-decel) calc(320ms + 14 * 30ms) both;
+}
+
+.sidebar__nav>*:nth-child(16) {
+  animation: linkEnter var(--duration-base) var(--ease-decel) calc(320ms + 15 * 30ms) both;
+}
+
+.sidebar__nav>*:nth-child(17) {
+  animation: linkEnter var(--duration-base) var(--ease-decel) calc(320ms + 16 * 30ms) both;
+}
+
+.sidebar__nav>*:nth-child(18) {
+  animation: linkEnter var(--duration-base) var(--ease-decel) calc(320ms + 17 * 30ms) both;
+}
+
+/* ── SIDEBAR LINK ────────────────────────────────────────────── */
 .sidebar__link {
   display: flex;
   align-items: center;
@@ -286,12 +605,15 @@
   font-size: 0.88rem;
   font-weight: 500;
   color: var(--theme-text-secondary);
+  /* padding-left shift on hover: layout change, but small & intentional
+     for nav indent metaphor. Keep — it's the design. */
   transition:
-    background var(--t-fast),
-    color var(--t-fast),
-    padding-left var(--t-base),
-    box-shadow var(--t-fast),
-    border-color var(--t-fast);
+    background var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out),
+    padding-left var(--duration-base) var(--ease-inout),
+    box-shadow var(--duration-fast) var(--ease-out),
+    border-color var(--duration-fast) var(--ease-out),
+    opacity var(--duration-fast) var(--ease-out);
   position: relative;
   white-space: nowrap;
   overflow: hidden;
@@ -306,13 +628,19 @@
   padding-left: 18px;
 }
 
-/* MOTION — focus ring for keyboard nav */
+.sidebar__link:active {
+  opacity: 0.75;
+  transform: scale(0.98);
+  transition-duration: var(--duration-fast);
+}
+
 .sidebar__link:focus-visible {
   outline: 2px solid var(--theme-accent);
   outline-offset: -2px;
   border-radius: var(--r-md);
 }
 
+/* ── ACTIVE LINK ─────────────────────────────────────────────── */
 .active {
   background: var(--theme-purple-dim);
   border-color: var(--theme-border-hover);
@@ -323,6 +651,7 @@
     0 2px 8px var(--theme-purple-dim);
 }
 
+/* Active indicator bar — grows down on route change */
 .sidebar__link.active::before,
 .active::before {
   content: "";
@@ -334,28 +663,39 @@
   background: var(--theme-accent);
   border-radius: 0 var(--r-full) var(--r-full) 0;
   box-shadow: 0 0 8px var(--theme-accent-glow);
+  transform-origin: top center;
+  /* Bar grows down — implies "you are here" anchoring */
+  animation: indicatorGrow var(--duration-base) var(--ease-spring) both;
 }
 
+/* ── LINK ICON ───────────────────────────────────────────────── */
 .sidebar__link-icon {
   color: var(--theme-text-secondary);
   width: 18px;
   height: 18px;
   flex-shrink: 0;
   transition:
-    opacity var(--t-fast),
-    color var(--t-fast);
+    opacity var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out),
+    transform var(--duration-fast) var(--ease-spring);
 }
 
 .sidebar__link:hover .sidebar__link-icon {
   opacity: 1;
   color: var(--theme-text);
+  /* Slight nudge right — reinforces the indent animation */
+  transform: translateX(2px);
+}
+
+.sidebar__link:active .sidebar__link-icon {
+  transform: scale(0.9);
 }
 
 .sidebar__link.active .sidebar__link-icon {
   opacity: 1;
 }
 
-/* colored icon overrides */
+/* Colored icon overrides — unchanged */
 .sidebar__link[data-color="teal"] .sidebar__link-icon {
   color: var(--clr-teal);
 }
@@ -380,9 +720,12 @@
   color: var(--clr-primary);
 }
 
+/* ── SIDEBAR FOOTER ─────────────────────────────────────────── */
 .sidebar__footer {
   padding: var(--sp-4) var(--sp-3);
   border-top: 1px solid var(--theme-border);
+  /* Footer fades in last */
+  animation: labelEnter var(--duration-slow) var(--ease-out) 700ms both;
 }
 
 .sidebar__logout-btn {
@@ -397,9 +740,11 @@
   color: var(--theme-red);
   background: transparent;
   transition:
-    background var(--t-fast),
-    color var(--t-fast),
-    opacity var(--t-fast);
+    background var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out),
+    opacity var(--duration-fast) var(--ease-out),
+    transform var(--duration-fast) var(--ease-spring),
+    border-color var(--duration-fast) var(--ease-out);
   border: 1px solid transparent;
   opacity: 0.75;
 }
@@ -411,13 +756,17 @@
   opacity: 1;
 }
 
+.sidebar__logout-btn:active {
+  transform: scale(0.97);
+  opacity: 0.9;
+}
+
 .sidebar__logout-btn:focus-visible {
   outline: 2px solid var(--theme-red);
   outline-offset: 2px;
 }
 
 /* ── MOBILE SIDEBAR BACKDROP ────────────────────────────────── */
-/* RESPONSIVE — enabled in mobile breakpoint below */
 .sidebar-backdrop {
   display: none;
   position: fixed;
@@ -426,11 +775,10 @@
   backdrop-filter: blur(2px);
   -webkit-backdrop-filter: blur(2px);
   z-index: 55;
-  /* above main, below sidebar (60) */
   opacity: 0;
   pointer-events: none;
-  /* MOTION — fade in signals "focus shifted to drawer" */
-  transition: opacity 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  /* Backdrop fade — signals focus shift to drawer */
+  transition: opacity var(--duration-base) var(--ease-inout);
 }
 
 .sidebar-backdrop--visible {
@@ -438,33 +786,19 @@
   pointer-events: auto;
 }
 
-/* ── MAIN CONTENT SLOT ──────────────────────────────────────── */
+/* ── MAIN CONTENT ───────────────────────────────────────────── */
 .main-content {
   grid-area: main;
   overflow-y: auto;
   overflow-x: hidden;
   background: var(--theme-bg);
-  transition: background var(--t-slow);
-  /* MOTION — smooth anchor-link scrolling within pages */
+  transition: background var(--duration-slow) var(--ease-inout);
   scroll-behavior: smooth;
 }
 
-/* MOTION — page slot fade-in: new route content slides up gently */
-@keyframes contentFadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Targets the immediate page component dropped in by <Outlet /> */
+/* Route page entrance — each new Outlet child fades up */
 .main-content>* {
-  animation: contentFadeIn 260ms cubic-bezier(0.4, 0, 0.2, 1) both;
+  animation: contentFadeIn var(--duration-base) var(--ease-decel) both;
 }
 
 /* ── RIGHT PANEL ────────────────────────────────────────────── */
@@ -484,10 +818,10 @@
   transform: translateX(40px);
   pointer-events: none;
   transition:
-    opacity 500ms cubic-bezier(0.4, 0, 0.2, 1),
-    transform 500ms cubic-bezier(0.4, 0, 0.2, 1),
-    background var(--t-slow),
-    border-color var(--t-slow);
+    opacity var(--duration-slower) var(--ease-out),
+    transform var(--duration-slower) var(--ease-out),
+    background var(--duration-slow) var(--ease-inout),
+    border-color var(--duration-slow) var(--ease-inout);
 }
 
 .right-panel--open {
@@ -495,6 +829,28 @@
   transform: translateX(0);
   pointer-events: auto;
   width: var(--rightpanel-w);
+}
+
+/* Panel widgets stagger after panel opens.
+   Panel takes ~600ms to open; widgets start at 500ms. */
+.right-panel--open>*:nth-child(1) {
+  animation: widgetEnter var(--duration-base) var(--ease-decel) 500ms both;
+}
+
+.right-panel--open>*:nth-child(2) {
+  animation: widgetEnter var(--duration-base) var(--ease-decel) 560ms both;
+}
+
+.right-panel--open>*:nth-child(3) {
+  animation: widgetEnter var(--duration-base) var(--ease-decel) 620ms both;
+}
+
+.right-panel--open>*:nth-child(4) {
+  animation: widgetEnter var(--duration-base) var(--ease-decel) 680ms both;
+}
+
+.right-panel--open>*:nth-child(5) {
+  animation: widgetEnter var(--duration-base) var(--ease-decel) 740ms both;
 }
 
 /* ── PANEL CLOSE BUTTON ─────────────────────────────────────── */
@@ -514,10 +870,10 @@
   justify-content: center;
   flex-shrink: 0;
   transition:
-    background var(--t-fast),
-    color var(--t-fast),
-    transform var(--t-fast),
-    border-color var(--t-fast);
+    background var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out),
+    transform var(--duration-fast) var(--ease-spring),
+    border-color var(--duration-fast) var(--ease-out);
   z-index: 10;
 }
 
@@ -525,7 +881,13 @@
   background: rgba(239, 68, 68, 0.2);
   border-color: rgba(239, 68, 68, 0.3);
   color: var(--theme-red);
-  transform: scale(1.1);
+  transform: scale(1.12) rotate(90deg);
+  /* X rotates to signal "closing" */
+}
+
+.panel-close-btn:active {
+  transform: scale(0.92) rotate(90deg);
+  transition-duration: var(--duration-fast);
 }
 
 .panel-close-btn:focus-visible {
@@ -545,8 +907,19 @@
   flex-shrink: 0;
   box-shadow: var(--theme-card-shadow);
   transition:
-    background var(--t-slow),
-    border-color var(--t-slow);
+    background var(--duration-slow) var(--ease-inout),
+    border-color var(--duration-slow) var(--ease-inout),
+    box-shadow var(--duration-base) var(--ease-out),
+    transform var(--duration-base) var(--ease-spring);
+}
+
+.upgrade-card:hover {
+  /* Card lift — signals it's interactive */
+  transform: translateY(-2px);
+  box-shadow:
+    var(--theme-card-shadow),
+    0 8px 24px rgba(124, 111, 224, 0.15);
+  border-color: var(--theme-border-hover);
 }
 
 .upgrade-card::before {
@@ -557,13 +930,10 @@
   width: 140px;
   height: 140px;
   border-radius: 50%;
-  background: radial-gradient(circle,
-      var(--theme-purple-dim) 0%,
-      transparent 70%);
+  background: radial-gradient(circle, var(--theme-purple-dim) 0%, transparent 70%);
   pointer-events: none;
 }
 
-/* shimmer top edge */
 .upgrade-card::after {
   content: "";
   position: absolute;
@@ -571,10 +941,7 @@
   left: 0;
   right: 0;
   height: 1px;
-  background: linear-gradient(90deg,
-      transparent,
-      var(--theme-border-hover),
-      transparent);
+  background: linear-gradient(90deg, transparent, var(--theme-border-hover), transparent);
 }
 
 .upgrade-card__header {
@@ -594,6 +961,12 @@
   align-items: center;
   justify-content: center;
   font-size: 0.9rem;
+  transition: transform var(--duration-fast) var(--ease-spring);
+}
+
+.upgrade-card:hover .upgrade-card__badge {
+  transform: rotate(-8deg) scale(1.1);
+  /* badge wiggle on card hover */
 }
 
 .upgrade-card__title {
@@ -624,20 +997,23 @@
   font-weight: 700;
   border-radius: var(--r-md);
   transition:
-    background var(--t-fast),
-    transform var(--t-fast),
-    box-shadow var(--t-fast);
+    background var(--duration-fast) var(--ease-out),
+    transform var(--duration-fast) var(--ease-spring),
+    box-shadow var(--duration-fast) var(--ease-out);
   box-shadow: 0 2px 10px rgba(34, 197, 94, 0.25);
+  will-change: transform;
+  /* repeated hover target in visible panel */
 }
 
 .upgrade-card__btn:hover {
   background: var(--clr-accent-dark);
-  transform: scale(1.01);
+  transform: scale(1.02);
   box-shadow: 0 4px 16px rgba(34, 197, 94, 0.35);
 }
 
 .upgrade-card__btn:active {
-  transform: scale(0.98);
+  transform: scale(0.97);
+  transition-duration: var(--duration-fast);
 }
 
 .upgrade-card__btn:focus-visible {
@@ -652,19 +1028,23 @@
   border-radius: var(--r-lg);
   padding: var(--sp-4) var(--sp-5);
   flex-shrink: 0;
-  /* MOTION — lift signals interactivity */
   transition:
-    border-color var(--t-base),
-    box-shadow var(--t-base),
-    background var(--t-slow),
-    transform var(--t-base);
+    border-color var(--duration-base) var(--ease-inout),
+    box-shadow var(--duration-base) var(--ease-inout),
+    background var(--duration-slow) var(--ease-inout),
+    transform var(--duration-base) var(--ease-spring);
 }
 
 .panel-widget:hover {
   border-color: var(--theme-border-hover);
   box-shadow: 0 4px 16px var(--theme-purple-dim);
-  transform: translateY(-1px);
-  /* MOTION — earned: each widget is a clickable zone */
+  transform: translateY(-2px);
+  /* lift = interactivity affordance */
+}
+
+.panel-widget:active {
+  transform: translateY(0) scale(0.99);
+  transition-duration: var(--duration-fast);
 }
 
 .panel-widget__title {
@@ -691,13 +1071,20 @@
   font-weight: 600;
   color: var(--theme-accent);
   transition:
-    opacity var(--t-fast),
-    color var(--t-fast);
+    opacity var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out),
+    transform var(--duration-fast) var(--ease-spring);
 }
 
 .panel-widget__link:hover {
   opacity: 0.85;
   color: var(--theme-accent);
+  /* Arrow nudge — classic link affordance */
+  transform: translateX(3px);
+}
+
+.panel-widget__link:active {
+  transform: translateX(1px);
 }
 
 .panel-widget__link:focus-visible {
@@ -706,6 +1093,7 @@
   border-radius: 2px;
 }
 
+/* ── STREAK WIDGET ──────────────────────────────────────────── */
 .streak-widget {
   display: flex;
   align-items: center;
@@ -726,11 +1114,14 @@
   font-size: 0.78rem;
   font-weight: 600;
   color: var(--theme-accent);
-  transition: opacity var(--t-fast);
+  transition:
+    opacity var(--duration-fast) var(--ease-out),
+    transform var(--duration-fast) var(--ease-spring);
 }
 
 .streak-widget__link:hover {
   opacity: 0.85;
+  transform: translateX(3px);
 }
 
 .streak-widget__link:focus-visible {
@@ -746,7 +1137,7 @@
 
 /* ─────────────────────────────────────────────────────────────
    RESPONSIVE — ≤ 1100px
-   Right panel drops out of the grid (laptop / narrow desktop)
+   Right panel drops from grid (laptop / narrow desktop)
 ───────────────────────────────────────────────────────────── */
 @media (max-width: 1100px) {
   .app-shell {
@@ -760,13 +1151,11 @@
 }
 
 /* ─────────────────────────────────────────────────────────────
-   RESPONSIVE — ≤ 768px (tablet portrait and below)
-   Sidebar becomes a fixed off-canvas drawer.
-   Hamburger button and backdrop become active.
+   RESPONSIVE — ≤ 768px
+   Sidebar → fixed off-canvas drawer.
+   Hamburger + backdrop activate.
 ───────────────────────────────────────────────────────────── */
 @media (max-width: 768px) {
-
-  /* Grid drops sidebar column — sidebar is now fixed-positioned */
   .app-shell {
     grid-template-columns: 1fr;
     grid-template-rows: var(--topbar-h) 1fr;
@@ -774,15 +1163,12 @@
       "topbar"
       "main";
     height: 100dvh;
-    /* dvh accounts for mobile browser chrome */
   }
 
-  /* Panel open modifier is a no-op on mobile — panel is hidden */
   .app-shell--panel-open {
     grid-template-columns: 1fr;
   }
 
-  /* RESPONSIVE — sidebar exits the grid flow, becomes an overlay drawer */
   .sidebar {
     grid-area: unset;
     position: fixed;
@@ -794,28 +1180,27 @@
     flex-direction: column;
     overflow-y: auto;
     overflow-x: hidden;
-    /* MOTION — slides in from the left edge */
+    /* Mount animation disabled on mobile — drawer starts off-screen,
+       slides in only on user action (hamburger tap) */
+    animation: none;
     transform: translateX(-100%);
     transition:
-      transform 320ms cubic-bezier(0.4, 0, 0.2, 1),
-      box-shadow 320ms cubic-bezier(0.4, 0, 0.2, 1),
-      background var(--t-slow),
-      border-color var(--t-slow);
+      transform 320ms var(--ease-inout),
+      box-shadow 320ms var(--ease-inout),
+      background var(--duration-slow) var(--ease-inout),
+      border-color var(--duration-slow) var(--ease-inout);
     box-shadow: none;
   }
 
-  /* MOTION — shadow appears as drawer slides in, reinforcing depth */
   .sidebar--open {
     transform: translateX(0);
     box-shadow: 6px 0 28px rgba(0, 0, 0, 0.4);
   }
 
-  /* RESPONSIVE — backdrop activates */
   .sidebar-backdrop {
     display: block;
   }
 
-  /* RESPONSIVE — hamburger appears */
   .topbar__hamburger {
     display: flex;
   }
@@ -827,8 +1212,7 @@
 }
 
 /* ─────────────────────────────────────────────────────────────
-   RESPONSIVE — ≤ 480px (phones)
-   Tighten spacing; hide upgrade button text to save topbar space
+   RESPONSIVE — ≤ 480px
 ───────────────────────────────────────────────────────────── */
 @media (max-width: 480px) {
   .sidebar__link {
@@ -841,7 +1225,6 @@
     letter-spacing: 0.06em;
   }
 
-  /* Collapse the upgrade button to icon-only */
   .topbar__upgrade-btn {
     padding: 7px 9px;
     gap: 0;
@@ -853,8 +1236,7 @@
 }
 
 /* ─────────────────────────────────────────────────────────────
-   RESPONSIVE — ≤ 320px (minimum supported viewport)
-   Prevent horizontal overflow; keep everything functional
+   RESPONSIVE — ≤ 320px
 ───────────────────────────────────────────────────────────── */
 @media (max-width: 320px) {
   .sidebar {
@@ -868,15 +1250,13 @@
 
   .topbar__upgrade-btn {
     display: none;
-    /* too cramped at 320px; accessible via the drawer */
   }
 }
 
 /* ─────────────────────────────────────────────────────────────
    MOTION — prefers-reduced-motion
-   Every animation and transition is cut to near-instant for
-   users who have opted out in their OS accessibility settings.
-   This is the single authoritative override — nothing escapes it.
+   Single authoritative kill-switch. Every animation/transition
+   collapses to near-instant. No exceptions.
 ───────────────────────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
 
@@ -889,26 +1269,48 @@
     scroll-behavior: auto !important;
   }
 
-  /* Theme toggle rotation */
+  /* Rotations */
   .topbar__theme-toggle:hover,
   .topbar__theme-toggle:active {
     transform: none;
   }
 
-  /* Button lifts */
+  /* Lifts */
   .topbar__upgrade-btn:hover,
   .topbar__upgrade-btn:active,
-  .topbar__avatar:hover {
+  .topbar__avatar:hover,
+  .topbar__avatar:active {
     transform: none;
   }
 
-  /* Widget hover lift */
-  .panel-widget:hover {
+  /* Card/widget lifts */
+  .panel-widget:hover,
+  .panel-widget:active,
+  .upgrade-card:hover {
     transform: none;
   }
 
-  /* Panel close button scale */
-  .panel-close-btn:hover {
+  /* Badge wiggle */
+  .upgrade-card:hover .upgrade-card__badge {
+    transform: none;
+  }
+
+  /* Close button rotation */
+  .panel-close-btn:hover,
+  .panel-close-btn:active {
+    transform: none;
+  }
+
+  /* Link arrow nudge */
+  .panel-widget__link:hover,
+  .panel-widget__link:active,
+  .streak-widget__link:hover {
+    transform: none;
+  }
+
+  /* Icon nudge */
+  .sidebar__link:hover .sidebar__link-icon,
+  .sidebar__link:active .sidebar__link-icon {
     transform: none;
   }
 }
