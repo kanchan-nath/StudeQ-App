@@ -8,7 +8,7 @@ import cookieParser from "cookie-parser";
 import cors from "cors"
 import limiter from "./middlewares/rateLimiter.middleware.js";
 import helmet from "helmet"
-
+import logger from "./logger/index.js"
 const app = express();
 app.use(express.json({ limit: "16kb" }))
 app.use(express.urlencoded({ extended: true, limit: "16kb" }))
@@ -28,6 +28,11 @@ import pdfAnalysisRouter from "./routes/pdfAnalysis.route.js"
 import schedulerRouter from "./routes/scheduler.route.js"
 import filesRagRouter from "./routes/filesRag.route.js"
 import searchAPIRouter from "./routes/searchAPI.route.js"
+
+logger.info("Hello world X  ")
+logger.warn("Hello world X  ")
+logger.debug("Hello world X  ")
+
 
 app.use("/api/auth", registerRoute)
 app.use("/api/user", userRoute)

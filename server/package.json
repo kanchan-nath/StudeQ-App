@@ -13,6 +13,7 @@
   "license": "ISC",
   "type": "module",
   "dependencies": {
+    "@axiomhq/winston": "^1.6.1",
     "@clerk/express": "^2.1.19",
     "@clerk/react": "^6.7.0",
     "@google/generative-ai": "^0.24.1",
@@ -52,6 +53,7 @@
     "socket.io": "^4.8.3",
     "tesseract.js": "^7.0.0",
     "uuid": "^14.0.0",
+    "winston": "^3.19.0",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
