@@ -6,8 +6,6 @@ dotenv.config({ path: ".env.development" })
 const developmentLogger = ()=>{
     const { combine, timestamp, errors, json, colorize, printf } = format;
 
-    const isProd = process.env.NODE_ENV === "development";
-
     const consoleFormat = printf(({ level, message, timestamp, stack }) => {
         return `${timestamp} ${level}: ${stack || message}`;
     });
@@ -27,10 +25,10 @@ const developmentLogger = ()=>{
             new transports.Console({
                 format: combine(timestamp(), colorize(), consoleFormat),
             }),
-            new AxiomTransport({
-                dataset: process.env.AXIOM_DATASET,
-                token: process.env.AXIOM_TOKEN,
-            }),
+            // new AxiomTransport({
+            //     dataset: process.env.AXIOM_DATASET,
+            //     token: process.env.AXIOM_TOKEN,
+            // }),
         ],
         exitOnError: false,
     });
