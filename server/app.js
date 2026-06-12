@@ -6,6 +6,7 @@ if(!process.env.NODE_ENV){
 dotenv.config({
     path: `.env.${process.env.NODE_ENV || "development"}`
 });
+
 import express from "express"
 import prisma from "./lib/prisma.js"
 import cookieParser from "cookie-parser";
@@ -56,12 +57,20 @@ app.use("/api", schedulerRouter)
 app.use("/api/documents", filesRagRouter)
 app.use("/api", searchAPIRouter)
 
+app.use((req, res)=>{
+    res.status(404)
+    .json(
+        {
+            success:false,
+            message: "Route not found"
+        }
+    )
+})
 app.use((err, req, res, next)=>{
     const statusCode = err.statusCode || 500
 
     logger.error(err)
-    res
-    .status(statusCode)
+    res.status(statusCode)
     .json(
         {
             success:false,
