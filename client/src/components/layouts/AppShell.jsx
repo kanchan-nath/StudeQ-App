@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Link, Outlet, useNavigate, useLocation } from "react-router-dom";
 import styles from "./appShell.module.css";
 import {
@@ -35,7 +35,6 @@ const NAV_MAIN = [
     color: "green",
   },
   { to: "/notebook", label: "Notebook", icon: Notebook01Icon, color: "blue" },
-  
 ];
 
 const NAV_AI = [
@@ -69,7 +68,7 @@ const NAV_EVENT = [
   },
   {
     to: "/event-scheduling/assignments",
-    label: " Assignment",
+    label: "Assignment",
     icon: Calendar03Icon,
     color: "orange",
   },
@@ -101,19 +100,49 @@ const AppShell = ({ userName = "" }) => {
   const location = useLocation();
 
   const [panelOpen, setPanelOpen] = useState(false);
+  // RESPONSIVE — controls the mobile off-canvas drawer
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => setPanelOpen(true), 2500);
     return () => clearTimeout(timer);
   }, []);
 
+  // RESPONSIVE — auto-close drawer on route change
+  useEffect(() => {
+    setSidebarOpen(false);
+  }, [location.pathname]);
+
+  // RESPONSIVE — body scroll lock while the mobile drawer is open
+  useEffect(() => {
+    document.body.style.overflow = sidebarOpen ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [sidebarOpen]);
+
+  // MOTION — ESC key closes the mobile drawer (keyboard accessibility)
+  const handleKeyDown = useCallback(
+    (e) => {
+      if (e.key === "Escape" && sidebarOpen) {
+        setSidebarOpen(false);
+      }
+    },
+    [sidebarOpen]
+  );
+
+  useEffect(() => {
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [handleKeyDown]);
+
   const initials = userName
     ? userName
-        .split(" ")
-        .map((w) => w[0])
-        .join("")
-        .slice(0, 2)
-        .toUpperCase()
+      .split(" ")
+      .map((w) => w[0])
+      .join("")
+      .slice(0, 2)
+      .toUpperCase()
     : "KN";
 
   const handleLogout = (e) => {
@@ -122,7 +151,7 @@ const AppShell = ({ userName = "" }) => {
     localStorage.removeItem("token");
     navigate("/login");
   };
-  // AFTER
+
   useEffect(() => {
     const html = document.documentElement;
     html.classList.add("theme-transitioning");
@@ -147,13 +176,61 @@ const AppShell = ({ userName = "" }) => {
         className={styles.topbar}
         role="banner"
       >
-        <div className={styles["topbar__left"]} />
+        <div className={styles["topbar__left"]}>
+          {/*
+            RESPONSIVE — hamburger button.
+            display:none on desktop via CSS; display:flex on ≤768px.
+            aria-expanded reflects drawer state for screen readers.
+          */}
+          <button
+            className={styles["topbar__hamburger"]}
+            aria-label={sidebarOpen ? "Close navigation" : "Open navigation"}
+            aria-expanded={sidebarOpen}
+            aria-controls="app-sidebar"
+            onClick={() => setSidebarOpen((prev) => !prev)}
+          >
+            {sidebarOpen ? (
+              /* X icon — rendered when drawer is open */
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                aria-hidden="true"
+              >
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            ) : (
+              /* Hamburger icon — rendered when drawer is closed */
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                aria-hidden="true"
+              >
+                <line x1="3" y1="6" x2="21" y2="6" />
+                <line x1="3" y1="12" x2="21" y2="12" />
+                <line x1="3" y1="18" x2="21" y2="18" />
+              </svg>
+            )}
+          </button>
+        </div>
 
         <button
           className={styles["topbar__upgrade-btn"]}
           aria-label="Upgrade to premium"
         >
-          <CashbackIcon /> Upgrade
+          <CashbackIcon />
+          {/* RESPONSIVE — text hidden at ≤480px via CSS, icon remains */}
+          <span className={styles["topbar__upgrade-label"]}>Upgrade</span>
         </button>
 
         {/* ── THEME TOGGLE ── */}
@@ -172,60 +249,17 @@ const AppShell = ({ userName = "" }) => {
               strokeWidth="2"
               strokeLinecap="round"
               strokeLinejoin="round"
+              aria-hidden="true"
             >
-              <circle
-                cx="12"
-                cy="12"
-                r="5"
-              />
-              <line
-                x1="12"
-                y1="1"
-                x2="12"
-                y2="3"
-              />
-              <line
-                x1="12"
-                y1="21"
-                x2="12"
-                y2="23"
-              />
-              <line
-                x1="4.22"
-                y1="4.22"
-                x2="5.64"
-                y2="5.64"
-              />
-              <line
-                x1="18.36"
-                y1="18.36"
-                x2="19.78"
-                y2="19.78"
-              />
-              <line
-                x1="1"
-                y1="12"
-                x2="3"
-                y2="12"
-              />
-              <line
-                x1="21"
-                y1="12"
-                x2="23"
-                y2="12"
-              />
-              <line
-                x1="4.22"
-                y1="19.78"
-                x2="5.64"
-                y2="18.36"
-              />
-              <line
-                x1="18.36"
-                y1="5.64"
-                x2="19.78"
-                y2="4.22"
-              />
+              <circle cx="12" cy="12" r="5" />
+              <line x1="12" y1="1" x2="12" y2="3" />
+              <line x1="12" y1="21" x2="12" y2="23" />
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+              <line x1="1" y1="12" x2="3" y2="12" />
+              <line x1="21" y1="12" x2="23" y2="12" />
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
             </svg>
           ) : (
             <svg
@@ -237,6 +271,7 @@ const AppShell = ({ userName = "" }) => {
               strokeWidth="2"
               strokeLinecap="round"
               strokeLinejoin="round"
+              aria-hidden="true"
             >
               <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
             </svg>
@@ -252,9 +287,22 @@ const AppShell = ({ userName = "" }) => {
         </div>
       </header>
 
+      {/*
+        RESPONSIVE — backdrop overlay.
+        Rendered as a sibling to the sidebar in the DOM.
+        CSS display:none on desktop; visible only on ≤768px.
+        Clicking it closes the drawer.
+      */}
+      <div
+        className={`${styles["sidebar-backdrop"]}${sidebarOpen ? ` ${styles["sidebar-backdrop--visible"]}` : ""}`}
+        onClick={() => setSidebarOpen(false)}
+        aria-hidden="true"
+      />
+
       {/* ── LEFT SIDEBAR ── */}
       <aside
-        className={styles.sidebar}
+        id="app-sidebar"
+        className={`${styles.sidebar}${sidebarOpen ? ` ${styles["sidebar--open"]}` : ""}`}
         role="navigation"
         aria-label="Main navigation"
       >
@@ -282,10 +330,7 @@ const AppShell = ({ userName = "" }) => {
                 className={styles["sidebar__link-icon"]}
                 aria-hidden="true"
               >
-                <Icon
-                  size={20}
-                  color="white"
-                />
+                <Icon size={20} color="white" />
               </span>
               {label}
             </Link>
@@ -304,10 +349,7 @@ const AppShell = ({ userName = "" }) => {
                 className={styles["sidebar__link-icon"]}
                 aria-hidden="true"
               >
-                <Icon
-                  size={20}
-                  color="white"
-                />
+                <Icon size={20} color="white" />
               </span>
               {label}
             </Link>
@@ -326,10 +368,7 @@ const AppShell = ({ userName = "" }) => {
                 className={styles["sidebar__link-icon"]}
                 aria-hidden="true"
               >
-                <Icon
-                  size={20}
-                  color="white"
-                />
+                <Icon size={20} color="white" />
               </span>
               {label}
             </Link>
@@ -356,7 +395,6 @@ const AppShell = ({ userName = "" }) => {
         role="complementary"
         aria-label="Sidebar widgets"
       >
-        {/* Close button */}
         <button
           className={styles["panel-close-btn"]}
           onClick={() => setPanelOpen(false)}
