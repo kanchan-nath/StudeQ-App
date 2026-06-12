@@ -13,11 +13,18 @@ const app = express();
 app.use(express.json({ limit: "16kb" }))
 app.use(express.urlencoded({ extended: true, limit: "16kb" }))
 app.use(cookieParser());
-app.use(cors())
+
+const allowOrigins = (process.env.CORS_ORIGINS || "").split(",").filter(Boolean)
+app.use(cors(
+    {
+        origin:allowOrigins.length ? allowOrigins : false,
+        credentials: true
+    }
+))
 app.use(limiter)
 app.use(helmet())
 
-import registerRoute from "./routes/auth.route.js"
+
 import userRoute from "./routes/auth.route.js"
 import noteRoute from "./routes/note.route.js"
 import tutorRouter from "./routes/tutor.route.js"
@@ -29,7 +36,7 @@ import schedulerRouter from "./routes/scheduler.route.js"
 import filesRagRouter from "./routes/filesRag.route.js"
 import searchAPIRouter from "./routes/searchAPI.route.js"
 
-app.use("/api/auth", registerRoute)
+app.use("/api/auth", userRoute)
 app.use("/api/user", userRoute)
 app.use("/api", noteRoute)
 app.use("/api/tutor", tutorRouter)
