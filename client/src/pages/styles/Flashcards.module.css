@@ -152,7 +152,6 @@
    REDUCED MOTION — disable all animations for a11y
 ═══════════════════════════════════════════════════════ */
 @media (prefers-reduced-motion: reduce) {
-
   *,
   *::before,
   *::after {
@@ -253,7 +252,7 @@ html {
   gap: 20px;
   padding: 28px 36px;
   background: var(--theme-surface);
-  border: 1px solid var(--theme-border) ;
+  border: 1px solid var(--theme-border);
   border-radius: var(--r-lg);
   box-shadow: var(--shadow-xs);
   cursor: pointer;
@@ -326,7 +325,7 @@ html {
   position: relative;
   height: 100%;
   background: var(--theme-surface);
-  border-left: 1px solid var(--theme-border)  ;
+  border-left: 1px solid var(--theme-border);
   display: flex;
   flex-direction: row;
   flex-shrink: 0;
@@ -353,7 +352,7 @@ html {
   width: 36px;
   height: 48px;
   background: var(--theme-surface);
-  border: 1px solid var(--theme-border) ;
+  border: 1px solid var(--theme-border);
   border-left: none;
   border-radius: 0 8px 8px 0;
   cursor: pointer;
@@ -386,7 +385,7 @@ html {
   height: 100%;
   overflow-y: auto;
   scrollbar-width: thin;
-  scrollbar-color: var(--theme-border)   var(--theme-surface);
+  scrollbar-color: var(--theme-border) var(--theme-surface);
   display: flex;
   flex-direction: column;
 }
@@ -400,7 +399,7 @@ html {
 }
 
 .sidebarContent::-webkit-scrollbar-thumb {
-  background: var(--theme-border) ;
+  background: var(--theme-border);
   border-radius: 999px;
   transition: background var(--duration-fast) var(--ease-out-quart);
 }
@@ -462,7 +461,7 @@ html {
 /* Staggered sidebar items: nth-child delays create visual flow */
 .sidebarItem {
   padding: 12px 14px;
-  border: 1.5px solid var(--theme-border) ;
+  border: 1.5px solid var(--theme-border);
   border-radius: var(--r-sm);
   margin-bottom: 10px;
   cursor: pointer;
@@ -586,7 +585,7 @@ html {
 }
 
 .threeDotBtn:hover {
-  background: var(--theme-border) ;
+  background: var(--theme-border);
   color: var(--theme-text);
   transform: scale(1.15);
   /* enlarge hit area feel */
@@ -603,7 +602,7 @@ html {
   right: 0;
   top: calc(100% + 4px);
   background: var(--theme-surface);
-  border: 1px solid var(--theme-border) ;
+  border: 1px solid var(--theme-border);
   border-radius: var(--r-sm);
   box-shadow: var(--shadow-md);
   z-index: 50;
@@ -651,7 +650,7 @@ html {
   height: var(--headbar-height);
   padding: 0 20px;
   background: var(--bg-headbar);
-  border-bottom: 1px solid var(--theme-border)  ;
+  border-bottom: 1px solid var(--theme-border);
   flex-shrink: 0;
   position: sticky;
   top: 0;
@@ -685,7 +684,7 @@ html {
   gap: 8px;
   padding: 8px 14px;
   background: var(--theme-surface);
-  border: 1px solid var(--theme-border) ;
+  border: 1px solid var(--theme-border);
   border-radius: var(--r-sm);
   color: var(--theme-text);
   font-size: 0.875rem;
@@ -717,7 +716,7 @@ html {
   top: calc(100% + 6px);
   left: 0;
   background: var(--bg-dropdown);
-  border: 1px solid var(--theme-border) ;
+  border: 1px solid var(--theme-border);
   border-radius: var(--r-md);
   box-shadow: var(--shadow-md);
   overflow: hidden;
@@ -771,7 +770,7 @@ html {
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  border: 2px solid var(--theme-border) ;
+  border: 2px solid var(--theme-border);
   background: transparent;
   cursor: pointer;
   flex-shrink: 0;
@@ -808,7 +807,7 @@ html {
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid var(--theme-border) ;
+  border: 1px solid var(--theme-border);
   border-radius: var(--r-sm);
   background: transparent;
   color: var(--theme-text-secondary);
@@ -847,7 +846,7 @@ html {
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid var(--theme-border) ;
+  border: 1px solid var(--theme-border);
   border-radius: var(--r-sm);
   background: transparent;
   color: var(--theme-text);
@@ -891,7 +890,8 @@ html {
   padding: 24px 32px;
   gap: 20px;
   /* Enters after headbar: delayed so headbar lands first */
-  animation: cardEntrance var(--duration-slower) var(--ease-out-quart) 120ms both;
+  animation: cardEntrance var(--duration-slower) var(--ease-out-quart) 120ms
+    both;
 }
 
 .cardMeta {
@@ -921,7 +921,7 @@ html {
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid var(--theme-border) ;
+  border: 1px solid var(--theme-border);
   border-radius: 50%;
   background: transparent;
   color: var(--theme-text-muted);
@@ -985,7 +985,7 @@ html {
   position: relative;
   transform-style: preserve-3d;
   /* Flip: slower = dramatic; spring-like easing via cubic-bezier */
-  transition: transform var(--duration-slower) cubic-bezier(0.4, 0.2, 0.2, 1.0);
+  transition: transform var(--duration-slower) cubic-bezier(0.4, 0.2, 0.2, 1);
 }
 
 .cardFlipped {
@@ -1020,7 +1020,11 @@ html {
 
 .cardBack {
   transform: rotateX(180deg);
-  background: linear-gradient(135deg, var(--theme-surface) 0%, var(--theme-purple-dim) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--theme-surface) 0%,
+    var(--theme-purple-dim) 100%
+  );
 }
 
 .cardText {
@@ -1050,7 +1054,7 @@ html {
   gap: 6px;
   padding: 10px 22px;
   background: var(--theme-surface);
-  border: 1px solid var(--theme-border) ;
+  border: 1px solid var(--theme-border);
   border-radius: var(--r-md);
   color: var(--theme-text);
   font-size: 0.9rem;
@@ -1087,7 +1091,7 @@ html {
   gap: 10px;
   padding: 10px 28px;
   background: var(--theme-surface);
-  border: 1px solid var(--theme-border) ;
+  border: 1px solid var(--theme-border);
   border-radius: var(--r-md);
   color: var(--theme-text);
   font-size: 0.9rem;
@@ -1119,7 +1123,7 @@ html {
   align-items: center;
   padding: 2px 6px;
   background: var(--theme-bg);
-  border: 1px solid var(--theme-border) ;
+  border: 1px solid var(--theme-border);
   border-radius: 4px;
   font-size: 0.7rem;
   font-family: monospace;
@@ -1143,7 +1147,7 @@ html {
   padding: 0 28px;
   height: var(--headbar-height);
   background: var(--bg-headbar);
-  border-bottom: 1px solid var(--theme-border)  ;
+  border-bottom: 1px solid var(--theme-border);
   flex-shrink: 0;
   position: sticky;
   top: 0;
@@ -1166,7 +1170,7 @@ html {
   align-items: center;
   gap: 6px;
   padding: 8px 16px;
-  border: 1px solid var(--theme-border) ;
+  border: 1px solid var(--theme-border);
   border-radius: var(--r-sm);
   background: var(--theme-surface);
   color: var(--theme-text);
@@ -1200,7 +1204,7 @@ html {
   flex: 1;
   padding: 36px 40px;
   overflow-y: auto;
-  border-right: 1px solid var(--theme-border) ;
+  border-right: 1px solid var(--theme-border);
   animation: fadeUp var(--duration-slow) var(--ease-out-quart) 80ms both;
 }
 
@@ -1246,7 +1250,7 @@ html {
   gap: 12px;
   padding: 28px 20px;
   background: var(--bg-tile);
-  border: 1px solid var(--theme-border) ;
+  border: 1px solid var(--theme-border);
   border-radius: var(--r-md);
   cursor: pointer;
   position: relative;
@@ -1354,7 +1358,7 @@ html {
   font-weight: 600;
   padding: 2px 6px;
   background: var(--theme-bg);
-  border: 1px solid var(--theme-border) ;
+  border: 1px solid var(--theme-border);
   border-radius: 99px;
   color: var(--theme-text-muted);
   text-transform: uppercase;
@@ -1501,7 +1505,7 @@ html {
   width: 100%;
   max-width: 480px;
   padding: 12px 16px;
-  border: 1px solid var(--theme-border) ;
+  border: 1px solid var(--theme-border);
   border-radius: var(--r-sm);
   background: var(--theme-surface-2);
   color: var(--theme-text);
@@ -1522,7 +1526,9 @@ html {
 .fieldInput:focus {
   border-color: var(--theme-purple);
   /* Glow: layered shadows for depth */
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12), 0 0 0 1px var(--theme-purple);
+  box-shadow:
+    0 0 0 3px rgba(99, 102, 241, 0.12),
+    0 0 0 1px var(--theme-purple);
   /* Micro lift on focus = "active" state */
   transform: translateY(-1px);
 }
@@ -1544,7 +1550,7 @@ html {
 
 .backBtn {
   padding: 11px 28px;
-  border: 1px solid var(--theme-border) ;
+  border: 1px solid var(--theme-border);
   border-radius: var(--r-md);
   background: var(--theme-surface);
   color: var(--theme-text);
@@ -1608,7 +1614,7 @@ html {
   align-items: center;
   gap: 16px;
   background: var(--theme-surface);
-  border: 1px solid var(--theme-border) ;
+  border: 1px solid var(--theme-border);
   border-radius: var(--r-lg);
   padding: 36px 24px;
   margin-bottom: 28px;
@@ -1637,7 +1643,7 @@ html {
 .dropzone {
   position: relative;
   max-width: 480px;
-  border: 2px dashed var(--theme-border)  ;
+  border: 2px dashed var(--theme-border);
   border-radius: var(--r-md);
   padding: 40px 24px;
   display: flex;
@@ -1700,7 +1706,7 @@ html {
 
 .scratchCard {
   background: var(--theme-surface);
-  border: 1px solid var(--theme-border) ;
+  border: 1px solid var(--theme-border);
   border-radius: var(--r-md);
   padding: 16px 20px;
   display: flex;
@@ -1927,7 +1933,7 @@ html {
     transition: transform var(--duration-slow) var(--ease-snappy);
     will-change: transform;
     overflow-y: auto;
-    border-left: 1px solid var(--theme-border)  ;
+    border-left: 1px solid var(--theme-border);
   }
 
   .mobileSidebarOpen {
@@ -1950,7 +1956,7 @@ html {
     justify-content: center;
     width: 28px;
     height: 28px;
-    border: 1px solid var(--theme-border) ;
+    border: 1px solid var(--theme-border);
     border-radius: 6px;
     background: var(--bg-dropdown);
     color: var(--theme-text-secondary);

@@ -4,15 +4,16 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon index.js",
-    "dev-worker": "nodemon services/worker.js",
-    "start": "node index.js"
+    "dev": "NODE_ENV=development nodemon index.js",
+    "dev-worker": "NODE_ENV=development nodemon services/worker.js",
+    "start": "NODE_ENV=production node index.js"
   },
   "keywords": [],
   "author": "KANCHAN NATH",
   "license": "ISC",
   "type": "module",
   "dependencies": {
+    "@axiomhq/winston": "^1.6.1",
     "@clerk/express": "^2.1.19",
     "@clerk/react": "^6.7.0",
     "@google/generative-ai": "^0.24.1",
@@ -31,7 +32,9 @@
     "croner": "^10.0.1",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
+    "express-rate-limit": "^8.5.2",
     "groq-sdk": "^1.1.2",
+    "helmet": "^8.2.0",
     "ics": "^3.12.0",
     "ioredis": "^5.10.1",
     "jsonwebtoken": "^9.0.3",
@@ -50,6 +53,7 @@
     "socket.io": "^4.8.3",
     "tesseract.js": "^7.0.0",
     "uuid": "^14.0.0",
+    "winston": "^3.19.0",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {

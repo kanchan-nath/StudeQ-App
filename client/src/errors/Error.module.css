@@ -6,521 +6,519 @@
 
 /* ── Keyframes ────────────────────────────────────────────── */
 @keyframes errorFadeUp {
-    from {
-        opacity: 0;
-        transform: translateY(24px);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
 
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes floatDrift {
+  0%,
+  100% {
+    transform: translateY(0px) rotate(0deg);
+  }
 
-    0%,
-    100% {
-        transform: translateY(0px) rotate(0deg);
-    }
+  33% {
+    transform: translateY(-10px) rotate(1.5deg);
+  }
 
-    33% {
-        transform: translateY(-10px) rotate(1.5deg);
-    }
-
-    66% {
-        transform: translateY(-5px) rotate(-1deg);
-    }
+  66% {
+    transform: translateY(-5px) rotate(-1deg);
+  }
 }
 
 @keyframes orbPulse {
+  0%,
+  100% {
+    opacity: 0.15;
+    transform: scale(1);
+  }
 
-    0%,
-    100% {
-        opacity: 0.15;
-        transform: scale(1);
-    }
-
-    50% {
-        opacity: 0.3;
-        transform: scale(1.08);
-    }
+  50% {
+    opacity: 0.3;
+    transform: scale(1.08);
+  }
 }
 
 @keyframes starTwinkle {
+  0%,
+  100% {
+    opacity: 0.2;
+  }
 
-    0%,
-    100% {
-        opacity: 0.2;
-    }
-
-    50% {
-        opacity: 0.9;
-    }
+  50% {
+    opacity: 0.9;
+  }
 }
 
 @keyframes toastIn {
-    from {
-        opacity: 0;
-        transform: translateX(110%);
-    }
+  from {
+    opacity: 0;
+    transform: translateX(110%);
+  }
 
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 @keyframes toastOut {
-    from {
-        opacity: 1;
-        transform: translateX(0);
-    }
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
 
-    to {
-        opacity: 0;
-        transform: translateX(110%);
-    }
+  to {
+    opacity: 0;
+    transform: translateX(110%);
+  }
 }
 
 @keyframes scanLine {
-    0% {
-        transform: translateY(-100%);
-    }
+  0% {
+    transform: translateY(-100%);
+  }
 
-    100% {
-        transform: translateY(400%);
-    }
+  100% {
+    transform: translateY(400%);
+  }
 }
 
 @keyframes glitch {
+  0%,
+  94%,
+  100% {
+    clip-path: none;
+    transform: none;
+  }
 
-    0%,
-    94%,
-    100% {
-        clip-path: none;
-        transform: none;
-    }
+  95% {
+    clip-path: inset(20% 0 60% 0);
+    transform: translateX(-4px);
+  }
 
-    95% {
-        clip-path: inset(20% 0 60% 0);
-        transform: translateX(-4px);
-    }
-
-    97% {
-        clip-path: inset(60% 0 10% 0);
-        transform: translateX(4px);
-    }
+  97% {
+    clip-path: inset(60% 0 10% 0);
+    transform: translateX(4px);
+  }
 }
 
 /* ── Full-page error wrapper ──────────────────────────────── */
 .errorPage {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: var(--theme-bg);
-    padding: 24px;
-    position: relative;
-    overflow: hidden;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--theme-bg);
+  padding: 24px;
+  position: relative;
+  overflow: hidden;
 }
 
 /* Starfield ambient dots */
 .starfield {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    z-index: 0;
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
 }
 
 .star {
-    position: absolute;
-    width: 2px;
-    height: 2px;
-    border-radius: 50%;
-    background: var(--theme-text-muted);
-    animation: starTwinkle var(--dur, 3s) ease-in-out infinite;
-    animation-delay: var(--delay, 0s);
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  border-radius: 50%;
+  background: var(--theme-text-muted);
+  animation: starTwinkle var(--dur, 3s) ease-in-out infinite;
+  animation-delay: var(--delay, 0s);
 }
 
 /* Ambient orbs */
 .orb {
-    position: absolute;
-    border-radius: 50%;
-    pointer-events: none;
-    animation: orbPulse 6s ease-in-out infinite;
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: orbPulse 6s ease-in-out infinite;
 }
 
 .orb1 {
-    width: 400px;
-    height: 400px;
-    top: -120px;
-    right: -100px;
-    background: radial-gradient(circle, var(--theme-purple-dim), transparent 70%);
-    animation-delay: 0s;
+  width: 400px;
+  height: 400px;
+  top: -120px;
+  right: -100px;
+  background: radial-gradient(circle, var(--theme-purple-dim), transparent 70%);
+  animation-delay: 0s;
 }
 
 .orb2 {
-    width: 300px;
-    height: 300px;
-    bottom: -60px;
-    left: -80px;
-    background: radial-gradient(circle, var(--theme-accent-dim), transparent 70%);
-    animation-delay: 3s;
+  width: 300px;
+  height: 300px;
+  bottom: -60px;
+  left: -80px;
+  background: radial-gradient(circle, var(--theme-accent-dim), transparent 70%);
+  animation-delay: 3s;
 }
 
 /* ── Card ─────────────────────────────────────────────────── */
 .card {
-    position: relative;
-    z-index: 1;
-    max-width: 520px;
-    width: 100%;
-    background: var(--theme-surface);
-    border: 1px solid var(--theme-border);
-    border-radius: 20px;
-    padding: 48px 40px 40px;
-    text-align: center;
-    box-shadow: var(--theme-card-shadow);
-    animation: errorFadeUp 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  position: relative;
+  z-index: 1;
+  max-width: 520px;
+  width: 100%;
+  background: var(--theme-surface);
+  border: 1px solid var(--theme-border);
+  border-radius: 20px;
+  padding: 48px 40px 40px;
+  text-align: center;
+  box-shadow: var(--theme-card-shadow);
+  animation: errorFadeUp 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 
 /* ── Illustration ─────────────────────────────────────────── */
 .illustration {
-    width: 96px;
-    height: 96px;
-    margin: 0 auto 28px;
-    animation: floatDrift 5s ease-in-out infinite;
-    position: relative;
+  width: 96px;
+  height: 96px;
+  margin: 0 auto 28px;
+  animation: floatDrift 5s ease-in-out infinite;
+  position: relative;
 }
 
 .illustrationSvg {
-    width: 100%;
-    height: 100%;
+  width: 100%;
+  height: 100%;
 }
 
 /* Code badge (404 / 500 / NET) */
 .codeBadge {
-    display: inline-block;
-    font-family: var(--font-display, "DM Sans", sans-serif);
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--theme-text-muted);
-    background: var(--theme-surface-2);
-    border: 1px solid var(--theme-border);
-    border-radius: 6px;
-    padding: 3px 8px;
-    margin-bottom: 12px;
+  display: inline-block;
+  font-family: var(--font-display, "DM Sans", sans-serif);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--theme-text-muted);
+  background: var(--theme-surface-2);
+  border: 1px solid var(--theme-border);
+  border-radius: 6px;
+  padding: 3px 8px;
+  margin-bottom: 12px;
 }
 
 /* ── Text ─────────────────────────────────────────────────── */
 .headline {
-    font-family: var(--font-display, "DM Sans", sans-serif);
-    font-size: 26px;
-    font-weight: 700;
-    color: var(--theme-text);
-    margin: 0 0 12px;
-    animation: glitch 8s ease-in-out infinite;
+  font-family: var(--font-display, "DM Sans", sans-serif);
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--theme-text);
+  margin: 0 0 12px;
+  animation: glitch 8s ease-in-out infinite;
 }
 
 .description {
-    font-size: 15px;
-    line-height: 1.65;
-    color: var(--theme-text-secondary);
-    margin: 0 0 32px;
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--theme-text-secondary);
+  margin: 0 0 32px;
 }
 
 /* ── CTAs ─────────────────────────────────────────────────── */
 .actions {
-    display: flex;
-    gap: 12px;
-    justify-content: center;
-    flex-wrap: wrap;
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
 }
 
 .btnPrimary {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 10px 22px;
-    border-radius: var(--r-full, 9999px);
-    background: var(--theme-purple);
-    color: #fff;
-    font-family: var(--font-display, "DM Sans", sans-serif);
-    font-size: 14px;
-    font-weight: 600;
-    border: none;
-    cursor: pointer;
-    transition:
-        background 150ms ease,
-        transform 150ms ease,
-        box-shadow 150ms ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 22px;
+  border-radius: var(--r-full, 9999px);
+  background: var(--theme-purple);
+  color: #fff;
+  font-family: var(--font-display, "DM Sans", sans-serif);
+  font-size: 14px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition:
+    background 150ms ease,
+    transform 150ms ease,
+    box-shadow 150ms ease;
 }
 
 .btnPrimary:hover {
-    background: var(--theme-purple-light);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 16px var(--theme-purple-dim);
+  background: var(--theme-purple-light);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px var(--theme-purple-dim);
 }
 
 .btnPrimary:focus-visible {
-    outline: 2px solid var(--theme-purple);
-    outline-offset: 3px;
+  outline: 2px solid var(--theme-purple);
+  outline-offset: 3px;
 }
 
 .btnPrimary:active {
-    transform: translateY(0);
+  transform: translateY(0);
 }
 
 .btnSecondary {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 10px 22px;
-    border-radius: var(--r-full, 9999px);
-    background: transparent;
-    color: var(--theme-text-secondary);
-    font-family: var(--font-display, "DM Sans", sans-serif);
-    font-size: 14px;
-    font-weight: 500;
-    border: 1px solid var(--theme-border);
-    cursor: pointer;
-    transition:
-        background 150ms ease,
-        color 150ms ease,
-        border-color 150ms ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 22px;
+  border-radius: var(--r-full, 9999px);
+  background: transparent;
+  color: var(--theme-text-secondary);
+  font-family: var(--font-display, "DM Sans", sans-serif);
+  font-size: 14px;
+  font-weight: 500;
+  border: 1px solid var(--theme-border);
+  cursor: pointer;
+  transition:
+    background 150ms ease,
+    color 150ms ease,
+    border-color 150ms ease;
 }
 
 .btnSecondary:hover {
-    background: var(--theme-purple-dim);
-    color: var(--theme-text);
-    border-color: var(--theme-border-hover);
+  background: var(--theme-purple-dim);
+  color: var(--theme-text);
+  border-color: var(--theme-border-hover);
 }
 
 .btnSecondary:focus-visible {
-    outline: 2px solid var(--theme-purple);
-    outline-offset: 3px;
+  outline: 2px solid var(--theme-purple);
+  outline-offset: 3px;
 }
 
 /* ── Inline / section error ───────────────────────────────── */
 .inlineError {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 12px;
-    padding: 32px 24px;
-    text-align: center;
-    animation: errorFadeUp 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 32px 24px;
+  text-align: center;
+  animation: errorFadeUp 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 
 .inlineIcon {
-    width: 48px;
-    height: 48px;
-    color: var(--theme-text-muted);
+  width: 48px;
+  height: 48px;
+  color: var(--theme-text-muted);
 }
 
 .inlineHeadline {
-    font-size: 16px;
-    font-weight: 600;
-    color: var(--theme-text);
-    margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--theme-text);
+  margin: 0;
 }
 
 .inlineDesc {
-    font-size: 14px;
-    color: var(--theme-text-secondary);
-    margin: 0;
+  font-size: 14px;
+  color: var(--theme-text-secondary);
+  margin: 0;
 }
 
 /* ── Empty state ──────────────────────────────────────────── */
 .emptyState {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-    padding: 48px 24px;
-    text-align: center;
-    animation: errorFadeUp 0.4s var(--ease-spring, cubic-bezier(0.34, 1.56, 0.64, 1)) both;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 48px 24px;
+  text-align: center;
+  animation: errorFadeUp 0.4s
+    var(--ease-spring, cubic-bezier(0.34, 1.56, 0.64, 1)) both;
 }
 
 .emptyIllustration {
-    width: 80px;
-    height: 80px;
-    margin-bottom: 8px;
-    opacity: 0.6;
-    animation: floatDrift 6s ease-in-out infinite;
+  width: 80px;
+  height: 80px;
+  margin-bottom: 8px;
+  opacity: 0.6;
+  animation: floatDrift 6s ease-in-out infinite;
 }
 
 .emptyHeadline {
-    font-size: 17px;
-    font-weight: 600;
-    color: var(--theme-text);
-    margin: 0;
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--theme-text);
+  margin: 0;
 }
 
 .emptyDesc {
-    font-size: 14px;
-    color: var(--theme-text-muted);
-    margin: 0;
-    max-width: 300px;
+  font-size: 14px;
+  color: var(--theme-text-muted);
+  margin: 0;
+  max-width: 300px;
 }
 
 /* ── Toast stack ──────────────────────────────────────────── */
 .toastStack {
-    position: fixed;
-    bottom: 24px;
-    right: 24px;
-    z-index: 9999;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    pointer-events: none;
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
 }
 
 .toast {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 12px 16px;
-    border-radius: var(--r-md, 12px);
-    font-family: var(--font-display, "DM Sans", sans-serif);
-    font-size: 14px;
-    font-weight: 500;
-    min-width: 260px;
-    max-width: 380px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-    pointer-events: all;
-    border: 1px solid var(--theme-border);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  border-radius: var(--r-md, 12px);
+  font-family: var(--font-display, "DM Sans", sans-serif);
+  font-size: 14px;
+  font-weight: 500;
+  min-width: 260px;
+  max-width: 380px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  pointer-events: all;
+  border: 1px solid var(--theme-border);
 }
 
 .toastEnter {
-    animation: toastIn 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  animation: toastIn 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 
 .toastExit {
-    animation: toastOut 0.22s ease-in both;
+  animation: toastOut 0.22s ease-in both;
 }
 
 .toastError {
-    background: var(--theme-surface-2);
-    color: var(--theme-text);
-    border-left: 3px solid var(--theme-red);
+  background: var(--theme-surface-2);
+  color: var(--theme-text);
+  border-left: 3px solid var(--theme-red);
 }
 
 .toastSuccess {
-    background: var(--theme-surface-2);
-    color: var(--theme-text);
-    border-left: 3px solid var(--theme-green);
+  background: var(--theme-surface-2);
+  color: var(--theme-text);
+  border-left: 3px solid var(--theme-green);
 }
 
 .toastIcon {
-    font-size: 16px;
-    flex-shrink: 0;
+  font-size: 16px;
+  flex-shrink: 0;
 }
 
 .toastMsg {
-    flex: 1;
-    line-height: 1.4;
+  flex: 1;
+  line-height: 1.4;
 }
 
 .toastClose {
-    background: none;
-    border: none;
-    color: var(--theme-text-muted);
-    cursor: pointer;
-    font-size: 18px;
-    line-height: 1;
-    padding: 0 2px;
-    transition: color 150ms ease;
-    flex-shrink: 0;
+  background: none;
+  border: none;
+  color: var(--theme-text-muted);
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+  padding: 0 2px;
+  transition: color 150ms ease;
+  flex-shrink: 0;
 }
 
 .toastClose:hover {
-    color: var(--theme-text);
+  color: var(--theme-text);
 }
 
 /* ── ErrorBoundary wrapper ────────────────────────────────── */
 .boundaryWrap {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: var(--theme-bg);
-    padding: 24px;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--theme-bg);
+  padding: 24px;
 }
 
 /* ── Scan-line detail on server errors ────────────────────── */
 .scanEffect {
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    overflow: hidden;
-    pointer-events: none;
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  overflow: hidden;
+  pointer-events: none;
 }
 
 .scanEffect::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    right: 0;
-    height: 40px;
-    background: linear-gradient(transparent,
-            rgba(124, 95, 245, 0.06),
-            transparent);
-    animation: scanLine 3s linear infinite;
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 40px;
+  background: linear-gradient(
+    transparent,
+    rgba(124, 95, 245, 0.06),
+    transparent
+  );
+  animation: scanLine 3s linear infinite;
 }
 
 /* ── Responsive ───────────────────────────────────────────── */
 @media (max-width: 600px) {
-    .card {
-        padding: 36px 24px 28px;
-    }
+  .card {
+    padding: 36px 24px 28px;
+  }
 
-    .headline {
-        font-size: 22px;
-    }
+  .headline {
+    font-size: 22px;
+  }
 
-    .actions {
-        flex-direction: column;
-        align-items: stretch;
-    }
+  .actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
 
-    .btnPrimary,
-    .btnSecondary {
-        justify-content: center;
-    }
+  .btnPrimary,
+  .btnSecondary {
+    justify-content: center;
+  }
 
-    .toastStack {
-        left: 16px;
-        right: 16px;
-        bottom: 16px;
-    }
+  .toastStack {
+    left: 16px;
+    right: 16px;
+    bottom: 16px;
+  }
 
-    .toast {
-        min-width: unset;
-        max-width: 100%;
-    }
+  .toast {
+    min-width: unset;
+    max-width: 100%;
+  }
 }
 
 /* ── Reduced motion ───────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
+  .illustration,
+  .emptyIllustration {
+    animation: none;
+  }
 
-    .illustration,
-    .emptyIllustration {
-        animation: none;
-    }
+  .orb,
+  .star {
+    animation: none;
+  }
 
-    .orb,
-    .star {
-        animation: none;
-    }
+  .card {
+    animation: none;
+  }
 
-    .card {
-        animation: none;
-    }
-
-    .headline {
-        animation: none;
-    }
+  .headline {
+    animation: none;
+  }
 }

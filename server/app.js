@@ -1,13 +1,21 @@
-import "dotenv/config";
+import dotenv from "dotenv";
+dotenv.config({
+    path: `.env.${process.env.NODE_ENV || "development"}`
+});
 import express from "express"
 import prisma from "./lib/prisma.js"
 import cookieParser from "cookie-parser";
 import cors from "cors"
+import limiter from "./middlewares/rateLimiter.middleware.js";
+import helmet from "helmet"
+
 const app = express();
 app.use(express.json({ limit: "16kb" }))
 app.use(express.urlencoded({ extended: true, limit: "16kb" }))
 app.use(cookieParser());
 app.use(cors())
+app.use(limiter)
+app.use(helmet())
 
 import registerRoute from "./routes/auth.route.js"
 import userRoute from "./routes/auth.route.js"

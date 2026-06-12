@@ -1,53 +1,57 @@
 /* ThemeToggle.module.css */
 
 .toggleBtn {
-    background: none;
-    border: none;
-    padding: 0;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    outline: none;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  outline: none;
 }
 
 .toggleBtn:focus-visible .track {
-    box-shadow: 0 0 0 2px var(--toggle-accent);
+  box-shadow: 0 0 0 2px var(--toggle-accent);
 }
 
 .track {
-    position: relative;
-    display: flex;
-    align-items: center;
-    width: 52px;
-    height: 28px;
-    border-radius: 9999px;
-    background: var(--toggle-track-bg);
-    border: 1px solid var(--toggle-track-border);
-    transition: background 0.25s ease, border-color 0.25s ease;
-    padding: 2px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 52px;
+  height: 28px;
+  border-radius: 9999px;
+  background: var(--toggle-track-bg);
+  border: 1px solid var(--toggle-track-border);
+  transition:
+    background 0.25s ease,
+    border-color 0.25s ease;
+  padding: 2px;
 }
 
 .thumb {
-    position: absolute;
-    width: 22px;
-    height: 22px;
-    border-radius: 50%;
-    background: var(--toggle-thumb-bg);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 13px;
-    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), background 0.25s ease;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
-    top: 50%;
-    transform: translateY(-50%);
-    left: 3px;
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--toggle-thumb-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  transition:
+    transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+    background 0.25s ease;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  top: 50%;
+  transform: translateY(-50%);
+  left: 3px;
 }
 
 .thumbDark {
-    transform: translate(24px, -50%);
+  transform: translate(24px, -50%);
 }
 
 .thumbLight {
-    transform: translate(0px, -50%);
+  transform: translate(0px, -50%);
 }

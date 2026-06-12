@@ -1,7 +1,7 @@
 import React from "react";
 import ErrorPage, { RouteErrorPage } from "./errors/components/ErrorPage.jsx";
 import { ERROR_TYPES } from "./errors/config/errorConfig.js";
-import "../src/index.css"
+import "../src/index.css";
 import "./pages/styles/global.css";
 import { Routes, Route } from "react-router-dom";
 import Home from "../src/pages/Home.jsx";
@@ -53,7 +53,10 @@ const App = () => {
           element={<Login />}
         />
 
-        <Route element={<AppShell />} errorElement={<RouteErrorPage />}>
+        <Route
+          element={<AppShell />}
+          errorElement={<RouteErrorPage />}
+        >
           {/* <Route path='/dashboard' element={<ProtectedRoute component={<Dashboard/>}/>} /> */}
           <Route
             path="/dashboard"
@@ -63,99 +66,204 @@ const App = () => {
             path="/notes"
             element={<ProtectedRoute component={<Notes />} />}
           />
-          <Route path="/quiz" element={<ProtectedRoute component={<Quiz />} />} />
-          <Route path="/quiz/create" element={<ProtectedRoute component={<Quiz />} />} />
-          <Route path="/quiz/upload" element={<ProtectedRoute component={<Quiz />} />} />
-          <Route path="/quiz/text" element={<ProtectedRoute component={<Quiz />} />} />
-          <Route path="/quiz/types" element={<ProtectedRoute component={<Quiz />} />} />
-          <Route path="/quiz/take/:id" element={<ProtectedRoute component={<Quiz />} />} />
-          <Route path="/quiz/results/:id" element={<ProtectedRoute component={<Quiz />} />} />
-          <Route path="/quiz/history" element={<ProtectedRoute component={<Quiz />} />} />
-          <Route path="/flashcards" element={<ProtectedRoute component={<Flashcards />} />} />
-          <Route path="/flashcards/viewer/:id" element={<ProtectedRoute component={<Flashcards />} />} />
-          <Route path="/flashcards/create" element={<ProtectedRoute component={<Flashcards />} />} />
-          <Route path="/flashcards/create/topic" element={<ProtectedRoute component={<Flashcards />} />} />
-          <Route path="/flashcards/create/scratch" element={<ProtectedRoute component={<Flashcards />} />} />
-          <Route path="/flashcards/create/pdf" element={<ProtectedRoute component={<Flashcards />} />} />
+          <Route
+            path="/quiz"
+            element={<ProtectedRoute component={<Quiz />} />}
+          />
+          <Route
+            path="/quiz/create"
+            element={<ProtectedRoute component={<Quiz />} />}
+          />
+          <Route
+            path="/quiz/upload"
+            element={<ProtectedRoute component={<Quiz />} />}
+          />
+          <Route
+            path="/quiz/text"
+            element={<ProtectedRoute component={<Quiz />} />}
+          />
+          <Route
+            path="/quiz/types"
+            element={<ProtectedRoute component={<Quiz />} />}
+          />
+          <Route
+            path="/quiz/take/:id"
+            element={<ProtectedRoute component={<Quiz />} />}
+          />
+          <Route
+            path="/quiz/results/:id"
+            element={<ProtectedRoute component={<Quiz />} />}
+          />
+          <Route
+            path="/quiz/history"
+            element={<ProtectedRoute component={<Quiz />} />}
+          />
+          <Route
+            path="/flashcards"
+            element={<ProtectedRoute component={<Flashcards />} />}
+          />
+          <Route
+            path="/flashcards/viewer/:id"
+            element={<ProtectedRoute component={<Flashcards />} />}
+          />
+          <Route
+            path="/flashcards/create"
+            element={<ProtectedRoute component={<Flashcards />} />}
+          />
+          <Route
+            path="/flashcards/create/topic"
+            element={<ProtectedRoute component={<Flashcards />} />}
+          />
+          <Route
+            path="/flashcards/create/scratch"
+            element={<ProtectedRoute component={<Flashcards />} />}
+          />
+          <Route
+            path="/flashcards/create/pdf"
+            element={<ProtectedRoute component={<Flashcards />} />}
+          />
 
           <Route
             path="/tutor"
-            element={<ProtectedRoute component={
-              <ComingSoon label="Tutor Chat" eta="July 2026">
-                <Tutor />
-              </ComingSoon>
-          } />}
+            element={
+              <ProtectedRoute
+                component={
+                  <ComingSoon
+                    label="Tutor Chat"
+                    eta="July 2026"
+                  >
+                    <Tutor />
+                  </ComingSoon>
+                }
+              />
+            }
           />
           <Route
             path="/study-room"
-            element={<ProtectedRoute component={
-              <ComingSoon label="Your Collaboraive Study Room" eta="August 2026">
-
-                <StudyRoom />
-              </ComingSoon>
-          } />}
+            element={
+              <ProtectedRoute
+                component={
+                  <ComingSoon
+                    label="Your Collaboraive Study Room"
+                    eta="August 2026"
+                  >
+                    <StudyRoom />
+                  </ComingSoon>
+                }
+              />
+            }
           />
           <Route
             path="/study-room/:roomId"
-            element={<ProtectedRoute component={
-              <ComingSoon label="Room Chat" eta="July 2026">
-
-                <RoomChat />
-              </ComingSoon>
-          } />}
+            element={
+              <ProtectedRoute
+                component={
+                  <ComingSoon
+                    label="Room Chat"
+                    eta="July 2026"
+                  >
+                    <RoomChat />
+                  </ComingSoon>
+                }
+              />
+            }
           />
           <Route
             path="/image-analysis"
-            element={<ProtectedRoute component={
-              <ComingSoon label="Image Analysis" eta="July 2026">
-
-                <ImageAnalysis />
-              </ComingSoon>
-          } />}
+            element={
+              <ProtectedRoute
+                component={
+                  <ComingSoon
+                    label="Image Analysis"
+                    eta="July 2026"
+                  >
+                    <ImageAnalysis />
+                  </ComingSoon>
+                }
+              />
+            }
           />
           <Route
             path="/pdf-analysis"
-            element={<ProtectedRoute component={
-              <ComingSoon label="Pdf Analysis" eta="July 2026">
-
-                <PDFSummary />
-              </ComingSoon>
-          } />}
-
+            element={
+              <ProtectedRoute
+                component={
+                  <ComingSoon
+                    label="Pdf Analysis"
+                    eta="July 2026"
+                  >
+                    <PDFSummary />
+                  </ComingSoon>
+                }
+              />
+            }
           />
           <Route
             path="/scheduler"
-            element={<ProtectedRoute component={
-              <ComingSoon label="Event Schedule" eta="July 2025">
-
-                <Scheduler />
-              </ComingSoon>
-          } />}
+            element={
+              <ProtectedRoute
+                component={
+                  <ComingSoon
+                    label="Event Schedule"
+                    eta="July 2025"
+                  >
+                    <Scheduler />
+                  </ComingSoon>
+                }
+              />
+            }
           />
 
-          <Route path="/time-table" element={<ProtectedRoute component={<TimeTable />} />} />
-          <Route path="/time-table/:view" element={<ProtectedRoute component={<TimeTable />} />} />
-          <Route path="/time-table/:view/event/:id" element={<ProtectedRoute component={<TimeTable />} />} />
-          <Route path="/time-table/:view/create" element={<ProtectedRoute component={<TimeTable />} />} />
-          <Route path="/time-table/:view/edit/:id" element={<ProtectedRoute component={<TimeTable />} />} />
+          <Route
+            path="/time-table"
+            element={<ProtectedRoute component={<TimeTable />} />}
+          />
+          <Route
+            path="/time-table/:view"
+            element={<ProtectedRoute component={<TimeTable />} />}
+          />
+          <Route
+            path="/time-table/:view/event/:id"
+            element={<ProtectedRoute component={<TimeTable />} />}
+          />
+          <Route
+            path="/time-table/:view/create"
+            element={<ProtectedRoute component={<TimeTable />} />}
+          />
+          <Route
+            path="/time-table/:view/edit/:id"
+            element={<ProtectedRoute component={<TimeTable />} />}
+          />
 
           <Route
             path="/event-scheduling"
-            element={<ProtectedRoute component={
-              <ComingSoon label="Event Scheduling" eta="July 2026">
-
-                <EventScheduling />
-              </ComingSoon>
-          } />}
+            element={
+              <ProtectedRoute
+                component={
+                  <ComingSoon
+                    label="Event Scheduling"
+                    eta="July 2026"
+                  >
+                    <EventScheduling />
+                  </ComingSoon>
+                }
+              />
+            }
           />
           <Route
             path="/scheduler/generate-plan"
-            element={<ProtectedRoute component={
-              <ComingSoon label="AI Generated Study Plan" eta="July 2026">
-
-                <GeneratePlanView />
-              </ComingSoon>
-          } />}
+            element={
+              <ProtectedRoute
+                component={
+                  <ComingSoon
+                    label="AI Generated Study Plan"
+                    eta="July 2026"
+                  >
+                    <GeneratePlanView />
+                  </ComingSoon>
+                }
+              />
+            }
           />
           <Route
             path="/notebook"
@@ -167,20 +275,52 @@ const App = () => {
           />
           <Route
             path="/event-scheduling/exams"
-            element={<ProtectedRoute component={<ExamSchedule />} />}
+            element={<ProtectedRoute component={
+              <ComingSoon
+                label="Exam Sxhedule"
+                eta="July 2026"
+              >
+
+                <ExamSchedule />
+              </ComingSoon>
+            } />}
           />
           <Route
             path="/event-scheduling/projects"
-            element={<ProtectedRoute component={<ProjectSubmissionScheduler />} />}
+            element={
+              <ProtectedRoute component={
+                <ComingSoon
+                  label="Project Scheduler"
+                  eta="July 2026"
+                >
+
+                  <ProjectSubmissionScheduler />
+                </ComingSoon>
+              } />
+            }
           />
-          <Route path="/event-scheduling/assignments" element={<ProtectedRoute component={<Assignments />} />} />
-          <Route path="/event-scheduling/assignments/new" element={<ProtectedRoute component={<Assignments />} />} />
-          <Route path="/event-scheduling/assignments/:id/edit" element={<ProtectedRoute component={<Assignments />} />} />
-          
-          <Route path="/search" element={<ProtectedRoute component={<SearchResults />} />} />
-          <Route path="/search/:tab" element={<ProtectedRoute component={<SearchResults />} />} />
+          <Route
+            path="/event-scheduling/assignments"
+            element={<ProtectedRoute component={<Assignments />} />}
+          />
+          <Route
+            path="/event-scheduling/assignments/new"
+            element={<ProtectedRoute component={<Assignments />} />}
+          />
+          <Route
+            path="/event-scheduling/assignments/:id/edit"
+            element={<ProtectedRoute component={<Assignments />} />}
+          />
+
+          <Route
+            path="/search"
+            element={<ProtectedRoute component={<SearchResults />} />}
+          />
+          <Route
+            path="/search/:tab"
+            element={<ProtectedRoute component={<SearchResults />} />}
+          />
         </Route>
-         
       </Routes>
     </>
   );

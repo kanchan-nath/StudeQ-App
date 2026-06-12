@@ -19,13 +19,15 @@ import ErrorToastStack from "./errors/components/ErrorToastStack.jsx";
 try {
   const savedTheme = localStorage.getItem("sparke-theme") || "dark";
   document.documentElement.setAttribute("data-theme", savedTheme);
-} catch (e) { }
+} catch (e) {}
 
 createRoot(document.getElementById("root")).render(
   <BrowserRouter>
     {/* ErrorBoundary wraps everything — catches catastrophic render crashes */}
     <ErrorBoundary>
-      <ErrorProvider>          {/* provides useErrorHandler + global toast queue */}
+      <ErrorProvider>
+        {" "}
+        {/* provides useErrorHandler + global toast queue */}
         <LoaderProvider>
           <UserProvider>
             <App />
@@ -35,5 +37,5 @@ createRoot(document.getElementById("root")).render(
         <ErrorToastStack />
       </ErrorProvider>
     </ErrorBoundary>
-  </BrowserRouter>
+  </BrowserRouter>,
 );

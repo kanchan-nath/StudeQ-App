@@ -1,99 +1,212 @@
 /// <reference types="vitest/globals" />
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, waitFor, cleanup } from '@testing-library/react'
-import userEvent from "@testing-library/user-event"
-import { NoteInputForm } from '../../pages/Notes'
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { render, screen, waitFor, cleanup } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { NoteInputForm } from "../../pages/Notes";
 import styles from "/src/pages/styles/notes.module.css";
-import { createRef } from 'react'
+import { createRef } from "react";
 
-describe('NoteInputForm', () => {
-    const onChangeMock = vi.fn()
-    const onSubmitMock = vi.fn()
-    const onCancelEditMock = vi.fn()
+describe("NoteInputForm", () => {
+  const onChangeMock = vi.fn();
+  const onSubmitMock = vi.fn();
+  const onCancelEditMock = vi.fn();
 
-    beforeEach(() => {
-        onChangeMock.mockClear()
-        onSubmitMock.mockClear()
-        onCancelEditMock.mockClear()
+  beforeEach(() => {
+    onChangeMock.mockClear();
+    onSubmitMock.mockClear();
+    onCancelEditMock.mockClear();
 
-        render(<NoteInputForm content="" onChange={onChangeMock} onSubmit={onSubmitMock} loading={false} editId={null} onCancelEdit={onCancelEditMock} inputRef={null} />)
-    })
+    render(
+      <NoteInputForm
+        content=""
+        onChange={onChangeMock}
+        onSubmit={onSubmitMock}
+        loading={false}
+        editId={null}
+        onCancelEdit={onCancelEditMock}
+        inputRef={null}
+      />,
+    );
+  });
 
-    it("renders '✦ New Note' label when no editId", () => {
-        expect(screen.getByText("✦ New Note")).toBeInTheDocument()
-    })
+  it("renders '✦ New Note' label when no editId", () => {
+    expect(screen.getByText("✦ New Note")).toBeInTheDocument();
+  });
 
-    it("renders '✎ Edit Note Content' label when editId provided", () => {
-        cleanup()
-        render(<NoteInputForm content="" onChange={onChangeMock} onSubmit={onSubmitMock} loading={false} editId="abc123" onCancelEdit={onCancelEditMock} inputRef={null} />)
-        expect(screen.getByText("✎ Edit Note Content")).toBeInTheDocument()
-    })
+  it("renders '✎ Edit Note Content' label when editId provided", () => {
+    cleanup();
+    render(
+      <NoteInputForm
+        content=""
+        onChange={onChangeMock}
+        onSubmit={onSubmitMock}
+        loading={false}
+        editId="abc123"
+        onCancelEdit={onCancelEditMock}
+        inputRef={null}
+      />,
+    );
+    expect(screen.getByText("✎ Edit Note Content")).toBeInTheDocument();
+  });
 
-    it("shows Cancel button when editId provided", () => {
-        cleanup()
-        render(<NoteInputForm content="" onChange={onChangeMock} onSubmit={onSubmitMock} loading={false} editId="abc123" onCancelEdit={onCancelEditMock} inputRef={null} />)
-        expect(screen.getByRole("button", { name: /cancel editing/i })).toBeInTheDocument()
-    })
+  it("shows Cancel button when editId provided", () => {
+    cleanup();
+    render(
+      <NoteInputForm
+        content=""
+        onChange={onChangeMock}
+        onSubmit={onSubmitMock}
+        loading={false}
+        editId="abc123"
+        onCancelEdit={onCancelEditMock}
+        inputRef={null}
+      />,
+    );
+    expect(
+      screen.getByRole("button", { name: /cancel editing/i }),
+    ).toBeInTheDocument();
+  });
 
-    it("hides Cancel button when no editId", () => {
-        expect(screen.queryByRole("button", { name: /cancel editing/i })).not.toBeInTheDocument()
-    })
+  it("hides Cancel button when no editId", () => {
+    expect(
+      screen.queryByRole("button", { name: /cancel editing/i }),
+    ).not.toBeInTheDocument();
+  });
 
-    it("textarea shows placeholder when empty", () => {
-        const textarea = screen.getByRole("textbox", { name: /content to summarise/i })
-        expect(textarea).toHaveAttribute("placeholder", "Paste your lecture notes, article, or any text here…")
-    })
+  it("textarea shows placeholder when empty", () => {
+    const textarea = screen.getByRole("textbox", {
+      name: /content to summarise/i,
+    });
+    expect(textarea).toHaveAttribute(
+      "placeholder",
+      "Paste your lecture notes, article, or any text here…",
+    );
+  });
 
-    it("shows character count when content is not empty", () => {
-        cleanup()
-        render(<NoteInputForm content="Hello World" onChange={onChangeMock} onSubmit={onSubmitMock} loading={false} editId={null} onCancelEdit={onCancelEditMock} inputRef={null} />)
-        expect(screen.getByText("11 characters")).toBeInTheDocument()
-    })
+  it("shows character count when content is not empty", () => {
+    cleanup();
+    render(
+      <NoteInputForm
+        content="Hello World"
+        onChange={onChangeMock}
+        onSubmit={onSubmitMock}
+        loading={false}
+        editId={null}
+        onCancelEdit={onCancelEditMock}
+        inputRef={null}
+      />,
+    );
+    expect(screen.getByText("11 characters")).toBeInTheDocument();
+  });
 
-    it("shows tip text when content is empty", () => {
-        expect(screen.getByText("Tip: longer text = richer summary")).toBeInTheDocument()
-    })
+  it("shows tip text when content is empty", () => {
+    expect(
+      screen.getByText("Tip: longer text = richer summary"),
+    ).toBeInTheDocument();
+  });
 
-    it("shows spinner and 'Summarising…' text when loading", () => {
-        cleanup()
-        render(<NoteInputForm content="" onChange={onChangeMock} onSubmit={onSubmitMock} loading={true} editId={null} onCancelEdit={onCancelEditMock} inputRef={null} />)
-        expect(screen.getByRole("button", { name: /summarising/i })).toHaveTextContent("Summarising…")
-    })
+  it("shows spinner and 'Summarising…' text when loading", () => {
+    cleanup();
+    render(
+      <NoteInputForm
+        content=""
+        onChange={onChangeMock}
+        onSubmit={onSubmitMock}
+        loading={true}
+        editId={null}
+        onCancelEdit={onCancelEditMock}
+        inputRef={null}
+      />,
+    );
+    expect(
+      screen.getByRole("button", { name: /summarising/i }),
+    ).toHaveTextContent("Summarising…");
+  });
 
-    it("shows '✦ Update Note' on submit button when editId set", () => {
-        cleanup()
-        render(<NoteInputForm content="" onChange={onChangeMock} onSubmit={onSubmitMock} loading={false} editId="abc123" onCancelEdit={onCancelEditMock} inputRef={null} />)
-        expect(screen.getByRole("button", { name: /update note/i })).toHaveTextContent("✦ Update Note")
-    })
+  it("shows '✦ Update Note' on submit button when editId set", () => {
+    cleanup();
+    render(
+      <NoteInputForm
+        content=""
+        onChange={onChangeMock}
+        onSubmit={onSubmitMock}
+        loading={false}
+        editId="abc123"
+        onCancelEdit={onCancelEditMock}
+        inputRef={null}
+      />,
+    );
+    expect(
+      screen.getByRole("button", { name: /update note/i }),
+    ).toHaveTextContent("✦ Update Note");
+  });
 
-    it("shows '✦ Summarise & Save' on submit button when no editId", () => {
-        expect(screen.getByRole("button", { name: /summarise & save/i })).toHaveTextContent("✦ Summarise & Save")
-    })
+  it("shows '✦ Summarise & Save' on submit button when no editId", () => {
+    expect(
+      screen.getByRole("button", { name: /summarise & save/i }),
+    ).toHaveTextContent("✦ Summarise & Save");
+  });
 
-    it("calls onChange when user types in textarea", async () => {
-        const textarea = screen.getByRole("textbox", { name: /content to summarise/i })
-        await userEvent.type(textarea, "a")
-        expect(onChangeMock).toHaveBeenCalled()
-    })
+  it("calls onChange when user types in textarea", async () => {
+    const textarea = screen.getByRole("textbox", {
+      name: /content to summarise/i,
+    });
+    await userEvent.type(textarea, "a");
+    expect(onChangeMock).toHaveBeenCalled();
+  });
 
-    it("calls onSubmit when form is submitted", async () => {
-        cleanup()
-        render(<NoteInputForm content="some content" onChange={onChangeMock} onSubmit={onSubmitMock} loading={false} editId={null} onCancelEdit={onCancelEditMock} inputRef={null} />)
-        await userEvent.click(screen.getByRole("button", { name: /summarise & save/i }))
-        expect(onSubmitMock).toHaveBeenCalledTimes(1)
-    })
+  it("calls onSubmit when form is submitted", async () => {
+    cleanup();
+    render(
+      <NoteInputForm
+        content="some content"
+        onChange={onChangeMock}
+        onSubmit={onSubmitMock}
+        loading={false}
+        editId={null}
+        onCancelEdit={onCancelEditMock}
+        inputRef={null}
+      />,
+    );
+    await userEvent.click(
+      screen.getByRole("button", { name: /summarise & save/i }),
+    );
+    expect(onSubmitMock).toHaveBeenCalledTimes(1);
+  });
 
-    it("calls onCancelEdit when Cancel button clicked", async () => {
-        cleanup()
-        render(<NoteInputForm content="" onChange={onChangeMock} onSubmit={onSubmitMock} loading={false} editId="abc123" onCancelEdit={onCancelEditMock} inputRef={null} />)
-        await userEvent.click(screen.getByRole("button", { name: /cancel editing/i }))
-        expect(onCancelEditMock).toHaveBeenCalledTimes(1)
-    })
+  it("calls onCancelEdit when Cancel button clicked", async () => {
+    cleanup();
+    render(
+      <NoteInputForm
+        content=""
+        onChange={onChangeMock}
+        onSubmit={onSubmitMock}
+        loading={false}
+        editId="abc123"
+        onCancelEdit={onCancelEditMock}
+        inputRef={null}
+      />,
+    );
+    await userEvent.click(
+      screen.getByRole("button", { name: /cancel editing/i }),
+    );
+    expect(onCancelEditMock).toHaveBeenCalledTimes(1);
+  });
 
-    it("textarea is focused via inputRef", () => {
-        cleanup()
-        const inputRef = createRef()
-        render(<NoteInputForm content="" onChange={onChangeMock} onSubmit={onSubmitMock} loading={false} editId={null} onCancelEdit={onCancelEditMock} inputRef={inputRef} />)
-        expect(inputRef.current).toBeInstanceOf(HTMLTextAreaElement)
-    })
-})
+  it("textarea is focused via inputRef", () => {
+    cleanup();
+    const inputRef = createRef();
+    render(
+      <NoteInputForm
+        content=""
+        onChange={onChangeMock}
+        onSubmit={onSubmitMock}
+        loading={false}
+        editId={null}
+        onCancelEdit={onCancelEditMock}
+        inputRef={inputRef}
+      />,
+    );
+    expect(inputRef.current).toBeInstanceOf(HTMLTextAreaElement);
+  });
+});

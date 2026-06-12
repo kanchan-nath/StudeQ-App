@@ -35,7 +35,7 @@
   --shadow: 0 2px 16px rgba(0, 0, 0, 0.18);
   --shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.28);
   --theme-amber: #f59e0b;
-    --theme-orange: #f97316;
+  --theme-orange: #f97316;
 }
 
 /* ─── BASE ──────────────────────────────────────────── */
@@ -139,7 +139,11 @@
 .homeIcon {
   width: 64px;
   height: 64px;
-  background: linear-gradient(135deg, var(--theme-purple), var(--theme-purple-light));
+  background: linear-gradient(
+    135deg,
+    var(--theme-purple),
+    var(--theme-purple-light)
+  );
   border-radius: 18px;
   margin: 0 auto 24px;
   display: flex;
@@ -353,7 +357,6 @@
 }
 
 @keyframes selectedPulse {
-
   0%,
   100% {
     box-shadow: 0 0 0 0px rgba(124, 95, 245, 0);
@@ -872,7 +875,6 @@
 }
 
 @keyframes cardFloat {
-
   0%,
   100% {
     transform: translateY(0);
@@ -912,7 +914,6 @@
 }
 
 @keyframes shimmer {
-
   0%,
   100% {
     opacity: 0.35;
@@ -939,7 +940,6 @@
 }
 
 @keyframes fadeStatus {
-
   0%,
   100% {
     opacity: 0.45;
@@ -1219,7 +1219,11 @@
 .quizHeaderIcon {
   width: 32px;
   height: 32px;
-  background: linear-gradient(135deg, var(--theme-amber, #f59e0b), var(--theme-orange, #f97316));
+  background: linear-gradient(
+    135deg,
+    var(--theme-amber, #f59e0b),
+    var(--theme-orange, #f97316)
+  );
   border-radius: var(--radius-sm);
   display: flex;
   align-items: center;
@@ -1244,7 +1248,8 @@
   font-size: 13px;
   color: var(--text2);
   cursor: pointer;
-  transition: background var(--duration-fast) var(--ease-out-quart),
+  transition:
+    background var(--duration-fast) var(--ease-out-quart),
     border-color var(--duration-fast) var(--ease-out-quart);
 }
 
@@ -1254,10 +1259,10 @@
 }
 
 .btnPrimary {
-    background: none;
-    /* border-color: 1px solid var(--border);; */
-    color:var(--text2);;
-    font-weight: 600;
+  background: none;
+  /* border-color: 1px solid var(--border);; */
+  color: var(--text2);
+  font-weight: 600;
 }
 
 .btnPrimary:hover {
@@ -1275,7 +1280,8 @@
   font-size: 13px;
   color: var(--text2);
   cursor: pointer;
-  transition: background var(--duration-fast) var(--ease-out-quart),
+  transition:
+    background var(--duration-fast) var(--ease-out-quart),
     border-color var(--duration-fast) var(--ease-out-quart),
     color var(--duration-fast) var(--ease-out-quart);
 }
@@ -2002,7 +2008,6 @@
 
 /* ─── MOBILE RESPONSIVE ──────────────────────────────────────── */
 @media (max-width: 768px) {
-
   .homeWrapper {
     flex-direction: column;
     position: relative;
@@ -2238,7 +2243,6 @@
 /* ─── REDUCED MOTION ────────────────────────────────── */
 /* Disable all animations & slow transitions for users who prefer it */
 @media (prefers-reduced-motion: reduce) {
-
   *,
   *::before,
   *::after {

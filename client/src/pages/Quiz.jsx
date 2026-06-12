@@ -399,7 +399,6 @@ export default function Quiz() {
       {/* ── HOME ─────────────────────────────────────────────────── */}
       {phase === PHASE.HOME && (
         <div className={styles.homeWrapper}>
-
           {/* ── MOBILE TOPBAR ── */}
           <div className={styles.mobileTopbar}>
             <span className={styles.mobileTopbar__title}>🧠 Spark.E Quiz</span>
@@ -469,10 +468,19 @@ export default function Quiz() {
             {/* Content — desktop: only when sidebarOpen; mobile: only when mobileSidebarOpen */}
             {(sidebarOpen || mobileSidebarOpen) && (
               <div className={styles.sidebarContent}>
-
                 {/* Header: title + close btn */}
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
-                  <h3 className={styles.sidebarTitle} style={{ margin: 0 }}>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    marginBottom: 16,
+                  }}
+                >
+                  <h3
+                    className={styles.sidebarTitle}
+                    style={{ margin: 0 }}
+                  >
                     🕓 Quiz History
                   </h3>
                   <button
@@ -489,7 +497,10 @@ export default function Quiz() {
                   <p className={styles.sidebarEmpty}>No quizzes yet.</p>
                 ) : (
                   allQuizzes.map((q) => (
-                    <div key={q._id} className={styles.sidebarItem}>
+                    <div
+                      key={q._id}
+                      className={styles.sidebarItem}
+                    >
                       <div className={styles.sidebarItemRow}>
                         <div
                           className={styles.sidebarItemText}
@@ -508,7 +519,9 @@ export default function Quiz() {
                             className={styles.threeDotBtn}
                             onClick={(e) => {
                               e.stopPropagation();
-                              setOpenMenuId(openMenuId === q._id ? null : q._id);
+                              setOpenMenuId(
+                                openMenuId === q._id ? null : q._id,
+                              );
                             }}
                           >
                             ···
@@ -945,7 +958,6 @@ export default function Quiz() {
 
           return (
             <div className={styles.quizScreen}>
-
               <div className={styles.quizTopbar}>
                 <span className={styles.quizTitleBar}>
                   {quizData.quiz?.title || "Quiz"}
@@ -1034,17 +1046,9 @@ export default function Quiz() {
 
           return (
             <div className={styles.resultsScreen}>
-              <div
-                className={styles.quizHeader}
-              >
-                <div
-                  className={styles.quizHeaderIcon}
-                >
-                  📋
-                </div>
-                <span className={styles.quizHeaderTitle}>
-                  Quiz Results
-                </span>
+              <div className={styles.quizHeader}>
+                <div className={styles.quizHeaderIcon}>📋</div>
+                <span className={styles.quizHeaderTitle}>Quiz Results</span>
                 <button
                   className={`${styles.btnAction} ${styles.btnPrimary}`}
                   onClick={() => {
@@ -1173,14 +1177,8 @@ export default function Quiz() {
 
 function Topbar({ step, onExit }) {
   return (
-    <div
-      className={styles.quizHeader}
-    >
-      <div
-        className={styles.quizHeaderIcon}
-      >
-        📋
-      </div>
+    <div className={styles.quizHeader}>
+      <div className={styles.quizHeaderIcon}>📋</div>
       <span className={styles.quizHeaderTitle}>Create Quiz</span>
       <span style={{ fontSize: 13, color: "#9298b0", marginLeft: 8 }}>
         {step}

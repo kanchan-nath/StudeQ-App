@@ -236,7 +236,6 @@ const Dashboard = () => {
       //   xpPercent:   profileData?.data?.xpPercent   ?? DEFAULT_PROFILE.xpPercent,
       //   xpNextLevel: profileData?.data?.xpNextLevel ?? DEFAULT_PROFILE.xpNextLevel,
       // });
-
     } catch (err) {
       // ── Network / TypeError (no connection) ─────────────────────────────────
       const type = resolveErrorType(err);
@@ -268,11 +267,11 @@ const Dashboard = () => {
   // ── Derived values ───────────────────────────────────────────────────────────
   const initials = userData?.name
     ? userData.name
-      .split(" ")
-      .map((w) => w[0])
-      .join("")
-      .slice(0, 2)
-      .toUpperCase()
+        .split(" ")
+        .map((w) => w[0])
+        .join("")
+        .slice(0, 2)
+        .toUpperCase()
     : "YOU";
 
   const today = new Date().toLocaleDateString("en-US", {

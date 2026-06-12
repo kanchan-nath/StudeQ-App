@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import UserContext from "./UserContext.js";
 import BASE_URL from "../lib/api.js";
-import useLoader from "./useLoader.js"
+import useLoader from "./useLoader.js";
 
 const UserProvider = ({ children }) => {
   const { show, hide } = useLoader();
@@ -33,7 +33,7 @@ const UserProvider = ({ children }) => {
       } catch (error) {
         setLoading(false);
       } finally {
-        hide();  // ← ADD
+        hide(); // ← ADD
       }
     };
     fetchUser();

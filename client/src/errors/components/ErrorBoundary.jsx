@@ -19,57 +19,57 @@ import { ERROR_TYPES } from "../config/errorConfig.js";
  *   </ErrorBoundary>
  */
 class ErrorBoundary extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            hasError: false,
-            error: null,
-            info: null,
-        };
-        this.handleRetry = this.handleRetry.bind(this);
+  constructor(props) {
+    super(props);
+    this.state = {
+      hasError: false,
+      error: null,
+      info: null,
+    };
+    this.handleRetry = this.handleRetry.bind(this);
+  }
+
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error, info) {
+    this.setState({ info });
+
+    // Log to console in dev; swap for your error tracking (Sentry, etc.)
+    if (import.meta.env?.DEV) {
+      console.error("[ErrorBoundary] Caught render error:", error, info);
     }
 
-    static getDerivedStateFromError(error) {
-        return { hasError: true, error };
+    // Optional external reporter from props
+    this.props.onError?.(error, info);
+  }
+
+  handleRetry() {
+    this.setState({ hasError: false, error: null, info: null });
+  }
+
+  render() {
+    if (!this.state.hasError) {
+      return this.props.children;
     }
 
-    componentDidCatch(error, info) {
-        this.setState({ info });
-
-        // Log to console in dev; swap for your error tracking (Sentry, etc.)
-        if (import.meta.env?.DEV) {
-            console.error("[ErrorBoundary] Caught render error:", error, info);
-        }
-
-        // Optional external reporter from props
-        this.props.onError?.(error, info);
+    // Allow custom fallback UI
+    if (this.props.fallback) {
+      return this.props.fallback;
     }
 
-    handleRetry() {
-        this.setState({ hasError: false, error: null, info: null });
-    }
-
-    render() {
-        if (!this.state.hasError) {
-            return this.props.children;
-        }
-
-        // Allow custom fallback UI
-        if (this.props.fallback) {
-            return this.props.fallback;
-        }
-
-        return (
-            <div className={styles.boundaryWrap}>
-                <ErrorPage
-                    type={ERROR_TYPES.UNKNOWN}
-                    customHeadline="Something crashed"
-                    customDescription="An unexpected error broke this page. Refresh to recover, or go back to safety."
-                    onRetry={this.handleRetry}
-                />
-            </div>
-        );
-    }
+    return (
+      <div className={styles.boundaryWrap}>
+        <ErrorPage
+          type={ERROR_TYPES.UNKNOWN}
+          customHeadline="Something crashed"
+          customDescription="An unexpected error broke this page. Refresh to recover, or go back to safety."
+          onRetry={this.handleRetry}
+        />
+      </div>
+    );
+  }
 }
 
 export default ErrorBoundary;

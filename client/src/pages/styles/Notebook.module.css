@@ -88,7 +88,6 @@
 
 /* ── Accessibility: kill all motion for prefers-reduced-motion ── */
 @media (prefers-reduced-motion: reduce) {
-
   *,
   *::before,
   *::after {
@@ -157,7 +156,6 @@
 
 /* Floating upload icon */
 @keyframes floatUp {
-
   0%,
   100% {
     transform: translateY(0);
@@ -196,7 +194,6 @@
 
 /* Text pulse for loader label */
 @keyframes pulse {
-
   0%,
   100% {
     opacity: 1;
@@ -209,7 +206,6 @@
 
 /* Live dot pulse on chat header */
 @keyframes dotPulse {
-
   0%,
   100% {
     box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.25);
@@ -222,7 +218,6 @@
 
 /* Dot bounce for "thinking" indicator */
 @keyframes dotBounce {
-
   0%,
   80%,
   100% {
@@ -478,35 +473,35 @@
 
 /* Stagger: each card delays by its DOM order via nth-child.
    CSS-only stagger up to 8 cards; beyond that they share last delay. */
-.sidebarList>li:nth-child(1) {
+.sidebarList > li:nth-child(1) {
   animation-delay: 60ms;
 }
 
-.sidebarList>li:nth-child(2) {
+.sidebarList > li:nth-child(2) {
   animation-delay: 110ms;
 }
 
-.sidebarList>li:nth-child(3) {
+.sidebarList > li:nth-child(3) {
   animation-delay: 160ms;
 }
 
-.sidebarList>li:nth-child(4) {
+.sidebarList > li:nth-child(4) {
   animation-delay: 210ms;
 }
 
-.sidebarList>li:nth-child(5) {
+.sidebarList > li:nth-child(5) {
   animation-delay: 260ms;
 }
 
-.sidebarList>li:nth-child(6) {
+.sidebarList > li:nth-child(6) {
   animation-delay: 310ms;
 }
 
-.sidebarList>li:nth-child(7) {
+.sidebarList > li:nth-child(7) {
   animation-delay: 360ms;
 }
 
-.sidebarList>li:nth-child(n+8) {
+.sidebarList > li:nth-child(n + 8) {
   animation-delay: 400ms;
 }
 
@@ -890,7 +885,9 @@
 .dropZoneActive {
   border-color: var(--n-accent);
   background: var(--n-accent-glow);
-  box-shadow: 0 0 0 4px var(--n-accent-glow), var(--n-shadow-md);
+  box-shadow:
+    0 0 0 4px var(--n-accent-glow),
+    var(--n-shadow-md);
   transform: scale(1.012);
   /* subtle grow confirms drag target */
 }
@@ -1334,7 +1331,9 @@
 }
 
 .bubbleEditing {
-  box-shadow: 0 0 0 2px var(--n-accent), var(--n-shadow-sm);
+  box-shadow:
+    0 0 0 2px var(--n-accent),
+    var(--n-shadow-sm);
 }
 
 /* ── User message content ─────────────────────────────────── */
