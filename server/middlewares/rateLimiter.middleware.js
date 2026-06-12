@@ -1,14 +1,12 @@
 import {rateLimit} from "express-rate-limit"
+import { ApiError, ApiResponse } from "../utils/Async.js"
 
 const limiter = rateLimit(
     {
         windowMs:60*1000,
         limit:50,
         message: async(req, res)=>{
-            return {
-                success: false,
-                message:`Too many request from this IP: ${req.ip}, try again later!`
-            }
+            throw new ApiError(429, `To many request from this IP: ${req.ip}`)
         },
         statusCode:429,
         standardHeaders: "draft-8",
