@@ -8,6 +8,7 @@ import cookieParser from "cookie-parser";
 import cors from "cors"
 import limiter from "./middlewares/rateLimiter.middleware.js";
 import helmet from "helmet"
+import logger from "./logger/index.js"
 
 const app = express();
 app.use(express.json({ limit: "16kb" }))
@@ -15,12 +16,13 @@ app.use(express.urlencoded({ extended: true, limit: "16kb" }))
 app.use(cookieParser());
 
 const allowOrigins = (process.env.CORS_ORIGINS || "").split(",").filter(Boolean)
-app.use(cors(
-    {
-        origin:allowOrigins.length ? allowOrigins : false,
-        credentials: true
-    }
-))
+// app.use(cors(
+//     {
+//         origin:allowOrigins.length ? allowOrigins : false,
+//         credentials: true
+//     }
+// ))
+app.use(cors())
 app.use(limiter)
 app.use(helmet())
 
@@ -47,4 +49,19 @@ app.use("/api/pdf", pdfAnalysisRouter)
 app.use("/api", schedulerRouter)
 app.use("/api/documents", filesRagRouter)
 app.use("/api", searchAPIRouter)
+
+app.use((err, req, res, next)=>{
+    const statusCode = err.statusCode || 500
+
+    loggers.error(err)
+    res
+    .status(statusCode)
+    .json(
+        {
+            success:false,
+            message: err.message || "Internal Server Error",
+            ...(process.env.NODE_ENV === "development" && {stack: err.stack})
+        }
+    )
+})
 export { app }
