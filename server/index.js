@@ -85,15 +85,36 @@ io.on("connection",(socket)=>{
     
 })
 
-const PORT = process.env.PORT
+const PORT = process.env.PORT || 3000
+if (!PORT) {
+    logger.error("FATAL: PORT env var not set")
+    process.exit(1)
+}
 
+let httpServer
 connectDB()
     .then(() => {
-        server.listen(PORT, '0.0.0.0', () => {
-            console.log(`Server is running at ${PORT}`);
+        httpServer = server.listen(PORT, '0.0.0.0', () => {
+            logger.info(`Server is running at ${PORT}`);
 
         })
     })
     .catch((error) => {
-        console.log("MONGO db connection failed !!! ", error);
+        logger.error("MONGO db connection failed !!! ", error);
     })
+
+    const shutdown = (signal)=>{
+        logger.info(`${signal} received, shutting down gracefully...`)
+
+        io.close(() => logger.info(`Socket.io closed`))
+
+        httpServer?.close(()=>{
+            logger.info("HTTP server closed")
+            process.exit(0)
+        })
+
+        setTimeout(()=>process.exit(1), 10000)
+    }
+
+    process.on("SIGTERM",()=> shutdown("SIGTERM"))
+    process.on("SIGINT", ()=> shutdown("SIGINT"))
