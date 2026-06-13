@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "NODE_ENV=development nodemon index.js",
     "dev-worker": "NODE_ENV=development nodemon services/worker.js",
-    "start": "NODE_ENV=production node index.js"
+    "start": "NODE_ENV=production node index.js",
+    "debug": "node index.js 2>&1",
+    "debug:full": "node --inspect index.js 2>&1 | tee logs/debug.log"
   },
   "keywords": [],
   "author": "KANCHAN NATH",

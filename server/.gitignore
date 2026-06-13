@@ -12,3 +12,4 @@ node_modules
 
 server/uploads/*
 !server/uploads/.gitkeep
+logs/
