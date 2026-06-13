@@ -13,9 +13,9 @@ redisClient.on("connect", () => logger.info("Redis connected"))
 redisClient.on("ready", () => logger.info(" Redis: ready to accept commands"))
 redisClient.on("reconnecting", () => logger.warn("Redis: reconnecting..."))
 redisClient.on("end", () => logger.warn("Redis: connection ended permanently"))
-redisClient.on("error", () => logger.error("Redis error:", err.message))
+redisClient.on("error", (err) => logger.error("Redis error:", err.message))
 
-export const shutdownRedis = async (signal)=>{
+export const shutdownRedis = async ()=>{
     try {
         await redisClient.quit(() => logger.info(" Redis: gracefully disconnected"))
     } catch (error) {
