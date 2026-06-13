@@ -6,6 +6,7 @@ import { ApiError } from "./utils/Async.js"
 import { initSocket } from "./lib/socket.js"
 import { aiQueueEvents } from "./services/queueEvents.js"
 import logger from "./logger/index.js"
+import { shutdownRedis } from "./lib/redisClient.js"
 
 const isProd = process.env.NODE_ENV || "production"
 
@@ -102,7 +103,7 @@ connectDB()
         logger.error("MONGO db connection failed !!! ", error);
     })
 
-    const shutdown = (signal)=>{
+    const shutdown = async (signal)=>{
         logger.info(`${signal} received, shutting down gracefully...`)
 
         io.close(() => logger.info(`Socket.io closed`))
@@ -111,6 +112,8 @@ connectDB()
             logger.info("HTTP server closed")
             process.exit(0)
         })
+
+        await shutdownRedis(signal)
 
         setTimeout(()=>process.exit(1), 10000)
     }
