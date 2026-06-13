@@ -1,7 +1,5 @@
 import {createLogger, format, transports} from "winston"
 import { WinstonTransport as AxiomTransport } from '@axiomhq/winston';
-import dotenv from "dotenv"
-dotenv.config({ path: ".env.development" }) 
 
 const developmentLogger = ()=>{
     const { combine, timestamp, errors, json, colorize, printf } = format;

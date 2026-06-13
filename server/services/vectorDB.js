@@ -1,5 +1,3 @@
-import dotenv from "dotenv"
-dotenv.config()
 import { Pinecone } from "@pinecone-database/pinecone";
 import embedText from "./embedText.js";
 import chunking from "./chunking.js";

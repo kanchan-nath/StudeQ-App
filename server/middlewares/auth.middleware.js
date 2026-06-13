@@ -33,18 +33,18 @@ const verifyJWT = asyncHandler(async (req, res, next) => {
         const cached = await redisClient.get(cacheKey)
 
         if(cached){
-            req.user = json.parse(cached)
+            req.user = JSON.parse(cached)
+            return next()
         }
-        return next()
 
     } catch (error) {
-        logger.error("Redis cache miss (error):", redisErr.message)
+        logger.error("Redis cache miss (error):", error.message)
     }
 
     let user
     try {   
 
-        const user = await prisma.user.findUnique({
+         user = await prisma.user.findUnique({
             where: {
                 id: decodedToken.userId,
             },
@@ -53,7 +53,6 @@ const verifyJWT = asyncHandler(async (req, res, next) => {
                 password:true
             }
         })
-        next()
     } catch (error) {
         logger.error("DB error in verifyJWT:", error)
         throw new ApiError(500, "Something went wrong, please try again")

@@ -1,6 +1,4 @@
 import groq from "./groq.js"
-import dotenv from "dotenv"
-dotenv.config()
 import fs from "fs"
 import path from "path"
 import { prompt_TextExtraction } from "../prompt.js"
