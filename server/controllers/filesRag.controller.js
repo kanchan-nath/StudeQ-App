@@ -34,7 +34,7 @@ const uploadFile = asyncHandler(async (req, res) => {
     const id = metadata._id
     const fileName = metadata.originalName
 
-    await vectorDB(localFile, userId)
+    await vectorDB(localFile, userId,chatRoomKey)
     await ChatRoom.create({
         userId,
         chatRoomKey,
@@ -60,7 +60,7 @@ const askQuery = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Query is not found")
     }
 
-    const topChunks = await queryDB(query)
+    const topChunks = await queryDB(query, userId)
     const results = await llmCall(query, topChunks, userId)
 
     await ChatRoom.findOneAndUpdate(

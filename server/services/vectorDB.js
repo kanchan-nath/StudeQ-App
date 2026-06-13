@@ -58,7 +58,7 @@ const vectorDB = async (file, userId, documentId) => {
         )
     }
 
-    await ns.upsert( records )
+    await ns.upsert( {records} )
     logger.info(`Upserted ${records.length} chunks for document ${documentId} (user ${userId})`)
     
 }
@@ -71,19 +71,10 @@ const deleteDocumentVectors = async(userId, documentId, chunkCount)=>{
     await ns.deleteMany(ids)
 }
 
-const queryDB = async(query)=>{
-    const pc = new Pinecone(
-        {
-            apiKey: process.env.PINECONE_API_KEY
-        }
-    )
+const queryDB = async(query, userId)=>{
+    const index = getIndex()
 
-    const index = pc.index("vectordb")
-
-    const namespace = process.env.PINECONE_NAME_SPACE ? process.env.PINECONE_NAME_SPACE.replace(/['"]/g, '') : "Kanchan_12345"
-
-    const ns = index.namespace(namespace);
-
+    const ns = index.namespace(getNamespace(userId))
 
     const queryVector = await embedText(query)
 
@@ -92,10 +83,14 @@ const queryDB = async(query)=>{
         topK: 5,
         includeMetadata: true
     })
-    
-    const topChunks = results.matches.map((m)=>(m.metadata.text))
-    console.log("Top chunks:",topChunks);
-    
-    return topChunks
+    logger.info(`queryDB: ${results.matches.length} matches for user ${userId}`)
+
+    return topChunks = results.matches.map((m)=>(
+        {
+            text: m.metadata.text,
+            documentId: m.metadata.documentId,
+            score: m.score
+        }
+    ))    
 }
-export  {vectorDB, queryDB}
+export  {vectorDB, queryDB, deleteDocumentVectors}
