@@ -1,17 +1,23 @@
 import {rateLimit} from "express-rate-limit"
-import { ApiError, ApiResponse } from "../utils/Async.js"
+import {RedisStore} from "rate-limit-redis"
+import redisClient from "../lib/redisClient.js"
 
-const limiter = rateLimit(
-    {
-        windowMs:60*1000,
-        limit:50,
-        message: async(req, res)=>{
-            throw new ApiError(429, `To many request from this IP: ${req.ip}`)
-        },
-        statusCode:429,
-        standardHeaders: "draft-8",
-        legacyHeaders: false
-    }
-)
+const createLimiter = ({ windowMs, limit, prefix })=>{
+    rateLimit(
+        {
+            windowMs,
+            limit,
+            statusCode:429,
+            standardHeaders:"draft-8",
+            legacyHeaders:false,
+            store: new RedisStore(
+                {
+                    sendCommand: (...args)=> redisClient.call(...args),
+                    prefix:`rl:${prefix}:`
+                }
+            )
+        }
+    )
+}
 
 export default limiter
