@@ -37,4 +37,11 @@ export const generalLimiter = createLimiter(
         prefix: "general"
     }
 )
+export const authLimiter = createLimiter(
+    {
+        windowMs: 60 * 1000,
+        limit: 5,
+        prefix: "auth"
+    }
+)
 export default limiter
