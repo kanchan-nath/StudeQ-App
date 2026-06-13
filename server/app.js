@@ -3,7 +3,7 @@ import express from "express"
 import prisma from "./lib/prisma.js"
 import cookieParser from "cookie-parser";
 import cors from "cors"
-import limiter from "./middlewares/rateLimiter.middleware.js";
+import {generalLimiter, authLimiter, aiLimiter} from "./middlewares/rateLimiter.middleware.js";
 import helmet from "helmet"
 import logger from "./logger/index.js"
 
@@ -12,20 +12,17 @@ const app = express();
 app.set("trust proxy", 1)
 app.use(helmet())
 
-// const allowOrigins = (process.env.CORS_ORIGINS || "").split(",").filter(Boolean)
-// app.use(cors(
-//     {
-//         origin: allowOrigins.length ? allowOrigins : false,
-//         credentials: true
-//     }
-// ))
-app.use(cors())
+const allowOrigins = (process.env.CORS_ORIGINS || "").split(",").filter(Boolean)
+app.use(cors(
+    {
+        origin: allowOrigins.length ? allowOrigins : false,
+        credentials: true
+    }
+))
 
 app.use(express.json({ limit: "16kb" }))
 app.use(express.urlencoded({ extended: true, limit: "16kb" }))
 app.use(cookieParser());
-app.use(limiter)
-
 
 import userRoute from "./routes/auth.route.js"
 import noteRoute from "./routes/note.route.js"
@@ -38,6 +35,7 @@ import schedulerRouter from "./routes/scheduler.route.js"
 import filesRagRouter from "./routes/filesRag.route.js"
 import searchAPIRouter from "./routes/searchAPI.route.js"
 
+app.use(generalLimiter)
 app.use("/api/auth", userRoute)
 app.use("/api/user", userRoute)
 app.use("/api", noteRoute)

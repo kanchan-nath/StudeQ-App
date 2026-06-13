@@ -3,7 +3,7 @@ import { RedisStore } from "rate-limit-redis"
 import redisClient from "../lib/redisClient.js"
 
 const createLimiter = ({ windowMs, limit, prefix }) => {
-    rateLimit(
+    return rateLimit(
         {
             windowMs,
             limit,
@@ -18,7 +18,7 @@ const createLimiter = ({ windowMs, limit, prefix }) => {
             ),
             handler: (req, res) => {
                 res
-                    .status(4269)
+                    .status(429)
                     .json(
                         {
                             success: false,
@@ -44,7 +44,7 @@ export const authLimiter = createLimiter(
         prefix: "auth"
     }
 )
-export const generalLimiter = createLimiter(
+export const aiLimiter = createLimiter(
     {
         windowMs: 60 * 1000,
         limit: 10,
