@@ -3,6 +3,7 @@ import { asyncHandler } from "../utils/asyncHandler.js"
 import { ApiError } from "../utils/Async.js"
 import prisma from "../lib/prisma.js"
 import redisClient from "../lib/redisClient.js"
+import logger from "../logger/index.js"
 
 const verifyJWT = asyncHandler(async (req, res, next) => {
 
@@ -31,7 +32,6 @@ const verifyJWT = asyncHandler(async (req, res, next) => {
 
     try {
         const cached = await redisClient.get(cacheKey)
-
         if(cached){
             req.user = JSON.parse(cached)
             return next()
