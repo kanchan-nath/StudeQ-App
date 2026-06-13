@@ -28,6 +28,10 @@ const verifyJWT = asyncHandler(async (req, res, next) => {
         throw new ApiError(401, "Invalid access token")
     }
 
+    if (decodedToken.type && decodedToken.type !== "access") {
+        throw new ApiError(401, "Invalid token type")
+    }
+
     const cacheKey = `user-cache:${decodedToken.userId}`
 
     try {
@@ -40,6 +44,7 @@ const verifyJWT = asyncHandler(async (req, res, next) => {
     } catch (error) {
         logger.error("Redis cache miss (error):", error.message)
     }
+    
 
     let user
     try {   
