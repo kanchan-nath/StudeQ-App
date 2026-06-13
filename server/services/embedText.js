@@ -11,7 +11,7 @@ const getEmbedder = () => {
 
 const embedText = async (text) => {
 
-    const embedder = getEmbedder()
+    const embedder = await getEmbedder()
     const output = await embedder(text, {
         pooling: "mean",
         normalize: true
