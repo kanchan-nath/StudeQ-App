@@ -63,6 +63,14 @@ const vectorDB = async (file, userId, documentId) => {
     
 }
 
+const deleteDocumentVectors = async(userId, documentId, chunkCount)=>{
+    const index = getIndex()
+    const ns = index.namespace(getNamespace(userId))
+    const ids = Array.from({ length: chunkCount }, (_, i) => `${documentId}_chunk_${i}`)
+
+    await ns.deleteMany(ids)
+}
+
 const queryDB = async(query)=>{
     const pc = new Pinecone(
         {
