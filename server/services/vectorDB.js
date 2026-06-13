@@ -27,7 +27,7 @@ const getNamespace = (userId)=>{
     return `user_${userId}`
 }
 
-const vectorDB = async (file, userId) => {
+const vectorDB = async (file, userId, documentId) => {
 
     if (!userId || !documentId) {
         throw new Error("vectorDB: userId and documentId are required")
@@ -36,34 +36,30 @@ const vectorDB = async (file, userId) => {
     const extractedText = await textExtractor(file)
     const chunks = await chunking(extractedText)
 
-    const pc = new Pinecone(
-        {
-        }
-    )
-
-    const index = await pc.index("vectordb")
-
-    const namespace = process.env.PINECONE_NAME_SPACE ? process.env.PINECONE_NAME_SPACE.replace(/['"]/g, '') : "Kanchan_12345"
-
+    const index = getIndex()
     const ns = index.namespace(getNamespace(userId));
 
-    const embeddings = await Promise.all(
-        chunks.map(chunk => embedText(chunk))
-    );
+    const records= []
 
-    const records = chunks.map((chunk, i) => (
-        {
-            id: `doc_${i}`,
-            values: embeddings[i],
-            metadata: {
-                text: chunk,
+    for(let i=0; i<chunks.length;i++){
+        const values = await embedText(chunks[i])
+
+        records.push(
+            {
+                id: `${documentId}_chunk_${i}`,
+                values,
+                metadata:{
+                    text:chunks[i],
+                    userId,
+                    documentId,
+                    chunkIndex: i,
+                }
             }
-        }
-    ))
+        )
+    }
 
-    console.log("Records saved:");
-    
-    await ns.upsert({ records })
+    await ns.upsert( records )
+    logger.info(`Upserted ${records.length} chunks for document ${documentId} (user ${userId})`)
     
 }
 
