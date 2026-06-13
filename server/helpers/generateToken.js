@@ -1,10 +1,10 @@
 import jwt from "jsonwebtoken"
+import crypto from "crypto"
 
 const generateAccessToken = (user)=>{
     return jwt.sign(
         {
             userId: user.id,
-            email: user.email,
             type:"access"
         },
         process.env.ACCESS_TOKEN_SECRET,
@@ -18,8 +18,8 @@ const generateRefreshToken = (user) => {
     return jwt.sign(
         {
             userId: user.id,
-            email: user.email,
-            type:"refresh"
+            type:"refresh",
+            jti: crypto.randomUUID()
         },
         process.env.REFRESH_TOKEN_SECRET,
         {
