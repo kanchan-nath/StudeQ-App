@@ -34,7 +34,7 @@ const uploadFile = asyncHandler(async (req, res) => {
     const id = metadata._id
     const fileName = metadata.originalName
 
-    await vectorDB(localFile)
+    await vectorDB(localFile, userId)
     await ChatRoom.create({
         userId,
         chatRoomKey,
