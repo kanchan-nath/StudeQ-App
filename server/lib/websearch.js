@@ -1,9 +1,4 @@
 import { getJson } from "serpapi"
-import dotenv from "dotenv"
-
-dotenv.config({
-    path: "/Users/kanchannath/Coding/Spark.E/server/.env"
-})
 const webSearch = async (query) => {
     const response = await getJson({
         engine: "google",

@@ -49,6 +49,7 @@
     "pdfjs-dist": "^5.7.284",
     "pg": "^8.20.0",
     "prettier": "^3.8.3",
+    "rate-limit-redis": "^5.0.0",
     "serpapi": "^2.2.1",
     "socket.io": "^4.8.3",
     "tesseract.js": "^7.0.0",
