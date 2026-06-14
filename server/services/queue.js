@@ -1,26 +1,43 @@
 import { Queue } from "bullmq"
-
+import logger from "../logger/index.js"
 const connection = {
-    host: "localhost",
-    port: 6379,
+    host: process.env.REDIS_HOST || "localhost",
+    port: Number(process.env.REDIS_PORT) || 6379,
+    password: process.env.REDIS_PASSWORD || undefined
 }
+const aiResponseQueueInstance = new Queue("ai-response-handler", {connection})
 
 const AIResponseQueue = async (userId, data) => {
-    const queue = new Queue("ai-response-handler", {connection})
-    console.log('Queue created:', queue.name);
+    logger.info('Queue created:', queue.name);
+
+    if(!userId){
+        throw new Error("AIResponseQueue: userId is required")
+    }
 
     const jobData = {userId, data}
-    await queue.add("ai-response-handler", jobData,{
-        // delay: 5000,
-        backoff:{
-            type:"exponential",
-            delay: 1000,
-        },
-        removeOnComplete:true,
-        removeOnFail:false
-    })
+
+    try {
+        await aiResponseQueueInstance.add("ai-response-handler",jobData, {
+            attempts:3,
+            backoff: {
+                type: "exponential",
+                delay: 1000,
+            },
+            removeOnComplete:true,
+            removeOnFail: {
+                age: 24*3600,
+                count:1000
+            },
+            jobId: hash(userId + JSON.stringify(data))
+        })
+    } catch (error) {
+        logger.error(`Failed to queue AI response job for user ${userId}:`, error)
+        throw error
+    }
 }
-// AIResponseQueue("ai-response", {data:"Hello Z wrold"})
+export const closeAIResponseQueue = async () => {
+    await aiResponseQueueInstance.close()
+}
 
 export {
     AIResponseQueue

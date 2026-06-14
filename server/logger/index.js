@@ -1,13 +1,14 @@
 import developmentLogger from "./developmentLogger.js"
 import productionLogger from "./productionLogger.js"
 
+const env = process.env.NODE_ENV || "development"
 let logger = null
 
-if (process.env.NODE_ENV === 'development') {
+if (env === 'development') {
     logger = developmentLogger()
 }
 
-if (process.env.NODE_ENV === 'production') {
+if (env === 'production') {
     logger = productionLogger()
 }
 

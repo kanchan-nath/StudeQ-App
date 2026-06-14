@@ -2,57 +2,79 @@ import { Pinecone } from "@pinecone-database/pinecone";
 import embedText from "./embedText.js";
 import chunking from "./chunking.js";
 import textExtractor from "./textExtractor.js";
+import logger from "../logger/index.js"
 
-const vectorDB = async (file) => {
+let pcClient = null
+
+const getIndex = ()=>{
+    if(!pcClient){
+        pcClient = new Pinecone(
+            {
+                apiKey: process.env.PINECONE_API_KEY
+
+            }
+        )
+    }
+
+    return pcClient.index(process.env.PINECONE_INDEX_NAME)
+}
+
+const getNamespace = (userId)=>{
+    if(!userId){
+        throw new Error("vectorDB: userId required for namespace isolation")
+    }
+
+    return `user_${userId}`
+}
+
+const vectorDB = async (file, userId, documentId) => {
+
+    if (!userId || !documentId) {
+        throw new Error("vectorDB: userId and documentId are required")
+    }
+
     const extractedText = await textExtractor(file)
-    
     const chunks = await chunking(extractedText)
 
-    const pc = new Pinecone(
-        {
-            apiKey: process.env.PINECONE_API_KEY
-        }
-    )
+    const index = getIndex()
+    const ns = index.namespace(getNamespace(userId));
 
-    const index = await pc.index("vectordb")
+    const records= []
 
-    const namespace = process.env.PINECONE_NAME_SPACE ? process.env.PINECONE_NAME_SPACE.replace(/['"]/g, '') : "Kanchan_12345"
+    for(let i=0; i<chunks.length;i++){
+        const values = await embedText(chunks[i])
 
-    const ns = index.namespace(namespace);
-
-    const embeddings = await Promise.all(
-        chunks.map(chunk => embedText(chunk))
-    );
-
-    const records = chunks.map((chunk, i) => (
-        {
-            id: `doc_${i}`,
-            values: embeddings[i],
-            metadata: {
-                text: chunk,
+        records.push(
+            {
+                id: `${documentId}_chunk_${i}`,
+                values,
+                metadata:{
+                    text:chunks[i],
+                    userId,
+                    documentId,
+                    chunkIndex: i,
+                }
             }
-        }
-    ))
+        )
+    }
 
-    console.log("Records saved:");
-    
-    await ns.upsert({ records })
+    await ns.upsert( {records} )
+    logger.info(`Upserted ${records.length} chunks for document ${documentId} (user ${userId})`)
     
 }
 
-const queryDB = async(query)=>{
-    const pc = new Pinecone(
-        {
-            apiKey: process.env.PINECONE_API_KEY
-        }
-    )
+const deleteDocumentVectors = async(userId, documentId, chunkCount)=>{
+    const index = getIndex()
+    const ns = index.namespace(getNamespace(userId))
+    const ids = Array.from({ length: chunkCount }, (_, i) => `${documentId}_chunk_${i}`)
 
-    const index = pc.index("vectordb")
+    await ns.deleteMany(ids)
+}
 
-    const namespace = process.env.PINECONE_NAME_SPACE ? process.env.PINECONE_NAME_SPACE.replace(/['"]/g, '') : "Kanchan_12345"
+const queryDB = async(query, userId)=>{
+    const index = getIndex()
 
-    const ns = index.namespace(namespace);
-
+    const ns = index.namespace(getNamespace(userId))
 
     const queryVector = await embedText(query)
 
@@ -61,10 +83,14 @@ const queryDB = async(query)=>{
         topK: 5,
         includeMetadata: true
     })
-    
-    const topChunks = results.matches.map((m)=>(m.metadata.text))
-    console.log("Top chunks:",topChunks);
-    
-    return topChunks
+    logger.info(`queryDB: ${results.matches.length} matches for user ${userId}`)
+
+    return topChunks = results.matches.map((m)=>(
+        {
+            text: m.metadata.text,
+            documentId: m.metadata.documentId,
+            score: m.score
+        }
+    ))    
 }
-export  {vectorDB, queryDB}
+export  {vectorDB, queryDB, deleteDocumentVectors}

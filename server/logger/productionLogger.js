@@ -1,7 +1,7 @@
-import {createLogger, format, transports} from "winston"
+import { createLogger, format, transports } from "winston"
 import { WinstonTransport as AxiomTransport } from '@axiomhq/winston';
 
-const developmentLogger = ()=>{
+const developmentLogger = () => {
     const { combine, timestamp, errors, json, colorize, printf } = format;
 
     const consoleFormat = printf(({ level, message, timestamp, stack }) => {
@@ -9,7 +9,7 @@ const developmentLogger = ()=>{
     });
 
     const logger = createLogger({
-        level:"info",
+        level: "info",
         format: combine(
             timestamp(),
             errors({ stack: true }),
@@ -36,9 +36,10 @@ const developmentLogger = ()=>{
         new transports.Console({ format: combine(timestamp(), consoleFormat) })
     );
     process.on("unhandledRejection", (reason) => {
-        logger.error("Unhandled Rejection", { reason });
+        logger.error(`Unhandled Rejection, ${reason}`);
+
     });
-    
+
     return logger
 }
 
