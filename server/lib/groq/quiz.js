@@ -115,7 +115,9 @@ const quizFromFile = async (types, extractedText, userId) => {
     if (!types || !extractedText || !userId) {
         throw new Error("quizFromFile: types, extractedText, userId all required")
     }
-    
+
+    const typesJson = JSON.stringify(Array.isArray(types) ? types : [types])
+
     const prompt = `
 You are a quiz generator.
 
