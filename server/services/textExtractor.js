@@ -124,11 +124,11 @@ const textExtractor = async (file) => {
             const extractedText = fs.readFileSync(filePath, 'utf8')
 
             safeUnlink(filePath)
-            
+
             return extractedText
         } else {
+            safeUnlink(filePath)
             throw new ApiError(404, "File not supported")
-            fs.unlinkSync(filePath)
         }
     } catch (error) {
         logger.error("Text extraction error:", error)
