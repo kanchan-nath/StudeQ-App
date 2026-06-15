@@ -52,6 +52,9 @@ const register = asyncHandler(async (req, res) => {
     const existingEmail = await prisma.user.findFirst({
         where: {
             email: email
+        },
+        select:{
+            id:true
         }
     })
 
