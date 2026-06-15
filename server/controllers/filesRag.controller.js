@@ -6,6 +6,7 @@ import { Documents } from "../models/document.model.js"
 import { v4 as uuid4 } from "uuid"
 import { ChatRoom } from "../models/chatRoom.model.js"
 import mongoose, { mongo } from "mongoose"
+import { ragQueryValidator } from "../validators/ragQuery.validator.js"
 
 const isValidId = (id)=>{
     return mongoose.Types.ObjectId.isValid(id)
@@ -66,10 +67,18 @@ const askQuery = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Something went wrong")
     }
 
-    
+    if(!isValidId){
+        throw new ApiError(400, "Invalid Id")
+    }
+
     const userId = req.user.id
 
-    const { query } = req.body
+    const {data, error} = ragQueryValidator.safeParse(req.body)
+    
+    if (error) {
+        throw new ApiError(400, error.issues.map(e => e.message).join(", "))
+    }
+    const { query } = data
 
     if (!query) {
         throw new ApiError(400, "Query is not found")
@@ -81,7 +90,7 @@ const askQuery = asyncHandler(async (req, res) => {
     await ChatRoom.findOneAndUpdate(
         {
             userId,
-            chatRoomKey
+            _id:id
         },
         {
             $push: {
@@ -103,7 +112,7 @@ const askQuery = asyncHandler(async (req, res) => {
 
     return res
         .status(200)
-        .json(new ApiResponse(200, results, "Response is provided successfully"))
+        .json(new ApiResponse(200, results, "Response provided successfully"))
 })
 
 const allChatsMessage = asyncHandler(async (req, res) => {
