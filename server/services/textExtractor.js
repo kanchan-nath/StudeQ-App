@@ -123,7 +123,8 @@ const textExtractor = async (file) => {
         } else if (mimeType == "text/plain") {
             const extractedText = fs.readFileSync(filePath, 'utf8')
 
-            fs.unlinkSync(filePath, mimeType)
+            safeUnlink(filePath)
+            
             return extractedText
         } else {
             throw new ApiError(404, "File not supported")
