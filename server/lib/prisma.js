@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client'
 import { PrismaPg } from '@prisma/adapter-pg'
 import pg from "pg"
+import logger from "../logger/index.js"
 
 if (!process.env.DATABASE_URL) {
     throw new Error("Missing required env var: DATABASE_URL")
@@ -20,5 +21,11 @@ const prisma = new PrismaClient({
         ? ["query", "warn", "error"]
         : ["warn", "error"]
  })
+
+export const disconnectPrisma = async () => {
+    logger.info("Prisma Disconnected successfully")
+    await prisma.$disconnect()
+    await pool.end()
+}
 
 export default prisma
