@@ -116,23 +116,32 @@ const askQuery = asyncHandler(async (req, res) => {
 })
 
 const allChatsMessage = asyncHandler(async (req, res) => {
-    const { id, chatRoomKey } = req.params
-    const userId = req.user.id
+    const { id } = req.params
 
-    if (!id || !chatRoomKey) {
+    if (!id) {
         throw new ApiError(400, "Something went wrong")
     }
 
-    const data = await ChatRoom.find(
+    if (!isValidId) {
+        throw new ApiError(400, "Invalid Id")
+    }
+
+    const userId = req.user.id
+
+    const data = await ChatRoom.findOne(
         {
-            chatRoomKey,
+            _id:id,
             userId
         }
     )
 
+    if(!data){
+        throw new ApiError(404, "Chat room not found")
+    }
+
     return res
         .status(200)
-        .json(new ApiResponse(200, data, "All chats fetched"))
+        .json(new ApiResponse(200, data, "Messages fetched"))
 })
 
 const updateQuery = asyncHandler(async (req, res) => {
