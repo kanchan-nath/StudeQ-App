@@ -1,6 +1,6 @@
 import groq from "./groq.js"
 import logger from "../../logger/index.js"
-
+import { AIResponse } from "../../models/aiResponse.model.js"
 const MAX_INPUT_CHARS = 80_000
 
 const buildPrompt = (text)=>{
@@ -37,15 +37,37 @@ ${safeText}
 </document>`
 
 }
+const logAIResponse = async (userId, prompt, rawResult, response) => {
+    const { prompt_tokens, completion_tokens, total_tokens, total_time } = response.usage
 
-const summarizeText = async (text) => {
+    try {
+        await AIResponse.create(
+            {
+                userId,
+                prompt,
+                response: rawResult,
+                model: response.model,
+                promptTokens: prompt_tokens,
+                completionTokens: completion_tokens,
+                totalTokens: total_tokens,
+                totalTime: total_time,
+            }
+        )
+    } catch (error) {
+        logger.error("AIResponse log failed (non-critical):", error)
+    }
+
+}
+
+const summarizeText = async (text, userId) => {
 
     if(!text || typeof text !=="string"){
         throw new Error("summarizeText: text must be a non-empty string")
     }
 
+    let response
     try {
-        const response = await groq.chat.completions.create({
+         response = await groq.chat.completions.create({
             model: process.env.GROQ_SUMMARIZE_MODEL || "llama-3.3-70b-versatile",
             messages: [
                 {
@@ -61,13 +83,6 @@ const summarizeText = async (text) => {
             temperature:0.4
         })
 
-        const content = response?.choices[0]?.message?.content
-
-        if (!content) {
-            throw new Error("Groq returned empty response — possible content filter or model error")
-        }
-        
-        return content
     } catch (error) {
         logger.error(
             { error },
@@ -86,6 +101,15 @@ const summarizeText = async (text) => {
         throw new Error(`summarizeText failed: ${error.message}`)
     }
 
+
+    const raw = response?.choices[0]?.message?.content
+
+    if (!raw) {
+        throw new Error("Groq returned empty response — possible content filter or model error")
+    }
+    await logAIResponse(userId, buildPrompt, raw, response)
+
+    return raw
    
 }
 
