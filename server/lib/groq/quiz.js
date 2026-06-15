@@ -177,33 +177,32 @@ try {
     return data
 }
 
-const flashcards = async (topic, subject) => {
-    const prompt = `
-       You are a flashcard generator for the subject: ${subject}.
+const flashcards = async (topic, subject, userId) => {
 
-Generate at least 5 flashcards on the topic: ${topic}.
-Also give the difficulety level - easy/medium/hard.
+    if (!topic || !subject || !userId) {
+        throw new Error("flashcards: topic, subject, userId all required")
+    }
 
-Return the response ONLY in valid JSON format as an array like this:
+    const systemPrompt = `You are a flashcard generator. Return ONLY valid JSON. No markdown fences, no extra text.`
 
+    const userPrompt = `Generate exactly 10 flashcards on topic: "${topic}" for subject: "${subject}".
 
+Return ONLY this valid JSON structure:
 {
-    "difficultyLevel": "easy/medium/hard",
-    "card":[
-        {
-            "front": "Question or term",
-            "back": "Answer or definition"
-        }
-    ]
+  "difficultyLevel": "easy|medium|hard",
+  "card": [
+    {
+      "front": "Short question or keyword",
+      "back": "Clear concise answer or definition"
+    }
+  ]
 }
 
 Rules:
-- Exactly 10 flashcards
-- "front" should contain a short question, keyword, or concept
-- "back" should contain a clear and concise explanation or answer
-- Keep the language simple and student-friendly
-- Do not include markdown, extra text, or explanations outside the JSON
-    `
+- Exactly 10 cards.
+- "front": short question/keyword. "back": clear explanation.
+- Language simple and student-friendly.
+- Return NOTHING except the JSON object.`
 
     const response = await groq.chat.completions.create({
         model: "llama-3.3-70b-versatile",
