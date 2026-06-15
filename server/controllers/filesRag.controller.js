@@ -7,6 +7,10 @@ import { v4 as uuid4 } from "uuid"
 import { ChatRoom } from "../models/chatRoom.model.js"
 import mongoose, { mongo } from "mongoose"
 
+const isValidId = (id)=>{
+    return mongoose.Types.ObjectId.isValid(id)
+}
+
 const uploadFile = asyncHandler(async (req, res) => {
     const userId = req.user?.id
 
@@ -56,12 +60,15 @@ const uploadFile = asyncHandler(async (req, res) => {
 })
 
 const askQuery = asyncHandler(async (req, res) => {
-    const { id, chatRoomKey } = req.params
-    const userId = req.user.id
-
-    if (!id || !chatRoomKey) {
+    const { id } = req.params
+    
+    if (!id) {
         throw new ApiError(400, "Something went wrong")
     }
+
+    
+    const userId = req.user.id
+
     const { query } = req.body
 
     if (!query) {
