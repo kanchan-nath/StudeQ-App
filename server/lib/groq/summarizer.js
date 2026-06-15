@@ -60,12 +60,25 @@ const summarizeText = async (text) => {
             temperature:0.4
         })
 
-        const raw = response.choices[0].message.content
-        // const data = JSON.parse(raw)
+        const content = response?.choices[0]?.message?.content
 
-        return raw
+        if (!content) {
+            throw new Error("Groq returned empty response — possible content filter or model error")
+        }
+
+        return content
     } catch (error) {
-        
+        if(error?.status===429){
+            const retryErr = new Error("Groq rate limit exceeded")
+            retryErr.code = "RATE_LIMITED"
+            throw retryErr
+        }
+
+        if (error?.status >= 500) {
+            throw new Error(`Groq server error: ${error.status}`)
+        }
+
+        throw new Error(`summarizeText failed: ${error.message}`)
     }
 
    
