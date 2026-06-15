@@ -201,7 +201,7 @@ const updateQuery = asyncHandler(async (req, res) => {
 
     return res
         .status(200)
-        .json(new ApiResponse(200, chatRoom, "Query upadated"))
+        .json(new ApiResponse(200, chatRoom, "Query updated"))
 })
 
 const allChats = asyncHandler(async (req, res) => {
