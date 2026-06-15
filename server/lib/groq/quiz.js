@@ -23,7 +23,7 @@ const extractJSON = (raw) => {
     }
 }
 
-const logAIResponse = async(userId, prompt, rawResult, response) => {
+const logAIResponse = async (userId, prompt, rawResult, response) => {
     const { prompt_tokens, completion_tokens, total_tokens, total_time } = response.usage
 
     try {
@@ -42,27 +42,28 @@ const logAIResponse = async(userId, prompt, rawResult, response) => {
     } catch (error) {
         logger.error("AIResponse log failed (non-critical):", error)
     }
-   
+
 }
 
 
 const quiz = async (types, topic, subject, userId) => {
 
-    const prompt = `
-You are a quiz generator for the subject: ${subject}.
-Generate at least 5 ${type} questions on the topic: ${topic}.
-The questions must be strictly relevant to "${topic}" within "${subject}".
+    if (!types || !topic || !subject || !userId) {
+        throw new Error("quiz: types, topic, subject, userId all required")
+    }
+    const typesJson = JSON.stringify(Array.isArray(types) ? types : [types])
 
-Return ONLY valid JSON. No explanations, headings, notes, markdown fences, or extra text.
-Question types to use: ${JSON.stringify(types)}
-Response format:
+    const systemPrompt = `You are a quiz generator. Return ONLY valid JSON arrays. Never include markdown fences, explanations, or extra text.`
 
+    const userPrompt = `Generate at least 5 ${typesJson} questions on the topic: "${topic}" within subject: "${subject}".
+
+Return ONLY a valid JSON array:
 [
   {
     "number": 1,
-    "type": "${type}",
+    "type": "one of ${typesJson}",
     "question": "Markdown formatted question",
-    "options": ["Markdown option A", "Markdown option B", "Markdown option C", "Markdown option D"],
+    "options": ["Option A", "Option B", "Option C", "Option D"],
     "answer": "Exact text of correct option",
     "userResponse": null,
     "isCorrect": null
@@ -70,50 +71,43 @@ Response format:
 ]
 
 Rules:
-- Return valid JSON array only.
-- Minimum 5 question objects.
-- "number" starts at 1, increments by 1.
-- "type" must be picked by cycling through: ${JSON.stringify(types)} — distribute evenly.
-- Every string value may contain Markdown formatting.
-- "options" must be array of exactly 4 strings.
-- "answer" must be exact text of one option from the "options" array.
-- Distribute correct answers across all options — do not cluster on same position.
-- "userResponse" must always be null.
-- "isCorrect" must always be null.
-- No trailing commas.
-- Escape quotes properly inside strings.
-`
+- Minimum 5 questions. Type field cycles through ${typesJson} evenly.
+- "answer" must exactly match one of the "options" strings.
+- "userResponse" and "isCorrect" always null.
+- Return NOTHING except the JSON array.`
 
-    const response = await groq.chat.completions.create({
-        model: "llama-3.3-70b-versatile",
-        messages: [
-            {
-                role: "user",
-                content: prompt
-            }
-        ]
-    })
+    let response
+    try {
+        response = await groq.chat.completions.create({
+            model: MODEL,
+            messages: [
+                {
+                    role: "system",
+                    content: systemPrompt
+                },
+                {
+                    role: "user",
+                    content: userPrompt
+                }
+            ],
+            max_tokens: 3000,  
+            temperature: 0.4,
+        })
 
-    const { prompt_tokens, completion_tokens, total_tokens, total_time } = response.usage
+        
+    } catch (error) {
+        throw new Error(`Groq API error in quiz(): ${error.message}`)
+    }
 
-    const model = response.model
+    const raw = response?.choices[0]?.message?.content
 
-    const result = response.choices[0].message.content
+    if (!raw) throw new Error("quiz: empty response from Groq")
 
-    await AIResponse.create({
-        userId,
-        prompt,
-        response: result,
-        model,
-        promptTokens: prompt_tokens,
-        completionTokens: completion_tokens,
-        totalTokens: total_tokens,
-        totalTime: total_time,
+    const data = extractJSON(raw)
 
-    })
-
-    const data = JSON.parse(result)
+    await logAIResponse(userId, userPrompt, raw, response)
     return data
+
 }
 
 const quizFromFile = async (types, extractedText, userId) => {
