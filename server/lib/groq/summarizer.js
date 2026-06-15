@@ -1,4 +1,5 @@
 import groq from "./groq.js"
+import logger from "../../logger/index.js"
 
 const MAX_INPUT_CHARS = 80_000
 
@@ -65,9 +66,13 @@ const summarizeText = async (text) => {
         if (!content) {
             throw new Error("Groq returned empty response — possible content filter or model error")
         }
-
+        
         return content
     } catch (error) {
+        logger.error(
+            { error },
+            "Groq summarization failed"
+        )
         if(error?.status===429){
             const retryErr = new Error("Groq rate limit exceeded")
             retryErr.code = "RATE_LIMITED"
