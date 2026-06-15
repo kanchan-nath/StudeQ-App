@@ -12,6 +12,10 @@ const uploadFile = asyncHandler(async (req, res) => {
 
     const localFile = req.files?.file[0]
     
+    if (!localFile) {
+        throw new ApiError(400, "No file uploaded")
+    }
+    
     const chatRoomKey = uuid4()
 
     if (!chatRoomKey) {
