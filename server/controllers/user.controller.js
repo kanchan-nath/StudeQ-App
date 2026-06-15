@@ -104,17 +104,17 @@ const login = asyncHandler(async (req, res) => {
     const existedUser = await prisma.user.findUnique({
         where: {
             email: email
+        },
+        omit:{
+            refreshToken:true
         }
     })
 
-    if (!existedUser) {
-        throw new ApiError(400, "User not exist")
-    }
+    const isUserValid = existedUser && bcrypt.compare(password, existedUser.password)
 
-    const isPasswordValid = await isPasswordCorrect(email, password)
+    if (!isUserValid){
+        throw new ApiError(404, "Invalid credentials")
 
-    if (!isPasswordValid) {
-        throw new ApiError(400, "Password not matched")
     }
 
     const { accessToken, refreshToken } = await generateAccessAndRefreshToken(existedUser)
