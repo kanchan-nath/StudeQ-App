@@ -73,7 +73,7 @@ const askQuery = asyncHandler(async (req, res) => {
 
     const userId = req.user.id
 
-    const {data, error} = ragQueryValidator.safeParse(req.body)
+    const {data, error} = ragQueryValidator.safeParse(req.params)
     
     if (error) {
         throw new ApiError(400, error.issues.map(e => e.message).join(", "))
@@ -145,31 +145,43 @@ const allChatsMessage = asyncHandler(async (req, res) => {
 })
 
 const updateQuery = asyncHandler(async (req, res) => {
-    const { id, chatRoomKey, chatId } = req.params
-    const { query } = req.body
-    const userId = req.user.id
+    
+    const { id, chatId } = req.params
 
-    if (!id || !chatRoomKey || !chatId || !query) {
+    if (!id || !chatId) {
         throw new ApiError(400, "Something went wrong")
     }
 
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-        throw new ApiError(400, "Invalid chat id")
+    if (!isValidId(id) || !isValidId(chatId)) {
+        throw new ApiError(400, "Invalid Id")
+    }
+
+    const {data, error} = ragQueryValidator.safeParse(req.body)
+    if (error) {
+        throw new ApiError(400, error.issues.map(e => e.message).join(", "))
+    }
+    const { query } = data
+
+    const userId = req.user.id
+
+    if (!query) {
+        throw new ApiError(400, "All fields are rquired")
     }
 
     const topChunks = await queryDB(query, userId)
 
-    if (!topChunks) {
-        throw new ApiError(400, "topChunks generation error")
+    if (!topChunks?.length) {
+        throw new ApiError(400, "Could not retrieve relevant context")
     }
+
     const results = await llmCall(query, topChunks, userId)
 
     if (!results) {
         throw new ApiError(400, "Query answer problem, Try Again")
     }
 
-
-    const chatRoom = await ChatRoom.findOne({ userId, chatRoomKey })
+    const chatRoom = await ChatRoom.findOne({ userId, _id:chatId })
+    if (!chatRoom) throw new ApiError(404, "Chat room not found")
 
     const msgIndex = chatRoom.messages.findIndex(
         m => m._id.toString() == chatId
@@ -177,24 +189,19 @@ const updateQuery = asyncHandler(async (req, res) => {
 
     if (msgIndex === -1) throw new ApiError(404, "Message not found")
 
-    const data = await ChatRoom.findOneAndUpdate(
-        {
-            userId,
-            chatRoomKey,
-            "messages._id": new mongoose.Types.ObjectId(chatId)
-
-        },
-        {
-            $set: {
-                [`messages.${msgIndex}.content`]: query,
-                [`messages.${msgIndex + 1}.content`]: results
-            }
+        const nextMsg = chatRoom.messages[msgIndex+1]
+        if(!nextMsg || nextMsg.role !=="assistant"){
+            throw new ApiError(400, "Message pair structure invalid")
         }
-    )
+
+    chatRoom.messages[msgIndex].content = query
+    chatRoom.messages[msgIndex + 1].content = results
+
+   await chatRoom.save()
 
     return res
         .status(200)
-        .json(new ApiResponse(200, data, "Query upadated"))
+        .json(new ApiResponse(200, chatRoom, "Query upadated"))
 })
 
 const allChats = asyncHandler(async (req, res) => {
