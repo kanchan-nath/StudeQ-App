@@ -52,9 +52,6 @@ const textExtractor = async (file) => {
     const fileDataBuffer = fs.readFileSync(filePath)
     const fileType = await isFile(fileDataBuffer)
     console.log(fileType.ext);
-    
-    // const fileDataBuffer = fs.readFileSync(filePath)
-    // const base64File = fileDataBuffer.toString('base64')
 
     const THERESOLD_CHAR = 200
     const THERESOLD_WORD = 50
@@ -102,15 +99,13 @@ const textExtractor = async (file) => {
 
             return extractedText
 
-        } else if (mimeType == "application/vnd.ms-excel") {
+        } else if (mimeType == "application/vnd.ms-excel" || mimeType === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") {
             const wrokbook = XLSX.readFile(filePath)
             const sheet = wrokbook.Sheets[wrokbook.SheetNames[0]]
 
             const result = XLSX.utils.sheet_to_json(sheet)
-            const extractedText = JSON.stringify(result)
-
-            fs.unlinkSync(filePath)
-            return extractedText
+            safeUnlink(filePath)
+            return JSON.stringify(result)
 
         } else if ((["jpeg", "png", "webp", "jpg"].includes(fileType?.ext))) {
 
