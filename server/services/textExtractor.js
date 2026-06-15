@@ -131,9 +131,10 @@ const textExtractor = async (file) => {
             throw new ApiError(404, "File not supported")
         }
     } catch (error) {
-        logger.error("Text extraction error:", error)
-        fs.unlinkSync(filePath)
+        safeUnlink(filePath)
 
+        if (error instanceof ApiError) throw error
+        throw new ApiError(500, `Text extraction failed: ${error.message}`)
     }
 }
 
