@@ -8,7 +8,7 @@ import { aiQueueEvents } from "./services/queueEvents.js"
 import logger from "./logger/index.js"
 import { shutdownRedis } from "./lib/redisClient.js"
 import { closeAIResponseQueue } from "./services/queue.js"
-
+import { disconnectPrisma } from "./lib/prisma.js"
 const isProd = process.env.NODE_ENV || "production"
 
 const server = http.createServer(app)
@@ -110,7 +110,7 @@ const shutdown = async (signal) => {
     io.close(() => logger.info(`Socket.io closed`))
     await shutdownRedis()
     await closeAIResponseQueue()
-
+    await disconnectPrisma()
     httpServer?.close(() => {
         logger.info("HTTP server closed")
         process.exit(0)

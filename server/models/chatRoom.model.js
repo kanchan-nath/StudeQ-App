@@ -5,11 +5,6 @@ const chatRoomSchema = new mongoose.Schema({
         type:String,
         required : true
     },
-    chatRoomKey:{
-        type: String,
-        Unique: true,
-        required: true
-    },
     docId:{
         type: String,
         required: true,

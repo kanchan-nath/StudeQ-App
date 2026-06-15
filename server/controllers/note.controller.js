@@ -17,7 +17,7 @@ const createNote = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Content is required")
     }
 
-    const result = await summarizeText(content)
+    const result = await summarizeText(content, userId)
 
     const title = await titleExtract(result)
 

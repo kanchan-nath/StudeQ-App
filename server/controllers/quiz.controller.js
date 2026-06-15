@@ -29,8 +29,6 @@ const generateQuiz = asyncHandler(async (req, res) => {
     // Expected return shape from quiz(): { title, questions: [{type, question, options, answer}] }
     const data = await quiz(topic, subject, types, difficulty || "medium")
 
-    const { questions } = data
-
     // ✅ FIX: old code tried findOne({quizId}) then conditionally create/update
     //         but quizId was undefined → always created new doc with null quizId
     //         Now we always create a fresh quiz doc per generation call
@@ -38,10 +36,10 @@ const generateQuiz = asyncHandler(async (req, res) => {
         userId,
         quiz: {
             title: title || data.title || `${topic} Quiz`,  // use provided title or AI-generated
-            totalQuestion: questions.length,
+            totalQuestion: data.length,
             // meta fields (startedAt, submittedAt, score) default to null — set later
         },
-        questions: questions.map(q => ({
+        data: data.map(q => ({
             types: q.type,
             question: q.question,
             options: q.options,       // array of strings
