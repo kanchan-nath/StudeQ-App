@@ -5,7 +5,7 @@ import llmCall from "../lib/groq/llmCall.js"
 import { Documents } from "../models/document.model.js"
 import { v4 as uuid4 } from "uuid"
 import { ChatRoom } from "../models/chatRoom.model.js"
-import mongoose from "mongoose"
+import mongoose, { mongo } from "mongoose"
 
 const uploadFile = asyncHandler(async (req, res) => {
     const userId = req.user?.id
@@ -120,7 +120,11 @@ const updateQuery = asyncHandler(async(req, res)=>{
         throw new ApiError(400, "Something went wrong")
     }
 
-    const topChunks = await queryDB(query)
+    if(!mongoose.Types.ObjectId.isValid(id)){
+        throw new ApiError(400, "Invalid chat id")
+    }
+
+    const topChunks = await queryDB(query, userId)
 
     if(!topChunks){
         throw new ApiError(400, "topChunks generation error")
@@ -177,10 +181,21 @@ const allChats = asyncHandler(async(req,res)=>{
 const deleteChat = asyncHandler(async(req, res)=>{
     const {id} = req.params
 
+    if(!id){
+        throw new ApiError("Id is required")
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        throw new ApiError(400, "Invalid chat id")
+    }
     const userId = req.user.id
 
-    const data = await ChatRoom.findOneAndDelete({userId, _id:id})
+    const chatRoom = await ChatRoom.findOneAndDelete({userId, _id:id})
     
+    if (!chatRoom) {
+        throw new ApiError(404, "Chat not found")
+    }
+
     return res
     .status(200)
     .json(new ApiResponse(200, data, "Vhat deleted"))
