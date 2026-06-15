@@ -204,16 +204,28 @@ Rules:
 - Language simple and student-friendly.
 - Return NOTHING except the JSON object.`
 
+let response
+try {
     const response = await groq.chat.completions.create({
-        model: "llama-3.3-70b-versatile",
+        model: MODEL,
         messages: [
             {
-                role: "user",
-                content: prompt
+                role: "system",
+                content: systemPrompt
+            },
+            {
+                role:"user",
+                content:userPrompt
             }
-        ]
+        ],
+        max_tokens: 2000, 
+        temperature: 0.4,
     })
 
+} catch (error) {
+    
+}
+   
     const raw = response.choices[0].message.content
     const data = JSON.parse(raw)
     return data
