@@ -45,7 +45,7 @@ const uploadFile = asyncHandler(async (req, res) => {
         await vectorDB(localFile, userId, documentId)
         await ChatRoom.create({
             userId,
-            docId:metadata._id
+            docId: documentId
         })
     } catch (error) {
         await Documents.findByIdAndDelete(documentId).catch(()=>{})
@@ -211,7 +211,7 @@ const allChats = asyncHandler(async (req, res) => {
         {
             userId
         }
-    ).select({ docId: 1, chatRoomKey: 1, messages: { $slice: 1 }, createdAt: 1 })
+    ).select({ docId: 1, messages: { $slice: -1 }, createdAt: 1 })
 
     return res
         .status(200)
@@ -222,12 +222,13 @@ const deleteChat = asyncHandler(async (req, res) => {
     const { id } = req.params
 
     if (!id) {
-        throw new ApiError("Id is required")
+        throw new ApiError(400, "Something went wrong")
     }
 
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-        throw new ApiError(400, "Invalid chat id")
+    if (!isValidId) {
+        throw new ApiError(400, "Invalid Id")
     }
+
     const userId = req.user.id
 
     const chatRoom = await ChatRoom.findOneAndDelete({ userId, _id: id })
@@ -236,9 +237,21 @@ const deleteChat = asyncHandler(async (req, res) => {
         throw new ApiError(404, "Chat not found")
     }
 
+    if (chatRoom.docId) {
+        const documentId = chatRoom.docId.toString()
+        Promise.all([
+            Documents.findByIdAndDelete(documentId).catch(e =>
+                logger.error("Doc metadata cleanup failed:", e)
+            ),
+            deleteDocumentVectors(userId, documentId).catch(e =>
+                logger.error("Vector cleanup failed:", e)
+            )
+        ])
+    }
+
     return res
         .status(200)
-        .json(new ApiResponse(200, data, "Vhat deleted"))
+        .json(new ApiResponse(200, {}, "Chat deleted successfully"))
 })
 export {
     uploadFile,

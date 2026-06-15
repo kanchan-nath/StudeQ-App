@@ -7,7 +7,7 @@ import { loginValidator, registerValidator } from "../validators/auth.validator.
 import logger from "../logger/index.js"
 
 const hashPassword = async (password) => {
-    const hashed = bcrypt.hash(password, process.env.HASH_PASSWORD_SALT_ROUND)
+    const hashed = await bcrypt.hash(password, /*process.env.HASH_PASSWORD_SALT_ROUND*/ 10)
     if(!hashed){
         throw new ApiError(500, "Failed to process password")
     }
@@ -24,7 +24,7 @@ const generateAccessAndRefreshToken = async (user) => {
     const accessToken = generateAccessToken(user)
     const refreshToken = generateRefreshToken(user)
 
-    const hashedRefreshToken = bcrypt.hash(refreshToken, process.env.REFRESH_TOKEN_SALT_ROUND)
+    const hashedRefreshToken = await bcrypt.hash(refreshToken, /*process.env.REFRESH_TOKEN_SALT_ROUND*/ 8)
 
     if(!hashedRefreshToken){
         throw new ApiError(500, "Failed to procedd token")
@@ -125,18 +125,8 @@ const login = asyncHandler(async (req, res) => {
     
     const { accessToken, refreshToken } = await generateAccessAndRefreshToken(existedUser)
     
-    const { password: _} = existedUser
+    const { password: _, ...safeUser} = existedUser
 
-  
-
-    const loggedInUser = await prisma.user.findUnique({
-        where: {
-            id: existedUser.id
-        },
-        omit: {
-            refreshToken: true
-        }
-    })
     return res
         .status(200)
         .cookie("accessToken", accessToken, cookieOptions)
