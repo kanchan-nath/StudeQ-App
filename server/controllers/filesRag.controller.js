@@ -1,6 +1,6 @@
 import { asyncHandler } from "../utils/asyncHandler.js"
 import { ApiError, ApiResponse } from "../utils/Async.js"
-import { vectorDB, queryDB } from "../services/vectordb.js"
+import { vectorDB, queryDB, deleteDocumentVectors } from "../services/vectordb.js"
 import llmCall from "../lib/groq/llmCall.js"
 import { Documents } from "../models/document.model.js"
 import { v4 as uuid4 } from "uuid"
@@ -11,16 +11,17 @@ const uploadFile = asyncHandler(async (req, res) => {
     const userId = req.user?.id
 
     const localFile = req.files?.file[0]
-    
+
     if (!localFile) {
         throw new ApiError(400, "No file uploaded")
     }
-    
-    const chatRoomKey = uuid4()
 
-    if (!chatRoomKey) {
-        throw new ApiError(400, "chatRoomKey generation failed, Try again!")
-    }
+    // const chatRoomKey = uuid4()
+
+    // if (!chatRoomKey) {
+    //     throw new ApiError(400, "chatRoomKey generation failed, Try again!")
+    // }
+
     const metadata = await Documents.create(
         {
             userId,
@@ -32,22 +33,25 @@ const uploadFile = asyncHandler(async (req, res) => {
         }
     )
 
-    if (!metadata) {
-        throw new ApiError(400, "metadata saving error")
-    }
-    const id = metadata._id
-    const fileName = metadata.originalName
+    const documentId = metadata._id
+    const documentName = metadata.originalName
 
-    await vectorDB(localFile, userId,chatRoomKey)
-    await ChatRoom.create({
-        userId,
-        chatRoomKey,
-        docId:id
-    })
+    try {
+        await vectorDB(localFile, userId, documentId)
+        await ChatRoom.create({
+            userId,
+            docId:metadata._id
+        })
+    } catch (error) {
+        await Documents.findByIdAndDelete(documentId).catch(()=>{})
+        await deleteDocumentVectors(userId, documentId).catch(() => { })
+
+        throw new ApiError(500, "File processing failed, please try again")
+    }
 
     return res
-        .status(200)
-        .json(new ApiResponse(200, { id, chatRoomKey, fileName  }, "Document's metadata uploaded successfully"))
+        .status(210)
+        .json(new ApiResponse(201, { id: documentId, documentName }, "Document's metadata uploaded successfully"))
 
 })
 
@@ -95,12 +99,12 @@ const askQuery = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, results, "Response is provided successfully"))
 })
 
-const allChatsMessage = asyncHandler(async(req, res)=>{
+const allChatsMessage = asyncHandler(async (req, res) => {
     const { id, chatRoomKey } = req.params
     const userId = req.user.id
 
-    if(!id || !chatRoomKey){
-        throw new ApiError(400 , "Something went wrong")
+    if (!id || !chatRoomKey) {
+        throw new ApiError(400, "Something went wrong")
     }
 
     const data = await ChatRoom.find(
@@ -111,29 +115,29 @@ const allChatsMessage = asyncHandler(async(req, res)=>{
     )
 
     return res
-    .status(200)
-    .json(new ApiResponse(200, data, "All chats fetched"))
+        .status(200)
+        .json(new ApiResponse(200, data, "All chats fetched"))
 })
 
-const updateQuery = asyncHandler(async(req, res)=>{
-    const {id, chatRoomKey, chatId} = req.params
-    const {query} = req.body
+const updateQuery = asyncHandler(async (req, res) => {
+    const { id, chatRoomKey, chatId } = req.params
+    const { query } = req.body
     const userId = req.user.id
-    
-    if(!id || !chatRoomKey || !chatId || !query){
+
+    if (!id || !chatRoomKey || !chatId || !query) {
         throw new ApiError(400, "Something went wrong")
     }
 
-    if(!mongoose.Types.ObjectId.isValid(id)){
+    if (!mongoose.Types.ObjectId.isValid(id)) {
         throw new ApiError(400, "Invalid chat id")
     }
 
     const topChunks = await queryDB(query, userId)
 
-    if(!topChunks){
+    if (!topChunks) {
         throw new ApiError(400, "topChunks generation error")
     }
-    const results = await llmCall(query, topChunks,userId)
+    const results = await llmCall(query, topChunks, userId)
 
     if (!results) {
         throw new ApiError(400, "Query answer problem, Try Again")
@@ -145,7 +149,7 @@ const updateQuery = asyncHandler(async(req, res)=>{
     const msgIndex = chatRoom.messages.findIndex(
         m => m._id.toString() == chatId
     )
-    
+
     if (msgIndex === -1) throw new ApiError(404, "Message not found")
 
     const data = await ChatRoom.findOneAndUpdate(
@@ -153,39 +157,39 @@ const updateQuery = asyncHandler(async(req, res)=>{
             userId,
             chatRoomKey,
             "messages._id": new mongoose.Types.ObjectId(chatId)
-            
+
         },
         {
-           $set:{
-                [`messages.${msgIndex}.content`]: query, 
+            $set: {
+                [`messages.${msgIndex}.content`]: query,
                 [`messages.${msgIndex + 1}.content`]: results
-           }
+            }
         }
     )
 
     return res
-    .status(200)
-    .json(new ApiResponse(200, data, "Query upadated"))
+        .status(200)
+        .json(new ApiResponse(200, data, "Query upadated"))
 })
 
-const allChats = asyncHandler(async(req,res)=>{
+const allChats = asyncHandler(async (req, res) => {
     const userId = req.user?.id
 
     const data = await ChatRoom.find(
         {
             userId
         }
-    ).select({ docId: 1, chatRoomKey: 1, messages: { $slice: 1 }, createdAt:1 })
+    ).select({ docId: 1, chatRoomKey: 1, messages: { $slice: 1 }, createdAt: 1 })
 
     return res
-    .status(200)
-    .json(new ApiResponse(200, data, "All chats fetched successfully"))
+        .status(200)
+        .json(new ApiResponse(200, data, "All chats fetched successfully"))
 })
 
-const deleteChat = asyncHandler(async(req, res)=>{
-    const {id} = req.params
+const deleteChat = asyncHandler(async (req, res) => {
+    const { id } = req.params
 
-    if(!id){
+    if (!id) {
         throw new ApiError("Id is required")
     }
 
@@ -194,15 +198,15 @@ const deleteChat = asyncHandler(async(req, res)=>{
     }
     const userId = req.user.id
 
-    const chatRoom = await ChatRoom.findOneAndDelete({userId, _id:id})
-    
+    const chatRoom = await ChatRoom.findOneAndDelete({ userId, _id: id })
+
     if (!chatRoom) {
         throw new ApiError(404, "Chat not found")
     }
 
     return res
-    .status(200)
-    .json(new ApiResponse(200, data, "Vhat deleted"))
+        .status(200)
+        .json(new ApiResponse(200, data, "Vhat deleted"))
 })
 export {
     uploadFile,
