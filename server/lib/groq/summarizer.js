@@ -39,41 +39,10 @@ ${safeText}
 
 const summarizeText = async (text) => {
 
-    const prompt = `
-        You are a study assistant. Summarize the following text for a student.
-
-Use markdown formatting throughout:
-- **Bold** for key terms and important words
-- *Italic* for definitions or emphasis
-- "code" for technical terms, formulas, or names
-- > blockquote for critical rules or must-remember lines
-- <mark>text</mark> for exam-critical points
-- <u>text</u> for underlined terms
-
-Format the summary exactly like this:
-
-##  Topic
-One line — what this text is about.
-
-##  Key Concepts
-- Bullet each major idea — **bold the concept name**, then explain briefly
-
-##  Detailed Summary
-3-5 paragraphs. Use **bold** for important terms. Use *italics* for definitions.
-Wrap critical rules in blockquotes:
-> Rule or principle to remember
-
-##  Quick Recap
-2-3 sentences. Bold the most critical words.
-
-##  Likely Exam Points
-- **Term or fact** — short explanation
-- Repeat for each point
-
----
-Text to summarize:
-${text}
-    `
+    if(!text || typeof text !=="string"){
+        throw new Error("summarizeText: text must be a non-empty string")
+    }
+    
     const response = await groq.chat.completions.create({
         model: "llama-3.3-70b-versatile",
         messages: [
