@@ -71,6 +71,10 @@ const register = asyncHandler(async (req, res) => {
             email: email.toLowerCase().trim(),
             password: hashedPassword,
             grade: grade.toLowerCase().trim()
+        },
+        omit:{
+            password: true,
+            refreshToken:true
         }
     })
 
