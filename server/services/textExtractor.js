@@ -7,6 +7,12 @@ import chunking from "./chunking.js"
 import embedText from "./embedText.js"
 import { extract, extractTextFromImage } from "../lib/groq/extractText.js"
 import pdfToImages from "./pdfToImages.js"
+import { fileTypeFromBuffer } from "file-type"
+import logger from "../logger/index.js"
+
+const isFile = async (buffer) => {
+    return await fileTypeFromBuffer(buffer)
+}
 
 const cleanExtractedText = (text) => {
     return text
@@ -32,54 +38,69 @@ const cleanExtractedText = (text) => {
         .trim()
 }
 
+const safeUnlink = (filePath) => {
+    try {
+        fs.unlinkSync(filePath)
+    } catch (error) {
+        throw new Error(`File is not deleted: ${error}`)
+    }
+}
+
 const textExtractor = async (file) => {
     const mimeType = file.mimetype
     const filePath = file.path
-
     const fileDataBuffer = fs.readFileSync(filePath)
-    const base64File = fileDataBuffer.toString('base64')
+    const fileType = await isFile(fileDataBuffer)
+    console.log(fileType.ext);
+    
+    // const fileDataBuffer = fs.readFileSync(filePath)
+    // const base64File = fileDataBuffer.toString('base64')
 
     const THERESOLD_CHAR = 200
     const THERESOLD_WORD = 50
 
     try {
         if (mimeType == "application/pdf") {
+
+            if (!fileType || fileType?.ext !== "pdf") {
+                throw new ApiError(400, "File content does not match declared type")
+            }
+
             const uint8Array = new Uint8Array(fileDataBuffer)
             const parser = await new PDFParse(uint8Array)
 
-            const text = ((await parser.getText()).text.replace(/--\s*\d+\s*of\s*\d+\s*--/g, '').trim())
+            const rawText = ((await parser.getText()).text.replace(/--\s*\d+\s*of\s*\d+\s*--/g, '').trim())
 
-            const extractedText = cleanExtractedText(text)
+            const extractedText = cleanExtractedText(rawText)
 
             const charCount = extractedText.length
             const wordCount = extractedText.split(/\s+/).filter(Boolean).length
-            const pageCount = parser.doc._pdfInfo.numPages
+            const pageCount = parser.numPages
 
-            if (charCount < (THERESOLD_CHAR * pageCount) || wordCount < (THERESOLD_WORD * pageCount)) {
+            const isSparse = charCount < (THERESOLD_CHAR * pageCount) ||
+                wordCount < (THERESOLD_WORD * pageCount)
 
-                try {
-                    const outputDir = "/Users/kanchannath/Coding/Spark.E/server/uploads/images"
+            if (isSparse) {
+                    const outputDir = process.env.PDF_IMAGES_DIR ||
+                        path.join(process.cwd(), "uploads", "images")
+
+                        if(!fs.existsSync(outputDir)){
+                            fs.mkdirSync(outputDir, {recursive: true})
+                        }
 
                     await pdfToImages(filePath, pageCount, outputDir)
 
-                    const results = await extract()
-                    console.log("Text Extracted from Pdf -> Images");
+                    const results = await extract(outputDir)
+                    safeUnlink(filePath)
+                    logger.info("Text Extracted from Pdf -> Images");
 
-                    embedText(results)
-                    fs.unlinkSync(filePath)
                     return results
 
-                } catch (error) {
-                    console.error(error);
-                    fs.unlinkSync(filePath)
-                }
+            } 
+            
+            safeUnlink(filePath)
 
-            } else {
-
-                embedText(extractedText)
-                fs.unlinkSync(filePath)
-                return extractedText
-            }
+            return extractedText
 
         } else if (mimeType == "application/vnd.ms-excel") {
             const wrokbook = XLSX.readFile(filePath)
@@ -91,14 +112,11 @@ const textExtractor = async (file) => {
             fs.unlinkSync(filePath)
             return extractedText
 
-        } else if ((["image/jpeg", "image/png", "image/webp", "image/jpg"].includes(mimeType))) {
-
-            // const { data } = await Tesseract.recognize(filePath, "eng")
-            // const extractedText = data.text
+        } else if ((["jpeg", "png", "webp", "jpg"].includes(fileType?.ext))) {
 
             const extractedText = await extractTextFromImage(filePath)
 
-            fs.unlinkSync(filePath)
+            safeUnlink(filePath)
 
             return extractedText
 
@@ -112,7 +130,7 @@ const textExtractor = async (file) => {
             fs.unlinkSync(filePath)
         }
     } catch (error) {
-        console.error("Text extractiobn error", error)
+        logger.error("Text extraction error:", error)
         fs.unlinkSync(filePath)
 
     }
