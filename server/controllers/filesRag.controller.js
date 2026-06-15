@@ -41,9 +41,10 @@ const uploadFile = asyncHandler(async (req, res) => {
     const documentId = metadata._id
     const documentName = metadata.originalName
 
+    let data
     try {
         await vectorDB(localFile, userId, documentId)
-        await ChatRoom.create({
+        data = await ChatRoom.create({
             userId,
             docId: documentId
         })
@@ -56,7 +57,7 @@ const uploadFile = asyncHandler(async (req, res) => {
 
     return res
         .status(210)
-        .json(new ApiResponse(201, { id: documentId, documentName }, "Document's metadata uploaded successfully"))
+        .json(new ApiResponse(201, data, "Document's metadata uploaded successfully"))
 
 })
 
@@ -73,12 +74,12 @@ const askQuery = asyncHandler(async (req, res) => {
 
     const userId = req.user.id
 
-    const {data, error} = ragQueryValidator.safeParse(req.params)
+    const {data, error} = ragQueryValidator.safeParse(req.body)
     
     if (error) {
         throw new ApiError(400, error.issues.map(e => e.message).join(", "))
     }
-    const { query } = data
+    const { query } = data    
 
     if (!query) {
         throw new ApiError(400, "Query is not found")

@@ -13,8 +13,8 @@ router.route("/upload").post(verifyJWT,
     ]),
     uploadFile
 )
-router.route("/:id/chat/:chatRoomKey").get(verifyJWT, allChatsMessage)
-router.route("/:id/chat/:chatRoomKey").post(verifyJWT, askQuery)
+router.route("/:id/chat/:docId").get(verifyJWT, allChatsMessage)
+router.route("/:id/chat/:docId").post(verifyJWT, askQuery)
 router.route("/:id/chat/:chatRoomKey/:chatId").patch(verifyJWT, updateQuery)
 router.route("/chat/all").get(verifyJWT, allChats)
 router.route("/:id").delete(verifyJWT, deleteChat)

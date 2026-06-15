@@ -85,7 +85,7 @@ const queryDB = async(query, userId)=>{
     })
     logger.info(`queryDB: ${results.matches.length} matches for user ${userId}`)
 
-    return topChunks = results.matches.map((m)=>(
+    return results.matches.map((m)=>(
         {
             text: m.metadata.text,
             documentId: m.metadata.documentId,
