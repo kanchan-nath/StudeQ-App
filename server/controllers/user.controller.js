@@ -19,10 +19,16 @@ const generateAccessAndRefreshToken = async (user) => {
     const accessToken = generateAccessToken(user)
     const refreshToken = generateRefreshToken(user)
 
-    const tokenUser = await prisma.user.update({
+    const hashedRefreshToken = bcrypt.hash(refreshToken, process.env.REFRESH_TOKEN_SALT_ROUND)
+
+    if(!hashedRefreshToken){
+        throw new ApiError(500, "Failed to procedd token")
+    }
+
+    await prisma.user.update({
         where: { id: user.id },
         data: {
-            refreshToken: refreshToken
+            refreshToken: hashedRefreshToken
         }
 
     })
