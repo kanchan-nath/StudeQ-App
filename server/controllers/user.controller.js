@@ -3,6 +3,8 @@ import { ApiError, ApiResponse } from "../utils/Async.js"
 import prisma from "../lib/prisma.js"
 import { generateAccessToken, generateRefreshToken } from "../helpers/generateToken.js"
 import bcrypt from "bcrypt"
+import { loginValidator, registerValidator } from "../validators/auth.validator.js"
+import logger from "../logger/index.js"
 
 const isPasswordCorrect = async (email, password) => {
     try {
@@ -85,7 +87,13 @@ const register = asyncHandler(async (req, res) => {
 })
 
 const login = asyncHandler(async (req, res) => {
-    const { email, password } = req.body
+    const { data, error } = loginValidator.safeParse(req.body)
+
+    if (error) {
+        throw new ApiError(400, error.issues.map(e => e.message).join(", "))
+    } 
+
+    const { email, password } = data
 
     if (!password || !email) {
         throw new ApiError(400, "All fields are required")
