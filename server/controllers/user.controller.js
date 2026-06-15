@@ -38,7 +38,12 @@ const generateAccessAndRefreshToken = async (user) => {
 }
 
 const register = asyncHandler(async (req, res) => {
-    const { name, email, password, grade } = req.body
+    const {data, error} = registerValidator.safeParse(req.body)
+
+    if(error){
+        throw new ApiError(400, error.issues.map(e => e.message).join(", "))
+    }
+    const { name, email, password, grade } = data
 
     if (!name || !email || !password || !grade) {
         throw new ApiError(400, "All fields are required")
