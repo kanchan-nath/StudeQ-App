@@ -90,11 +90,11 @@ Rules:
                     content: userPrompt
                 }
             ],
-            max_tokens: 3000,  
+            max_tokens: 3000,
             temperature: 0.4,
         })
 
-        
+
     } catch (error) {
         throw new Error(`Groq API error in quiz(): ${error.message}`)
     }
@@ -145,27 +145,27 @@ Return ONLY a valid JSON object:
 ${safeText}
 </document>`
 
-let  response
-try {
-    const response = await groq.chat.completions.create({
-        model: MODEL,
-        messages: [
-            {
-                role: "system",
-                content: systemPrompt
-            },
-            {
-                role:"user",
-                content:userPrompt
-            }
-        ],
-        max_tokens: 3000,  
-        temperature: 0.4,
-    })
+    let response
+    try {
+        const response = await groq.chat.completions.create({
+            model: MODEL,
+            messages: [
+                {
+                    role: "system",
+                    content: systemPrompt
+                },
+                {
+                    role: "user",
+                    content: userPrompt
+                }
+            ],
+            max_tokens: 3000,
+            temperature: 0.4,
+        })
 
-} catch (error) {
-    throw new Error(`Groq API error in quizFromFile(): ${error.message}`)
-}
+    } catch (error) {
+        throw new Error(`Groq API error in quizFromFile(): ${error.message}`)
+    }
 
     const raw = response?.choices[0]?.message?.content
     if (!raw) throw new Error("quizFromFile: empty response from Groq")
@@ -204,30 +204,35 @@ Rules:
 - Language simple and student-friendly.
 - Return NOTHING except the JSON object.`
 
-let response
-try {
-    const response = await groq.chat.completions.create({
-        model: MODEL,
-        messages: [
-            {
-                role: "system",
-                content: systemPrompt
-            },
-            {
-                role:"user",
-                content:userPrompt
-            }
-        ],
-        max_tokens: 2000, 
-        temperature: 0.4,
-    })
+    let response
+    try {
+        const response = await groq.chat.completions.create({
+            model: MODEL,
+            messages: [
+                {
+                    role: "system",
+                    content: systemPrompt
+                },
+                {
+                    role: "user",
+                    content: userPrompt
+                }
+            ],
+            max_tokens: 2000,
+            temperature: 0.4,
+        })
 
-} catch (error) {
-    
-}
-   
-    const raw = response.choices[0].message.content
-    const data = JSON.parse(raw)
+    } catch (error) {
+        throw new Error(`Groq API error in flashcards(): ${error.message}`)
+    }
+
+    const raw = response?.choices[0]?.message?.content
+
+    if (!raw) throw new Error("flashcards: empty response from Groq")
+
+    const data = extractJSON(raw)
+    await logAIResponse(userId, userPrompt, raw, response)
+
     return data
 }
 export {
