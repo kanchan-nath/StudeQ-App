@@ -14,6 +14,11 @@ const hashPassword = async (password) => {
 
     return hashed
 }
+const cookieOptions = {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+}
 
 const generateAccessAndRefreshToken = async (user) => {
     const accessToken = generateAccessToken(user)
@@ -110,19 +115,19 @@ const login = asyncHandler(async (req, res) => {
         }
     })
 
-    const isUserValid = existedUser && bcrypt.compare(password, existedUser.password)
+    const isUserValid = existedUser && await bcrypt.compare(password, existedUser.password)
 
     if (!isUserValid){
         throw new ApiError(404, "Invalid credentials")
 
     }
 
+    
     const { accessToken, refreshToken } = await generateAccessAndRefreshToken(existedUser)
+    
+    const { password: _} = existedUser
 
-    const options = {
-        httpOnly: true,
-        secure: true
-    }
+  
 
     const loggedInUser = await prisma.user.findUnique({
         where: {
