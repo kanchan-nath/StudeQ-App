@@ -79,12 +79,12 @@ const register = asyncHandler(async (req, res) => {
     })
 
     if (!newUser) {
-        throw new ApiError(400, "user not created")
+        throw new ApiError(500, "User creataion failed, Try again later")
     }
 
     return res
-        .status(200)
-        .json(new ApiResponse(200, newUser))
+        .status(201)
+        .json(new ApiResponse(201, newUser, "Registration successful"))
 
 })
 
