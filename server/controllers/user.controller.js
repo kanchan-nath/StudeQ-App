@@ -6,29 +6,13 @@ import bcrypt from "bcrypt"
 import { loginValidator, registerValidator } from "../validators/auth.validator.js"
 import logger from "../logger/index.js"
 
-const isPasswordCorrect = async (email, password) => {
-    try {
-        const user = await prisma.user.findUnique({
-            where: {
-                email
-            }
-        })
-
-        return await bcrypt.compare(password, user.password)
-    } catch (error) {
-        throw new ApiError(400, "Incorrect password")
-    }
-}
-
 const hashPassword = async (password) => {
-    try {
-        return await bcrypt.hash(password, 10)
-
-    } catch (error) {
-        console.error("Password not hashed");
-
+    const hashed = bcrypt.hash(password, process.env.HASH_PASSWORD_SALT_ROUND)
+    if(!hashed){
+        throw new ApiError(500, "Failed to process password")
     }
 
+    return hashed
 }
 
 const generateAccessAndRefreshToken = async (user) => {
