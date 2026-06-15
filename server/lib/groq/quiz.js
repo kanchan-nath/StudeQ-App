@@ -1,5 +1,6 @@
 import groq from "./groq.js";
 import { AIResponse } from "../../models/aiResponse.model.js"
+import logger from "../../logger/index.js";
 
 const MODEL = process.env.GROQ_QUIZ_MODEL || "llama-3.3-70b-versatile"
 
@@ -21,7 +22,31 @@ const extractJSON = (raw) => {
         throw new Error(`JSON parse failed: ${error.message}. Raw: ${raw.slice(0, 200)}`)
     }
 }
-const quiz = async (type, topic, subject, userId) => {
+
+const logAIResponse = async(userId, prompt, rawResult, response) => {
+    const { prompt_tokens, completion_tokens, total_tokens, total_time } = response.usage
+
+    try {
+        await AIResponse.create(
+            {
+                userId,
+                prompt,
+                response: rawResult,
+                model: response.model,
+                promptTokens: prompt_tokens,
+                completionTokens: completion_tokens,
+                totalTokens: total_tokens,
+                totalTime: total_time,
+            }
+        )
+    } catch (error) {
+        logger.error("AIResponse log failed (non-critical):", error)
+    }
+   
+}
+
+
+const quiz = async (types, topic, subject, userId) => {
 
     const prompt = `
 You are a quiz generator for the subject: ${subject}.
