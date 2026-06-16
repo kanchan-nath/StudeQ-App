@@ -2,6 +2,7 @@ import groq from "./groq.js"
 import { webSearch } from "../websearch.js"
 import logger from "../../logger/index.js"
 import { AIResponse } from "../../models/aiResponse.model.js"
+import { logAIResponse } from "../../utils/logAIResponseUtils.js"
 
 const MODEL = process.env.GROQ_QA_MODEL || "llama-3.3-70b-versatile"
 const MAX_SEARCH_CHARS = 12_000
@@ -20,28 +21,6 @@ const prepareSearchContext = (searchResult) => {
         return null
     }
     return searchResult.slice(0, MAX_SEARCH_CHARS)
-}
-
-const logAIResponse = async (userId, prompt, rawResult, response) => {
-    const { prompt_tokens, completion_tokens, total_tokens, total_time } = response.usage
-
-    try {
-        await AIResponse.create(
-            {
-                userId,
-                prompt,
-                response: rawResult,
-                model: response.model,
-                promptTokens: prompt_tokens,
-                completionTokens: completion_tokens,
-                totalTokens: total_tokens,
-                totalTime: total_time,
-            }
-        )
-    } catch (error) {
-        logger.error("AIResponse log failed (non-critical):", error)
-    }
-
 }
 
 const questionAnswer = async (query, subject, userId) => {

@@ -1,5 +1,7 @@
 import groq from "./groq.js";
 import {extractJSON} from "../../utils/llmUtils.js"
+import { AIResponse } from "../../models/aiResponse.model.js"
+import { logAIResponse } from "../../utils/logAIResponseUtils.js"
 
 const MODEL = process.env.GROQ_FLASHCARD_MODEL || "meta-llama/llama-4-scout-17b-16e-instruct"
 
@@ -73,8 +75,7 @@ ${safeText}
         throw new Error("pdfToFlashcard: empty response from model")
     }
 
+    await logAIResponse(userId, userPrompt, raw, response)
     return extractJSON(raw)
-    const data = JSON.parse(raw)
-    return data
 }
 export {pdfToFlashcard}
