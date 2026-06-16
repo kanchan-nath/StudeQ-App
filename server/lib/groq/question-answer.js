@@ -1,6 +1,18 @@
 import groq from "./groq.js"
 import { webSearch } from "../websearch.js"
 
+const MODEL = process.env.GROQ_QA_MODEL || "llama-3.3-70b-versatile"
+const MAX_SEARCH_CHARS = 12_000
+const MAX_SUBJECT_LENGTH = 100
+
+const sanitizeSubject = (subject) => {
+    if (!subject || typeof subject !== "string") return "General Studies"
+    return subject
+        .slice(0, MAX_SUBJECT_LENGTH)
+        .replace(/[^\w\s\-]/g, "") 
+        .trim() || "General Studies"
+}
+
 const questionAnswer = async (query, subject) => {
     const searchResult = await webSearch(query)
 
