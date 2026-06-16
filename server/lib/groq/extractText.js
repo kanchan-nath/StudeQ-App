@@ -59,8 +59,11 @@ const extract = async (outputDir) => {
 
         const files = allFiles.filter(isImageFile)
 
+        if (files.length === 0) {
+            throw new Error(`extract: no image files found in ${outputDir}`)
+        }
+
         const results = []
-        const batchSize = 3
 
         for (let i = 0; i < files.length; i += batchSize) {
             const batch = files.slice(i, i + batchSize)
@@ -73,28 +76,40 @@ const extract = async (outputDir) => {
                     const imgPath = path.join(folder, file)
                     const base64 = fs.readFileSync(imgPath).toString("base64")
 
-                    const dataURI = `data:image/jpeg;base64,${base64}`
+                    const mimeType = result.mime
+                    const dataURI = `data:${mimeType};base64,${base64}`
 
-                    const response = await groq.chat.completions.create({
-                        model: "meta-llama/llama-4-scout-17b-16e-instruct",
-                        messages: [
-                            {
-                                role: "user",
-                                content: [
-                                    {
-                                        type: "text",
-                                        text: prompt_TextExtraction
-                                    },
-                                    {
-                                        type: "image_url",
-                                        image_url: {
-                                            url: `data:image/jpeg;base64,${base64}`
+                    let response
+
+                    try {
+                        const response = await groq.chat.completions.create({
+                            model: MODEL,
+                            messages: [
+                                {
+                                    role: "system",
+                                    content: prompt_TextExtraction
+                                },
+                                {
+                                    role: "user",
+                                    content: [
+                                        {
+                                            type: "text",
+                                            text: "Extract all content from this image."
+                                        },
+                                        {
+                                            type: "image_url",
+                                            image_url: {
+                                                url: dataURI
+                                            }
                                         }
-                                    }
-                                ]
-                            }
-                        ]
-                    })
+                                    ]
+                                }
+                            ]
+                        })
+                    } catch (error) {
+
+                    }
+
                     const data = response.choices[0].message.content
 
                     return data
