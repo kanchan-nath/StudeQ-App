@@ -15,8 +15,11 @@ const webSearch = async (query) => {
     }
 
 
-    const result = response.organic_results
-    
+    const result = response?.organic_results
+    if (!results?.length) {
+        return "No search results found for this query."
+    }
+
     const searchResult = result.map((item, index) => {
         return `
         Result: ${index + 1}
