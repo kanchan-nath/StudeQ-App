@@ -9,6 +9,10 @@ const pdfToFlashcard = async(text, userId)=>{
     if (!text || typeof text !== "string" || text.trim().length < 20) {
         throw new Error("pdfToFlashcard: valid text content required")
     }
+
+    if (!userId) throw new Error("pdfToFlashcard: userId required")
+
+    const safeText = text.slice(0, MAX_INPUT_CHARS)
     const prompt  =`
     You are a flashcard generator. User gives ${text}. Extract key concepts. 
 Also give the difficulety level - easy/medium/hard.
