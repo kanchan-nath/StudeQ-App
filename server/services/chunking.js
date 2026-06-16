@@ -1,5 +1,6 @@
 import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
 import embedText from "./embedText.js";
+import logger from "../logger/index.js"
 
 const splitter = new RecursiveCharacterTextSplitter({
     chunkSize: 1500,
@@ -17,7 +18,9 @@ const chunking = async (text) => {
         throw new Error("chunking: no chunks produced — text may be too short or malformed")
     }
 
-    
+    if (chunks.length === 1) {
+        logger.warn(`chunking: only 1 chunk produced from ${text.length} chars — document may be very short`)
+    }
     return chunks
 }
 
