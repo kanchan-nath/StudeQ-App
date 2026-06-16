@@ -10,6 +10,11 @@ const search = asyncHandler(async (req, res) => {
     if (!query) {
         throw new ApiError(400, "Query is required")
     }
+
+    if (query.length > MAX_QUERY_LENGTH) {
+        throw new ApiError(400, `Query must be under ${MAX_QUERY_LENGTH} characters`)
+    }
+    
     const { googleResponse, youtubeResponse } = await searchAPI(query)
     const data = { googleResponse, youtubeResponse }
 
