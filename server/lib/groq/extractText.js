@@ -18,21 +18,30 @@ const safeRmDir = (folderPath)=>{
     }
 }
 
-const getMimeType = async (filePath) => {
+const getMimeType = async(filePath)=>{
+
     let result
     try {
         result = await fileTypeFromFile(filePath)
-    } catch {
+
+    } catch (error) {
         throw new ApiError(415, "Could not read file")
     }
 
-    if (!result || !ALLOWED_MIMES.has(result.mime)) {
+    const ALLOWED = new Set(['image/jpeg', 'image/png', 'image/webp', 'application/pdf'])
+
+    if (!ALLOWED.has(result.mime)) {
+        throw new ApiError(415, "Unsupported File Type")
+    }
+    const IMAGE_EXTENSIONS = new Set([".jpg", ".jpeg", ".png", ".webp"])
+
+    if (!IMAGE_EXTENSIONS.has(result.ext)) {
         throw new ApiError(415, "Unsupported File Type")
     }
 
-    return result.mime
-}
 
+    return result
+}
 const extract = async () => {
     const folder = "/Users/kanchannath/Coding/Spark.E/server/uploads/images"
     try {
