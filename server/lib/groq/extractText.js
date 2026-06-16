@@ -104,10 +104,12 @@ const extract = async (outputDir) => {
                                         }
                                     ]
                                 }
-                            ]
+                            ],
+                            max_completion_tokens: 2000,
                         })
                     } catch (error) {
-
+                        logger.error(`Vision API failed for ${file}:`, error.message)
+                        return `[OCR failed for page ${i + batch.indexOf(file) + 1}]`
                     }
 
                     const data = response.choices[0].message.content
