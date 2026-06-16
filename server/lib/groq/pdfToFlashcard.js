@@ -67,9 +67,13 @@ ${safeText}
         throw new Error(`pdfToFlashcard Groq error: ${err.message}`)
     }
 
-    
+    const raw = response?.choices[0]?.message?.content
 
-    const raw = response.choices[0].message.content
+    if(!raw){
+        throw new Error("pdfToFlashcard: empty response from model")
+    }
+
+    return extractJSON(raw)
     const data = JSON.parse(raw)
     return data
 }
