@@ -112,13 +112,21 @@ const extract = async (outputDir) => {
                         return `[OCR failed for page ${i + batch.indexOf(file) + 1}]`
                     }
 
-                    const data = response.choices[0].message.content
+                    const raw = response?.choices[0]?.message?.content
+                    if (!raw) {
+                        logger.warn(`Empty response for ${file}`)
 
-                    return data
+                        return `[Empty response for page ${i + batch.indexOf(file) + 1}]`
+                    }
+                    return raw
                 })
             )
 
             results.push(...batchResults)
+            
+            if (i + batchSize < files.length) {
+                await new Promise(r => setTimeout(r, 500))
+            }
         }
         const data = results.join('\n')
         console.log(data)
