@@ -121,7 +121,7 @@ const extract = async (outputDir, userId) => {
                     }
 
                     await logAIResponse(userId, "Extract all text from the image", raw, response)
-                    
+
                     return raw
                 })
             )
@@ -147,8 +147,18 @@ const extract = async (outputDir, userId) => {
 
 }
 
-const extractTextFromImage = async (filePath, mimeType) => {
+const extractTextFromImage = async (filePath) => {
     const base64 = fs.readFileSync(filePath).toString("base64")
+
+    if (!filePath){
+        throw new Error("extractTextFromImage: filePath required")
+    }
+
+    if(!fs.existsSync(filePath)){
+        throw new Error(`extractTextFromImage: file not found: ${filePath}`)
+    }
+
+    
 
     try {
         const response = await groq.chat.completions.create({
