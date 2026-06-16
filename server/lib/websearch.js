@@ -1,11 +1,19 @@
 import { getJson } from "serpapi"
+
 const webSearch = async (query) => {
-    const response = await getJson({
-        engine: "google",
-        api_key: process.env.SERP_API_KEY,
-        q: `${query}`,
-        location: "India"
-    })
+
+    let response
+    try {
+         response = await getJson({
+            engine: "google",
+            api_key: process.env.SERP_API_KEY,
+            q: `${query}`,
+             location: process.env.SEARCH_LOCATION || "India" 
+        })
+    } catch (error) {
+        throw new Error(`webSearch API call failed: ${error.message}`)
+    }
+
 
     const result = response.organic_results
     
