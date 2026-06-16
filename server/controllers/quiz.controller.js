@@ -7,16 +7,12 @@ import fs from "fs"
 import { pdfToFlashcard } from "../lib/groq/pdfToFlashcard.js"
 import { v4 as uuidv4 } from "uuid" // ✅ ADDED: need this to generate unique quizId on server
 import { Flascards } from "../models/flashcard.model.js"
+import textExtractor from "../services/textExtractor.js"
+import mongoose from "mongoose"
 
-// ─────────────────────────────────────────────
-// GENERATE QUIZ FROM TEXT (topic + subject)
-// POST /api/quiz/generate
-// Body: { topic, subject, title, types, difficulty, audience }
-// ─────────────────────────────────────────────
 const generateQuiz = asyncHandler(async (req, res) => {
     const { topic, subject, types, title, difficulty, audience } = req.body
     const userId = req.user.id
-    console.log(types);
     
     if (!topic || !subject || !types) {
         throw new ApiError(400, "topic, subject, and types are required")
