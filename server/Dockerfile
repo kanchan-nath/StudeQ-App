@@ -20,6 +20,6 @@ COPY . .
 
 ENV TRANSFORMERS_CACHE=/app/.cache/transformers
 
-EXPOSE 4000
+EXPOSE 3000
 
 CMD ["node", "index.js"]
