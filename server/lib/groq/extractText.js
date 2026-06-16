@@ -8,7 +8,7 @@ import { ApiError } from "../../utils/Async.js"
 
 const MODEL = process.env.GROQ_VISION_MODEL || "meta-llama/llama-4-scout-17b-16e-instruct"
 
-const safeRmDir = (folderPath)=>{
+const safeRmDir = (folderPath) => {
     try {
         if (fs.existsSync(folderPath)) {
             fs.rmSync(folderPath, { recursive: true, force: true })
@@ -18,7 +18,7 @@ const safeRmDir = (folderPath)=>{
     }
 }
 
-const getMimeType = async(filePath)=>{
+const getMimeType = async (filePath) => {
 
     let result
     try {
@@ -27,6 +27,8 @@ const getMimeType = async(filePath)=>{
     } catch (error) {
         throw new ApiError(415, "Could not read file")
     }
+
+    if (!result) throw new ApiError(415, "Could not read file")
 
     const ALLOWED = new Set(['image/jpeg', 'image/png', 'image/webp', 'application/pdf'])
 
@@ -38,20 +40,24 @@ const getMimeType = async(filePath)=>{
     if (!IMAGE_EXTENSIONS.has(result.ext)) {
         throw new ApiError(415, "Unsupported File Type")
     }
+    const isImageFile = (filePath) =>
+        IMAGE_EXTENSIONS.has(path.extname(filePath).toLowerCase())
 
-    return result
+    return { result, isImageFile }
 }
 const extract = async (outputDir) => {
     // const folder = "/Users/kanchannath/Coding/Spark.E/server/uploads/images"
-    if(!outputDir){
+    if (!outputDir) {
         throw new Error("extract: outputDir is required")
     }
     const batchSize = Number(process.env.VISION_BATCH_SIZE) || 3
+    const { result, isImageFile } = getMimeType(filePath)
 
     try {
 
-        const files = fs.readdirSync(folder).sort()
-        console.log('files found:', files.length)
+        const allFiles = fs.readdirSync(outputDir).sort()
+
+        const files = allFiles.filter(isImageFile)
 
         const results = []
         const batchSize = 3
@@ -110,23 +116,23 @@ const extract = async (outputDir) => {
 
 }
 
-const extractTextFromImage = async(filePath, mimeType)=>{
+const extractTextFromImage = async (filePath, mimeType) => {
     const base64 = fs.readFileSync(filePath).toString("base64")
 
     try {
         const response = await groq.chat.completions.create({
-            model:"meta-llama/llama-4-scout-17b-16e-instruct",
-            messages:[
+            model: "meta-llama/llama-4-scout-17b-16e-instruct",
+            messages: [
                 {
-                    role:"user",
-                    content:[
+                    role: "user",
+                    content: [
                         {
-                            type:"text",
-                            text:prompt_TextExtraction
+                            type: "text",
+                            text: prompt_TextExtraction
                         },
                         {
-                            type:"image_url",
-                            image_url:{
+                            type: "image_url",
+                            image_url: {
                                 url: `data:${mimeType};base64,${base64}`
                             }
                         }
@@ -143,8 +149,8 @@ const extractTextFromImage = async(filePath, mimeType)=>{
     }
 }
 
-export  {
-    
+export {
+
     extract,
     extractTextFromImage
 }
