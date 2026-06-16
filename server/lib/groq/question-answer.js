@@ -1,5 +1,6 @@
 import groq from "./groq.js"
 import { webSearch } from "../websearch.js"
+import logger from "../../logger/index.js"
 
 const MODEL = process.env.GROQ_QA_MODEL || "llama-3.3-70b-versatile"
 const MAX_SEARCH_CHARS = 12_000
@@ -13,7 +14,32 @@ const sanitizeSubject = (subject) => {
         .trim() || "General Studies"
 }
 
-const questionAnswer = async (query, subject) => {
+const prepareSearchContext = (searchResult) => {
+    if (!searchResult || typeof searchResult !== "string" || searchResult.trim().length < 10) {
+        return null
+    }
+    return searchResult.slice(0, MAX_SEARCH_CHARS)
+}
+
+const questionAnswer = async (query, subject, userId) => {
+    if (!query || typeof query !== "string") {
+        throw new Error("questionAnswer: query is required")
+    }
+
+    const safeSubject = sanitizeSubject(subject)
+
+    let searchResult = null
+    try {
+        const raw = await webSearch(query)
+        searchResult = prepareSearchContext(raw) 
+    } catch (error) {
+        logger.warn(`webSearch failed for query "${query}": ${err.message}`)
+    }
+
+    const searchSection = searchResult
+        ? `Use the following search results as your PRIMARY source. Do not invent facts not present in them.\n\n<search_results>\n${searchResult}\n</search_results>`
+        : `No web search results are available. Answer from your training knowledge and clearly state you are doing so.`
+        
     const searchResult = await webSearch(query)
 
     const prompt = `
