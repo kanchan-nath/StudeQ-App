@@ -3,6 +3,8 @@ import fs from "fs"
 import path from "path"
 import { prompt_TextExtraction } from "../prompt.js"
 
+const MODEL = process.env.GROQ_VISION_MODEL || "meta-llama/llama-4-scout-17b-16e-instruct"
+
 const extract = async () => {
     const folder = "/Users/kanchannath/Coding/Spark.E/server/uploads/images"
     try {
