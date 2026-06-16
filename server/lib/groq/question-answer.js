@@ -72,7 +72,7 @@ const questionAnswer = async (query, subject, userId) => {
      searchResult = await webSearch(query)
 
     const userPrompt =
-        // FIX #1: <search_results> tag isolates web content from instructions
+
         `${searchSection}
 
 Question:
