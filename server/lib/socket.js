@@ -1,5 +1,4 @@
 import { Server } from "socket.io"
-import { ApiError } from "../utils/Async.js"
 import logger from "../logger/index.js"
 
 let io
@@ -30,7 +29,7 @@ const initSocket = (httpServer)=>{
 
 const getIO = ()=>{
     if(!io){
-        throw new ApiError(400, "Socket not initialized")
+        throw new Error("Socket.io not initialized — call initSocket(httpServer) first")
     }
     return io
 }
