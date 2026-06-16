@@ -2,9 +2,31 @@ import groq from "./groq.js"
 import fs from "fs"
 import path from "path"
 import { prompt_TextExtraction } from "../prompt.js"
+import logger from "../../logger/index.js"
+import { fileTypeFromFile } from "file-type"
+import { ApiError } from "../../utils/Async.js"
 
 const MODEL = process.env.GROQ_VISION_MODEL || "meta-llama/llama-4-scout-17b-16e-instruct"
 
+const safeRmDir = (folderPath)=>{
+    try {
+        if (fs.existsSync(folderPath)) {
+            fs.rmSync(folderPath, { recursive: true, force: true })
+        }
+    } catch (error) {
+        logger.error(`safeRmDir failed for ${folderPath}:`, error.message)
+    }
+}
+
+const getMimeType = async(filePath)=>{
+    const { mime } = await fileTypeFromFile(filePath)
+
+    if(!mime){
+        throw new ApiError(415, "Unsupported File Type")
+    }
+
+    return mime
+}
 const extract = async () => {
     const folder = "/Users/kanchannath/Coding/Spark.E/server/uploads/images"
     try {
