@@ -5,6 +5,7 @@ import { prompt_TextExtraction } from "../prompt.js"
 import logger from "../../logger/index.js"
 import { fileTypeFromFile } from "file-type"
 import { ApiError } from "../../utils/Async.js"
+import {logAIResponse} from "../../utils/logAIResponseUtils.js"
 
 const MODEL = process.env.GROQ_VISION_MODEL || "meta-llama/llama-4-scout-17b-16e-instruct"
 
@@ -45,7 +46,7 @@ const getMimeType = async (filePath) => {
 
     return { result, isImageFile }
 }
-const extract = async (outputDir) => {
+const extract = async (outputDir, userId) => {
     // const folder = "/Users/kanchannath/Coding/Spark.E/server/uploads/images"
     if (!outputDir) {
         throw new Error("extract: outputDir is required")
@@ -82,7 +83,7 @@ const extract = async (outputDir) => {
                     let response
 
                     try {
-                        const response = await groq.chat.completions.create({
+                        response = await groq.chat.completions.create({
                             model: MODEL,
                             messages: [
                                 {
@@ -118,6 +119,9 @@ const extract = async (outputDir) => {
 
                         return `[Empty response for page ${i + batch.indexOf(file) + 1}]`
                     }
+
+                    await logAIResponse(userId, "Extract all text from the image", raw, response)
+                    
                     return raw
                 })
             )
