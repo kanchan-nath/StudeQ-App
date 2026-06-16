@@ -51,7 +51,7 @@ const extract = async (outputDir) => {
         throw new Error("extract: outputDir is required")
     }
     const batchSize = Number(process.env.VISION_BATCH_SIZE) || 3
-    const { result, isImageFile } = getMimeType(filePath)
+    const { result, isImageFile } = await getMimeType(filePath)
 
     try {
 
@@ -123,19 +123,21 @@ const extract = async (outputDir) => {
             )
 
             results.push(...batchResults)
-            
+
             if (i + batchSize < files.length) {
                 await new Promise(r => setTimeout(r, 500))
             }
         }
         const data = results.join('\n')
-        console.log(data)
-        fs.rmSync(folder, { recursive: true, force: true })
+        logger.info(`extract: processed ${files.length} pages, ${data.length} chars extracted`)
+
+        safeRmDir(outputDir)
+        
         return data
 
     } catch (error) {
-        console.error(error.message)
-        fs.rmSync(folder, { recursive: true, force: true })
+        safeRmDir(outputDir)
+        throw new Error(`extract failed: ${error.message}`)
 
     }
 
