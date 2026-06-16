@@ -79,10 +79,7 @@ Answer clearly and accurately. If search results are provided, cite them as your
     const content = response?.choices?.[0]?.message?.content
     if (!content) throw new Error("questionAnswer: empty response from model")
 
-
-    const data = raw
-
-    return data
+    return content
 }
 
 export { questionAnswer }
