@@ -1,4 +1,7 @@
 import groq from "./groq.js";
+import {extractJSON} from "../../utils/llmUtils.js"
+
+const MODEL = process.env.GROQ_FLASHCARD_MODEL || "meta-llama/llama-4-scout-17b-16e-instruct"
 
 const pdfToFlashcard = async(text)=>{
 

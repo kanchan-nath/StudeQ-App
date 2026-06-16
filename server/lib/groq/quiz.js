@@ -1,27 +1,9 @@
 import groq from "./groq.js";
 import { AIResponse } from "../../models/aiResponse.model.js"
 import logger from "../../logger/index.js";
+import { extractJSON } from "../../utils/llmUtils.js";
 
 const MODEL = process.env.GROQ_QUIZ_MODEL || "llama-3.3-70b-versatile"
-
-const extractJSON = (raw) => {
-    if (!raw) {
-        throw new Error("Empty response from model")
-    }
-
-    let cleaned = raw.replace(/```(?:json)?\n?/gi, "").trim()
-    const arrayMatch = cleaned.match(/(\[[\s\S]*\])/)
-    const objectMatch = cleaned.match(/(\{[\s\S]*\})/)
-    const jsonStr = arrayMatch?.[1] || objectMatch?.[1]
-    if (!jsonStr) throw new Error("No valid JSON structure found in model response")
-
-    try {
-        return JSON.parse(jsonStr)
-
-    } catch (error) {
-        throw new Error(`JSON parse failed: ${error.message}. Raw: ${raw.slice(0, 200)}`)
-    }
-}
 
 const logAIResponse = async (userId, prompt, rawResult, response) => {
     const { prompt_tokens, completion_tokens, total_tokens, total_time } = response.usage
