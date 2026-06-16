@@ -76,8 +76,9 @@ Answer clearly and accurately. If search results are provided, cite them as your
         }
         throw new Error(`questionAnswer Groq error: ${error.message}`)
     }
-    const raw = response.choices[0].message.content
-    // const data = JSON.parse(raw)
+    const content = response?.choices?.[0]?.message?.content
+    if (!content) throw new Error("questionAnswer: empty response from model")
+
 
     const data = raw
 
