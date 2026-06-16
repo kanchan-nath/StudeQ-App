@@ -3,8 +3,12 @@ import {extractJSON} from "../../utils/llmUtils.js"
 
 const MODEL = process.env.GROQ_FLASHCARD_MODEL || "meta-llama/llama-4-scout-17b-16e-instruct"
 
-const pdfToFlashcard = async(text)=>{
+const MAX_INPUT_CHARS = 60_000
 
+const pdfToFlashcard = async(text, userId)=>{
+    if (!text || typeof text !== "string" || text.trim().length < 20) {
+        throw new Error("pdfToFlashcard: valid text content required")
+    }
     const prompt  =`
     You are a flashcard generator. User gives ${text}. Extract key concepts. 
 Also give the difficulety level - easy/medium/hard.
