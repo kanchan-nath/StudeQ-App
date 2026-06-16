@@ -39,11 +39,15 @@ const getMimeType = async(filePath)=>{
         throw new ApiError(415, "Unsupported File Type")
     }
 
-
     return result
 }
-const extract = async () => {
-    const folder = "/Users/kanchannath/Coding/Spark.E/server/uploads/images"
+const extract = async (outputDir) => {
+    // const folder = "/Users/kanchannath/Coding/Spark.E/server/uploads/images"
+    if(!outputDir){
+        throw new Error("extract: outputDir is required")
+    }
+    const batchSize = Number(process.env.VISION_BATCH_SIZE) || 3
+
     try {
 
         const files = fs.readdirSync(folder).sort()
