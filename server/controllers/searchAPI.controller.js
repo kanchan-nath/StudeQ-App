@@ -2,6 +2,8 @@ import { asyncHandler } from "../utils/asyncHandler.js"
 import { ApiError, ApiResponse } from "../utils/Async.js"
 import searchAPI from "../lib/searchAPI.js"
 
+const MAX_QUERY_LENGTH = 200
+
 const search = asyncHandler(async (req, res) => {
     const { query, filter, sort } = req.query
 
