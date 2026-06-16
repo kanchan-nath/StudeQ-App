@@ -147,9 +147,7 @@ const extract = async (outputDir, userId) => {
 
 }
 
-const extractTextFromImage = async (filePath) => {
-    const base64 = fs.readFileSync(filePath).toString("base64")
-
+const extractTextFromImage = async (filePath, userId) => {
     if (!filePath){
         throw new Error("extractTextFromImage: filePath required")
     }
@@ -158,36 +156,56 @@ const extractTextFromImage = async (filePath) => {
         throw new Error(`extractTextFromImage: file not found: ${filePath}`)
     }
 
-    
+    let base64
 
     try {
-        const response = await groq.chat.completions.create({
-            model: "meta-llama/llama-4-scout-17b-16e-instruct",
+        base64 = fs.readFileSync(filePath).toString("base64")
+    } catch (error) {
+        throw new Error(`extractTextFromImage: failed to read file: ${error.message}`)
+    }
+    const mimeType = await getMimeType(filePath)
+    const dataURI = `data:${mimeType};base64,${base64}`
+    let response
+    try {
+         response = await groq.chat.completions.create({
+            model: MODEL,
             messages: [
+                {
+                    role:"system",
+                    content: prompt_TextExtraction
+                },
                 {
                     role: "user",
                     content: [
                         {
                             type: "text",
-                            text: prompt_TextExtraction
+                            text: "Extract all content from this image."
                         },
                         {
                             type: "image_url",
                             image_url: {
-                                url: `data:${mimeType};base64,${base64}`
+                                url:dataURI
                             }
                         }
                     ]
                 }
-            ]
+            ],
+            max_completion_tokens:2000,
+            temperature:0
         })
 
-        const data = response.choices[0].message.content
-
-        return data
     } catch (error) {
-        console.error(error.message)
+        throw new Error(`extractTextFromImage failed: ${error.message}`)
     }
+    const raw = response?.choices[0]?.message?.content
+
+    if (!raw) {
+        throw new Error("extractTextFromImage: empty response from vision model")
+    }
+
+    await logAIResponse(userId, "Extract all content from this image.", raw, response)
+
+    return raw
 }
 
 export {
