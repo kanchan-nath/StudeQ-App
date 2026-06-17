@@ -209,7 +209,6 @@ Rules:
     }
 
     const raw = response?.choices[0]?.message?.content
-    console.log(raw);
     
     if (!raw) throw new Error("flashcards: empty response from Groq")
 
