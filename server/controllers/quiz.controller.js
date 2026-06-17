@@ -25,17 +25,10 @@ const generateQuiz = asyncHandler(async (req, res) => {
 
     const userId = req.user.id
 
-
-    // ✅ FIX: quizId was used below but never defined — now generated here on server
     const quizId = uuidv4()
 
-    // Call Groq to generate quiz questions
-    // Expected return shape from quiz(): { title, questions: [{type, question, options, answer}] }
-    const data = await quiz(topic, subject, types, difficulty || "medium")
+    const data = await quiz(types, topic, subject, userId)
 
-    // ✅ FIX: old code tried findOne({quizId}) then conditionally create/update
-    //         but quizId was undefined → always created new doc with null quizId
-    //         Now we always create a fresh quiz doc per generation call
     const quizDoc = await Quiz.create({
         userId,
         quiz: {
