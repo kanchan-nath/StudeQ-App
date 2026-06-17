@@ -3,6 +3,7 @@ import { ApiError, ApiResponse } from "../utils/Async.js"
 import { summarizeText } from "../lib/groq/summarizer.js"
 import { Note } from "../models/note.model.js"
 import {AIResponseQueue} from "../services/queue.js"
+import { noteValidator } from "../validators/note.validator.js"
 
 const titleExtract = (markdownResponse) => {
     if (!markdownResponse) return "Summary"
@@ -11,7 +12,13 @@ const titleExtract = (markdownResponse) => {
 };
 
 const createNote = asyncHandler(async (req, res) => {
-    const { content } = req.body
+
+    const {data, error} = noteValidator.safeParse(req.body)
+
+    if(error){
+        throw new ApiError(400, error.issues.map(e=>e.message).join(", "))
+    }
+    const { content } = data
     const userId = req.user.id
 
     if (!content) {
