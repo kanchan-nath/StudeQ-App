@@ -191,37 +191,25 @@ const generateQuizFromFiles = asyncHandler(async (req, res) => {
     if(error){
         throw new ApiError(400, error.issues.map(e=>e.message).join(", "))
     }
-    const { types, total } = req.body
+    const { types } = data
     const userId = req.user.id
-    const localFilePath = req.files?.file?.[0].path
-    console.log("Types: ",types);
+
+    const localFile = req.files?.file?.[0]
     
-    if (!types || !localFilePath || !total) {
-        throw new ApiError(400, "file, types, and total are required")
+    if (!types || !localFile) {
+        throw new ApiError(400, "file and types are required")
     }
 
-    let extractedText = ""
+    const extractedText = await textExtractor(localFile)
 
-    try {
-        // Read PDF buffer and extract text
-        const dataBuffer = fs.readFileSync(localFilePath)
-        const unit8Array = new Uint8Array(dataBuffer)
-        const parser = new PDFParse(unit8Array)
-        const result = await parser.getText()
-        extractedText = result.text
-    } finally {
-        // ✅ FIX: old code had fs.unlinkSync AFTER return statement (unreachable)
-        //         Now cleanup always runs in finally block
-        if (fs.existsSync(localFilePath)) {
-            fs.unlinkSync(localFilePath)
-        }
+    const response = await quizFromFile(types, extractedText, userId)
+
+    const { title, questions } = response
+
+    if (!Array.isArray(questions) || questions.length === 0) {
+        throw new ApiError(500, "Quiz generation returned invalid data")
     }
-
-    // Pass extracted text to Groq — types is JSON string from FormData, parse it
-    // const parsedTypes = typeof types === "string" ? JSON.parse(types) : types
-    const result = await quizFromFile(types, extractedText, parseInt(total))
-    const { title, questions } = result
-
+    
     const quizDoc = await Quiz.create({
         userId,
         quiz: {

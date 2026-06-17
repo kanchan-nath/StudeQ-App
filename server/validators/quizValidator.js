@@ -25,6 +25,5 @@ export const answersValidator = z.object({
 
 export const generateQuizFromFilesValidetor = z.object({
     types: z.array(z.enum(["mcq", "true_false", "fill_blank", "short_answer"])).min(1),
-    total: z.number().int().positive(),
 
 })
