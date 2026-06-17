@@ -2,7 +2,7 @@ import { asyncHandler } from "../utils/asyncHandler.js"
 import { ApiError, ApiResponse } from "../utils/Async.js"
 import { summarizeText } from "../lib/groq/summarizer.js"
 import { Note } from "../models/note.model.js"
-import {AIResponseQueue} from "../services/queue.js"
+import { AIResponseQueue } from "../services/queue.js"
 import { noteValidator } from "../validators/note.validator.js"
 
 const titleExtract = (markdownResponse) => {
@@ -13,32 +13,30 @@ const titleExtract = (markdownResponse) => {
 
 const createNote = asyncHandler(async (req, res) => {
 
-    const {data, error} = noteValidator.safeParse(req.body)
+    const { data, error } = noteValidator.safeParse(req.body)
 
-    if(error){
-        throw new ApiError(400, error.issues.map(e=>e.message).join(", "))
+    if (error) {
+        throw new ApiError(400, error.issues.map(e => e.message).join(", "))
     }
     const { content } = data
-    const userId = req.user.id
 
     if (!content) {
         throw new ApiError(400, "Content is required")
     }
+    const userId = req.user.id
 
-    const result = await summarizeText(content, userId)
+    const response = await summarizeText(content, userId)
 
-    const title = await titleExtract(result)
+    if (!response) {
+        await AIResponseQueue(userId, content)
 
-    if (!result) {
-        // throw new ApiError(400, "Something went wrong, Try again !")
-        const response = await AIResponseQueue(userId, content)        
-        
         return res
-        .status(200)
-        .json(new ApiResponse(200, {}, "retrying"))
+            .status(202)
+            .json(new ApiResponse(202, {}, "Summarization queued — you'll be notified when ready"))
 
     }
-    
+    const title = await titleExtract(response)
+
     const data = await Note.create({
         userId,
         title,
@@ -47,7 +45,7 @@ const createNote = asyncHandler(async (req, res) => {
     })
     return res
         .status(200)
-        .json(new ApiResponse(200, data, "Content created successfuly"))
+        .json(new ApiResponse(201, data, "Note created successfully"))
 
 })
 
@@ -56,7 +54,7 @@ const getNote = asyncHandler(async (req, res) => {
 
     const allNotes = await Note.find({
         userId: userId
-    }).sort({isPinned:-1})
+    }).sort({ isPinned: -1 })
 
     return res
         .status(200)
@@ -123,7 +121,7 @@ const updateNote = asyncHandler(async (req, res) => {
 
 const tooglePin = asyncHandler(async (req, res) => {
     const { newPinned } = req.body
-    
+
     const { id } = req.params
 
     const userId = req.user.id
