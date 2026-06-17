@@ -53,19 +53,11 @@ const generateQuiz = asyncHandler(async (req, res) => {
         .json(new ApiResponse(201, quizDoc, "Quiz generated successfully"))
 })
 
-
-// ─────────────────────────────────────────────
-// GET ALL QUIZZES FOR CURRENT USER
-// GET /api/quiz/all
-// ─────────────────────────────────────────────
 const getAllQuiz = asyncHandler(async (req, res) => {
     const userId = req.user.id
 
-    // Returns all quiz docs belonging to this user
-    // Each doc has: quiz{title, totalQuestion, meta}, questions[]
-    const data = await Quiz.find({ userId }).sort({ createdAt: -1 }) // newest first
+    const data = await Quiz.find({ userId }).sort({ createdAt: -1 })
 
-    // ✅ FIX: old code threw error if empty array — empty array is valid, not an error
     return res
         .status(200)
         .json(new ApiResponse(200, data, "All quizzes fetched"))
