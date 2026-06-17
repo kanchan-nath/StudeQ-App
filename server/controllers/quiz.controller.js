@@ -352,31 +352,47 @@ const deleteFlashcards = asyncHandler(async (req, res) => {
 
 
 const addMoreFlashcards = asyncHandler(async (req, res) => {
-    const { topic, subject, flashcardId } = req.body
-    const { id } = req.params
+    const { data, error } = generateQuizFromFilesValidetor.safeParse(req.body)
+
+    if (error) {
+        throw new ApiError(400, error.issues.map(e => e.message).join(", "))
+    }
+    const { topic, subject, flashcardId } = data
+
+    const isIdValid = idParamValidator.safeParse(req.params)
+
+    if (isIdValid.error) {
+        throw new ApiError(400, (isIdValid.error).issues.map(e => e.message).join(", "))
+    }
+    const { id } = isIdValid.data
+    if (!mongoose.Types.ObjectId.isValid(id)){
+        throw new ApiError(400, "Invalid flashcard ID")
+    }
     const userId = req.user.id
 
-    const result = await flashcards(topic, subject)
+    const { card } = await flashcards(topic, subject, userId)
 
-    const data = await Flascards.findOneAndUpdate(
+    const dbData = await Flascards.findOneAndUpdate(
         {
             _id: id,
-            // userId,
-            // flashcardId
+            userId,
         },
         {
             $push: {
                 flashcards: {
-                    $each: result
+                    $each: card
                 }
             }
         },
         { new: true }
     )
 
+    if (!data){
+        throw new ApiError(404, "Flashcard not found or unauthorized")
+    }
     return res
         .status(200)
-        .json(new ApiResponse(200, data, "Flashcard updated successfully"))
+        .json(new ApiResponse(200, dbData, "Flashcard updated successfully"))
 
 })
 
