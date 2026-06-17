@@ -5,7 +5,7 @@ import llmCall from "../lib/groq/llmCall.js"
 import { Documents } from "../models/document.model.js"
 import { v4 as uuid4 } from "uuid"
 import { ChatRoom } from "../models/chatRoom.model.js"
-import mongoose, { mongo } from "mongoose"
+import mongoose from "mongoose"
 import { ragQueryValidator } from "../validators/ragQuery.validator.js"
 
 const isValidId = (id)=>{
@@ -15,17 +15,11 @@ const isValidId = (id)=>{
 const uploadFile = asyncHandler(async (req, res) => {
     const userId = req.user?.id
 
-    const localFile = req.files?.file[0]
+    const localFile = req.files?.file?.[0]
 
     if (!localFile) {
         throw new ApiError(400, "No file uploaded")
     }
-
-    // const chatRoomKey = uuid4()
-
-    // if (!chatRoomKey) {
-    //     throw new ApiError(400, "chatRoomKey generation failed, Try again!")
-    // }
 
     const metadata = await Documents.create(
         {
@@ -56,7 +50,7 @@ const uploadFile = asyncHandler(async (req, res) => {
     }
 
     return res
-        .status(210)
+        .status(201)
         .json(new ApiResponse(201, data, "Document's metadata uploaded successfully"))
 
 })
@@ -68,7 +62,7 @@ const askQuery = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Something went wrong")
     }
 
-    if(!isValidId){
+    if(!isValidId(id)){
         throw new ApiError(400, "Invalid Id")
     }
 
@@ -80,10 +74,6 @@ const askQuery = asyncHandler(async (req, res) => {
         throw new ApiError(400, error.issues.map(e => e.message).join(", "))
     }
     const { query } = data    
-
-    if (!query) {
-        throw new ApiError(400, "Query is not found")
-    }
 
     const topChunks = await queryDB(query, userId)
     const results = await llmCall(query, topChunks, userId)
