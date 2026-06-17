@@ -86,13 +86,28 @@ const deleteNote = asyncHandler(async (req, res) => {
 })
 
 const updateNote = asyncHandler(async (req, res) => {
-    const { content } = req.body
-    const { id } = req.params
-    const userId = req.user.id
 
-    if (!content || !id) {
-        throw new ApiError(400, "Content is not changed anything")
+    const { data, error } = noteValidator.safeParse(req.body)
+
+    if (error) {
+        throw new ApiError(400, error.issues.map(e => e.message).join(", "))
     }
+    const { content } = data
+
+    if (!content) {
+        throw new ApiError(400, "Content is required")
+    }
+    const { id } = req.params
+
+    if (!content || !id){
+        throw new ApiError(400, "Content and id are required")
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(id)){
+        throw new ApiError(400, "Invalid note ID")
+
+    }
+    const userId = req.user.id
 
     const result = await summarizeText(content)
     const { title, summary, keyPoints } = result
