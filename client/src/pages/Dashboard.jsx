@@ -185,10 +185,12 @@ const Dashboard = () => {
       }
 
       const data = await res.json();
+      console.log(data);
+      
       setUserData({
-        name: data?.name ?? "",
-        email: data?.email ?? "",
-        grade: data?.grade ?? "",
+        name: data?.data?.name ?? "",
+        email: data?.data?.email ?? "",
+        grade: data?.data?.grade ?? "",
       });
 
       // ── Quiz stats (uncomment when route ready) ────────────────────────────
