@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import { useState, useCallback } from "react"; // [FIX-8] drop React import
 import LoaderContext from "./LoaderContext.js";
 import GlobalLoader from "../components/GlobalLoader.jsx";
 
@@ -16,10 +16,7 @@ const LoaderProvider = ({ children }) => {
   return (
     <LoaderContext.Provider value={{ show, hide }}>
       {children}
-      <GlobalLoader
-        visible={state.visible}
-        label={state.label}
-      />
+      <GlobalLoader visible={state.visible} label={state.label} />
     </LoaderContext.Provider>
   );
 };
