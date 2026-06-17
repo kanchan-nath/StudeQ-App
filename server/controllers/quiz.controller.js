@@ -323,11 +323,20 @@ const getFlashcards = asyncHandler(async (req, res) => {
 })
 
 const deleteFlashcards = asyncHandler(async (req, res) => {
-    const { id } = req.params
+    const { data, error } = idParamValidator.safeParse(req.params)
+
+    if (error) {
+        throw new ApiError(400, error.issues.map(e => e.message).join(", "))
+    }
+    const { id } = data
+
+    if (mongoose.Types.ObjectId.isValid(id)) {
+        throw new ApiError(400, "Invalid flashcard ID")
+    }
 
     const userId = req.user.id
 
-    const data = await Flascards.findOneAndDelete(
+    const dbData = await Flascards.findOneAndDelete(
         {
             userId,
             _id: id
