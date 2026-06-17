@@ -2,44 +2,50 @@ import { asyncHandler } from "../utils/asyncHandler.js"
 import { ApiError, ApiResponse } from "../utils/Async.js"
 import { summarizeText } from "../lib/groq/summarizer.js"
 import { Note } from "../models/note.model.js"
-import {AIResponseQueue} from "../services/queue.js"
+import { AIResponseQueue } from "../services/queue.js"
+import { noteValidator } from "../validators/note.validator.js"
 
 const titleExtract = (markdownResponse) => {
+    if (!markdownResponse) return "Summary"
     const match = markdownResponse.match(/##\s+Topic\s*\n+(.+)/);
     return match ? match[1].trim() : "Summary";
 };
 
 const createNote = asyncHandler(async (req, res) => {
-    const { content } = req.body
-    const userId = req.user.id
+
+    const { data, error } = noteValidator.safeParse(req.body)
+
+    if (error) {
+        throw new ApiError(400, error.issues.map(e => e.message).join(", "))
+    }
+    const { content } = data
 
     if (!content) {
         throw new ApiError(400, "Content is required")
     }
+    const userId = req.user.id
 
-    const result = await summarizeText(content, userId)
+    const response = await summarizeText(content, userId)
 
-    const title = await titleExtract(result)
+    if (!response) {
+        await AIResponseQueue(userId, content)
 
-    if (!result) {
-        // throw new ApiError(400, "Something went wrong, Try again !")
-        const response = await AIResponseQueue(userId, content)        
-        
         return res
-        .status(200)
-        .json(new ApiResponse(200, {}, "retrying"))
+            .status(202)
+            .json(new ApiResponse(202, {}, "Summarization queued — you'll be notified when ready"))
 
     }
-    
-    const data = await Note.create({
+    const title = await titleExtract(response)
+
+    const dbData = await Note.create({
         userId,
         title,
         content,
         summary: result,
     })
     return res
-        .status(200)
-        .json(new ApiResponse(200, data, "Content created successfuly"))
+        .status(201)
+        .json(new ApiResponse(201, dbData, "Note created successfully"))
 
 })
 
@@ -48,7 +54,7 @@ const getNote = asyncHandler(async (req, res) => {
 
     const allNotes = await Note.find({
         userId: userId
-    }).sort({isPinned:-1})
+    }).sort({ isPinned: -1, createdAt: -1 })
 
     return res
         .status(200)
@@ -58,78 +64,111 @@ const getNote = asyncHandler(async (req, res) => {
 
 const deleteNote = asyncHandler(async (req, res) => {
     const { id } = req.params
-    const userId = req.user.id
-    if (!id) {
-        throw new ApiError(400, "Not found")
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        throw new ApiError(400, "Invalid note ID")
     }
 
-    const response = await Note.findByIdAndDelete({
+    const userId = req.user.id
+
+    const deleted = await Note.findByIdAndDelete({
         _id: id,
         userId: userId
     })
-    console.log(response);
+
+    if (!deleted) {
+        throw new ApiError(404, "Note not found")
+    }
 
     return res
         .status(200)
-        .json(new ApiResponse(200, response, "Notes deleted succesfully"))
+        .json(new ApiResponse(200, {}, "Note deleted succesfully"))
 })
 
 const updateNote = asyncHandler(async (req, res) => {
-    const { content } = req.body
+
+    const { data, error } = noteValidator.safeParse(req.body)
+
+    if (error) {
+        throw new ApiError(400, error.issues.map(e => e.message).join(", "))
+    }
+    const { content } = data
+
+    if (!content) {
+        throw new ApiError(400, "Content is required")
+    }
     const { id } = req.params
-    const userId = req.user.id
 
     if (!content || !id) {
-        throw new ApiError(400, "Content is not changed anything")
+        throw new ApiError(400, "Content and id are required")
     }
 
-    const result = await summarizeText(content)
-    const { title, summary, keyPoints } = result
-    console.log(title);
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        throw new ApiError(400, "Invalid note ID")
 
+    }
+    const userId = req.user.id
 
-    const existedNote = await Note.findOneAndUpdate(
+    const response = await summarizeText(content, userId)
+
+    if (!response) {
+        throw new ApiError(500, "Summarization failed, please try again")
+
+    }
+
+    const title = titleExtract(result)
+
+    const updated = await Note.findOneAndUpdate(
         {
             _id: id,
             userId
         },
         {
+            content,
             title,
-            summary,
-            keyPoints
+            summary: response
         },
         {
             returnDocument: 'after'
         }
     )
 
-    if (!existedNote) {
-        throw new ApiError(404, "Summarizing content not exit")
+    if (!updated) {
+        throw new ApiError(404, "Note not found")
     }
 
     return res
         .status(200)
-        .json(new ApiResponse(200, {}, "Note is updated"))
+        .json(new ApiResponse(200, updated, "Note updated successfully"))
 
 })
 
-const tooglePin = asyncHandler(async (req, res) => {
+const togglePin = asyncHandler(async (req, res) => {
     const { newPinned } = req.body
-    
-    const { id } = req.params
+    if (typeof newPinned !== "boolean") {
+        throw new ApiError(400, "newPinned must be a boolean")
+    }
 
+    const { id } = req.params
+    if (!mongoose.Types.ObjectId.isValid(id)){
+        throw new ApiError(400, "Invalid note ID")
+    }
     const userId = req.user.id
 
-    await Note.findOneAndUpdate(
+    const updated = await Note.findOneAndUpdate(
         {
             userId,
             _id: id
         },
         {
             isPinned: newPinned
-        }
+        },
+        { returnDocument: "after" }
     )
 
+    if(!updated){
+        throw new ApiError(404, "Note not found")   
+    }
     return res
         .status(200)
         .json(new ApiResponse(200, {}, "pin successful"))
@@ -139,6 +178,6 @@ export {
     getNote,
     deleteNote,
     updateNote,
-    tooglePin,
+    togglePin,
     titleExtract
 }

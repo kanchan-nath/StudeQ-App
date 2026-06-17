@@ -1,0 +1,78 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Server: Dev",
+            "type": "shell",
+            "command": "npm run dev",
+            "options": {
+                "cwd": "${workspaceFolder}/server"
+            },
+            "presentation": {
+                "panel": "dedicated",
+                "reveal": "always",
+                "group": "sparke"
+            }
+        },
+        {
+            "label": "Server: Worker",
+            "type": "shell",
+            "command": "npm run dev-worker",
+            "options": {
+                "cwd": "${workspaceFolder}/server"
+            },
+            "presentation": {
+                "panel": "dedicated",
+                "reveal": "always",
+                "group": "sparke"
+            }
+        },
+        {
+            "label": "Client: Dev",
+            "type": "shell",
+            "command": "npm run dev",
+            "options": {
+                "cwd": "${workspaceFolder}/client"
+            },
+            "presentation": {
+                "panel": "dedicated",
+                "reveal": "always",
+                "group": "sparke"
+            }
+        },
+        {
+            "label": "Client: Test",
+            "type": "shell",
+            "command": "npm run test",
+            "options": {
+                "cwd": "${workspaceFolder}/client"
+            },
+            "group": "test",
+            "presentation": {
+                "panel": "dedicated",
+                "reveal": "always"
+            }
+        },
+        {
+            "label": "Client: Build",
+            "type": "shell",
+            "command": "npm run build",
+            "options": {
+                "cwd": "${workspaceFolder}/client"
+            },
+            "group": "build"
+        },
+        {
+            "label": "SPARK.E: Start All",
+            "dependsOn": [
+                "Server: Dev",
+                "Client: Dev"
+            ],
+            "dependsOrder": "parallel",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        }
+    ]
+}

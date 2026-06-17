@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Link, Outlet, useNavigate, useLocation } from "react-router-dom";
+import { apiFetch } from "../../lib/api.js";
+import useUser from "../../ContextApi/useUser.js";
 import styles from "./appShell.module.css";
 import {
   Home03Icon,
@@ -93,6 +95,7 @@ const NAV_EVENT = [
 ];
 
 const AppShell = ({ userName = "" }) => {
+  const { setUser } = useUser();
   const [isDark, setIsDark] = useState(() => {
     return (localStorage.getItem("sparke-theme") ?? "dark") === "dark";
   });
@@ -145,10 +148,18 @@ const AppShell = ({ userName = "" }) => {
       .toUpperCase()
     : "KN";
 
-  const handleLogout = (e) => {
+  const handleLogout = async (e) => {
     e.preventDefault();
     disConnectSocket();
-    localStorage.removeItem("token");
+
+    try {
+      // Tell backend to clear the httpOnly cookie
+      await apiFetch("/api/auth/logout", { method: "POST" });
+    } catch {
+      // Continue logout even if request fails
+    }
+
+    setUser(null);        // clear context
     navigate("/login");
   };
 

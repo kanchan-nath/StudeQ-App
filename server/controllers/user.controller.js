@@ -7,7 +7,7 @@ import { loginValidator, registerValidator } from "../validators/auth.validator.
 import logger from "../logger/index.js"
 
 const hashPassword = async (password) => {
-    const hashed = await bcrypt.hash(password, /*process.env.HASH_PASSWORD_SALT_ROUND*/ 10)
+    const hashed = await bcrypt.hash(password, /*process.env.BCRYPT_SALT_ROUNDS*/ 10)
     if(!hashed){
         throw new ApiError(500, "Failed to process password")
     }
@@ -24,7 +24,7 @@ const generateAccessAndRefreshToken = async (user) => {
     const accessToken = generateAccessToken(user)
     const refreshToken = generateRefreshToken(user)
 
-    const hashedRefreshToken = await bcrypt.hash(refreshToken, /*process.env.REFRESH_TOKEN_SALT_ROUND*/ 8)
+    const hashedRefreshToken = await bcrypt.hash(refreshToken, /*process.env.REFRESH_TOKEN_SALT_ROUNDS*/ 8)
 
     if(!hashedRefreshToken){
         throw new ApiError(500, "Failed to procedd token")
@@ -159,6 +159,13 @@ const getUserData = asyncHandler(async (req, res) => {
         .status(200)
         .json(new ApiResponse(200, req.user, "User data fetched successfully"))
 
+})
+
+export const verifyMe =asyncHandler(async(req, res)=>{
+    
+    return res
+        .status(200)
+        .json(new ApiResponse(200, req.user, "User verified"))
 })
 
 export {

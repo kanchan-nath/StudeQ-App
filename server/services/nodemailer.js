@@ -10,13 +10,13 @@ const mailICSFile = async (outputPath) => {
         port: 587,
         secure: false,
         auth: {
-            user: process.env.NODEMAILER_GMAIL_ACCOUNT,
-            pass: process.env.NODEMAILER_GMAIL_PASS_KEY,
+            user: process.env.SMTP_USER,
+            pass: process.env.SMTP_APP_PASSWORD,
         }
     })
 
     const mailOptions = {
-        from: process.env.NODEMAILER_GMAIL_ACCOUNT,
+        from: process.env.SMTP_USER,
         to: "nathkn9339@gmail.com",
         subject: `Your Time Table event file`,
         text: `Your time table ICS file attatched to this email`,

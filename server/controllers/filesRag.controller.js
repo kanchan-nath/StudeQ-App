@@ -5,7 +5,7 @@ import llmCall from "../lib/groq/llmCall.js"
 import { Documents } from "../models/document.model.js"
 import { v4 as uuid4 } from "uuid"
 import { ChatRoom } from "../models/chatRoom.model.js"
-import mongoose, { mongo } from "mongoose"
+import mongoose from "mongoose"
 import { ragQueryValidator } from "../validators/ragQuery.validator.js"
 
 const isValidId = (id)=>{
@@ -15,17 +15,11 @@ const isValidId = (id)=>{
 const uploadFile = asyncHandler(async (req, res) => {
     const userId = req.user?.id
 
-    const localFile = req.files?.file[0]
+    const localFile = req.files?.file?.[0]
 
     if (!localFile) {
         throw new ApiError(400, "No file uploaded")
     }
-
-    // const chatRoomKey = uuid4()
-
-    // if (!chatRoomKey) {
-    //     throw new ApiError(400, "chatRoomKey generation failed, Try again!")
-    // }
 
     const metadata = await Documents.create(
         {
@@ -56,7 +50,7 @@ const uploadFile = asyncHandler(async (req, res) => {
     }
 
     return res
-        .status(210)
+        .status(201)
         .json(new ApiResponse(201, data, "Document's metadata uploaded successfully"))
 
 })
@@ -68,7 +62,7 @@ const askQuery = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Something went wrong")
     }
 
-    if(!isValidId){
+    if(!isValidId(id)){
         throw new ApiError(400, "Invalid Id")
     }
 
@@ -80,10 +74,6 @@ const askQuery = asyncHandler(async (req, res) => {
         throw new ApiError(400, error.issues.map(e => e.message).join(", "))
     }
     const { query } = data    
-
-    if (!query) {
-        throw new ApiError(400, "Query is not found")
-    }
 
     const topChunks = await queryDB(query, userId)
     const results = await llmCall(query, topChunks, userId)
@@ -123,7 +113,7 @@ const allChatsMessage = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Something went wrong")
     }
 
-    if (!isValidId) {
+    if (!isValidId(id)) {
         throw new ApiError(400, "Invalid Id")
     }
 
@@ -149,12 +139,14 @@ const updateQuery = asyncHandler(async (req, res) => {
     
     const { id, chatId } = req.params
 
-    if (!id || !chatId) {
-        throw new ApiError(400, "Something went wrong")
+    const messageId = chatId
+
+    if (!id || !messageId) {
+        throw new ApiError(400, "Room id and message id are required")
     }
 
-    if (!isValidId(id) || !isValidId(chatId)) {
-        throw new ApiError(400, "Invalid Id")
+    if (!isValidId(id) || !isValidId(messageId)) {
+        throw new ApiError(400, "Invalid id")
     }
 
     const {data, error} = ragQueryValidator.safeParse(req.body)
@@ -164,10 +156,6 @@ const updateQuery = asyncHandler(async (req, res) => {
     const { query } = data
 
     const userId = req.user.id
-
-    if (!query) {
-        throw new ApiError(400, "All fields are rquired")
-    }
 
     const topChunks = await queryDB(query, userId)
 
@@ -181,7 +169,7 @@ const updateQuery = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Query answer problem, Try Again")
     }
 
-    const chatRoom = await ChatRoom.findOne({ userId, _id:chatId })
+    const chatRoom = await ChatRoom.findOne({ userId, _id:id })
     if (!chatRoom) throw new ApiError(404, "Chat room not found")
 
     const msgIndex = chatRoom.messages.findIndex(
@@ -226,7 +214,7 @@ const deleteChat = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Something went wrong")
     }
 
-    if (!isValidId) {
+    if (!isValidId(id)) {
         throw new ApiError(400, "Invalid Id")
     }
 
@@ -242,10 +230,10 @@ const deleteChat = asyncHandler(async (req, res) => {
         const documentId = chatRoom.docId.toString()
         Promise.all([
             Documents.findByIdAndDelete(documentId).catch(e =>
-                logger.error("Doc metadata cleanup failed:", e)
+                console.error("Doc metadata cleanup failed:", e)
             ),
             deleteDocumentVectors(userId, documentId).catch(e =>
-                logger.error("Vector cleanup failed:", e)
+                console.error("Vector cleanup failed:", e)
             )
         ])
     }

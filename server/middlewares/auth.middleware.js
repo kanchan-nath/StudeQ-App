@@ -9,9 +9,9 @@ const verifyJWT = asyncHandler(async (req, res, next) => {
 
     const token = req.cookies?.accessToken || req.header("Authorization")?.replace("Bearer ", "")
     
-
+    
     if (!token) {
-        throw new ApiError(401, "Unathorized request")
+        throw new ApiError(401, "Unauthorized request")
     }
 
     let decodedToken
@@ -68,7 +68,7 @@ const verifyJWT = asyncHandler(async (req, res, next) => {
     }
 
     try {
-        redisClient.setex(cacheKey, process.env.USER_CACHE_TTL, JSON.stringify(user), ()=>logger.info("User data saved in redis memory"))
+        redisClient.setex(cacheKey, process.env.USER_CACHE_TTL_SECONDS, JSON.stringify(user), ()=>logger.info("User data saved in redis memory"))
 
     } catch (error) {
         logger.error("Redis set failed:", error)

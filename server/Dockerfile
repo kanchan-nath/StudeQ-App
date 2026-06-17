@@ -14,12 +14,12 @@ COPY package*.json ./
 COPY prisma ./prisma/
 
 RUN npm install --legacy-peer-deps
-RUN DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy" npx prisma generate
+RUN POSTGRES_URL="postgresql://dummy:dummy@localhost:5432/dummy" npx prisma generate
 
 COPY . .
 
 ENV TRANSFORMERS_CACHE=/app/.cache/transformers
 
-EXPOSE 4000
+EXPOSE 3000
 
 CMD ["node", "index.js"]
