@@ -261,13 +261,24 @@ const getResult = asyncHandler(async(req, res)=>{
 
 const generateFlashcards = asyncHandler(async (req, res) => {
     const { topic, subject, flashcardId } = req.body
-    const pdfFile = req.files?.pdfFilePath?.[0].path
+    const pdfFile = req.files?.pdfFilePath?.[0]
     const userId = req.user.id
-    console.log(pdfFile);
     
     if (pdfFile) {
-        console.log(pdfFile);
-        
+        const extractedText = await textExtractor(pdfFile)
+
+        const { difficultyLevel, card } = await pdfToFlashcard(extractedText, userId)  
+
+        const data = await Flascards.create({
+            userId,
+            difficultyLevel,
+            flashcards: card
+        })
+
+        return res
+            .status(200)
+            .json(new ApiResponse(200, data, "Flashcard generated"))
+            
         try {
             const dataBuffer = fs.readFileSync(pdfFile)
             const unit8Array = new Uint8Array(dataBuffer)
@@ -275,17 +286,10 @@ const generateFlashcards = asyncHandler(async (req, res) => {
 
             const extractedText = await parser.getText()
             
-            const {difficultyLevel , card} = await pdfToFlashcard(extractedText.text)            
+                     
             
-            const data = await Flascards.create({
-                userId,
-                difficultyLevel,
-                flashcards: card
-            })
-            return res
-            .status(200)
-            .json(new ApiResponse(200, data, "Flashcard generated"))
-            fs.unlinkSync(pdfFile)
+           
+           
         }finally {
             if (pdfFile && fs.existsSync(pdfFile)) {
                 fs.unlinkSync(pdfFile)
