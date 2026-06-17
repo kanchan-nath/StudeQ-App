@@ -11,13 +11,14 @@ import textExtractor from "../services/textExtractor.js"
 import mongoose from "mongoose"
 import { quizValidator } from "../validators/quizValidator.js"
 
-const generateQuiz = asyncHandler(async (req, res) => {
-    const {query, error} = quizValidator.safeParse(req.body)
+const generateQuiz = asyncHandler(async (req, res) => {    
+    const {data, error} = quizValidator.safeParse(req.body)
+console.log(data);
 
     if(error){
         throw new ApiError(400, error.issues.map(e=>e.message).join(",  "))
     }
-    const { topic, subject, types, title, difficulty, audience } = query
+    const { topic, subject, types, title, difficulty, audience } = data
     
     if (!topic || !subject || !types) {
         throw new ApiError(400, "topic, subject, and types are required")
@@ -27,16 +28,17 @@ const generateQuiz = asyncHandler(async (req, res) => {
 
     const quizId = uuidv4()
 
-    const data = await quiz(types, topic, subject, userId)
-
+    const response = await quiz(types, topic, subject, userId)
+    console.log(response);
+    
     const quizDoc = await Quiz.create({
         userId,
         quiz: {
-            title: title || data.title || `${topic} Quiz`,  // use provided title or AI-generated
-            totalQuestion: data.length,
+            title: title || response.title || `${topic} Quiz`,  // use provided title or AI-generated
+            totalQuestion: response.length,
             // meta fields (startedAt, submittedAt, score) default to null — set later
         },
-        data: data.map(q => ({
+        data: response.map(q => ({
             types: q.type,
             question: q.question,
             options: q.options,       // array of strings
