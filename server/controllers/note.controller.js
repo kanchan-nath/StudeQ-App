@@ -5,6 +5,7 @@ import { Note } from "../models/note.model.js"
 import {AIResponseQueue} from "../services/queue.js"
 
 const titleExtract = (markdownResponse) => {
+    if (!markdownResponse) return "Summary"
     const match = markdownResponse.match(/##\s+Topic\s*\n+(.+)/);
     return match ? match[1].trim() : "Summary";
 };
