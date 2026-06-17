@@ -5,6 +5,7 @@ import { generateAccessToken, generateRefreshToken } from "../helpers/generateTo
 import bcrypt from "bcrypt"
 import { loginValidator, registerValidator } from "../validators/auth.validator.js"
 import logger from "../logger/index.js"
+import { grantDailyLoginXP } from "../services/xpService.js"
 
 const hashPassword = async (password) => {
     const hashed = await bcrypt.hash(password, /*process.env.BCRYPT_SALT_ROUNDS*/ 10)
@@ -127,6 +128,13 @@ const login = asyncHandler(async (req, res) => {
     
     const { password: _, ...safeUser} = existedUser
 
+    let dailyXP = null
+    try {
+        dailyXP = await grantDailyLoginXP(existedUser.id)
+    } catch (err) {
+        logger.error("Daily XP failed:", err.message) // non-fatal
+    }
+
     return res
         .status(200)
         .cookie("accessToken", accessToken, cookieOptions)
@@ -154,7 +162,7 @@ const logout = asyncHandler(async (req, res) => {
 })
 
 const getUserData = asyncHandler(async (req, res) => {
-
+    
     return res
         .status(200)
         .json(new ApiResponse(200, req.user, "User data fetched successfully"))
