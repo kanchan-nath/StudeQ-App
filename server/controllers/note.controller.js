@@ -109,20 +109,24 @@ const updateNote = asyncHandler(async (req, res) => {
     }
     const userId = req.user.id
 
-    const result = await summarizeText(content)
-    const { title, summary, keyPoints } = result
-    console.log(title);
+    const response = await summarizeText(content, userId)
+    
+    if(!response){
+        throw new ApiError(500, "Summarization failed, please try again")
 
+    }
 
-    const existedNote = await Note.findOneAndUpdate(
+    const title = titleExtract(result)
+
+    const updated = await Note.findOneAndUpdate(
         {
             _id: id,
             userId
         },
         {
+            content, 
             title,
-            summary,
-            keyPoints
+            summary: response
         },
         {
             returnDocument: 'after'
