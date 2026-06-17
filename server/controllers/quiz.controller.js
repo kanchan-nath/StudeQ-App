@@ -317,10 +317,6 @@ const getFlashcards = asyncHandler(async (req, res) => {
 
     const existedFlashcards = await Flascards.find({ userId })
 
-    if (!existedFlashcards) {
-        throw new ApiError(400, "No flashcard found")
-    }
-
     return res
         .status(200)
         .json(new ApiResponse(200, existedFlashcards, "All flashcards fetched"))
