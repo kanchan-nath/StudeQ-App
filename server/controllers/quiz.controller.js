@@ -73,12 +73,11 @@ const getQuizById = asyncHandler(async (req, res) => {
     const { id } = data
 
     if(mongoose.Types.ObjectId.isValid(id)){
-        throw new ApiError(400, "Invalid Request")
+        throw new ApiError(400, "Invalid quiz ID")
     }
-    
+        
     const userId = req.user.id
 
-    // ✅ ADDED: was missing entirely — needed for quiz-taking screen to load questions
     const quizDoc = await Quiz.findOne({ _id: id, userId })
 
     if (!quizDoc) {
