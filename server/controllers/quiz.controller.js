@@ -9,14 +9,22 @@ import { v4 as uuidv4 } from "uuid" // ✅ ADDED: need this to generate unique q
 import { Flascards } from "../models/flashcard.model.js"
 import textExtractor from "../services/textExtractor.js"
 import mongoose from "mongoose"
+import { quizValidator } from "../validators/quizValidator.js"
 
 const generateQuiz = asyncHandler(async (req, res) => {
-    const { topic, subject, types, title, difficulty, audience } = req.body
-    const userId = req.user.id
+    const {query, error} = quizValidator.safeParse(req.body)
+
+    if(error){
+        throw new ApiError(400, error.issues.map(e=>e.message).join(",  "))
+    }
+    const { topic, subject, types, title, difficulty, audience } = query
     
     if (!topic || !subject || !types) {
         throw new ApiError(400, "topic, subject, and types are required")
     }
+
+    const userId = req.user.id
+
 
     // ✅ FIX: quizId was used below but never defined — now generated here on server
     const quizId = uuidv4()
