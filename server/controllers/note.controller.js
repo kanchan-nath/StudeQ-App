@@ -143,7 +143,7 @@ const updateNote = asyncHandler(async (req, res) => {
 
 })
 
-const tooglePin = asyncHandler(async (req, res) => {
+const togglePin = asyncHandler(async (req, res) => {
     const { newPinned } = req.body
     if (typeof newPinned !== "boolean") {
         throw new ApiError(400, "newPinned must be a boolean")
@@ -178,6 +178,5 @@ export {
     getNote,
     deleteNote,
     updateNote,
-    tooglePin,
-    titleExtract
+    togglePin,
 }
