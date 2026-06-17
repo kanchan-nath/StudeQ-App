@@ -44,7 +44,7 @@ const createNote = asyncHandler(async (req, res) => {
         summary: result,
     })
     return res
-        .status(200)
+        .status(201)
         .json(new ApiResponse(201, data, "Note created successfully"))
 
 })
@@ -54,7 +54,7 @@ const getNote = asyncHandler(async (req, res) => {
 
     const allNotes = await Note.find({
         userId: userId
-    }).sort({ isPinned: -1 })
+    }).sort({ isPinned: -1, createdAt: -1 })
 
     return res
         .status(200)
