@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import BASE_URL from "../lib/api.js";
+import { apiFetch } from "../lib/api.js";
 import styles from "./styles/Dashboard.module.css";
 import {
   Upload01Icon,
@@ -133,7 +133,6 @@ const DEFAULT_PROFILE = {
 const Dashboard = () => {
   const { show, hide } = useLoader();
   const navigate = useNavigate();
-  const token = localStorage.getItem("token");
 
   // ── Error handler hook ───────────────────────────────────────────────────────
   const { notifyError, notifySuccess } = useErrorHandler();
@@ -158,13 +157,8 @@ const Dashboard = () => {
     setPageError(null);
 
     try {
-      const res = await fetch(`${BASE_URL}/api/user/userinfo`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
+
+      const res = await apiFetch("/api/user/userinfo")
 
       // ── Auth errors → redirect + toast ──────────────────────────────────────
       if (res.status === 401) {
@@ -248,7 +242,7 @@ const Dashboard = () => {
       setUserLoading(false);
       hide();
     }
-  }, [token, navigate, notifyError, show, hide]);
+  }, [ navigate, notifyError, show, hide]);
 
   useEffect(() => {
     fetchData();
