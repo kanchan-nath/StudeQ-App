@@ -11,6 +11,7 @@ import textExtractor from "../services/textExtractor.js"
 import mongoose from "mongoose"
 import { answersValidator, quizValidator } from "../validators/quizValidator.js"
 import { flashcardValidator } from "../validators/flashcard.validator.js"
+import { idParamValidator } from "../validators/params.validator.js"
 
 const generateQuiz = asyncHandler(async (req, res) => {
     const { data, error } = quizValidator.safeParse(req.body)

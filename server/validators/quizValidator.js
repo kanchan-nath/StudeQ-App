@@ -10,9 +10,7 @@ export const quizValidator = z.object({
     title: z.string().min(3).max(100).optional(),
 });
 
-export const idParamValidator = z.object({
-    id: z.string().min(1),
-});
+
 
 export const answersValidator = z.object({
     answers: z.array(
