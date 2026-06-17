@@ -123,8 +123,6 @@ const submitQuizAnswers = asyncHandler(async (req, res) => {
 
     let correctCount = 0
 
-    // ✅ FIX: old getQuizAnswer only stored one answer string on the whole doc
-    //         New: iterate each question, store userResponse + mark isCorrect
     const updatedQuestions = quizDoc.questions.map((q, i) => {
         const userResp = answers[i] ?? null
         const isCorrect = userResp === q.answer
