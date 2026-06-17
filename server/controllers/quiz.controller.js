@@ -9,7 +9,7 @@ import { v4 as uuidv4 } from "uuid" // ✅ ADDED: need this to generate unique q
 import { Flascards } from "../models/flashcard.model.js"
 import textExtractor from "../services/textExtractor.js"
 import mongoose from "mongoose"
-import { quizValidator } from "../validators/quizValidator.js"
+import { answersValidator, quizValidator } from "../validators/quizValidator.js"
 
 const generateQuiz = asyncHandler(async (req, res) => {    
     const {data, error} = quizValidator.safeParse(req.body)
@@ -75,7 +75,7 @@ const getQuizById = asyncHandler(async (req, res) => {
     if(mongoose.Types.ObjectId.isValid(id)){
         throw new ApiError(400, "Invalid quiz ID")
     }
-        
+
     const userId = req.user.id
 
     const quizDoc = await Quiz.findOne({ _id: id, userId })
@@ -89,23 +89,32 @@ const getQuizById = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, quizDoc, "Quiz fetched"))
 })
 
-
-// ─────────────────────────────────────────────
-// SUBMIT QUIZ ANSWERS
-// PATCH /api/quiz/:id/submit
-// Body: { answers: ["answer1", "answer2", ...] }
-//       answers array index maps to questions array index
-// ─────────────────────────────────────────────
 const submitQuizAnswers = asyncHandler(async (req, res) => {
-    const { answers } = req.body   // array of user answer strings, index-matched to questions
-    const { id } = req.params
-    const userId = req.user.id
+    const {data, error} = answersValidator.safeParse(req.body)
 
+    if(error){
+        throw new ApiError(400, error.issues.map(e=>e.message).join(", "))
+    }
+    const { answers } = data
+
+
+    const isIdValid = idParamValidator.safeParse(req.params)
+
+    if (isIdValid.error) {
+        throw new ApiError(400, error.issues.map(e => e.message).join(", "))
+    }
+    const { id } = isIdValid.data
+
+    if (mongoose.Types.ObjectId.isValid(id)) {
+        throw new ApiError(400, "Invalid quiz ID")
+    }
+    
     if (!answers || !Array.isArray(answers)) {
         throw new ApiError(400, "answers must be an array")
     }
+    
+    const userId = req.user.id
 
-    // Load quiz to compare answers
     const quizDoc = await Quiz.findOne({ _id: id, userId })
 
     if (!quizDoc) {

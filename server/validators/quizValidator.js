@@ -13,3 +13,12 @@ export const quizValidator = z.object({
 export const idParamValidator = z.object({
     id: z.string().min(1),
 });
+
+export const answersValidator = z.object({
+    answers: z.array(
+        z.object({
+            questionId: z.string().min(1),
+            answer: z.string().min(1),
+        })
+    ).min(1),
+});
