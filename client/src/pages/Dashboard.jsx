@@ -656,7 +656,7 @@ const Dashboard = () => {
               <div className={styles.profileStat}>
                 <span className={styles.profileStatLabel}>Grade</span>
                 <span className={styles.profileStatValue}>
-                  {userLoading ? "—" : userData.grade || "—"}
+                  {userLoading ? "—" : userData.grade.toUpperCase() || "—"}
                 </span>
               </div>
               <div className={styles.profileStat}>
