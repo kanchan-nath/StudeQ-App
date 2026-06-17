@@ -12,6 +12,7 @@ import mongoose from "mongoose"
 import { answersValidator, quizValidator } from "../validators/quizValidator.js"
 import { flashcardValidator } from "../validators/flashcard.validator.js"
 import { idParamValidator } from "../validators/params.validator.js"
+import { grantXP } from "../services/xpService.js"
 
 const generateQuiz = asyncHandler(async (req, res) => {
     const { data, error } = quizValidator.safeParse(req.body)
@@ -150,6 +151,14 @@ const submitQuizAnswers = asyncHandler(async (req, res) => {
         },
         { new: true }
     )
+
+    let xpResult = null
+    try {
+        xpResult = await grantXP(req.user.id, "QUIZ_COMPLETE")
+    } catch (err) {
+        logger.error("XP grant failed:", err.message) 
+    }
+
 
     return res
         .status(200)
