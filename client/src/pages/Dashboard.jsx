@@ -386,7 +386,7 @@ const Dashboard = () => {
             </div>
             <div className={styles.cardBadge}>Multi LLM Powered</div>
             <Link
-              to="/tutor"
+              to="/notebook"
               className={styles.cardCta}
             >
               Open Chat <span aria-hidden="true">→</span>
