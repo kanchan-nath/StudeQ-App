@@ -13,6 +13,9 @@ model User {
   password     String?
   grade        String?
   refreshToken String?
+  totalXp      Int         @default(0)     
+  streak       Int         @default(0)      
+  lastStudyDate String?     
   notes        Note[]
   roomCreated  StudyRoom[]
   quizzes      Quiz[]
