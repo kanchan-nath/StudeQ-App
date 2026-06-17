@@ -37,7 +37,7 @@ const createNote = asyncHandler(async (req, res) => {
     }
     const title = await titleExtract(response)
 
-    const data = await Note.create({
+    const dbData = await Note.create({
         userId,
         title,
         content,
@@ -45,7 +45,7 @@ const createNote = asyncHandler(async (req, res) => {
     })
     return res
         .status(201)
-        .json(new ApiResponse(201, data, "Note created successfully"))
+        .json(new ApiResponse(201, dbData, "Note created successfully"))
 
 })
 
@@ -179,4 +179,5 @@ export {
     deleteNote,
     updateNote,
     togglePin,
+    titleExtract
 }
