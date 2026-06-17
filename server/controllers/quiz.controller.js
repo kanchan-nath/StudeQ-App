@@ -139,15 +139,14 @@ const submitQuizAnswers = asyncHandler(async (req, res) => {
     const totalQ = quizDoc.questions.length
     const scorePercent = Math.round((correctCount / totalQ) * 100)
 
-    // Update questions + meta (score, submittedAt) in one operation
     const updated = await Quiz.findByIdAndUpdate(
         id,
         {
             questions: updatedQuestions,
             "quiz.meta.submittedAt": new Date().toISOString(),
-            "quiz.meta.score": `${correctCount}/${totalQ}` // e.g. "7/10"
+            "quiz.meta.score": `${correctCount}/${totalQ}` 
         },
-        { new: true } // return updated doc
+        { new: true } 
     )
 
     return res
@@ -160,21 +159,21 @@ const submitQuizAnswers = asyncHandler(async (req, res) => {
         }, "Quiz submitted successfully"))
 })
 
-
-// ─────────────────────────────────────────────
-// DELETE QUIZ
-// DELETE /api/quiz/:id
-// ─────────────────────────────────────────────
 const deleteQuiz = asyncHandler(async (req, res) => {
-    const { id } = req.params
-    const userId = req.user.id
 
-    if (!id) {
-        throw new ApiError(400, "Quiz id is required")
+    const { data, error } = idParamValidator.safeParse(req.params)
+
+    if (error) {
+        throw new ApiError(400, error.issues.map(e => e.message).join(", "))
+    }
+    const { id } = data
+
+    if (mongoose.Types.ObjectId.isValid(id)) {
+        throw new ApiError(400, "Invalid quiz ID")
     }
 
-    // ✅ FIX: old code deleted by _id only — anyone could delete anyone's quiz
-    //         Now checks userId too so users can only delete their own quizzes
+    const userId = req.user.id
+
     const deleted = await Quiz.findOneAndDelete({ _id: id, userId })
 
     if (!deleted) {
