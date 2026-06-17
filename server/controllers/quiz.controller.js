@@ -64,7 +64,18 @@ const getAllQuiz = asyncHandler(async (req, res) => {
 })
 
 const getQuizById = asyncHandler(async (req, res) => {
-    const { id } = req.params
+
+    const { data, error } = idParamValidator.safeParse(req.params)
+
+    if(error){
+        throw new ApiError(400, error.issues.map(e=>e.message).join(", "))
+    }
+    const { id } = data
+
+    if(mongoose.Types.ObjectId.isValid(id)){
+        throw new ApiError(400, "Invalid Request")
+    }
+    
     const userId = req.user.id
 
     // ✅ ADDED: was missing entirely — needed for quiz-taking screen to load questions
