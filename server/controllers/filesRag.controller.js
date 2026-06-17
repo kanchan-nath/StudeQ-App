@@ -113,7 +113,7 @@ const allChatsMessage = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Something went wrong")
     }
 
-    if (!isValidId) {
+    if (!isValidId(id)) {
         throw new ApiError(400, "Invalid Id")
     }
 
@@ -139,12 +139,14 @@ const updateQuery = asyncHandler(async (req, res) => {
     
     const { id, chatId } = req.params
 
-    if (!id || !chatId) {
-        throw new ApiError(400, "Something went wrong")
+    const messageId = chatId
+
+    if (!id || !messageId) {
+        throw new ApiError(400, "Room id and message id are required")
     }
 
-    if (!isValidId(id) || !isValidId(chatId)) {
-        throw new ApiError(400, "Invalid Id")
+    if (!isValidId(id) || !isValidId(messageId)) {
+        throw new ApiError(400, "Invalid id")
     }
 
     const {data, error} = ragQueryValidator.safeParse(req.body)
@@ -154,10 +156,6 @@ const updateQuery = asyncHandler(async (req, res) => {
     const { query } = data
 
     const userId = req.user.id
-
-    if (!query) {
-        throw new ApiError(400, "All fields are rquired")
-    }
 
     const topChunks = await queryDB(query, userId)
 
@@ -171,7 +169,7 @@ const updateQuery = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Query answer problem, Try Again")
     }
 
-    const chatRoom = await ChatRoom.findOne({ userId, _id:chatId })
+    const chatRoom = await ChatRoom.findOne({ userId, _id:id })
     if (!chatRoom) throw new ApiError(404, "Chat room not found")
 
     const msgIndex = chatRoom.messages.findIndex(
@@ -216,7 +214,7 @@ const deleteChat = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Something went wrong")
     }
 
-    if (!isValidId) {
+    if (!isValidId(id)) {
         throw new ApiError(400, "Invalid Id")
     }
 
@@ -232,10 +230,10 @@ const deleteChat = asyncHandler(async (req, res) => {
         const documentId = chatRoom.docId.toString()
         Promise.all([
             Documents.findByIdAndDelete(documentId).catch(e =>
-                logger.error("Doc metadata cleanup failed:", e)
+                console.error("Doc metadata cleanup failed:", e)
             ),
             deleteDocumentVectors(userId, documentId).catch(e =>
-                logger.error("Vector cleanup failed:", e)
+                console.error("Vector cleanup failed:", e)
             )
         ])
     }
