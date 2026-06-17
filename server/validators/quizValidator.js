@@ -9,3 +9,7 @@ export const quizValidator = z.object({
     difficulty: z.enum(["easy", "medium", "hard"]).optional(),
     title: z.string().min(3).max(100).optional(),
 });
+
+export const idParamValidator = z.object({
+    id: z.string().min(1),
+});

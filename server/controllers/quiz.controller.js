@@ -63,11 +63,6 @@ const getAllQuiz = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, data, "All quizzes fetched"))
 })
 
-
-// ─────────────────────────────────────────────
-// GET SINGLE QUIZ BY ID
-// GET /api/quiz/:id
-// ─────────────────────────────────────────────
 const getQuizById = asyncHandler(async (req, res) => {
     const { id } = req.params
     const userId = req.user.id
