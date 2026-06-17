@@ -186,6 +186,11 @@ const deleteQuiz = asyncHandler(async (req, res) => {
 })
 
 const generateQuizFromFiles = asyncHandler(async (req, res) => {    
+    const { data, error } = generateQuizFromFilesValidetor.safeParse(req.body)
+
+    if(error){
+        throw new ApiError(400, error.issues.map(e=>e.message).join(", "))
+    }
     const { types, total } = req.body
     const userId = req.user.id
     const localFilePath = req.files?.file?.[0].path
