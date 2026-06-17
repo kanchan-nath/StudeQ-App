@@ -271,7 +271,7 @@ const getResult = asyncHandler(async (req, res) => {
 
 
 const generateFlashcards = asyncHandler(async (req, res) => {
-    const { data, error } = flashcardValidator(req.body)
+    const { data, error } = flashcardValidator.safeParse(req.body)
 
     if (error) {
         throw new ApiError(400, error.issues.map(e => e.message).join(", "))
@@ -314,6 +314,12 @@ const generateFlashcards = asyncHandler(async (req, res) => {
             topic,
             difficultyLevel
         })
+
+        try {
+            await grantXP(req.user.id, "FLASHCARD_SESSION")
+        } catch (err) {
+            logger.error("XP grant failed:", err.message) // non-fatal
+        }
 
         return res
             .status(201)
