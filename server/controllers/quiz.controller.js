@@ -277,24 +277,7 @@ const generateFlashcards = asyncHandler(async (req, res) => {
 
         return res
             .status(200)
-            .json(new ApiResponse(200, data, "Flashcard generated"))
-            
-        try {
-            const dataBuffer = fs.readFileSync(pdfFile)
-            const unit8Array = new Uint8Array(dataBuffer)
-            const parser = new PDFParse(unit8Array)
-
-            const extractedText = await parser.getText()
-            
-                     
-            
-           
-           
-        }finally {
-            if (pdfFile && fs.existsSync(pdfFile)) {
-                fs.unlinkSync(pdfFile)
-        }
-    }
+            .json(new ApiResponse(201, data, "Flashcard generated"))
 
     } else {
         if (!topic || !subject || !flashcardId) {
