@@ -64,20 +64,25 @@ const getNote = asyncHandler(async (req, res) => {
 
 const deleteNote = asyncHandler(async (req, res) => {
     const { id } = req.params
-    const userId = req.user.id
-    if (!id) {
-        throw new ApiError(400, "Not found")
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        throw new ApiError(400, "Invalid note ID")
     }
 
-    const response = await Note.findByIdAndDelete({
+    const userId = req.user.id
+
+    const deleted = await Note.findByIdAndDelete({
         _id: id,
         userId: userId
     })
-    console.log(response);
+
+    if(!deleted){
+        throw new ApiError(404, "Note not found")
+    }
 
     return res
         .status(200)
-        .json(new ApiResponse(200, response, "Notes deleted succesfully"))
+        .json(new ApiResponse(200, {}, "Note deleted succesfully"))
 })
 
 const updateNote = asyncHandler(async (req, res) => {
