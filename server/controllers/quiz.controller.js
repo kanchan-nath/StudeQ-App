@@ -12,14 +12,14 @@ import mongoose from "mongoose"
 import { answersValidator, quizValidator } from "../validators/quizValidator.js"
 import { flashcardValidator } from "../validators/flashcard.validator.js"
 
-const generateQuiz = asyncHandler(async (req, res) => {    
-    const {data, error} = quizValidator.safeParse(req.body)
+const generateQuiz = asyncHandler(async (req, res) => {
+    const { data, error } = quizValidator.safeParse(req.body)
 
-    if(error){
-        throw new ApiError(400, error.issues.map(e=>e.message).join(", "))
+    if (error) {
+        throw new ApiError(400, error.issues.map(e => e.message).join(", "))
     }
     const { topic, subject, types, title, difficulty, audience } = data
-    
+
     if (!topic || !subject || !types) {
         throw new ApiError(400, "topic, subject, and types are required")
     }
@@ -29,23 +29,23 @@ const generateQuiz = asyncHandler(async (req, res) => {
     const quizId = uuidv4()
 
     const response = await quiz(types, topic, subject, userId)
-    
+
     if (!Array.isArray(response) || response.length === 0) {
         throw new ApiError(500, "Quiz generation returned invalid data")
     }
     const quizDoc = await Quiz.create({
         userId,
         quiz: {
-            title: title || response.title || `${topic} Quiz`, 
+            title: title || response.title || `${topic} Quiz`,
             totalQuestion: response.length,
         },
         data: response.map(q => ({
             types: q.type,
             question: q.question,
-            options: q.options,      
+            options: q.options,
             answer: q.answer,
-            userResponse: null,     
-            isCorrect: false   
+            userResponse: null,
+            isCorrect: false
         }))
     })
 
@@ -68,12 +68,12 @@ const getQuizById = asyncHandler(async (req, res) => {
 
     const { data, error } = idParamValidator.safeParse(req.params)
 
-    if(error){
-        throw new ApiError(400, error.issues.map(e=>e.message).join(", "))
+    if (error) {
+        throw new ApiError(400, error.issues.map(e => e.message).join(", "))
     }
     const { id } = data
 
-    if(mongoose.Types.ObjectId.isValid(id)){
+    if (mongoose.Types.ObjectId.isValid(id)) {
         throw new ApiError(400, "Invalid quiz ID")
     }
 
@@ -91,10 +91,10 @@ const getQuizById = asyncHandler(async (req, res) => {
 })
 
 const submitQuizAnswers = asyncHandler(async (req, res) => {
-    const {data, error} = answersValidator.safeParse(req.body)
+    const { data, error } = answersValidator.safeParse(req.body)
 
-    if(error){
-        throw new ApiError(400, error.issues.map(e=>e.message).join(", "))
+    if (error) {
+        throw new ApiError(400, error.issues.map(e => e.message).join(", "))
     }
     const { answers } = data
 
@@ -109,11 +109,11 @@ const submitQuizAnswers = asyncHandler(async (req, res) => {
     if (mongoose.Types.ObjectId.isValid(id)) {
         throw new ApiError(400, "Invalid quiz ID")
     }
-    
+
     if (!answers || !Array.isArray(answers)) {
         throw new ApiError(400, "answers must be an array")
     }
-    
+
     const userId = req.user.id
 
     const quizDoc = await Quiz.findOne({ _id: id, userId })
@@ -145,9 +145,9 @@ const submitQuizAnswers = asyncHandler(async (req, res) => {
         {
             questions: updatedQuestions,
             "quiz.meta.submittedAt": new Date().toISOString(),
-            "quiz.meta.score": `${correctCount}/${totalQ}` 
+            "quiz.meta.score": `${correctCount}/${totalQ}`
         },
-        { new: true } 
+        { new: true }
     )
 
     return res
@@ -186,17 +186,17 @@ const deleteQuiz = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, {}, "Quiz deleted"))
 })
 
-const generateQuizFromFiles = asyncHandler(async (req, res) => {    
+const generateQuizFromFiles = asyncHandler(async (req, res) => {
     const { data, error } = generateQuizFromFilesValidetor.safeParse(req.body)
 
-    if(error){
-        throw new ApiError(400, error.issues.map(e=>e.message).join(", "))
+    if (error) {
+        throw new ApiError(400, error.issues.map(e => e.message).join(", "))
     }
     const { types } = data
     const userId = req.user.id
 
     const localFile = req.files?.file?.[0]
-    
+
     if (!types || !localFile) {
         throw new ApiError(400, "file and types are required")
     }
@@ -232,7 +232,7 @@ const generateQuizFromFiles = asyncHandler(async (req, res) => {
         .json(new ApiResponse(201, quizDoc, "Quiz created from file"))
 })
 
-const getResult = asyncHandler(async(req, res)=>{
+const getResult = asyncHandler(async (req, res) => {
 
     const { data, error } = idParamValidator.safeParse(req.params)
 
@@ -247,34 +247,35 @@ const getResult = asyncHandler(async(req, res)=>{
 
     const userId = req.user.id
 
-    const dbData = await Quiz.find({_id:id, userId})
+    const dbData = await Quiz.find({ _id: id, userId })
 
-    if (!dbData){
+    if (!dbData) {
         throw new ApiError(404, "Quiz not found")
     }
 
     return res
-    .status(200)
+        .status(200)
         .json(new ApiResponse(200, dbData, "Quiz result fetched"))
 
 })
 
 
 const generateFlashcards = asyncHandler(async (req, res) => {
-    const {data, error} = flashcardValidator(req.body)
+    const { data, error } = flashcardValidator(req.body)
 
-    if(error){
-        throw new ApiError(400, error.issues.map(e=>e.message).join(", "))
+    if (error) {
+        throw new ApiError(400, error.issues.map(e => e.message).join(", "))
     }
 
     const { topic, subject, flashcardId } = data
+
     const pdfFile = req.files?.pdfFilePath?.[0]
     const userId = req.user.id
-    
+
     if (pdfFile) {
         const extractedText = await textExtractor(pdfFile)
 
-        const { difficultyLevel, card } = await pdfToFlashcard(extractedText, userId)  
+        const { difficultyLevel, card } = await pdfToFlashcard(extractedText, userId)
 
         const data = await Flascards.create({
             userId,
@@ -287,47 +288,26 @@ const generateFlashcards = asyncHandler(async (req, res) => {
             .json(new ApiResponse(201, data, "Flashcard generated"))
 
     } else {
-        if (!topic || !subject || !flashcardId) {
-            throw new ApiError(400, "All fields are required")
+        if (!topic || !subject) {
+            throw new ApiError(400, "topic and subject are required")
         }
 
-        const { difficultyLevel, card } = await flashcards(topic, subject)
-        
+        const flashcardId = uuidv4()
 
-        let flashcard = await Flascards.findOne({
-            flashcardId
+        const { difficultyLevel, card } = await flashcards(topic, subject, userId)
+
+        const data = await Flascards.create({
+            userId,
+            flashcardId,
+            flashcards: card,
+            subject,
+            topic,
+            difficultyLevel
         })
 
-        if (!flashcard) {
-            const data = await Flascards.create({
-                userId,
-                flashcardId,
-                flashcards: card,
-                subject,
-                topic,
-                difficultyLevel
-            })
-
-            return res
-                .status(200)
-                .json(new ApiResponse(200, data, "FLashcards generate successfully"))
-        } else {
-            const updatedData = await Flascards.updateOne(
-                {
-                    flashcardId
-                },
-                {
-                    $push: {
-                        flashcards: {
-                            $each: data
-                        }
-                    }
-                }
-            )
-            return res
-                .status(200)
-                .json(new ApiResponse(200, updatedData, "FLashcards generate successfully"))
-        }
+        return res
+            .status(201)
+            .json(new ApiResponse(201, data, "Flashcards generated successfully"))
     }
 
 })
