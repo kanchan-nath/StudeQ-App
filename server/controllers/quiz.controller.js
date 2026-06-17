@@ -35,9 +35,8 @@ const generateQuiz = asyncHandler(async (req, res) => {
     const quizDoc = await Quiz.create({
         userId,
         quiz: {
-            title: title || response.title || `${topic} Quiz`,  // use provided title or AI-generated
+            title: title || response.title || `${topic} Quiz`, 
             totalQuestion: response.length,
-            // meta fields (startedAt, submittedAt, score) default to null — set later
         },
         data: response.map(q => ({
             types: q.type,
