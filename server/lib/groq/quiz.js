@@ -188,7 +188,7 @@ Rules:
 
     let response
     try {
-        const response = await groq.chat.completions.create({
+         response = await groq.chat.completions.create({
             model: MODEL,
             messages: [
                 {
@@ -209,7 +209,7 @@ Rules:
     }
 
     const raw = response?.choices[0]?.message?.content
-
+    
     if (!raw) throw new Error("flashcards: empty response from Groq")
 
     const data = extractJSON(raw)

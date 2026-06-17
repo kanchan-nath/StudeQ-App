@@ -16,6 +16,7 @@ import {
   Home01Icon,
 } from "hugeicons-react";
 import useLoader from "../ContextApi/useLoader.js";
+import BASE_URL from "../lib/api.js";
 
 // ── Error system imports ───────────────────────────────────────────────────────
 import ErrorPage from "../errors/components/ErrorPage.jsx";
@@ -159,7 +160,7 @@ const Dashboard = () => {
     try {
 
       const res = await apiFetch("/api/user/userinfo")
-
+      
       // ── Auth errors → redirect + toast ──────────────────────────────────────
       if (res.status === 401) {
         notifyError("Session expired. Sign in again.");
@@ -184,6 +185,8 @@ const Dashboard = () => {
       }
 
       const data = await res.json();
+      console.log(data);
+      
       setUserData({
         name: data?.data?.name ?? "",
         email: data?.data?.email ?? "",
@@ -191,25 +194,21 @@ const Dashboard = () => {
       });
 
       // ── Quiz stats (uncomment when route ready) ────────────────────────────
-      // const quizRes  = await fetch(`${BASE_URL}/api/quiz/stats`, {
-      //   headers: { Authorization: `Bearer ${token}` },
-      // });
-      // const quizData = await quizRes.json();
-      // setQuizStats({
-      //   total:     quizData?.data?.total     ?? DEFAULT_QUIZ.total,
-      //   lastScore: quizData?.data?.lastScore ?? DEFAULT_QUIZ.lastScore,
-      //   avgScore:  quizData?.data?.avgScore  ?? DEFAULT_QUIZ.avgScore,
-      // });
+      const quizRes  = await apiFetch("/api/quiz/stats");
+      const quizData = await quizRes.json();
+      setQuizStats({
+        total:     quizData?.data?.total     ?? DEFAULT_QUIZ.total,
+        lastScore: quizData?.data?.lastScore ?? DEFAULT_QUIZ.lastScore,
+        avgScore:  quizData?.data?.avgScore  ?? DEFAULT_QUIZ.avgScore,
+      });
 
       // ── Flashcard stats (uncomment when route ready) ───────────────────────
-      // const flashRes  = await fetch(`${BASE_URL}/api/flashcards/stats`, {
-      //   headers: { Authorization: `Bearer ${token}` },
-      // });
-      // const flashData = await flashRes.json();
-      // setFlashcardStats({
-      //   total:    flashData?.data?.total    ?? DEFAULT_FLASH.total,
-      //   dueToday: flashData?.data?.dueToday ?? DEFAULT_FLASH.dueToday,
-      // });
+      const flashRes  = await apiFetch("/api/quiz/flashcards/stats");
+      const flashData = await flashRes.json();
+      setFlashcardStats({
+        total:    flashData?.data?.total    ?? DEFAULT_FLASH.total,
+        dueToday: flashData?.data?.dueToday ?? DEFAULT_FLASH.dueToday,
+      });
 
       // ── Today's schedule (uncomment when route ready) ──────────────────────
       // const schedRes  = await fetch(`${BASE_URL}/api/schedule/today`, {
@@ -219,20 +218,23 @@ const Dashboard = () => {
       // setScheduleItems(schedData?.data ?? DEFAULT_SCHEDULE);
 
       // ── Profile / gamification stats (uncomment when route ready) ─────────
-      // const profileRes  = await fetch(`${BASE_URL}/api/user/stats`, {
-      //   headers: { Authorization: `Bearer ${token}` },
-      // });
-      // const profileData = await profileRes.json();
-      // setProfileStats({
-      //   streak:      profileData?.data?.streak      ?? DEFAULT_PROFILE.streak,
-      //   xp:          profileData?.data?.xp          ?? DEFAULT_PROFILE.xp,
-      //   level:       profileData?.data?.level       ?? DEFAULT_PROFILE.level,
-      //   xpPercent:   profileData?.data?.xpPercent   ?? DEFAULT_PROFILE.xpPercent,
-      //   xpNextLevel: profileData?.data?.xpNextLevel ?? DEFAULT_PROFILE.xpNextLevel,
-      // });
+      const profileRes = await apiFetch("/api/stats");
+
+      if (profileRes.ok) {
+        const profileData = await profileRes.json();
+        setProfileStats({
+          streak: profileData?.data?.streak ?? DEFAULT_PROFILE.streak,
+          xp: profileData?.data?.xp ?? DEFAULT_PROFILE.xp,
+          level: profileData?.data?.level ?? DEFAULT_PROFILE.level,
+          xpPercent: profileData?.data?.xpPercent ?? DEFAULT_PROFILE.xpPercent,
+          xpNextLevel: profileData?.data?.xpNextLevel ?? DEFAULT_PROFILE.xpNextLevel,
+        });
+      }
     } catch (err) {
       // ── Network / TypeError (no connection) ─────────────────────────────────
       const type = resolveErrorType(err);
+      console.log(err);
+      
       if (type === ERROR_TYPES.NETWORK) {
         setPageError(ERROR_TYPES.NETWORK);
       } else {
@@ -384,7 +386,7 @@ const Dashboard = () => {
             </div>
             <div className={styles.cardBadge}>Multi LLM Powered</div>
             <Link
-              to="/tutor"
+              to="/notebook"
               className={styles.cardCta}
             >
               Open Chat <span aria-hidden="true">→</span>
@@ -654,7 +656,7 @@ const Dashboard = () => {
               <div className={styles.profileStat}>
                 <span className={styles.profileStatLabel}>Grade</span>
                 <span className={styles.profileStatValue}>
-                  {userLoading ? "—" : userData.grade || "—"}
+                  {userLoading ? "—" : userData.grade.toUpperCase() || "—"}
                 </span>
               </div>
               <div className={styles.profileStat}>

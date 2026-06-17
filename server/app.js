@@ -39,6 +39,7 @@ import schedulerRouter from "./routes/scheduler.route.js"
 import filesRagRouter from "./routes/filesRag.route.js"
 import searchAPIRouter from "./routes/searchAPI.route.js"
 import healthRouter from "./routes/health.route.js"
+import statsRouter from "./routes/stats.route.js"
 
 app.use(generalLimiter)
 app.use("/api/auth", userRoute)
@@ -53,6 +54,7 @@ app.use("/api", schedulerRouter)
 app.use("/api/documents", filesRagRouter)
 app.use("/api", searchAPIRouter)
 app.use("/api/health", healthRouter)
+app.use("/api/stats", statsRouter)
 app.use((req, res)=>{
     res.status(404)
     .json(

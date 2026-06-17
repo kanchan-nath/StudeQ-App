@@ -12,6 +12,7 @@ import mongoose from "mongoose"
 import { answersValidator, quizValidator } from "../validators/quizValidator.js"
 import { flashcardValidator } from "../validators/flashcard.validator.js"
 import { idParamValidator } from "../validators/params.validator.js"
+import { grantXP } from "../services/xpService.js"
 
 const generateQuiz = asyncHandler(async (req, res) => {
     const { data, error } = quizValidator.safeParse(req.body)
@@ -151,6 +152,14 @@ const submitQuizAnswers = asyncHandler(async (req, res) => {
         { new: true }
     )
 
+    let xpResult = null
+    try {
+        xpResult = await grantXP(req.user.id, "QUIZ_COMPLETE")
+    } catch (err) {
+        logger.error("XP grant failed:", err.message) 
+    }
+
+
     return res
         .status(200)
         .json(new ApiResponse(200, {
@@ -260,9 +269,37 @@ const getResult = asyncHandler(async (req, res) => {
 
 })
 
+// ── Quiz stats for dashboard ─────────────────────────────────────────────────
+const getQuizStats = asyncHandler(async (req, res) => {
+    const userId = req.user.id
+
+    const allQuizzes = await Quiz.find({ userId }).select("quiz.meta.score").lean()
+
+    const total = allQuizzes.length
+
+    // Extract numeric scores from "correct/total" string e.g. "7/10"
+    const scores = allQuizzes
+        .map(q => q.quiz?.meta?.score)
+        .filter(Boolean)
+        .map(s => {
+            const [correct, total] = s.split("/").map(Number)
+            return total > 0 ? Math.round((correct / total) * 100) : null
+        })
+        .filter(n => n !== null)
+
+    const lastScore = scores.at(-1) ?? 0
+    const avgScore = scores.length
+        ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length)
+        : 0
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, { total, lastScore, avgScore }, "Quiz stats fetched"))
+})
+
 
 const generateFlashcards = asyncHandler(async (req, res) => {
-    const { data, error } = flashcardValidator(req.body)
+    const { data, error } = flashcardValidator.safeParse(req.body)
 
     if (error) {
         throw new ApiError(400, error.issues.map(e => e.message).join(", "))
@@ -305,6 +342,12 @@ const generateFlashcards = asyncHandler(async (req, res) => {
             topic,
             difficultyLevel
         })
+
+        try {
+            await grantXP(req.user.id, "FLASHCARD_SESSION")
+        } catch (err) {
+            logger.error("XP grant failed:", err.message) // non-fatal
+        }
 
         return res
             .status(201)
@@ -396,6 +439,25 @@ const addMoreFlashcards = asyncHandler(async (req, res) => {
 
 })
 
+const getFlashcardStats = asyncHandler(async (req, res) => {
+    const userId = req.user.id
+
+    const allDecks = await Flascards.find({ userId }).select("flashcards createdAt").lean()
+
+    const total = allDecks.reduce((sum, deck) => sum + (deck.flashcards?.length ?? 0), 0)
+
+    const todayStart = new Date()
+    todayStart.setHours(0, 0, 0, 0)
+
+    const dueToday = allDecks
+        .filter(deck => new Date(deck.createdAt) >= todayStart)
+        .reduce((sum, deck) => sum + (deck.flashcards?.length ?? 0), 0)
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, { total, dueToday }, "Flashcard stats fetched"))
+})
+
 export {
     generateQuiz,
     getAllQuiz,
@@ -404,9 +466,11 @@ export {
     deleteQuiz,
     generateQuizFromFiles,
     getResult,
+    getQuizStats,
 
     generateFlashcards,
     getFlashcards,
     deleteFlashcards,
-    addMoreFlashcards
+    addMoreFlashcards,
+    getFlashcardStats
 }
