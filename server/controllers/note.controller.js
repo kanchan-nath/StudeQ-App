@@ -76,7 +76,7 @@ const deleteNote = asyncHandler(async (req, res) => {
         userId: userId
     })
 
-    if(!deleted){
+    if (!deleted) {
         throw new ApiError(404, "Note not found")
     }
 
@@ -99,19 +99,19 @@ const updateNote = asyncHandler(async (req, res) => {
     }
     const { id } = req.params
 
-    if (!content || !id){
+    if (!content || !id) {
         throw new ApiError(400, "Content and id are required")
     }
 
-    if (!mongoose.Types.ObjectId.isValid(id)){
+    if (!mongoose.Types.ObjectId.isValid(id)) {
         throw new ApiError(400, "Invalid note ID")
 
     }
     const userId = req.user.id
 
     const response = await summarizeText(content, userId)
-    
-    if(!response){
+
+    if (!response) {
         throw new ApiError(500, "Summarization failed, please try again")
 
     }
@@ -124,7 +124,7 @@ const updateNote = asyncHandler(async (req, res) => {
             userId
         },
         {
-            content, 
+            content,
             title,
             summary: response
         },
@@ -133,13 +133,13 @@ const updateNote = asyncHandler(async (req, res) => {
         }
     )
 
-    if (!existedNote) {
-        throw new ApiError(404, "Summarizing content not exit")
+    if (!updated) {
+        throw new ApiError(404, "Note not found")
     }
 
     return res
         .status(200)
-        .json(new ApiResponse(200, {}, "Note is updated"))
+        .json(new ApiResponse(200, updated, "Note updated successfully"))
 
 })
 
