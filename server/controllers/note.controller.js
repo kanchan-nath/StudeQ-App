@@ -145,21 +145,30 @@ const updateNote = asyncHandler(async (req, res) => {
 
 const tooglePin = asyncHandler(async (req, res) => {
     const { newPinned } = req.body
+    if (typeof newPinned !== "boolean") {
+        throw new ApiError(400, "newPinned must be a boolean")
+    }
 
     const { id } = req.params
-
+    if (!mongoose.Types.ObjectId.isValid(id)){
+        throw new ApiError(400, "Invalid note ID")
+    }
     const userId = req.user.id
 
-    await Note.findOneAndUpdate(
+    const updated = await Note.findOneAndUpdate(
         {
             userId,
             _id: id
         },
         {
             isPinned: newPinned
-        }
+        },
+        { returnDocument: "after" }
     )
 
+    if(!updated){
+        throw new ApiError(404, "Note not found")   
+    }
     return res
         .status(200)
         .json(new ApiResponse(200, {}, "pin successful"))
