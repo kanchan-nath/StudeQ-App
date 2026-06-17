@@ -209,7 +209,7 @@ const generateQuizFromFiles = asyncHandler(async (req, res) => {
     if (!Array.isArray(questions) || questions.length === 0) {
         throw new ApiError(500, "Quiz generation returned invalid data")
     }
-    
+
     const quizDoc = await Quiz.create({
         userId,
         quiz: {
@@ -232,12 +232,19 @@ const generateQuizFromFiles = asyncHandler(async (req, res) => {
 })
 
 const getResult = asyncHandler(async(req, res)=>{
-    const {id} = req.params
-    const userId = req.user.id
 
-    if(!id){
-        throw new ApiError(404, "Quiz not found")
+    const { data, error } = idParamValidator.safeParse(req.params)
+
+    if (error) {
+        throw new ApiError(400, error.issues.map(e => e.message).join(", "))
     }
+    const { id } = data
+
+    if (mongoose.Types.ObjectId.isValid(id)) {
+        throw new ApiError(400, "Invalid quiz ID")
+    }
+
+    const userId = req.user.id
 
     const data = await Quiz.find({_id:id})
 
