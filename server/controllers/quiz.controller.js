@@ -41,10 +41,10 @@ const generateQuiz = asyncHandler(async (req, res) => {
         data: response.map(q => ({
             types: q.type,
             question: q.question,
-            options: q.options,       // array of strings
+            options: q.options,      
             answer: q.answer,
-            userResponse: null,       // filled when user submits
-            isCorrect: false          // updated on submit
+            userResponse: null,     
+            isCorrect: false   
         }))
     })
 
