@@ -68,7 +68,7 @@ const verifyJWT = asyncHandler(async (req, res, next) => {
     }
 
     try {
-        redisClient.setex(cacheKey, process.env.USER_CACHE_TTL, JSON.stringify(user), ()=>logger.info("User data saved in redis memory"))
+        redisClient.setex(cacheKey, process.env.USER_CACHE_TTL_SECONDS, JSON.stringify(user), ()=>logger.info("User data saved in redis memory"))
 
     } catch (error) {
         logger.error("Redis set failed:", error)

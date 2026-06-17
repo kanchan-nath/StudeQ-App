@@ -3,7 +3,7 @@ import logger from "../logger/index.js"
 
 const connectDB = async()=>{
 try {
-    const connectionInstance = await mongoose.connect(`${process.env.MONGODB_URI}/${process.env.MONGODB_NAME}`,
+    const connectionInstance = await mongoose.connect(`${process.env.MONGO_URI}/${process.env.MONGO_DB_NAME}`,
         {
             serverSelectionTimeoutMS: 5000,
             maxPoolSize: Number(process.env.MONGO_POOL_SIZE) || 10,
