@@ -10,6 +10,7 @@ import { Flascards } from "../models/flashcard.model.js"
 import textExtractor from "../services/textExtractor.js"
 import mongoose from "mongoose"
 import { answersValidator, quizValidator } from "../validators/quizValidator.js"
+import { flashcardValidator } from "../validators/flashcard.validator.js"
 
 const generateQuiz = asyncHandler(async (req, res) => {    
     const {data, error} = quizValidator.safeParse(req.body)
@@ -260,7 +261,13 @@ const getResult = asyncHandler(async(req, res)=>{
 
 
 const generateFlashcards = asyncHandler(async (req, res) => {
-    const { topic, subject, flashcardId } = req.body
+    const {data, error} = flashcardValidator(req.body)
+
+    if(error){
+        throw new ApiError(400, error.issues.map(e=>e.message).join(", "))
+    }
+
+    const { topic, subject, flashcardId } = data
     const pdfFile = req.files?.pdfFilePath?.[0]
     const userId = req.user.id
     
