@@ -13,10 +13,9 @@ import { quizValidator } from "../validators/quizValidator.js"
 
 const generateQuiz = asyncHandler(async (req, res) => {    
     const {data, error} = quizValidator.safeParse(req.body)
-console.log(data);
 
     if(error){
-        throw new ApiError(400, error.issues.map(e=>e.message).join(",  "))
+        throw new ApiError(400, error.issues.map(e=>e.message).join(", "))
     }
     const { topic, subject, types, title, difficulty, audience } = data
     
@@ -29,8 +28,10 @@ console.log(data);
     const quizId = uuidv4()
 
     const response = await quiz(types, topic, subject, userId)
-    console.log(response);
     
+    if (!Array.isArray(response) || response.length === 0) {
+        throw new ApiError(500, "Quiz generation returned invalid data")
+    }
     const quizDoc = await Quiz.create({
         userId,
         quiz: {
