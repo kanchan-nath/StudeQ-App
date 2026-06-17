@@ -246,11 +246,15 @@ const getResult = asyncHandler(async(req, res)=>{
 
     const userId = req.user.id
 
-    const data = await Quiz.find({_id:id})
+    const dbData = await Quiz.find({_id:id, userId})
+
+    if (!dbData){
+        throw new ApiError(404, "Quiz not found")
+    }
 
     return res
     .status(200)
-    .json(new ApiResponse(200, data, "All results"))
+        .json(new ApiResponse(200, dbData, "Quiz result fetched"))
 
 })
 
