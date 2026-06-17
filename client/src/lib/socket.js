@@ -4,15 +4,10 @@ import BASE_URL from "./api.js";
 let socket = null;
 
 const connectSocket = () => {
-  const token = localStorage.getItem("token");
-
-  if (!token) return;
-  if (socket?.connnected) return;
+  if (socket?.connected) return;
 
   socket = io(BASE_URL, {
-    auth: {
-      token,
-    },
+    withCredentials: true, 
   });
 
   socket.on("connect", () => {
@@ -20,13 +15,13 @@ const connectSocket = () => {
   });
 
   socket.on("connect_error", (err) => {
-    console.log("Socket disconnected", err.message);
+    console.log("Socket connection error:", err.message);
   });
 };
 
 const disConnectSocket = () => {
   if (socket) {
-    console.log("Socket disconnected", socket.id);
+    console.log("Socket disconnected:", socket.id);
     socket.disconnect();
     socket = null;
   }
