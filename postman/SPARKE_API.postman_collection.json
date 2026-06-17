@@ -1,0 +1,1034 @@
+{
+  "info": {
+    "name": "SPARK.E API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Full API collection for SPARK.E backend"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000/api", "type": "string" },
+    { "key": "token", "value": "", "type": "string" },
+    { "key": "id", "value": "REPLACE_WITH_ID", "type": "string" },
+    { "key": "docId", "value": "REPLACE_WITH_DOC_ID", "type": "string" },
+    { "key": "chatRoomKey", "value": "REPLACE_WITH_CHATROOM_KEY", "type": "string" },
+    { "key": "chatId", "value": "REPLACE_WITH_CHAT_ID", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/auth/register",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Kanchan\",\n  \"email\": \"kanchan@example.com\",\n  \"password\": \"password123\",\n  \"grade\": 12\n}"
+            }
+          }
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.data && res.data.token) {",
+                  "  pm.collectionVariables.set('token', res.data.token);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/auth/login",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"kanchan@example.com\",\n  \"password\": \"password123\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/auth/logout",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": { "mode": "raw", "raw": "" }
+          }
+        },
+        {
+          "name": "Get User Info",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/auth/userinfo",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Notes",
+      "item": [
+        {
+          "name": "Create Note",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/notes",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"Newton's laws of motion describe the relationship between forces acting on a body and its motion.\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get All Notes",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/notes",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ]
+          }
+        },
+        {
+          "name": "Update Note",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/notes/{{id}}",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"Updated note content here.\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Toggle Pin Note",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/notes/{{id}}/pin",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"newPinned\": true\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Note",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/notes/{{id}}",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Quiz",
+      "item": [
+        {
+          "name": "Generate Quiz (Text)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/quiz/generate",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"subject\": \"Physics\",\n  \"topic\": \"Newton Laws of Motion\",\n  \"types\": \"mcq\",\n  \"difficulty\": \"medium\",\n  \"title\": \"Newton Laws Quiz\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Generate Quiz From File (PDF)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/quiz/generate/file",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "file", "type": "file", "src": "" },
+                { "key": "types", "value": "mcq", "type": "text" },
+                { "key": "total", "value": "5", "type": "text" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get All Quizzes",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/quiz/all",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ]
+          }
+        },
+        {
+          "name": "Get Quiz By ID",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/quiz/{{id}}",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ]
+          }
+        },
+        {
+          "name": "Submit Quiz Answers",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/quiz/{{id}}/submit",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"answers\": [\n    { \"questionId\": \"REPLACE_QUESTION_ID\", \"answer\": \"A\" },\n    { \"questionId\": \"REPLACE_QUESTION_ID\", \"answer\": \"True\" }\n  ]\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Quiz Result",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/quiz/{{id}}/result",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ]
+          }
+        },
+        {
+          "name": "Delete Quiz",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/quiz/{{id}}",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Flashcards",
+      "item": [
+        {
+          "name": "Create Flashcards (with PDF)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/quiz/flashcards",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "topic", "value": "Thermodynamics", "type": "text" },
+                { "key": "subject", "value": "Physics", "type": "text" },
+                { "key": "flashcardId", "value": "REPLACE_OR_LEAVE_EMPTY", "type": "text" },
+                { "key": "pdfFilePath", "type": "file", "src": "" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get All Flashcards",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/quiz/flashcards",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ]
+          }
+        },
+        {
+          "name": "Add More Flashcards",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/quiz/flashcards/{{id}}",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"topic\": \"Laws of Thermodynamics\",\n  \"subject\": \"Physics\",\n  \"flashcardId\": \"REPLACE_WITH_FLASHCARD_ID\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Flashcard",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/quiz/flashcards/{{id}}",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Scheduler (Study Plan)",
+      "item": [
+        {
+          "name": "Create Scheduler",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/scheduler",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"subject\": \"Mathematics\",\n  \"topic\": \"Calculus\",\n  \"schedulerDate\": \"2025-08-01T10:00:00.000Z\",\n  \"duration\": 90\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Scheduler",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/scheduler",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ]
+          }
+        },
+        {
+          "name": "Update Scheduler",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/scheduler",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"subject\": \"Mathematics\",\n  \"topic\": \"Integration\",\n  \"schedulerDate\": \"2025-08-02T10:00:00.000Z\",\n  \"duration\": 60,\n  \"completed\": true\n}"
+            }
+          }
+        },
+        {
+          "name": "Generate AI Study Plan",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/scheduler/generate-plan",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"subjects\": [\"Physics\", \"Mathematics\", \"Chemistry\"],\n  \"hoursPerDay\": 4,\n  \"goalDate\": \"2025-09-01T00:00:00.000Z\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Save Generated Plan",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/scheduler/generate-plan/save",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"subjects\": [\"Physics\", \"Mathematics\", \"Chemistry\"],\n  \"hoursPerDay\": 4,\n  \"goalDate\": \"2025-09-01T00:00:00.000Z\",\n  \"generatedPlan\": [\n    { \"day\": 1, \"subject\": \"Physics\", \"topic\": \"Mechanics\", \"duration\": 90 },\n    { \"day\": 2, \"subject\": \"Mathematics\", \"topic\": \"Calculus\", \"duration\": 120 }\n  ]\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Exam Dates",
+      "item": [
+        {
+          "name": "Create Exam Date",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/scheduler/exam-dates",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"subjectName\": \"Physics\",\n  \"examDate\": \"2025-09-15T00:00:00.000Z\",\n  \"examTime\": \"10:00 AM\",\n  \"duration\": 180,\n  \"venue\": \"Exam Hall 1\",\n  \"onlineLink\": \"\",\n  \"subjectCode\": \"PHY101\",\n  \"notes\": \"Bring calculator\",\n  \"reminderEnabled\": true,\n  \"reminderDaysBefore\": 3,\n  \"status\": \"upcoming\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get All Exam Dates",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/scheduler/exam-dates",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ]
+          }
+        },
+        {
+          "name": "Get Exam Date By ID",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/scheduler/exam-dates/{{id}}",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ]
+          }
+        },
+        {
+          "name": "Update Exam Date",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/scheduler/exam-dates/{{id}}",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"subjectName\": \"Physics Updated\",\n  \"examDate\": \"2025-09-20T00:00:00.000Z\",\n  \"examTime\": \"02:00 PM\",\n  \"duration\": 180,\n  \"venue\": \"Main Hall\",\n  \"onlineLink\": \"\",\n  \"subjectCode\": \"PHY101\",\n  \"notes\": \"Bring calculator and ruler\",\n  \"reminderEnabled\": true,\n  \"reminderDaysBefore\": 5,\n  \"status\": \"upcoming\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Exam Date",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/scheduler/exam-dates/{{id}}",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Assignment Submissions",
+      "item": [
+        {
+          "name": "Create Assignment Submission",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/scheduler/assignment-submission",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"dueDate\": \"2025-08-10T23:59:00.000Z\",\n  \"allowLateSubmission\": false,\n  \"linkedAssignmentId\": \"REPLACE_OR_OMIT\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get All Assignment Submissions",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/scheduler/assignment-submission",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ]
+          }
+        },
+        {
+          "name": "Get Assignment Submission By ID",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/scheduler/assignment-submission/{{id}}",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ]
+          }
+        },
+        {
+          "name": "Update Assignment Submission",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/scheduler/assignment-submission/{{id}}",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"dueDate\": \"2025-08-12T23:59:00.000Z\",\n  \"submittedAt\": \"2025-08-11T15:30:00.000Z\",\n  \"submissionStatus\": \"submitted\",\n  \"feedback\": \"Good work\",\n  \"allowLateSubmission\": true,\n  \"linkedAssignmentId\": \"REPLACE_OR_OMIT\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Assignment Submission",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/scheduler/assignment-submission/{{id}}",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Project Submissions",
+      "item": [
+        {
+          "name": "Create Project Submission",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/scheduler/project-submission",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"projectTitle\": \"SPARK.E Study Platform\",\n  \"submissionDate\": \"2025-11-30T23:59:00.000Z\",\n  \"projectLink\": \"https://github.com/yourusername/sparke\",\n  \"phase\": \"development\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get All Project Submissions",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/scheduler/project-submission",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ]
+          }
+        },
+        {
+          "name": "Get Project Submission By ID",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/scheduler/project-submission/{{id}}",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ]
+          }
+        },
+        {
+          "name": "Update Project Submission",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/scheduler/project-submission/{{id}}",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"projectTitle\": \"SPARK.E Study Platform v2\",\n  \"submissionDate\": \"2025-12-15T23:59:00.000Z\",\n  \"projectLink\": \"https://github.com/yourusername/sparke\",\n  \"phase\": \"testing\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Project Submission",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/scheduler/project-submission/{{id}}",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Time Table",
+      "item": [
+        {
+          "name": "Create Time Table Entry",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/scheduler/time-table",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Morning Physics Session\",\n  \"topic\": \"Wave Optics\",\n  \"startTime\": \"2025-08-01T08:00:00.000Z\",\n  \"endTime\": \"2025-08-01T10:00:00.000Z\",\n  \"plannedDuration\": 120,\n  \"isRecurring\": false,\n  \"recurrencePattern\": \"weekly\",\n  \"recurrenceDays\": [\"Monday\", \"Wednesday\"],\n  \"recurrenceEndDate\": \"2025-09-01T00:00:00.000Z\",\n  \"status\": \"pending\",\n  \"actualDuration\": null,\n  \"goalDescription\": \"Complete chapter 10\",\n  \"reminderEnabled\": true,\n  \"reminderMinutesBefore\": 15\n}"
+            }
+          }
+        },
+        {
+          "name": "Get All Time Tables",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/scheduler/time-table",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ]
+          }
+        },
+        {
+          "name": "Get Time Table By ID",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/scheduler/time-table/{{id}}",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ]
+          }
+        },
+        {
+          "name": "Update Time Table Entry",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/scheduler/time-table/{{id}}",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Evening Physics Session\",\n  \"topic\": \"Wave Optics - Continued\",\n  \"startTime\": \"2025-08-01T18:00:00.000Z\",\n  \"endTime\": \"2025-08-01T20:00:00.000Z\",\n  \"plannedDuration\": 120,\n  \"isRecurring\": true,\n  \"recurrencePattern\": \"daily\",\n  \"recurrenceDays\": [\"Monday\", \"Tuesday\", \"Wednesday\"],\n  \"recurrenceEndDate\": \"2025-09-01T00:00:00.000Z\",\n  \"status\": \"completed\",\n  \"actualDuration\": 110,\n  \"goalDescription\": \"Completed chapter 10\",\n  \"reminderEnabled\": false,\n  \"reminderMinutesBefore\": 10\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Time Table Entry",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/scheduler/time-table/{{id}}",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ]
+          }
+        },
+        {
+          "name": "Download ICS File",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/scheduler/time-table/{{id}}/ics",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Raw Material",
+      "item": [
+        {
+          "name": "Upload Material (File)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/scheduler/material",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "file", "type": "file", "src": "" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get All Materials",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/scheduler/material",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ]
+          }
+        },
+        {
+          "name": "Get Material By ID",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/scheduler/material/{{id}}",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ]
+          }
+        },
+        {
+          "name": "Delete Material",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/scheduler/material/{{id}}",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ]
+          }
+        },
+        {
+          "name": "Delete All Material",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/scheduler/material/{{id}}/all",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "To-Do List",
+      "item": [
+        {
+          "name": "Create To-Do",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/scheduler/to-do-list",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Finish Physics Chapter 10\",\n  \"status\": \"pending\",\n  \"priority\": \"high\",\n  \"dueDate\": \"2025-08-05T23:59:00.000Z\",\n  \"isRecurring\": false,\n  \"recurrencePattern\": \"daily\",\n  \"reminderEnabled\": true,\n  \"reminderTime\": \"2025-08-05T08:00:00.000Z\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get All To-Dos",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/scheduler/to-do-list",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ]
+          }
+        },
+        {
+          "name": "Filter To-Dos",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/scheduler/to-do-list/filter?input=high",
+              "query": [{ "key": "input", "value": "high" }]
+            },
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ]
+          }
+        },
+        {
+          "name": "Sort To-Dos",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/scheduler/to-do-list/sort?sortBy=priority",
+              "query": [{ "key": "sortBy", "value": "priority" }]
+            },
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ]
+          }
+        },
+        {
+          "name": "Get To-Do By ID",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/scheduler/to-do-list/{{id}}",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ]
+          }
+        },
+        {
+          "name": "Update To-Do",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/scheduler/to-do-list/{{id}}",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Finish Physics Chapter 10 - Updated\",\n  \"status\": \"completed\",\n  \"priority\": \"medium\",\n  \"dueDate\": \"2025-08-06T23:59:00.000Z\",\n  \"isRecurring\": false,\n  \"recurrencePattern\": \"weekly\",\n  \"reminderEnabled\": false,\n  \"reminderTime\": null\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete To-Do By ID",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/scheduler/to-do-list/{{id}}",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ]
+          }
+        },
+        {
+          "name": "Delete All To-Dos",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/scheduler/to-do-list",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Documents (RAG)",
+      "item": [
+        {
+          "name": "Upload Document",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/documents/upload",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "file", "type": "file", "src": "" },
+                { "key": "image", "type": "file", "src": "" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Ask Query (RAG Chat)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/documents/{{id}}/chat/{{docId}}",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"What is the main concept explained in this document?\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get All Chats for Doc",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/documents/{{id}}/chat/{{docId}}",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ]
+          }
+        },
+        {
+          "name": "Update Chat Message",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/documents/{{id}}/chat/{{chatRoomKey}}/{{chatId}}",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"Updated question about the document\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get All Chat Rooms",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/documents/chat/all",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ]
+          }
+        },
+        {
+          "name": "Delete Document",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/documents/{{id}}",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Image Analysis",
+      "item": [
+        {
+          "name": "Analyze Image",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/image/analyze",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "image", "type": "file", "src": "" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "PDF Analysis",
+      "item": [
+        {
+          "name": "Analyze PDF",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/pdf/analyze",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "pdf", "type": "file", "src": "" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Study Rooms",
+      "item": [
+        {
+          "name": "Create Study Room",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/rooms",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Physics Study Room\",\n  \"roomId\": \"phys-room-001\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get All Rooms",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/rooms",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Tutor",
+      "item": [
+        {
+          "name": "Ask Tutor",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/tutor/ask",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"question\": \"Explain Newton's second law with an example\",\n  \"sessionId\": \"session-abc-123\",\n  \"subject\": \"Physics\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Chat History",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/tutor/history",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Search",
+      "item": [
+        {
+          "name": "Search",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/search?query=Newton laws of motion&filter=&sort=",
+              "query": [
+                { "key": "query", "value": "Newton laws of motion" },
+                { "key": "filter", "value": "" },
+                { "key": "sort", "value": "" }
+              ]
+            },
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "Liveness Check",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/health"
+          }
+        },
+        {
+          "name": "Readiness Check (Detailed)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/health/detailed"
+          }
+        }
+      ]
+    }
+  ]
+}

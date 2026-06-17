@@ -185,12 +185,6 @@ const deleteQuiz = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, {}, "Quiz deleted"))
 })
 
-
-// ─────────────────────────────────────────────
-// GENERATE QUIZ FROM UPLOADED FILE (PDF)
-// POST /api/quiz/generate-from-file
-// Multipart: file (PDF), body: { types, total }
-// ─────────────────────────────────────────────
 const generateQuizFromFiles = asyncHandler(async (req, res) => {    
     const { types, total } = req.body
     const userId = req.user.id
