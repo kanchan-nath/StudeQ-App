@@ -3,7 +3,7 @@ import dotenv from "dotenv"
 import { prompt_PromptOptimizer } from "../lib/prompt.js"
 
 const openai = new OpenAi({
-    apiKey: process.env.NVIDIA_DEEPSEEK_FLASH_API_KEY,
+    apiKey: process.env.NVIDIA_DEEPSEEK_API_KEY,
     baseURL: 'https://integrate.api.nvidia.com/v1'
 })
 
