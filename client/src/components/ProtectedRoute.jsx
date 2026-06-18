@@ -1,10 +1,12 @@
 import React from "react";
-import { Navigate, useNavigate } from "react-router-dom";
+import { Navigate } from "react-router-dom";
+import useUser from "../ContextApi/useUser.js";
 
 const ProtectedRoute = ({ component }) => {
-  const token = localStorage.getItem("token");
+  const { user, loading } = useUser();
 
-  return token ? component : <Navigate to="/login" />;
+  if (loading) return null; 
+  return user ? component : <Navigate to="/login" />;
 };
 
 export default ProtectedRoute;
