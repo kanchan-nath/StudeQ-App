@@ -1,7 +1,7 @@
 import { apiFetch } from "./api.js";
 import { disConnectSocket } from "./socket.js";
 
-export const logout = async (setUser, navigate) => {
+const logout = async (setUser, navigate) => {
     disConnectSocket();
     try {
         await apiFetch("/api/auth/logout", { method: "POST" });
@@ -11,3 +11,4 @@ export const logout = async (setUser, navigate) => {
     setUser(null);
     navigate("/login");
 };
+export default  logout
