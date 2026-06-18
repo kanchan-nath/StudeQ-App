@@ -9,6 +9,8 @@ import logger from "./logger/index.js"
 import { shutdownRedis } from "./lib/redisClient.js"
 import { closeAIResponseQueue } from "./services/queue.js"
 import { disconnectPrisma } from "./lib/prisma.js"
+import cookie from "cookie"
+
 const isProd = process.env.NODE_ENV || "production"
 
 const server = http.createServer(app)
@@ -19,8 +21,9 @@ aiQueueEvents(userSocketMap, io)
 
 io.use((socket, next) => {
     try {
-        const token = socket.handshake.auth?.token
-
+        const rawCookie = socket.handshake.headers.cookie || ""
+        const token = cookie.parse(rawCookie).accessToken
+        
         if (!token) {
             return next(new Error("Unauthorized: no token"))
         }
