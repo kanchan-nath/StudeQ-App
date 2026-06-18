@@ -4,6 +4,7 @@ import { summarizeText } from "../lib/groq/summarizer.js"
 import { Note } from "../models/note.model.js"
 import { AIResponseQueue } from "../services/queue.js"
 import { noteValidator } from "../validators/note.validator.js"
+import mongoose from "mongoose"
 
 const titleExtract = (markdownResponse) => {
     if (!markdownResponse) return "Summary"
@@ -116,7 +117,7 @@ const updateNote = asyncHandler(async (req, res) => {
 
     }
 
-    const title = titleExtract(result)
+    const title = titleExtract(response)
 
     const updated = await Note.findOneAndUpdate(
         {
