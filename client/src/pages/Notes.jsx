@@ -1,5 +1,6 @@
 import React, { useRef, useState, useEffect } from "react";
-import BASE_URL from "../lib/api.js";
+import { useLocation, useParams, useNavigate } from "react-router-dom";
+import BASE_URL, { apiFetch } from "../lib/api.js";
 import { jsPDF } from "jspdf";
 import styles from "./styles/notes.module.css";
 import ReactMarkdown from "react-markdown";
@@ -7,6 +8,11 @@ import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
 import html2canvas from "html2canvas";
 import { getSocket, connectSocket } from "../lib/socket.js";
+
+// ── Error system imports ───────────────────────────────────────────────────────
+import ErrorPage from "../errors/components/ErrorPage.jsx";
+import { ERROR_TYPES, resolveErrorType } from "../errors/config/errorConfig.js";
+import useErrorHandler from "../errors/hooks/useErrorHandler.jsx";
 
 export const LLMMarkdown = ({ content }) => {
   return (
@@ -416,7 +422,6 @@ export const NoteInputForm = ({
 ═══════════════════════════════════════════════════════════════ */
 const Notes = () => {
   const [isCopied, setIsCopied] = useState(false);
-  const [editId, setEditId] = useState("");
   const [editValue, setEditValue] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -425,17 +430,37 @@ const Notes = () => {
   const [notes, setNotes] = useState([]);
   const [fetchError, setFetchError] = useState("");
   const [fetching, setFetching] = useState(false);
-  const [activeNoteId, setActiveNoteId] = useState(null);
   const [showInputForm, setShowInputForm] = useState(false);
   const [generatedIds, setGeneratedIds] = useState(new Set());
   const [toast, setToast] = useState(null);
-  const [panelView, setPanelView] = useState("welcome");
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // ── Error handler hook ───────────────────────────────────────────────────────
+  const { notifyError, notifySuccess } = useErrorHandler();
+
+  // ── Blocking error state — replaces the whole page ──────────────────────────
+  // null = no error | ERROR_TYPES key = show full error page
+  const [pageError, setPageError] = useState(null);
+
   // ── NEW: mobile drawer state ──
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const noteDocRef = useRef(null);
   const inputRef = useRef(null);
-  const token = localStorage.getItem("token");
+
+  const location = useLocation();
+  const { id } = useParams();
+  const navigate = useNavigate();
+
+  const activeNoteId = id || null;
+  const panelView = location.pathname === "/notes/new"
+    ? "form"
+    : id && location.pathname.endsWith("/edit")
+      ? "form"
+      : id
+        ? "note"
+        : "welcome";
+
+  const editId = location.pathname.endsWith("/edit") ? id : "";
 
   // ── NEW: lock body scroll when mobile drawer is open ──
   useEffect(() => {
@@ -453,11 +478,10 @@ const Notes = () => {
     socket.on("ai-response", (data) => {
       const { title, summary, keyPoints, _id, isPinned } = data;
       setSummaryData({ title, summary, keyPoints, _id, isPinned });
-      setActiveNoteId(_id);
       setGeneratedIds((prev) => new Set(prev).add(_id));
       showToast("Note created!");
       fetchNotes();
-      setPanelView("note");
+      navigate(`/notes/${_id}`);
     });
 
     return () => socket.off("ai_response");
@@ -477,20 +501,38 @@ const Notes = () => {
 
     if (editId) {
       try {
-        const res = await fetch(`${BASE_URL}/api/notes/${editId}`, {
+        const res = await apiFetch(`/api/notes/${editId}`, {
           method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
           body: JSON.stringify({ content }),
         });
-        if (!res.ok) throw new Error("Update failed");
+
+        // ── Auth errors → redirect + toast ──────────────────────────────────────
+        if (res.status === 401) {
+          notifyError("Session expired. Sign in again.");
+          navigate("/login");
+          return;
+        }
+
+        if (res.status === 403) {
+          setPageError(ERROR_TYPES.FORBIDDEN);
+          return;
+        }
+
+        // ── Server errors → full-page error ─────────────────────────────────────
+        if (res.status >= 500) {
+          setPageError(ERROR_TYPES.SERVER_ERROR);
+          return;
+        }
+
+        if (!res.ok) {
+          setPageError(ERROR_TYPES.UNKNOWN);
+          return;
+        }
+
         showToast("Note updated successfully!");
-        setEditId("");
         setContent("");
         await fetchNotes();
-        setPanelView("note");
+        navigate(`/notes/${id}`);
       } catch (err) {
         showToast(err.message || "Update failed", "error");
       } finally {
@@ -498,25 +540,43 @@ const Notes = () => {
       }
     } else {
       try {
-        const res = await fetch(`${BASE_URL}/api/notes`, {
+        const res = await apiFetch("/api/notes", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
           body: JSON.stringify({ content }),
         });
-        if (!res.ok) throw new Error("Summarisation failed. Try again.");
+
+        // ── Auth errors → redirect + toast ──────────────────────────────────────
+        if (res.status === 401) {
+          notifyError("Session expired. Sign in again.");
+          navigate("/login");
+          return;
+        }
+
+        if (res.status === 403) {
+          setPageError(ERROR_TYPES.FORBIDDEN);
+          return;
+        }
+
+        // ── Server errors → full-page error ─────────────────────────────────────
+        if (res.status >= 500) {
+          setPageError(ERROR_TYPES.SERVER_ERROR);
+          return;
+        }
+
+        if (!res.ok) {
+          setPageError(ERROR_TYPES.UNKNOWN);
+          return;
+        }
+
         const data = await res.json();
         const { title, summary, keyPoints, _id, isPinned } = data.data;
 
         setSummaryData({ title, summary, keyPoints, _id, isPinned });
-        setActiveNoteId(_id);
         setGeneratedIds((prev) => new Set(prev).add(_id));
         setContent("");
         showToast("Note created!");
         await fetchNotes();
-        setPanelView("note");
+        navigate(`/notes/${_id}`);
       } catch (err) {
         setError(err.message || "Content generation failed");
         showToast(err.message || "Something went wrong", "error");
@@ -529,18 +589,38 @@ const Notes = () => {
   const fetchNotes = async () => {
     setFetching(true);
     try {
-      const res = await fetch(`${BASE_URL}/api/notes`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      if (!res.ok) throw new Error("Failed to fetch notes");
+      const res = await apiFetch("/api/notes");
+
+      if (res.status === 401) {
+        notifyError("Session expired. Sign in again.");
+        navigate("/login");
+        return;
+      }
+
+      if (res.status === 403) {
+        setPageError(ERROR_TYPES.FORBIDDEN);
+        return;
+      }
+
+      if (res.status >= 500) {
+        setPageError(ERROR_TYPES.SERVER_ERROR);
+        return;
+      }
+
+      if (!res.ok) {
+        setPageError(ERROR_TYPES.UNKNOWN);
+        return;
+      }
+
       const data = await res.json();
       setNotes(data.data);
     } catch (err) {
-      setFetchError(err.message);
+      const type = resolveErrorType(err);
+      if (type === ERROR_TYPES.NETWORK) {
+        setPageError(ERROR_TYPES.NETWORK);
+      } else {
+        setFetchError(err.message);
+      }
     } finally {
       setFetching(false);
     }
@@ -548,19 +628,35 @@ const Notes = () => {
 
   const handleSubmitDelete = async (id) => {
     try {
-      const res = await fetch(`${BASE_URL}/api/notes/${id}`, {
+      const res = await apiFetch(`/api/notes/${id}`, {
         method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
       });
-      if (!res.ok) throw new Error("Delete failed");
+
+      if (res.status === 401) {
+        notifyError("Session expired. Sign in again.");
+        navigate("/login");
+        return;
+      }
+
+      if (res.status === 403) {
+        setPageError(ERROR_TYPES.FORBIDDEN);
+        return;
+      }
+
+      if (res.status >= 500) {
+        setPageError(ERROR_TYPES.SERVER_ERROR);
+        return;
+      }
+
+      if (!res.ok) {
+        setPageError(ERROR_TYPES.UNKNOWN);
+        return;
+      }
+
       showToast("Note deleted");
       if (activeNoteId === id) {
-        setActiveNoteId(null);
         setSummaryData(null);
-        setPanelView("welcome");
+        navigate("/notes");
       }
       await fetchNotes();
     } catch (err) {
@@ -569,16 +665,14 @@ const Notes = () => {
   };
 
   const handleSubmitEdit = (note) => {
-    setEditId(note._id);
     setContent(note.summary);
-    setPanelView("form");
+    navigate(`/notes/${note._id}/edit`);
     setTimeout(() => inputRef.current?.focus(), 100);
   };
 
   const handleCancelEdit = () => {
-    setEditId("");
     setContent("");
-    setPanelView(activeNoteId ? "note" : "welcome");
+    navigate(activeNoteId ? `/notes/${activeNoteId}` : "/notes");
   };
 
   const handleCopy = async (note) => {
@@ -605,8 +699,8 @@ const Notes = () => {
 
       const keyPointsText = Array.isArray(note.keyPoints)
         ? note.keyPoints
-            .map((pt, i) => `${i + 1}. ${stripMarkdown(pt)}`)
-            .join("\n")
+          .map((pt, i) => `${i + 1}. ${stripMarkdown(pt)}`)
+          .join("\n")
         : stripMarkdown(note.keyPoints);
 
       const text = [
@@ -672,15 +766,32 @@ const Notes = () => {
   const tooglePin = async (note) => {
     const newPinned = !note.isPinned;
     try {
-      const res = await fetch(`${BASE_URL}/api/notes/${note._id}/pin`, {
+      const res = await apiFetch(`/api/notes/${note._id}/pin`, {
         method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
         body: JSON.stringify({ newPinned }),
       });
-      if (!res.ok) throw new Error(res.statusText);
+
+      if (res.status === 401) {
+        notifyError("Session expired. Sign in again.");
+        navigate("/login");
+        return;
+      }
+
+      if (res.status === 403) {
+        setPageError(ERROR_TYPES.FORBIDDEN);
+        return;
+      }
+
+      if (res.status >= 500) {
+        setPageError(ERROR_TYPES.SERVER_ERROR);
+        return;
+      }
+
+      if (!res.ok) {
+        setPageError(ERROR_TYPES.UNKNOWN);
+        return;
+      }
+
       showToast(newPinned ? "Note pinned!" : "Note unpinned");
       if (summaryData && summaryData._id === note._id) {
         setSummaryData((prev) => ({ ...prev, isPinned: newPinned }));
@@ -692,22 +803,16 @@ const Notes = () => {
   };
 
   const handleSidebarNoteClick = (note) => {
-    setActiveNoteId(note._id);
     setSummaryData(note);
-    setEditId("");
     setContent("");
-    setPanelView("note");
-    // ── NEW: close mobile drawer after selecting a note ──
+    navigate(`/notes/${note._id}`);
     setMobileSidebarOpen(false);
   };
 
   const handleNewNote = () => {
-    setActiveNoteId(null);
     setSummaryData(null);
-    setEditId("");
     setContent("");
-    setPanelView("form");
-    // ── NEW: close mobile drawer after tapping new note ──
+    navigate("/notes/new");
     setMobileSidebarOpen(false);
   };
 
@@ -721,6 +826,11 @@ const Notes = () => {
 
   const pinnedNotes = notes.filter((n) => n.isPinned);
   const unpinnedNotes = notes.filter((n) => !n.isPinned);
+
+  // ── Full-page error — replaces page entirely ─────────────────────────────────
+  if (pageError) {
+    return <ErrorPage type={pageError} onRetry={fetchNotes} />;
+  }
 
   // ── Shared sidebar content — rendered in both desktop + mobile drawer ──
   const SidebarContent = () => (
@@ -847,7 +957,7 @@ const Notes = () => {
         </div>
 
         {panelView === "welcome" && (
-          <WelcomePanel onStart={() => setPanelView("form")} />
+          <WelcomePanel onStart={() => navigate("/notes/new")} />
         )}
 
         {panelView === "form" && (

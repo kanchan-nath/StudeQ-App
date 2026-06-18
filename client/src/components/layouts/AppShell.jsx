@@ -3,6 +3,8 @@ import { Link, Outlet, useNavigate, useLocation } from "react-router-dom";
 import { apiFetch } from "../../lib/api.js";
 import useUser from "../../ContextApi/useUser.js";
 import styles from "./appShell.module.css";
+import logout from "../../lib/logout.js"
+
 import {
   Home03Icon,
   NoteEditIcon,
@@ -148,19 +150,9 @@ const AppShell = ({ userName = "" }) => {
       .toUpperCase()
     : "KN";
 
-  const handleLogout = async (e) => {
+  const handleLogout = (e) => {
     e.preventDefault();
-    disConnectSocket();
-
-    try {
-      // Tell backend to clear the httpOnly cookie
-      await apiFetch("/api/auth/logout", { method: "POST" });
-    } catch {
-      // Continue logout even if request fails
-    }
-
-    setUser(null);        // clear context
-    navigate("/login");
+    logout(setUser, navigate);
   };
 
   useEffect(() => {

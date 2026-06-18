@@ -17,28 +17,10 @@ const App = () => {
           path="/"
           element={<Home />}
         />
-        <Route
-          path="/register"
-          element={<Register />}
-        />
-        <Route
-          path="/login"
-          element={<Login />}
-        />
-
         <Route element={<AppShell />}>
-          {/* <Route path='/dashboard' element={<ProtectedRoute component={<Dashboard/>}/>} /> */}
-          <Route
-            path="/dashboard"
-            element={<Dashboard />}
-          />
           <Route
             path="/notes"
             element={<ProtectedRoute component={<Notes />} />}
-          />
-          <Route
-            path="/event-scheduling/assignments"
-            element={<ProtectedRoute component={<Assignments />} />}
           />
         </Route>
       </Routes>

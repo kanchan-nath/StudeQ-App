@@ -144,7 +144,7 @@ const Dashboard = () => {
 
   // ── Blocking error state — replaces the whole page ──────────────────────────
   // null = no error | ERROR_TYPES key = show full error page
-  const [pageError, setPageError] = useState(null);
+  const [pageError, setPageError] = useState(null); 
 
   // ── Dynamic data states ──────────────────────────────────────────────────────
   const [quizStats, setQuizStats] = useState(DEFAULT_QUIZ);
@@ -185,7 +185,6 @@ const Dashboard = () => {
       }
 
       const data = await res.json();
-      console.log(data);
       
       setUserData({
         name: data?.data?.name ?? "",

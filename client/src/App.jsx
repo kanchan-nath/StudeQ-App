@@ -1,9 +1,11 @@
 import React from "react";
 import ErrorPage, { RouteErrorPage } from "./errors/components/ErrorPage.jsx";
 import { ERROR_TYPES } from "./errors/config/errorConfig.js";
+import useUser from "../src/ContextApi/useUser.js";
+
 import "../src/index.css";
 import "./pages/styles/global.css";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 import Home from "../src/pages/Home.jsx";
 import Register from "./pages/Register.jsx";
 import Login from "./pages/Login.jsx";
@@ -32,10 +34,11 @@ import SearchResults from "./pages/Searchresults.jsx";
 import ComingSoon from "./components/ComingSoon/Index.jsx";
 
 const App = () => {
-  const token = localStorage.getItem("token");
-
+  const { user } = useUser();
   const hideNavOn = ["/login", "/register"];
-  const showNavbar = token && !hideNavOn.includes(location.pathname);
+  const location = useLocation();
+  const showNavbar = user && !hideNavOn.includes(location.pathname);
+
   return (
     <>
       {/* {showNavbar && <Navbar/>} */}
@@ -54,18 +57,16 @@ const App = () => {
         />
 
         <Route
-          element={<AppShell />}
+          element={<ProtectedRoute component={<AppShell />} />}
           errorElement={<RouteErrorPage />}
         >
-          {/* <Route path='/dashboard' element={<ProtectedRoute component={<Dashboard/>}/>} /> */}
-          <Route
-            path="/dashboard"
-            element={<Dashboard />}
-          />
-          <Route
-            path="/notes"
-            element={<ProtectedRoute component={<Notes />} />}
-          />
+          <Route path='/dashboard' element={<ProtectedRoute component={<Dashboard/>}/>} />
+
+          <Route path="/notes" element={<ProtectedRoute component={<Notes />} />} />
+          <Route path="/notes/new" element={<ProtectedRoute component={<Notes />} />} />
+          <Route path="/notes/:id" element={<ProtectedRoute component={<Notes />} />} />
+          <Route path="/notes/:id/edit" element={<ProtectedRoute component={<Notes />} />} />
+          
           <Route
             path="/quiz"
             element={<ProtectedRoute component={<Quiz />} />}
