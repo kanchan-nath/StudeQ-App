@@ -147,7 +147,6 @@ export default function Quiz() {
   const timerRef = useRef(null);
   const loaderRef = useRef(null);
   const quizDataRef = useRef(quizData);
-  const token = localStorage.getItem("token");
 
   // Keep ref in sync so setPhase closure always has latest quizData
   useEffect(() => {
@@ -176,9 +175,7 @@ export default function Quiz() {
     const p = location.pathname;
 
     if (p.startsWith("/quiz/results") && !quizData) {
-      fetch(`${BASE_URL}/api/quiz/${urlId}/result`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
+      apiFetch(`/api/quiz/${urlId}/result`)
         .then((r) => r.json())
         .then((data) => {
           const saved = data.data[0];
@@ -203,13 +200,12 @@ export default function Quiz() {
     try {
       const res = await apiFetch(`/api/quiz/all`);
       const data = await res.json();
-      console.log(data);
 
       if (data.data) setAllQuizzes(data.data);
     } catch (e) {
       console.error("fetchAllQuizzes:", e);
     }
-  }, [token]);
+  }, []);
 
   const deleteQuiz = async (id) => {
     try {
