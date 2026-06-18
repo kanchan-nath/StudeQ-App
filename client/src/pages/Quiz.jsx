@@ -103,6 +103,7 @@ export default function Quiz() {
 
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { notifyError, notifySuccess } = useErrorHandler();
 
   // ─── GLOBAL STATE ──────────────────────────────────────────────
   // Init phase from URL on mount

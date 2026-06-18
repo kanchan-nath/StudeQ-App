@@ -1,8 +1,13 @@
 import React, { useRef, useState, useEffect, useCallback } from "react";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
-import BASE_URL from "../lib/api.js";
+import BASE_URL, {apiFetch} from "../lib/api.js";
 import { v4 as uuidv4 } from "uuid";
 import styles from "./styles/Flashcards.module.css";
+
+// ── Error system imports ───────────────────────────────────────────────────────
+import ErrorPage from "../errors/components/ErrorPage.jsx";
+import { ERROR_TYPES, resolveErrorType } from "../errors/config/errorConfig.js";
+import useErrorHandler from "../errors/hooks/useErrorHandler.jsx";
 
 // ─── Icons ────────────────────────────────────────────────────────────────────
 const IconHome = () => (
@@ -1151,9 +1156,15 @@ const Flashcards = () => {
   const [allFlashcards, setAllFlashcards] = useState([]);
   const [selectedSet, setSelectedSet] = useState(null);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
-  const inputRef = useRef(null);
-  const token = localStorage.getItem("token");
 
+  const { notifyError, notifySuccess } = useErrorHandler();
+  const [pageError, setPageError] = useState(null);
+  const inputRef = useRef(null);
+
+  useEffect(() => {
+    fetchFlashcards();
+  }, []);
+  
   // Derive currentView from URL — reload always restores correct view
   const currentView = location.pathname.startsWith("/flashcards/viewer")
     ? VIEW.VIEWER
@@ -1162,72 +1173,86 @@ const Flashcards = () => {
   const navigateTo = (view) => navigate(PATH_MAP[view] ?? "/flashcards");
   const exitToViewer = () => navigate("/flashcards");
 
+  const fetchFlashcards = async (silent = false) => {
+    try {
+      const res = await apiFetch(`/api/quiz/flashcards`);
+
+      if (res.status === 401) {
+        notifyError("Session expired. Sign in again.");
+        navigate("/login");
+        return;
+      }
+
+      if (!silent) {
+        // Initial load — block page on failure
+        if (res.status === 403) { setPageError(ERROR_TYPES.FORBIDDEN); return; }
+        if (res.status >= 500) { setPageError(ERROR_TYPES.SERVER_ERROR); return; }
+        if (!res.ok) { setPageError(ERROR_TYPES.UNKNOWN); return; }
+      } else {
+        // Post-mutation re-fetch — toast only, don't blow up the page
+        if (!res.ok) { notifyError("Failed to refresh flashcards."); return; }
+      }
+
+      const data = await res.json();
+      setAllFlashcards(data.data);
+    } catch (err) {
+      const type = resolveErrorType(err);
+      if (!silent) {
+        setPageError(type === ERROR_TYPES.NETWORK ? ERROR_TYPES.NETWORK : ERROR_TYPES.UNKNOWN);
+      } else {
+        notifyError(type === ERROR_TYPES.NETWORK ? "No connection." : "Failed to refresh.");
+      }
+    }
+  };
+
   const handleSubmit = async ({ topic, subject }) => {
     setLoading(true);
     const id = uuidv4();
     setFlashcardId(id);
+
     if (moreFlashId) {
       try {
-        const res = await fetch(
-          `${BASE_URL}/api/quiz/flashcards/${moreFlashId}`,
-          {
-            method: "PATCH",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({ topic, subject, flashcardId: id }),
-          },
-        );
-        if (!res.ok) console.error("something went wrong");
+        const res = await apiFetch(`/api/quiz/flashcards/${moreFlashId}`, {
+          method: "PATCH",
+          body: JSON.stringify({ topic, subject, flashcardId: id }),
+        });
+
+        if (res.status === 401) { notifyError("Session expired. Sign in again."); navigate("/login"); return; }
+        if (!res.ok) { notifyError("Failed to add cards. Try again."); return; }
+
         await res.json();
-        fetchFlashcards();
+        notifySuccess("Cards added!");
+        fetchFlashcards(true);   // silent — page already loaded
         setSelectedSet(null);
-      } catch (error) {
-        console.error(error);
+      } catch (err) {
+        const type = resolveErrorType(err);
+        notifyError(type === ERROR_TYPES.NETWORK ? "No connection." : "Something went wrong.");
       } finally {
         setLoading(false);
       }
     } else {
       try {
-        const res = await fetch(`${BASE_URL}/api/quiz/flashcards`, {
+        const res = await apiFetch(`/api/quiz/flashcards`, {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
           body: JSON.stringify({ topic, subject, flashcardId: id }),
         });
-        if (!res.ok) console.error("Something went wrong, Try Again!");
+
+        if (res.status === 401) { notifyError("Session expired. Sign in again."); navigate("/login"); return; }
+        if (!res.ok) { notifyError("Failed to create set. Try again."); return; }
+
         const data = await res.json();
+        notifySuccess("Flashcard set created!");
         setInputResult(data.data);
         setInput({ topic: "", subject: "" });
-        fetchFlashcards();
+        fetchFlashcards(true);
         setSelectedSet(null);
         navigate("/flashcards/viewer/" + data.data._id);
-      } catch (error) {
-        console.error(error);
+      } catch (err) {
+        const type = resolveErrorType(err);
+        notifyError(type === ERROR_TYPES.NETWORK ? "No connection." : "Something went wrong.");
       } finally {
         setLoading(false);
       }
-    }
-  };
-
-  const fetchFlashcards = async () => {
-    try {
-      const res = await fetch(`${BASE_URL}/api/quiz/flashcards`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      if (!res.ok) console.error(`Something went wrong, Try Again`);
-      const data = await res.json();
-      console.log("Flashcards response:", data.data);
-      setAllFlashcards(data.data);
-    } catch (error) {
-      console.error(error);
     }
   };
 
@@ -1235,51 +1260,46 @@ const Flashcards = () => {
     const formData = new FormData();
     formData.append("pdfFilePath", file);
     try {
-      const res = await fetch(`${BASE_URL}/api/quiz/flashcards`, {
+      const res = await apiFetch(`/api/quiz/flashcards`, {
         method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
         body: formData,
       });
-      if (!res.ok) console.error("something went wrong");
+
+      if (res.status === 401) { notifyError("Session expired. Sign in again."); navigate("/login"); return; }
+      if (!res.ok) { notifyError("PDF upload failed. Try again."); return; }
+
       const data = await res.json();
+      notifySuccess("Cards created from PDF!");
       setInputResult(data.data);
-      fetchFlashcards();
+      fetchFlashcards(true);
       setSelectedSet(null);
       navigate("/flashcards/viewer/" + data.data._id);
-    } catch (error) {
-      console.error(error);
+    } catch (err) {
+      const type = resolveErrorType(err);
+      notifyError(type === ERROR_TYPES.NETWORK ? "No connection." : "Something went wrong.");
     }
   };
 
-  useEffect(() => {
-    fetchFlashcards();
-  }, []);
-  useEffect(() => {
-    if (id && allFlashcards.length > 0 && !selectedSet) {
-      const found = allFlashcards.find((s) => s._id === id);
-      if (found) setSelectedSet(found);
-    }
-  }, [id, allFlashcards]);
   const handleDeleteSet = async (id) => {
     try {
-      const res = await fetch(`${BASE_URL}/api/quiz/flashcards/${id}`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      if (!res.ok) return console.error("Delete failed");
+      const res = await apiFetch(`/api/quiz/flashcards/${id}`, { method: "DELETE" });
+
+      if (res.status === 401) { notifyError("Session expired. Sign in again."); navigate("/login"); return; }
+      if (!res.ok) { notifyError("Delete failed. Try again."); return; }
+
+      notifySuccess("Set deleted.");
       setAllFlashcards((prev) => prev.filter((s) => s._id !== id));
       if (selectedSet?._id === id) {
         setSelectedSet(null);
         navigate("/flashcards");
       }
     } catch (err) {
-      console.error(err);
+      const type = resolveErrorType(err);
+      notifyError(type === ERROR_TYPES.NETWORK ? "No connection." : "Delete failed.");
     }
   };
 
+  if (pageError) return <ErrorPage type={pageError} onRetry={fetchFlashcards} />
   return (
     <div className={styles.appShell}>
       {/* MOBILE HAMBURGER — floating, hidden on desktop via CSS */}
