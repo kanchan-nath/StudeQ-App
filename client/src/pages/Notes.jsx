@@ -434,6 +434,14 @@ const Notes = () => {
   const [generatedIds, setGeneratedIds] = useState(new Set());
   const [toast, setToast] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // ── Error handler hook ───────────────────────────────────────────────────────
+  const { notifyError, notifySuccess } = useErrorHandler();
+
+  // ── Blocking error state — replaces the whole page ──────────────────────────
+  // null = no error | ERROR_TYPES key = show full error page
+  const [pageError, setPageError] = useState(null);
+
   // ── NEW: mobile drawer state ──
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const noteDocRef = useRef(null);
@@ -497,12 +505,34 @@ const Notes = () => {
           method: "PATCH",
           body: JSON.stringify({ content }),
         });
-        if (!res.ok) throw new Error("Update failed");
+
+        // ── Auth errors → redirect + toast ──────────────────────────────────────
+        if (res.status === 401) {
+          notifyError("Session expired. Sign in again.");
+          navigate("/login");
+          return;
+        }
+
+        if (res.status === 403) {
+          setPageError(ERROR_TYPES.FORBIDDEN);
+          return;
+        }
+
+        // ── Server errors → full-page error ─────────────────────────────────────
+        if (res.status >= 500) {
+          setPageError(ERROR_TYPES.SERVER_ERROR);
+          return;
+        }
+
+        if (!res.ok) {
+          setPageError(ERROR_TYPES.UNKNOWN);
+          return;
+        }
+
         showToast("Note updated successfully!");
-        setEditId("");
         setContent("");
         await fetchNotes();
-        setPanelView("note");
+        navigate(`/notes/${id}`);
       } catch (err) {
         showToast(err.message || "Update failed", "error");
       } finally {
@@ -514,17 +544,39 @@ const Notes = () => {
           method: "POST",
           body: JSON.stringify({ content }),
         });
-        if (!res.ok) throw new Error("Summarisation failed. Try again.");
+
+        // ── Auth errors → redirect + toast ──────────────────────────────────────
+        if (res.status === 401) {
+          notifyError("Session expired. Sign in again.");
+          navigate("/login");
+          return;
+        }
+
+        if (res.status === 403) {
+          setPageError(ERROR_TYPES.FORBIDDEN);
+          return;
+        }
+
+        // ── Server errors → full-page error ─────────────────────────────────────
+        if (res.status >= 500) {
+          setPageError(ERROR_TYPES.SERVER_ERROR);
+          return;
+        }
+
+        if (!res.ok) {
+          setPageError(ERROR_TYPES.UNKNOWN);
+          return;
+        }
+
         const data = await res.json();
         const { title, summary, keyPoints, _id, isPinned } = data.data;
 
         setSummaryData({ title, summary, keyPoints, _id, isPinned });
-        setActiveNoteId(_id);
         setGeneratedIds((prev) => new Set(prev).add(_id));
         setContent("");
         showToast("Note created!");
         await fetchNotes();
-        setPanelView("note");
+        navigate(`/notes/${_id}`);
       } catch (err) {
         setError(err.message || "Content generation failed");
         showToast(err.message || "Something went wrong", "error");
@@ -538,11 +590,37 @@ const Notes = () => {
     setFetching(true);
     try {
       const res = await apiFetch("/api/notes");
-      if (!res.ok) throw new Error("Failed to fetch notes");
+
+      if (res.status === 401) {
+        notifyError("Session expired. Sign in again.");
+        navigate("/login");
+        return;
+      }
+
+      if (res.status === 403) {
+        setPageError(ERROR_TYPES.FORBIDDEN);
+        return;
+      }
+
+      if (res.status >= 500) {
+        setPageError(ERROR_TYPES.SERVER_ERROR);
+        return;
+      }
+
+      if (!res.ok) {
+        setPageError(ERROR_TYPES.UNKNOWN);
+        return;
+      }
+
       const data = await res.json();
       setNotes(data.data);
     } catch (err) {
-      setFetchError(err.message);
+      const type = resolveErrorType(err);
+      if (type === ERROR_TYPES.NETWORK) {
+        setPageError(ERROR_TYPES.NETWORK);
+      } else {
+        setFetchError(err.message);
+      }
     } finally {
       setFetching(false);
     }
@@ -551,9 +629,30 @@ const Notes = () => {
   const handleSubmitDelete = async (id) => {
     try {
       const res = await apiFetch(`/api/notes/${id}`, {
-        method: "DELETE", 
+        method: "DELETE",
       });
-      if (!res.ok) throw new Error("Delete failed");
+
+      if (res.status === 401) {
+        notifyError("Session expired. Sign in again.");
+        navigate("/login");
+        return;
+      }
+
+      if (res.status === 403) {
+        setPageError(ERROR_TYPES.FORBIDDEN);
+        return;
+      }
+
+      if (res.status >= 500) {
+        setPageError(ERROR_TYPES.SERVER_ERROR);
+        return;
+      }
+
+      if (!res.ok) {
+        setPageError(ERROR_TYPES.UNKNOWN);
+        return;
+      }
+
       showToast("Note deleted");
       if (activeNoteId === id) {
         setSummaryData(null);
@@ -572,10 +671,8 @@ const Notes = () => {
   };
 
   const handleCancelEdit = () => {
-    setEditId("");
     setContent("");
     navigate(activeNoteId ? `/notes/${activeNoteId}` : "/notes");
-
   };
 
   const handleCopy = async (note) => {
@@ -602,8 +699,8 @@ const Notes = () => {
 
       const keyPointsText = Array.isArray(note.keyPoints)
         ? note.keyPoints
-            .map((pt, i) => `${i + 1}. ${stripMarkdown(pt)}`)
-            .join("\n")
+          .map((pt, i) => `${i + 1}. ${stripMarkdown(pt)}`)
+          .join("\n")
         : stripMarkdown(note.keyPoints);
 
       const text = [
@@ -669,15 +766,32 @@ const Notes = () => {
   const tooglePin = async (note) => {
     const newPinned = !note.isPinned;
     try {
-      const res = await fetch(`${BASE_URL}/api/notes/${note._id}/pin`, {
+      const res = await apiFetch(`/api/notes/${note._id}/pin`, {
         method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
         body: JSON.stringify({ newPinned }),
       });
-      if (!res.ok) throw new Error(res.statusText);
+
+      if (res.status === 401) {
+        notifyError("Session expired. Sign in again.");
+        navigate("/login");
+        return;
+      }
+
+      if (res.status === 403) {
+        setPageError(ERROR_TYPES.FORBIDDEN);
+        return;
+      }
+
+      if (res.status >= 500) {
+        setPageError(ERROR_TYPES.SERVER_ERROR);
+        return;
+      }
+
+      if (!res.ok) {
+        setPageError(ERROR_TYPES.UNKNOWN);
+        return;
+      }
+
       showToast(newPinned ? "Note pinned!" : "Note unpinned");
       if (summaryData && summaryData._id === note._id) {
         setSummaryData((prev) => ({ ...prev, isPinned: newPinned }));
@@ -712,6 +826,11 @@ const Notes = () => {
 
   const pinnedNotes = notes.filter((n) => n.isPinned);
   const unpinnedNotes = notes.filter((n) => !n.isPinned);
+
+  // ── Full-page error — replaces page entirely ─────────────────────────────────
+  if (pageError) {
+    return <ErrorPage type={pageError} onRetry={fetchNotes} />;
+  }
 
   // ── Shared sidebar content — rendered in both desktop + mobile drawer ──
   const SidebarContent = () => (
@@ -838,7 +957,7 @@ const Notes = () => {
         </div>
 
         {panelView === "welcome" && (
-          <WelcomePanel onStart={() => setPanelView("form")} />
+          <WelcomePanel onStart={() => navigate("/notes/new")} />
         )}
 
         {panelView === "form" && (
