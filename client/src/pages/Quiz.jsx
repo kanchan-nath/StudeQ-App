@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
-import BASE_URL from "../lib/api.js";
+import BASE_URL, { apiFetch } from "../lib/api.js";
 import styles from "./styles/Quiz.module.css";
 
 // ─── PHASE CONSTANTS ───────────────────────────────────────────────
@@ -201,10 +201,7 @@ export default function Quiz() {
   // ─── FETCH ALL QUIZZES (history) ────────────────────────────────
   const fetchAllQuizzes = useCallback(async () => {
     try {
-      const res = await fetch(`${BASE_URL}/api/quiz/all`, {
-        method: "GET",
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await apiFetch(`/api/quiz/all`);
       const data = await res.json();
       console.log(data);
 
@@ -216,9 +213,8 @@ export default function Quiz() {
 
   const deleteQuiz = async (id) => {
     try {
-      await fetch(`${BASE_URL}/api/quiz/${id}`, {
+      await apiFetch(`/api/quiz/${id}`, {
         method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
       });
       setAllQuizzes((prev) => prev.filter((q) => q._id !== id));
     } catch (e) {
@@ -297,9 +293,8 @@ export default function Quiz() {
         fd.append("types", JSON.stringify(selectedTypes));
         fd.append("total", totalQuestions);
 
-        res = await fetch(`${BASE_URL}/api/quiz/generate/file`, {
+        res = await apiFetch(`/api/quiz/generate/file`, {
           method: "POST",
-          headers: { Authorization: `Bearer ${token}` },
           body: fd,
         });
       } else {
@@ -307,12 +302,8 @@ export default function Quiz() {
           (q) => ({ type: q.id, count: typeCounts[q.id] }),
         );
 
-        res = await fetch(`${BASE_URL}/api/quiz/generate`, {
+        res = await apiFetch(`/api/quiz/generate`, {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
           body: JSON.stringify({
             topic,
             subject,
@@ -346,9 +337,7 @@ export default function Quiz() {
 
   const viewResult = async (doc) => {
     try {
-      const res = await fetch(`${BASE_URL}/api/quiz/${doc._id}/result`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await apiFetch(`/api/quiz/${doc._id}/result`);
       const data = await res.json();
       const saved = data.data[0];
 
@@ -367,12 +356,8 @@ export default function Quiz() {
     clearInterval(timerRef.current);
 
     try {
-      await fetch(`${BASE_URL}/api/quiz/${quizData._id}/submit`, {
+      await apiFetch(`${BASE_URL}/api/quiz/${quizData._id}/submit`, {
         method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
         body: JSON.stringify({ answers }),
       });
       fetchAllQuizzes();
