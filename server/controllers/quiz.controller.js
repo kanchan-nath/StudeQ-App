@@ -9,12 +9,14 @@ import { v4 as uuidv4 } from "uuid" // ✅ ADDED: need this to generate unique q
 import { Flascards } from "../models/flashcard.model.js"
 import textExtractor from "../services/textExtractor.js"
 import mongoose from "mongoose"
-import { answersValidator, quizValidator } from "../validators/quizValidator.js"
+import { answersValidator, quizValidator, generateQuizFromFilesValidator } from "../validators/quizValidator.js"
 import { flashcardValidator } from "../validators/flashcard.validator.js"
 import { idParamValidator } from "../validators/params.validator.js"
 import { grantXP } from "../services/xpService.js"
 
 const generateQuiz = asyncHandler(async (req, res) => {
+    console.log(req.body);
+    
     const { data, error } = quizValidator.safeParse(req.body)
 
     if (error) {
@@ -75,9 +77,9 @@ const getQuizById = asyncHandler(async (req, res) => {
     }
     const { id } = data
 
-    if (mongoose.Types.ObjectId.isValid(id)) {
-        throw new ApiError(400, "Invalid quiz ID")
-    }
+    // if (!(mongoose.Types.ObjectId.isValid(id))) {
+    //     throw new ApiError(400, "Invalid quiz ID")
+    // }
 
     const userId = req.user.id
 
@@ -108,7 +110,7 @@ const submitQuizAnswers = asyncHandler(async (req, res) => {
     }
     const { id } = isIdValid.data
 
-    if (mongoose.Types.ObjectId.isValid(id)) {
+    if (!mongoose.Types.ObjectId.isValid(id)) {
         throw new ApiError(400, "Invalid quiz ID")
     }
 
@@ -179,7 +181,7 @@ const deleteQuiz = asyncHandler(async (req, res) => {
     }
     const { id } = data
 
-    if (mongoose.Types.ObjectId.isValid(id)) {
+    if (!mongoose.Types.ObjectId.isValid(id)) {
         throw new ApiError(400, "Invalid quiz ID")
     }
 
@@ -197,12 +199,13 @@ const deleteQuiz = asyncHandler(async (req, res) => {
 })
 
 const generateQuizFromFiles = asyncHandler(async (req, res) => {
-    const { data, error } = generateQuizFromFilesValidetor.safeParse(req.body)
+    const { data, error } = generateQuizFromFilesValidator.safeParse(req.body)
 
     if (error) {
         throw new ApiError(400, error.issues.map(e => e.message).join(", "))
     }
     const { types } = data
+    
     const userId = req.user.id
 
     const localFile = req.files?.file?.[0]
@@ -251,7 +254,7 @@ const getResult = asyncHandler(async (req, res) => {
     }
     const { id } = data
 
-    if (mongoose.Types.ObjectId.isValid(id)) {
+    if (!mongoose.Types.ObjectId.isValid(id)) {
         throw new ApiError(400, "Invalid quiz ID")
     }
 
@@ -374,7 +377,7 @@ const deleteFlashcards = asyncHandler(async (req, res) => {
     }
     const { id } = data
 
-    if (mongoose.Types.ObjectId.isValid(id)) {
+    if (!mongoose.Types.ObjectId.isValid(id)) {
         throw new ApiError(400, "Invalid flashcard ID")
     }
 
