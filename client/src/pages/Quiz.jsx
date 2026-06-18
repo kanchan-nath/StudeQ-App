@@ -4,6 +4,11 @@ import { useNavigate, useLocation, useParams } from "react-router-dom";
 import BASE_URL, { apiFetch } from "../lib/api.js";
 import styles from "./styles/Quiz.module.css";
 
+// ── Error system imports ───────────────────────────────────────────────────────
+import ErrorPage from "../errors/components/ErrorPage.jsx";
+import { ERROR_TYPES, resolveErrorType } from "../errors/config/errorConfig.js";
+import useErrorHandler from "../errors/hooks/useErrorHandler.jsx";
+
 // ─── PHASE CONSTANTS ───────────────────────────────────────────────
 const PHASE = {
   HOME: "home",
@@ -143,6 +148,7 @@ export default function Quiz() {
   const [error, setError] = useState("");
   const [dragover, setDragover] = useState(false);
   const [reviewFilter, setReviewFilter] = useState("all");
+  const [pageError, setPageError] = useState(null); 
 
   const timerRef = useRef(null);
   const loaderRef = useRef(null);
@@ -175,17 +181,46 @@ export default function Quiz() {
     const p = location.pathname;
 
     if (p.startsWith("/quiz/results") && !quizData) {
-      apiFetch(`/api/quiz/${urlId}/result`)
-        .then((r) => r.json())
-        .then((data) => {
+      (async () => {
+        try {
+          const r = await apiFetch(`/api/quiz/${urlId}/result`);
+
+          // ── Auth errors → redirect + toast ────────────────────────
+          if (r.status === 401) {
+            notifyError("Session expired. Sign in again.");
+            navigate("/login");
+            return;
+          }
+          if (r.status === 403) {
+            setPageError(ERROR_TYPES.FORBIDDEN);
+            return;
+          }
+          // ── Server errors → full-page error ───────────────────────
+          if (r.status >= 500) {
+            setPageError(ERROR_TYPES.SERVER_ERROR);
+            return;
+          }
+          if (!r.ok) {
+            setPageError(ERROR_TYPES.UNKNOWN);
+            return;
+          }
+
+          const data = await r.json();
           const saved = data.data[0];
           setQuizData(saved);
           setAnswers(saved.questions.map((q) => q.userResponse ?? null));
           setElapsedSec(0);
           setReviewFilter("all");
           setPhaseRaw(PHASE.RESULTS); // raw — URL already correct
-        })
-        .catch(console.error);
+        } catch (err) {
+          const type = resolveErrorType(err);
+          if (type === ERROR_TYPES.NETWORK) {
+            setPageError(ERROR_TYPES.NETWORK);
+          } else {
+            console.error(err);
+          }
+        }
+      })();
     }
 
     if (p.startsWith("/quiz/take") && !quizData) {
@@ -199,24 +234,71 @@ export default function Quiz() {
   const fetchAllQuizzes = useCallback(async () => {
     try {
       const res = await apiFetch(`/api/quiz/all`);
-      const data = await res.json();
 
+      // ── Auth errors → redirect + toast ──────────────────────────
+      if (res.status === 401) {
+        notifyError("Session expired. Sign in again.");
+        navigate("/login");
+        return;
+      }
+      if (res.status === 403) {
+        setPageError(ERROR_TYPES.FORBIDDEN);
+        return;
+      }
+      // ── Server errors → full-page error ─────────────────────────
+      if (res.status >= 500) {
+        setPageError(ERROR_TYPES.SERVER_ERROR);
+        return;
+      }
+      if (!res.ok) {
+        setPageError(ERROR_TYPES.UNKNOWN);
+        return;
+      }
+
+      const data = await res.json();
       if (data.data) setAllQuizzes(data.data);
     } catch (e) {
-      console.error("fetchAllQuizzes:", e);
+      const type = resolveErrorType(e);
+      if (type === ERROR_TYPES.NETWORK) {
+        setPageError(ERROR_TYPES.NETWORK);
+      } else {
+        console.error("fetchAllQuizzes:", e);
+      }
     }
   }, []);
 
   const deleteQuiz = async (id) => {
     try {
-      await apiFetch(`/api/quiz/${id}`, {
+      const res = await apiFetch(`/api/quiz/${id}`, {
         method: "DELETE",
       });
+
+      // ── Auth errors → redirect + toast ──────────────────────────
+      if (res.status === 401) {
+        notifyError("Session expired. Sign in again.");
+        navigate("/login");
+        return;
+      }
+      if (res.status === 403) {
+        setPageError(ERROR_TYPES.FORBIDDEN);
+        return;
+      }
+      // ── Server errors → full-page error ─────────────────────────
+      if (res.status >= 500) {
+        setPageError(ERROR_TYPES.SERVER_ERROR);
+        return;
+      }
+      if (!res.ok) {
+        setPageError(ERROR_TYPES.UNKNOWN);
+        return;
+      }
+
       setAllQuizzes((prev) => prev.filter((q) => q._id !== id));
     } catch (e) {
       console.error("deleteQuiz:", e);
+    } finally {
+      setOpenMenuId(null);
     }
-    setOpenMenuId(null);
   };
 
   useEffect(() => {
@@ -311,15 +393,39 @@ export default function Quiz() {
         });
       }
 
-      if (!res.ok) throw new Error("API error");
+      // ── Auth errors → redirect + toast ──────────────────────────
+      if (res.status === 401) {
+        notifyError("Session expired. Sign in again.");
+        navigate("/login");
+        return;
+      }
+      if (res.status === 403) {
+        setPageError(ERROR_TYPES.FORBIDDEN);
+        return;
+      }
+      // ── Server errors → full-page error ─────────────────────────
+      if (res.status >= 500) {
+        setPageError(ERROR_TYPES.SERVER_ERROR);
+        return;
+      }
+      if (!res.ok) {
+        setError("Generation failed. Check your connection or API.");
+        setPhase(PHASE.STEP3);
+        return;
+      }
 
       const data = await res.json();
       startQuiz(data.data);
       fetchAllQuizzes();
     } catch (e) {
-      console.error(e);
-      setError("Generation failed. Check your connection or API.");
-      setPhase(PHASE.STEP3);
+      const type = resolveErrorType(e);
+      if (type === ERROR_TYPES.NETWORK) {
+        setPageError(ERROR_TYPES.NETWORK);
+      } else {
+        console.error(e);
+        setError("Generation failed. Check your connection or API.");
+        setPhase(PHASE.STEP3);
+      }
     }
   };
 
@@ -331,9 +437,31 @@ export default function Quiz() {
     setPhase(PHASE.QUIZ, doc); // pass doc so setPhase has _id immediately
   };
 
+
   const viewResult = async (doc) => {
     try {
       const res = await apiFetch(`/api/quiz/${doc._id}/result`);
+
+      // ── Auth errors → redirect + toast ──────────────────────────
+      if (res.status === 401) {
+        notifyError("Session expired. Sign in again.");
+        navigate("/login");
+        return;
+      }
+      if (res.status === 403) {
+        setPageError(ERROR_TYPES.FORBIDDEN);
+        return;
+      }
+      // ── Server errors → full-page error ─────────────────────────
+      if (res.status >= 500) {
+        setPageError(ERROR_TYPES.SERVER_ERROR);
+        return;
+      }
+      if (!res.ok) {
+        setPageError(ERROR_TYPES.UNKNOWN);
+        return;
+      }
+
       const data = await res.json();
       const saved = data.data[0];
 
@@ -343,7 +471,12 @@ export default function Quiz() {
       setReviewFilter("all");
       setPhase(PHASE.RESULTS, saved); // pass saved so setPhase has _id
     } catch (e) {
-      console.error("viewResult:", e);
+      const type = resolveErrorType(e);
+      if (type === ERROR_TYPES.NETWORK) {
+        setPageError(ERROR_TYPES.NETWORK);
+      } else {
+        console.error("viewResult:", e);
+      }
     }
   };
 
@@ -352,16 +485,37 @@ export default function Quiz() {
     clearInterval(timerRef.current);
 
     try {
-      await apiFetch(`${BASE_URL}/api/quiz/${quizData._id}/submit`, {
+      const res = await apiFetch(`/api/quiz/${quizData._id}/submit`, {
         method: "PATCH",
         body: JSON.stringify({ answers }),
       });
+
+      // ── Auth errors → redirect + toast ──────────────────────────
+      if (res.status === 401) {
+        notifyError("Session expired. Sign in again.");
+        navigate("/login");
+        return;
+      }
+      if (res.status === 403) {
+        setPageError(ERROR_TYPES.FORBIDDEN);
+        return;
+      }
+      // ── Server errors → full-page error ─────────────────────────
+      if (res.status >= 500) {
+        setPageError(ERROR_TYPES.SERVER_ERROR);
+        return;
+      }
+      if (!res.ok) {
+        setPageError(ERROR_TYPES.UNKNOWN);
+        return;
+      }
+
       fetchAllQuizzes();
+      setPhase(PHASE.RESULTS);
     } catch (e) {
       console.error("submitQuiz:", e);
+      setPhase(PHASE.RESULTS); // still show results on network error
     }
-
-    setPhase(PHASE.RESULTS);
   };
 
   // ─── SCORE CALC ──────────────────────────────────────────────────
