@@ -529,6 +529,9 @@ export default function Quiz() {
   };
 
   // ─── RENDER ──────────────────────────────────────────────────────
+
+  if (pageError) return <ErrorPage type={pageError} />;  
+  
   return (
     <div className={styles.app}>
       {/* ── HOME ─────────────────────────────────────────────────── */}
