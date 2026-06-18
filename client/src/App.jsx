@@ -57,18 +57,16 @@ const App = () => {
         />
 
         <Route
-          element={<AppShell />}
+          element={<ProtectedRoute component={<AppShell />} />}
           errorElement={<RouteErrorPage />}
         >
           <Route path='/dashboard' element={<ProtectedRoute component={<Dashboard/>}/>} />
-          {/* <Route
-            path="/dashboard"
-            element={<Dashboard />}
-          /> */}
+
           <Route path="/notes" element={<ProtectedRoute component={<Notes />} />} />
           <Route path="/notes/new" element={<ProtectedRoute component={<Notes />} />} />
           <Route path="/notes/:id" element={<ProtectedRoute component={<Notes />} />} />
           <Route path="/notes/:id/edit" element={<ProtectedRoute component={<Notes />} />} />
+          
           <Route
             path="/quiz"
             element={<ProtectedRoute component={<Quiz />} />}
