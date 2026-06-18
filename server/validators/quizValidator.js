@@ -20,12 +20,7 @@ export const quizValidator = z.object({
 });
 
 export const answersValidator = z.object({
-    answers: z.array(
-        z.object({
-            questionId: z.string().min(1),
-            answer: z.string().min(1),
-        })
-    ).min(1),
+    answers: z.array(z.string().min(1)).min(1),
 });
 
 export const generateQuizFromFilesValidator = z.object({
