@@ -1,8 +1,13 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
-import BASE_URL from "../lib/api.js";
+import BASE_URL, { apiFetch } from "../lib/api.js";
 import styles from "./styles/Quiz.module.css";
+
+// ── Error system imports ───────────────────────────────────────────────────────
+import ErrorPage from "../errors/components/ErrorPage.jsx";
+import { ERROR_TYPES, resolveErrorType } from "../errors/config/errorConfig.js";
+import useErrorHandler from "../errors/hooks/useErrorHandler.jsx";
 
 // ─── PHASE CONSTANTS ───────────────────────────────────────────────
 const PHASE = {
@@ -98,6 +103,7 @@ export default function Quiz() {
 
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { notifyError, notifySuccess } = useErrorHandler();
 
   // ─── GLOBAL STATE ──────────────────────────────────────────────
   // Init phase from URL on mount
@@ -143,11 +149,11 @@ export default function Quiz() {
   const [error, setError] = useState("");
   const [dragover, setDragover] = useState(false);
   const [reviewFilter, setReviewFilter] = useState("all");
+  const [pageError, setPageError] = useState(null); 
 
   const timerRef = useRef(null);
   const loaderRef = useRef(null);
   const quizDataRef = useRef(quizData);
-  const token = localStorage.getItem("token");
 
   // Keep ref in sync so setPhase closure always has latest quizData
   useEffect(() => {
@@ -176,19 +182,46 @@ export default function Quiz() {
     const p = location.pathname;
 
     if (p.startsWith("/quiz/results") && !quizData) {
-      fetch(`${BASE_URL}/api/quiz/${urlId}/result`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-        .then((r) => r.json())
-        .then((data) => {
+      (async () => {
+        try {
+          const r = await apiFetch(`/api/quiz/${urlId}/result`);
+
+          // ── Auth errors → redirect + toast ────────────────────────
+          if (r.status === 401) {
+            notifyError("Session expired. Sign in again.");
+            navigate("/login");
+            return;
+          }
+          if (r.status === 403) {
+            setPageError(ERROR_TYPES.FORBIDDEN);
+            return;
+          }
+          // ── Server errors → full-page error ───────────────────────
+          if (r.status >= 500) {
+            setPageError(ERROR_TYPES.SERVER_ERROR);
+            return;
+          }
+          if (!r.ok) {
+            setPageError(ERROR_TYPES.UNKNOWN);
+            return;
+          }
+
+          const data = await r.json();
           const saved = data.data[0];
           setQuizData(saved);
           setAnswers(saved.questions.map((q) => q.userResponse ?? null));
           setElapsedSec(0);
           setReviewFilter("all");
           setPhaseRaw(PHASE.RESULTS); // raw — URL already correct
-        })
-        .catch(console.error);
+        } catch (err) {
+          const type = resolveErrorType(err);
+          if (type === ERROR_TYPES.NETWORK) {
+            setPageError(ERROR_TYPES.NETWORK);
+          } else {
+            console.error(err);
+          }
+        }
+      })();
     }
 
     if (p.startsWith("/quiz/take") && !quizData) {
@@ -201,30 +234,72 @@ export default function Quiz() {
   // ─── FETCH ALL QUIZZES (history) ────────────────────────────────
   const fetchAllQuizzes = useCallback(async () => {
     try {
-      const res = await fetch(`${BASE_URL}/api/quiz/all`, {
-        method: "GET",
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const data = await res.json();
-      console.log(data);
+      const res = await apiFetch(`/api/quiz/all`);
 
+      // ── Auth errors → redirect + toast ──────────────────────────
+      if (res.status === 401) {
+        notifyError("Session expired. Sign in again.");
+        navigate("/login");
+        return;
+      }
+      if (res.status === 403) {
+        setPageError(ERROR_TYPES.FORBIDDEN);
+        return;
+      }
+      // ── Server errors → full-page error ─────────────────────────
+      if (res.status >= 500) {
+        setPageError(ERROR_TYPES.SERVER_ERROR);
+        return;
+      }
+      if (!res.ok) {
+        setPageError(ERROR_TYPES.UNKNOWN);
+        return;
+      }
+
+      const data = await res.json();
       if (data.data) setAllQuizzes(data.data);
     } catch (e) {
-      console.error("fetchAllQuizzes:", e);
+      const type = resolveErrorType(e);
+      if (type === ERROR_TYPES.NETWORK) {
+        setPageError(ERROR_TYPES.NETWORK);
+      } else {
+        console.error("fetchAllQuizzes:", e);
+      }
     }
-  }, [token]);
+  }, []);
 
   const deleteQuiz = async (id) => {
     try {
-      await fetch(`${BASE_URL}/api/quiz/${id}`, {
+      const res = await apiFetch(`/api/quiz/${id}`, {
         method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
       });
+
+      // ── Auth errors → redirect + toast ──────────────────────────
+      if (res.status === 401) {
+        notifyError("Session expired. Sign in again.");
+        navigate("/login");
+        return;
+      }
+      if (res.status === 403) {
+        setPageError(ERROR_TYPES.FORBIDDEN);
+        return;
+      }
+      // ── Server errors → full-page error ─────────────────────────
+      if (res.status >= 500) {
+        setPageError(ERROR_TYPES.SERVER_ERROR);
+        return;
+      }
+      if (!res.ok) {
+        setPageError(ERROR_TYPES.UNKNOWN);
+        return;
+      }
+
       setAllQuizzes((prev) => prev.filter((q) => q._id !== id));
     } catch (e) {
       console.error("deleteQuiz:", e);
+    } finally {
+      setOpenMenuId(null);
     }
-    setOpenMenuId(null);
   };
 
   useEffect(() => {
@@ -297,9 +372,8 @@ export default function Quiz() {
         fd.append("types", JSON.stringify(selectedTypes));
         fd.append("total", totalQuestions);
 
-        res = await fetch(`${BASE_URL}/api/quiz/generate/file`, {
+        res = await apiFetch(`/api/quiz/generate/file`, {
           method: "POST",
-          headers: { Authorization: `Bearer ${token}` },
           body: fd,
         });
       } else {
@@ -307,12 +381,8 @@ export default function Quiz() {
           (q) => ({ type: q.id, count: typeCounts[q.id] }),
         );
 
-        res = await fetch(`${BASE_URL}/api/quiz/generate`, {
+        res = await apiFetch(`/api/quiz/generate`, {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
           body: JSON.stringify({
             topic,
             subject,
@@ -324,15 +394,39 @@ export default function Quiz() {
         });
       }
 
-      if (!res.ok) throw new Error("API error");
+      // ── Auth errors → redirect + toast ──────────────────────────
+      if (res.status === 401) {
+        notifyError("Session expired. Sign in again.");
+        navigate("/login");
+        return;
+      }
+      if (res.status === 403) {
+        setPageError(ERROR_TYPES.FORBIDDEN);
+        return;
+      }
+      // ── Server errors → full-page error ─────────────────────────
+      if (res.status >= 500) {
+        setPageError(ERROR_TYPES.SERVER_ERROR);
+        return;
+      }
+      if (!res.ok) {
+        setError("Generation failed. Check your connection or API.");
+        setPhase(PHASE.STEP3);
+        return;
+      }
 
       const data = await res.json();
       startQuiz(data.data);
       fetchAllQuizzes();
     } catch (e) {
-      console.error(e);
-      setError("Generation failed. Check your connection or API.");
-      setPhase(PHASE.STEP3);
+      const type = resolveErrorType(e);
+      if (type === ERROR_TYPES.NETWORK) {
+        setPageError(ERROR_TYPES.NETWORK);
+      } else {
+        console.error(e);
+        setError("Generation failed. Check your connection or API.");
+        setPhase(PHASE.STEP3);
+      }
     }
   };
 
@@ -344,11 +438,31 @@ export default function Quiz() {
     setPhase(PHASE.QUIZ, doc); // pass doc so setPhase has _id immediately
   };
 
+
   const viewResult = async (doc) => {
     try {
-      const res = await fetch(`${BASE_URL}/api/quiz/${doc._id}/result`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await apiFetch(`/api/quiz/${doc._id}/result`);
+
+      // ── Auth errors → redirect + toast ──────────────────────────
+      if (res.status === 401) {
+        notifyError("Session expired. Sign in again.");
+        navigate("/login");
+        return;
+      }
+      if (res.status === 403) {
+        setPageError(ERROR_TYPES.FORBIDDEN);
+        return;
+      }
+      // ── Server errors → full-page error ─────────────────────────
+      if (res.status >= 500) {
+        setPageError(ERROR_TYPES.SERVER_ERROR);
+        return;
+      }
+      if (!res.ok) {
+        setPageError(ERROR_TYPES.UNKNOWN);
+        return;
+      }
+
       const data = await res.json();
       const saved = data.data[0];
 
@@ -358,7 +472,12 @@ export default function Quiz() {
       setReviewFilter("all");
       setPhase(PHASE.RESULTS, saved); // pass saved so setPhase has _id
     } catch (e) {
-      console.error("viewResult:", e);
+      const type = resolveErrorType(e);
+      if (type === ERROR_TYPES.NETWORK) {
+        setPageError(ERROR_TYPES.NETWORK);
+      } else {
+        console.error("viewResult:", e);
+      }
     }
   };
 
@@ -367,20 +486,37 @@ export default function Quiz() {
     clearInterval(timerRef.current);
 
     try {
-      await fetch(`${BASE_URL}/api/quiz/${quizData._id}/submit`, {
+      const res = await apiFetch(`/api/quiz/${quizData._id}/submit`, {
         method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
         body: JSON.stringify({ answers }),
       });
+
+      // ── Auth errors → redirect + toast ──────────────────────────
+      if (res.status === 401) {
+        notifyError("Session expired. Sign in again.");
+        navigate("/login");
+        return;
+      }
+      if (res.status === 403) {
+        setPageError(ERROR_TYPES.FORBIDDEN);
+        return;
+      }
+      // ── Server errors → full-page error ─────────────────────────
+      if (res.status >= 500) {
+        setPageError(ERROR_TYPES.SERVER_ERROR);
+        return;
+      }
+      if (!res.ok) {
+        setPageError(ERROR_TYPES.UNKNOWN);
+        return;
+      }
+
       fetchAllQuizzes();
+      setPhase(PHASE.RESULTS);
     } catch (e) {
       console.error("submitQuiz:", e);
+      setPhase(PHASE.RESULTS); // still show results on network error
     }
-
-    setPhase(PHASE.RESULTS);
   };
 
   // ─── SCORE CALC ──────────────────────────────────────────────────
@@ -394,6 +530,9 @@ export default function Quiz() {
   };
 
   // ─── RENDER ──────────────────────────────────────────────────────
+
+  if (pageError) return <ErrorPage type={pageError} />;  
+  
   return (
     <div className={styles.app}>
       {/* ── HOME ─────────────────────────────────────────────────── */}
