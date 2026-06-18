@@ -95,7 +95,6 @@ const getQuizById = asyncHandler(async (req, res) => {
 })
 
 const submitQuizAnswers = asyncHandler(async (req, res) => {
-    console.log(req.body);
     
     const { data, error } = answersValidator.safeParse(req.body)
 
