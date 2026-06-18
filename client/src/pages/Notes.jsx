@@ -1,5 +1,6 @@
 import React, { useRef, useState, useEffect } from "react";
-import BASE_URL from "../lib/api.js";
+import { useLocation, useParams, useNavigate } from "react-router-dom";
+import BASE_URL, { apiFetch } from "../lib/api.js";
 import { jsPDF } from "jspdf";
 import styles from "./styles/notes.module.css";
 import ReactMarkdown from "react-markdown";
@@ -7,6 +8,11 @@ import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
 import html2canvas from "html2canvas";
 import { getSocket, connectSocket } from "../lib/socket.js";
+
+// ── Error system imports ───────────────────────────────────────────────────────
+import ErrorPage from "../errors/components/ErrorPage.jsx";
+import { ERROR_TYPES, resolveErrorType } from "../errors/config/errorConfig.js";
+import useErrorHandler from "../errors/hooks/useErrorHandler.jsx";
 
 export const LLMMarkdown = ({ content }) => {
   return (
@@ -416,7 +422,6 @@ export const NoteInputForm = ({
 ═══════════════════════════════════════════════════════════════ */
 const Notes = () => {
   const [isCopied, setIsCopied] = useState(false);
-  const [editId, setEditId] = useState("");
   const [editValue, setEditValue] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -425,17 +430,29 @@ const Notes = () => {
   const [notes, setNotes] = useState([]);
   const [fetchError, setFetchError] = useState("");
   const [fetching, setFetching] = useState(false);
-  const [activeNoteId, setActiveNoteId] = useState(null);
   const [showInputForm, setShowInputForm] = useState(false);
   const [generatedIds, setGeneratedIds] = useState(new Set());
   const [toast, setToast] = useState(null);
-  const [panelView, setPanelView] = useState("welcome");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   // ── NEW: mobile drawer state ──
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const noteDocRef = useRef(null);
   const inputRef = useRef(null);
-  const token = localStorage.getItem("token");
+
+  const location = useLocation();
+  const { id } = useParams();
+  const navigate = useNavigate();
+
+  const activeNoteId = id || null;
+  const panelView = location.pathname === "/notes/new"
+    ? "form"
+    : id && location.pathname.endsWith("/edit")
+      ? "form"
+      : id
+        ? "note"
+        : "welcome";
+
+  const editId = location.pathname.endsWith("/edit") ? id : "";
 
   // ── NEW: lock body scroll when mobile drawer is open ──
   useEffect(() => {
@@ -453,11 +470,10 @@ const Notes = () => {
     socket.on("ai-response", (data) => {
       const { title, summary, keyPoints, _id, isPinned } = data;
       setSummaryData({ title, summary, keyPoints, _id, isPinned });
-      setActiveNoteId(_id);
       setGeneratedIds((prev) => new Set(prev).add(_id));
       showToast("Note created!");
       fetchNotes();
-      setPanelView("note");
+      navigate(`/notes/${_id}`);
     });
 
     return () => socket.off("ai_response");
@@ -477,12 +493,8 @@ const Notes = () => {
 
     if (editId) {
       try {
-        const res = await fetch(`${BASE_URL}/api/notes/${editId}`, {
+        const res = await apiFetch(`/api/notes/${editId}`, {
           method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
           body: JSON.stringify({ content }),
         });
         if (!res.ok) throw new Error("Update failed");
@@ -498,12 +510,8 @@ const Notes = () => {
       }
     } else {
       try {
-        const res = await fetch(`${BASE_URL}/api/notes`, {
+        const res = await apiFetch("/api/notes", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
           body: JSON.stringify({ content }),
         });
         if (!res.ok) throw new Error("Summarisation failed. Try again.");
@@ -529,13 +537,7 @@ const Notes = () => {
   const fetchNotes = async () => {
     setFetching(true);
     try {
-      const res = await fetch(`${BASE_URL}/api/notes`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const res = await apiFetch("/api/notes");
       if (!res.ok) throw new Error("Failed to fetch notes");
       const data = await res.json();
       setNotes(data.data);
@@ -548,19 +550,14 @@ const Notes = () => {
 
   const handleSubmitDelete = async (id) => {
     try {
-      const res = await fetch(`${BASE_URL}/api/notes/${id}`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
+      const res = await apiFetch(`/api/notes/${id}`, {
+        method: "DELETE", 
       });
       if (!res.ok) throw new Error("Delete failed");
       showToast("Note deleted");
       if (activeNoteId === id) {
-        setActiveNoteId(null);
         setSummaryData(null);
-        setPanelView("welcome");
+        navigate("/notes");
       }
       await fetchNotes();
     } catch (err) {
@@ -569,16 +566,16 @@ const Notes = () => {
   };
 
   const handleSubmitEdit = (note) => {
-    setEditId(note._id);
     setContent(note.summary);
-    setPanelView("form");
+    navigate(`/notes/${note._id}/edit`);
     setTimeout(() => inputRef.current?.focus(), 100);
   };
 
   const handleCancelEdit = () => {
     setEditId("");
     setContent("");
-    setPanelView(activeNoteId ? "note" : "welcome");
+    navigate(activeNoteId ? `/notes/${activeNoteId}` : "/notes");
+
   };
 
   const handleCopy = async (note) => {
@@ -692,22 +689,16 @@ const Notes = () => {
   };
 
   const handleSidebarNoteClick = (note) => {
-    setActiveNoteId(note._id);
     setSummaryData(note);
-    setEditId("");
     setContent("");
-    setPanelView("note");
-    // ── NEW: close mobile drawer after selecting a note ──
+    navigate(`/notes/${note._id}`);
     setMobileSidebarOpen(false);
   };
 
   const handleNewNote = () => {
-    setActiveNoteId(null);
     setSummaryData(null);
-    setEditId("");
     setContent("");
-    setPanelView("form");
-    // ── NEW: close mobile drawer after tapping new note ──
+    navigate("/notes/new");
     setMobileSidebarOpen(false);
   };
 
