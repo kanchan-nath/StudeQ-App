@@ -4,14 +4,14 @@ export const extractJSON = (raw) => {
     }
 
     let cleaned = raw.replace(/```(?:json)?\n?/gi, "").trim()
-    const arrayMatch = cleaned.match(/(\[[\s\S]*\])/)
     const objectMatch = cleaned.match(/(\{[\s\S]*\})/)
-    const jsonStr = arrayMatch?.[1] || objectMatch?.[1]
+    const arrayMatch = cleaned.match(/(\[[\s\S]*\])/)
+    const jsonStr = objectMatch?.[1] || arrayMatch?.[1]
+
     if (!jsonStr) throw new Error("No valid JSON structure found in model response")
 
     try {
         return JSON.parse(jsonStr)
-
     } catch (error) {
         throw new Error(`JSON parse failed: ${error.message}. Raw: ${raw.slice(0, 200)}`)
     }
