@@ -61,36 +61,39 @@ const vectorDB = async (file, userId, documentId) => {
     await ns.upsert( {records} )
     logger.info(`Upserted ${records.length} chunks for document ${documentId} (user ${userId})`)
     
+    return chunks.length
 }
 
-const deleteDocumentVectors = async(userId, documentId, chunkCount)=>{
+const deleteDocumentVectors = async (userId, documentId, chunkCount) => {
     const index = getIndex()
     const ns = index.namespace(getNamespace(userId))
-    const ids = Array.from({ length: chunkCount }, (_, i) => `${documentId}_chunk_${i}`)
 
-    await ns.deleteMany(ids)
+    if (chunkCount) {
+        const ids = Array.from({ length: chunkCount }, (_, i) => `${documentId}_chunk_${i}`)
+        await ns.deleteMany(ids)
+    } else {
+        await ns.deleteMany({ filter: { documentId: { "$eq": String(documentId) } } })
+    }
 }
 
-const queryDB = async(query, userId)=>{
+const queryDB = async (query, userId, documentId) => {
+    if (!documentId) {
+        throw new Error("queryDB: documentId required to scope search to single document")
+    }
+
     const index = getIndex()
-
     const ns = index.namespace(getNamespace(userId))
-
     const queryVector = await embedText(query)
 
     const results = await ns.query({
         vector: queryVector,
         topK: 5,
-        includeMetadata: true
+        includeMetadata: true,
+        filter: { documentId: { "$eq": documentId } }
     })
-    logger.info(`queryDB: ${results.matches.length} matches for user ${userId}`)
 
-    return results.matches.map((m)=>(
-        {
-            text: m.metadata.text,
-            documentId: m.metadata.documentId,
-            score: m.score
-        }
-    ))    
-}
+    logger.info(`queryDB: ${results.matches.length} matches for user ${userId}, doc ${documentId}`)
+
+    return results.matches.map(m => m.metadata.text)
+}   
 export  {vectorDB, queryDB, deleteDocumentVectors}

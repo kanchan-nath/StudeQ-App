@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import BASE_URL from "../lib/api.js";
+import BASE_URL, { apiFetch } from "../lib/api.js";
 import styles from "./styles/Notebook.module.css";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -8,6 +8,10 @@ import rehypeRaw from "rehype-raw";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 import "katex/dist/katex.min.css";
+import ErrorPage from "../errors/components/ErrorPage.jsx";
+import { ERROR_TYPES, resolveErrorType } from "../errors/config/errorConfig.js";
+import useErrorHandler from "../errors/hooks/useErrorHandler.jsx";
+
 // ── Toast helper ──────────────────────────────────────────────────────────────
 const Toast = ({ toasts, removeToast }) => (
   <div className={styles.toastStack}>
@@ -151,7 +155,10 @@ const Notebook = () => {
   const inputRef = useRef(null);
   const fileInputRef = useRef(null);
   const messagesEndRef = useRef(null);
-  const token = localStorage.getItem("token");
+
+  const { notifyError, notifySuccess } = useErrorHandler();
+  const [pageError, setPageError] = useState(null); 
+
 
   // ── Theme ──────────────────────────────────────────────────────────────────
   useEffect(() => {
@@ -188,10 +195,10 @@ const Notebook = () => {
   // ── Restore state on reload (chatId exists but inputFileResult is empty) ──
   useEffect(() => {
     if (!chatId || allChats.length === 0) return;
-    if (inputFileResult?.id) return; // already set
+    if (inputFileResult?._id) return; // already set
     const found = allChats.find((c) => (c._id || c.id) === chatId);
     if (found) {
-      setInputFileResult({ id: found._id, chatRoomKey: found.chatRoomKey });
+      setInputFileResult(found);
     }
   }, [chatId, allChats]);
 
@@ -206,6 +213,7 @@ const Notebook = () => {
   };
 
   // ── Upload submit ──────────────────────────────────────────────────────────
+  // ── Upload submit ──────────────────────────────────────────────────────────
   const handleClickSubmit = async () => {
     if (!inputFile) {
       pushToast("Please select a file first.", "error");
@@ -217,36 +225,77 @@ const Notebook = () => {
 
     if (editId) {
       try {
-        const res = await fetch(
-          `${BASE_URL}/api/documents/${inputFileResult.id}/chat/${inputFileResult.chatRoomKey}/${editId}`,
+        const res = await apiFetch(
+          `/api/documents/${inputFileResult._id}/chat/${inputFileResult.docId}/${editId}`,
           {
             method: "PATCH",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify(inputFile),
+            body: JSON.stringify({query}),
           },
         );
-        if (!res.ok) throw new Error("Edit failed, try again.");
+
+        // ── Auth errors → redirect + toast ──────────────────────────
+        if (res.status === 401) {
+          notifyError("Session expired. Sign in again.");
+          navigate("/login");
+          return;
+        }
+        if (res.status === 403) {
+          setPageError(ERROR_TYPES.FORBIDDEN);
+          return;
+        }
+        // ── Server errors → full-page error ───────────────────────
+        if (res.status >= 500) {
+          setPageError(ERROR_TYPES.SERVER_ERROR);
+          return;
+        }
+        if (!res.ok) {
+          pushToast("Edit failed, try again.", "error");
+          return;
+        }
+
         const data = await res.json();
         setInputFileResult(data.data);
         fetchAllChats();
         pushToast("Document updated successfully.");
       } catch (err) {
-        pushToast(err.message, "error");
+        const type = resolveErrorType(err);
+        if (type === ERROR_TYPES.NETWORK) {
+          setPageError(ERROR_TYPES.NETWORK);
+        } else {
+          pushToast(err.message, "error");
+        }
       } finally {
         setLoading(false);
       }
     } else {
       try {
-        const res = await fetch(`${BASE_URL}/api/documents/upload`, {
+        const res = await apiFetch(`/api/documents/upload`, {
           method: "POST",
-          headers: { Authorization: `Bearer ${token}` },
           body: formData,
         });
-        if (!res.ok) throw new Error("File upload failed.");
+
+        // ── Auth errors → redirect + toast ──────────────────────────
+        if (res.status === 401) {
+          notifyError("Session expired. Sign in again.");
+          navigate("/login");
+          return;
+        }
+        if (res.status === 403) {
+          setPageError(ERROR_TYPES.FORBIDDEN);
+          return;
+        }
+        // ── Server errors → full-page error ───────────────────────
+        if (res.status >= 500) {
+          setPageError(ERROR_TYPES.SERVER_ERROR);
+          return;
+        }
+        if (!res.ok) {
+          pushToast("File upload failed.", "error");
+          return;
+        }
+
         const data = await res.json();
+        
         setInputFileResult(data.data);
         setInputFile(null);
         fetchAllChats();
@@ -254,7 +303,12 @@ const Notebook = () => {
         // Navigate to chatroom route — this is what switches the view
         navigate(`/notebook/${data.data._id}`);
       } catch (err) {
-        pushToast(err.message, "error");
+        const type = resolveErrorType(err);
+        if (type === ERROR_TYPES.NETWORK) {
+          setPageError(ERROR_TYPES.NETWORK);
+        } else {
+          pushToast(err.message, "error");
+        }
       } finally {
         setLoading(false);
       }
@@ -287,21 +341,41 @@ const Notebook = () => {
     setEditingMessageId(null);
 
     try {
-      const res = await fetch(
-        `${BASE_URL}/api/documents/${inputFileResult.id}/chat/${inputFileResult.chatRoomKey}`,
+      const res = await apiFetch(
+        `/api/documents/${inputFileResult._id}/chat/${inputFileResult.docId}`,
         {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
           body: JSON.stringify({ query }),
         },
       );
-      if (!res.ok) throw new Error("Message failed, try again.");
+      // ── Auth errors → redirect + toast ──────────────────────────
+      if (res.status === 401) {
+        notifyError("Session expired. Sign in again.");
+        navigate("/login");
+        return;
+      }
+      if (res.status === 403) {
+        setPageError(ERROR_TYPES.FORBIDDEN);
+        return;
+      }
+      // ── Server errors → full-page error ───────────────────────
+      if (res.status >= 500) {
+        setPageError(ERROR_TYPES.SERVER_ERROR);
+        return;
+      }
+      if (!res.ok) {
+        pushToast("Message failed, try again.", "error");
+        return;
+      }
+
       await fetchAllMessages();
     } catch (err) {
-      pushToast(err.message, "error");
+      const type = resolveErrorType(err);
+      if (type === ERROR_TYPES.NETWORK) {
+        setPageError(ERROR_TYPES.NETWORK);
+      } else {
+        pushToast(err.message, "error");
+      }
     } finally {
       setLoadingQuery(false);
     }
@@ -309,53 +383,110 @@ const Notebook = () => {
 
   // ── Fetch messages ─────────────────────────────────────────────────────────
   const fetchAllMessages = async () => {
-    if (!inputFileResult?.id) return;
+    if (!inputFileResult?._id) return;
     try {
-      const res = await fetch(
-        `${BASE_URL}/api/documents/${inputFileResult.id}/chat/${inputFileResult.chatRoomKey}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
-      if (!res.ok) throw new Error("Failed to load messages.");
+      
+      const res = await apiFetch(
+        `/api/documents/${inputFileResult._id}/chat/${inputFileResult.docId}`);
+
+      // ── Auth errors → redirect + toast ──────────────────────────
+      if (res.status === 401) {
+        notifyError("Session expired. Sign in again.");
+        navigate("/login");
+        return;
+      }
+      if (res.status === 403) {
+        setPageError(ERROR_TYPES.FORBIDDEN);
+        return;
+      }
+      // ── Server errors → full-page error ───────────────────────
+      if (res.status >= 500) {
+        setPageError(ERROR_TYPES.SERVER_ERROR);
+        return;
+      }
+      if (!res.ok) {
+        pushToast("Failed to load messages.", "error");
+        return;
+      }
+
       const data = await res.json();
-      setResult(data.data);
+      console.log("Data:",data.data);
+      
+      setResult([data.data]);
     } catch (err) {
-      pushToast(err.message, "error");
+      const type = resolveErrorType(err);
+      if (type === ERROR_TYPES.NETWORK) {
+        setPageError(ERROR_TYPES.NETWORK);
+      } else {
+        pushToast(err.message, "error");
+      }
     }
   };
 
   // ── Fetch all chats (sidebar) ──────────────────────────────────────────────
   const fetchAllChats = async () => {
     try {
-      const res = await fetch(`${BASE_URL}/api/documents/chat/all`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      if (!res.ok) throw new Error("Failed to load chat history.");
-      const data = await res.json();
+      const res = await apiFetch(`/api/documents/chat/all`);
 
+      // ── Auth errors → redirect + toast ──────────────────────────
+      if (res.status === 401) {
+        notifyError("Session expired. Sign in again.");
+        navigate("/login");
+        return;
+      }
+      if (res.status === 403) {
+        setPageError(ERROR_TYPES.FORBIDDEN);
+        return;
+      }
+      // ── Server errors → full-page error ───────────────────────
+      if (res.status >= 500) {
+        setPageError(ERROR_TYPES.SERVER_ERROR);
+        return;
+      }
+      if (!res.ok) {
+        pushToast("Failed to load chat history.", "error");
+        return;
+      }
+
+      const data = await res.json();
       setAllChats(data.data || []);
     } catch (err) {
-      pushToast(err.message, "error");
+      const type = resolveErrorType(err);
+      if (type === ERROR_TYPES.NETWORK) {
+        setPageError(ERROR_TYPES.NETWORK);
+      } else {
+        pushToast(err.message, "error");
+      }
     }
   };
 
   // ── Delete chat ────────────────────────────────────────────────────────────
   const handleDeleteChat = async (chat) => {
     try {
-      const res = await fetch(`${BASE_URL}/api/documents/${chat._id}`, {
+      const res = await apiFetch(`/api/documents/${chat._id}`, {
         method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
       });
-      if (!res.ok) throw new Error("Delete failed.");
+
+      // ── Auth errors → redirect + toast ──────────────────────────
+      if (res.status === 401) {
+        notifyError("Session expired. Sign in again.");
+        navigate("/login");
+        return;
+      }
+      if (res.status === 403) {
+        setPageError(ERROR_TYPES.FORBIDDEN);
+        return;
+      }
+      // ── Server errors → full-page error ───────────────────────
+      if (res.status >= 500) {
+        setPageError(ERROR_TYPES.SERVER_ERROR);
+        return;
+      }
+      if (!res.ok) {
+        pushToast("Delete failed.", "error");
+        return;
+      }
+
       pushToast("Chat deleted.");
       fetchAllChats();
       // If deleted chat is the currently open one, go back to upload view
@@ -365,22 +496,28 @@ const Notebook = () => {
         setInputFileResult({});
       }
     } catch (err) {
-      pushToast(err.message, "error");
+      const type = resolveErrorType(err);
+      if (type === ERROR_TYPES.NETWORK) {
+        setPageError(ERROR_TYPES.NETWORK);
+      } else {
+        pushToast(err.message, "error");
+      }
     }
   };
 
   // ── Select chat from sidebar ───────────────────────────────────────────────
   const handleSelectChat = (chat) => {
-    setInputFileResult({ id: chat._id, chatRoomKey: chat.chatRoomKey });
+    setInputFileResult(chat);
     navigate(`/notebook/${chat._id}`);
   };
 
   useEffect(() => {
-    if (inputFileResult?.id) fetchAllMessages();
-  }, [inputFileResult?.id]);
+    if (inputFileResult?._id) fetchAllMessages();
+  }, [inputFileResult?._id]);
 
   useEffect(() => {
     fetchAllChats();
+    
   }, []);
 
   // ── Edit click ─────────────────────────────────────────────────────────────
@@ -409,6 +546,15 @@ const Notebook = () => {
   const flatMessages = result.flatMap((r) => r.messages || []);
 
   // ── Render ─────────────────────────────────────────────────────────────────
+
+  if (pageError) {
+    return (
+      <ErrorPage
+        type={pageError}
+        onRetry={fetchAllChats}
+      />
+    );
+  }
   return (
     // FIX: root is now a flex row containing appShell + rightSidebar
     <div className={styles.root}>
