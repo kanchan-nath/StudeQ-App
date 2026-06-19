@@ -9,6 +9,10 @@ const documentsSchema = new mongoose.Schema({
         type:String,
         required: true
     },
+    chunkCount: {
+        type: Number,
+        default: 0
+    },
     mimeType:{
         type: String,
         required: true
