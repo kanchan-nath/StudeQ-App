@@ -85,12 +85,6 @@ const queryDB = async(query, userId)=>{
     })
     logger.info(`queryDB: ${results.matches.length} matches for user ${userId}`)
 
-    return results.matches.map((m)=>(
-        {
-            text: m.metadata.text,
-            documentId: m.metadata.documentId,
-            score: m.score
-        }
-    ))    
+    return results.matches.map(m => m.metadata.text)
 }
 export  {vectorDB, queryDB, deleteDocumentVectors}
