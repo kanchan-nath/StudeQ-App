@@ -22,12 +22,7 @@ const llmCall = async (query, topChunks, userId) => {
 
     const prompt = optimizedPrompt
         .replace("{{QUERY}}", query)
-        .replace("{{CHUNKS}}", chunksText)
-
-        // console.log("Prompt:",prompt);
-        // console.log("Chunks:",chunksText);
-        // console.log("Top Chunks:",topChunks);
-        
+        .replace("{{CHUNKS}}", chunksText)        
         
     let response
     try {
