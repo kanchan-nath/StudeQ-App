@@ -195,10 +195,10 @@ const Notebook = () => {
   // ── Restore state on reload (chatId exists but inputFileResult is empty) ──
   useEffect(() => {
     if (!chatId || allChats.length === 0) return;
-    if (inputFileResult?.id) return; // already set
+    if (inputFileResult?._id) return; // already set
     const found = allChats.find((c) => (c._id || c.id) === chatId);
     if (found) {
-      setInputFileResult({ id: found._id, chatRoomKey: found.chatRoomKey });
+      setInputFileResult(found);
     }
   }, [chatId, allChats]);
 
@@ -226,10 +226,10 @@ const Notebook = () => {
     if (editId) {
       try {
         const res = await apiFetch(
-          `/api/documents/${inputFileResult.id}/chat/${inputFileResult.chatRoomKey}/${editId}`,
+          `/api/documents/${inputFileResult._id}/chat/${inputFileResult.docId}/${editId}`,
           {
             method: "PATCH",
-            body: JSON.stringify(inputFile),
+            body: JSON.stringify({query}),
           },
         );
 
@@ -295,6 +295,7 @@ const Notebook = () => {
         }
 
         const data = await res.json();
+        
         setInputFileResult(data.data);
         setInputFile(null);
         fetchAllChats();
@@ -341,7 +342,7 @@ const Notebook = () => {
 
     try {
       const res = await apiFetch(
-        `/api/documents/${inputFileResult.id}/chat/${inputFileResult.chatRoomKey}`,
+        `/api/documents/${inputFileResult._id}/chat/${inputFileResult.docId}`,
         {
           method: "POST",
           body: JSON.stringify({ query }),
@@ -385,8 +386,9 @@ const Notebook = () => {
   const fetchAllMessages = async () => {
     if (!inputFileResult?.id) return;
     try {
+      
       const res = await apiFetch(
-        `/api/documents/${inputFileResult.id}/chat/${inputFileResult.chatRoomKey}`);
+        `/api/documents/${inputFileResult._id}/chat/${inputFileResult.docId}`);
 
       // ── Auth errors → redirect + toast ──────────────────────────
       if (res.status === 401) {
@@ -409,6 +411,8 @@ const Notebook = () => {
       }
 
       const data = await res.json();
+      console.log("Data:",data.data);
+      
       setResult(data.data);
     } catch (err) {
       const type = resolveErrorType(err);
@@ -504,16 +508,17 @@ const Notebook = () => {
 
   // ── Select chat from sidebar ───────────────────────────────────────────────
   const handleSelectChat = (chat) => {
-    setInputFileResult({ id: chat._id, chatRoomKey: chat.chatRoomKey });
+    setInputFileResult(chat);
     navigate(`/notebook/${chat._id}`);
   };
 
   useEffect(() => {
-    if (inputFileResult?.id) fetchAllMessages();
-  }, [inputFileResult?.id]);
+    if (inputFileResult?._id) fetchAllMessages();
+  }, [inputFileResult?._id]);
 
   useEffect(() => {
     fetchAllChats();
+    
   }, []);
 
   // ── Edit click ─────────────────────────────────────────────────────────────
