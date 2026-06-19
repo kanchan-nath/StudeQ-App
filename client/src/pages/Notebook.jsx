@@ -348,7 +348,6 @@ const Notebook = () => {
           body: JSON.stringify({ query }),
         },
       );
-
       // ── Auth errors → redirect + toast ──────────────────────────
       if (res.status === 401) {
         notifyError("Session expired. Sign in again.");
@@ -384,7 +383,7 @@ const Notebook = () => {
 
   // ── Fetch messages ─────────────────────────────────────────────────────────
   const fetchAllMessages = async () => {
-    if (!inputFileResult?.id) return;
+    if (!inputFileResult?._id) return;
     try {
       
       const res = await apiFetch(
@@ -413,7 +412,7 @@ const Notebook = () => {
       const data = await res.json();
       console.log("Data:",data.data);
       
-      setResult(data.data);
+      setResult([data.data]);
     } catch (err) {
       const type = resolveErrorType(err);
       if (type === ERROR_TYPES.NETWORK) {
