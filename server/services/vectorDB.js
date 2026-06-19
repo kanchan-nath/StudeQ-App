@@ -61,14 +61,19 @@ const vectorDB = async (file, userId, documentId) => {
     await ns.upsert( {records} )
     logger.info(`Upserted ${records.length} chunks for document ${documentId} (user ${userId})`)
     
+    return chunks.length
 }
 
-const deleteDocumentVectors = async(userId, documentId, chunkCount)=>{
+const deleteDocumentVectors = async (userId, documentId, chunkCount) => {
     const index = getIndex()
     const ns = index.namespace(getNamespace(userId))
-    const ids = Array.from({ length: chunkCount }, (_, i) => `${documentId}_chunk_${i}`)
 
-    await ns.deleteMany(ids)
+    if (chunkCount) {
+        const ids = Array.from({ length: chunkCount }, (_, i) => `${documentId}_chunk_${i}`)
+        await ns.deleteMany(ids)
+    } else {
+        await ns.deleteMany({ filter: { documentId: { "$eq": String(documentId) } } })
+    }
 }
 
 const queryDB = async (query, userId, documentId) => {
