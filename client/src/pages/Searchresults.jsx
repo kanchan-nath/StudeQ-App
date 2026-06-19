@@ -1,16 +1,20 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
-import BASE_URL from "../lib/api.js";
+import BASE_URL, { apiFetch } from "../lib/api.js";
 import styles from "./styles/SearchResults.module.css";
+import ErrorPage from "../errors/components/ErrorPage.jsx";
+import { ERROR_TYPES, resolveErrorType } from "../errors/config/errorConfig.js";
+import useErrorHandler from "../errors/hooks/useErrorHandler.jsx";
 
 // ─── Helpers ──────────────────────────────────────────────────
 
-async function fetchSearch(query, token) {
-  const res = await fetch(
-    `${BASE_URL}/api/search?query=${encodeURIComponent(query)}`,
-    { headers: { Authorization: `Bearer ${token}` } },
-  );
-  if (!res.ok) throw new Error(`Search failed: ${res.status}`);
+async function fetchSearch(query) {
+  const res = await apiFetch(`/api/search?query=${encodeURIComponent(query)}`);
+  if (!res.ok) {
+    const err = new Error(`Search failed: ${res.status}`);
+    err.status = res.status;   // ← caller can branch on this
+    throw err;
+  }
   const json = await res.json();
   return json.data;
 }
@@ -309,7 +313,7 @@ function OrganicResults({ results, savedLinks, onToggleSave, activeIndex }) {
   function handleCopy(e, link, idx) {
     e.preventDefault();
     e.stopPropagation();
-    navigator.clipboard.writeText(link).catch(() => {});
+    navigator.clipboard.writeText(link).catch(() => { });
     setCopiedIdx(idx);
     setTimeout(() => setCopiedIdx(null), 1500);
   }
@@ -630,6 +634,8 @@ export default function SearchResults() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [query, setQuery] = useState(urlQuery);
+  const { notifyError, notifySuccess } = useErrorHandler();
+  const [pageError, setPageError] = useState(null);
   const [filterChip, setFilterChip] = useState("All");
   const [dark, setDark] = useState(() => {
     return localStorage.getItem("sparke-theme");
@@ -663,9 +669,6 @@ export default function SearchResults() {
   const savedLinks = savedItems.map((i) => i.link);
 
   const [activeResultIndex, setActiveResultIndex] = useState(-1);
-
-  const token =
-    typeof window !== "undefined" ? localStorage.getItem("token") || "" : "";
 
   // Apply theme
   useEffect(() => {
@@ -718,10 +721,30 @@ export default function SearchResults() {
     setSearchParams(params, { replace: true });
 
     try {
-      const result = await fetchSearch(q, token);
+      const result = await fetchSearch(q);
       setData(result);
     } catch (err) {
-      setError(err.message);
+      // ── Auth → toast + redirect (don't show banner, we're leaving) ──
+      if (err.status === 401) {
+        notifyError("Session expired. Sign in again.");
+        navigate("/login");
+        return;
+      }
+
+      // ── Forbidden → toast only ───────────────────────────────────────
+      if (err.status === 403) {
+        notifyError("Access denied.");
+        setError("You don't have permission to use search.");
+        return;
+      }
+
+      // ── Network vs server → inline banner ───────────────────────────
+      const type = resolveErrorType(err);
+      if (type === ERROR_TYPES.NETWORK) {
+        setError("No internet connection. Check network and try again.");
+      } else {
+        setError(err.message || "Search failed. Try again.");
+      }
     } finally {
       setLoading(false);
     }
@@ -746,13 +769,13 @@ export default function SearchResults() {
       );
       const item = match
         ? {
-            link,
-            title: match.title,
-            snippet: match.snippet,
-            displayed_link: match.displayed_link,
-            favicon: match.favicon,
-            date: match.date,
-          }
+          link,
+          title: match.title,
+          snippet: match.snippet,
+          displayed_link: match.displayed_link,
+          favicon: match.favicon,
+          date: match.date,
+        }
         : { link, title: link, snippet: "", displayed_link: link };
       return [...prev, item];
     });
@@ -776,6 +799,14 @@ export default function SearchResults() {
   const googleUrl = google?.search_metadata?.google_url;
   const youtubeUrl = youtube?.search_metadata?.youtube_url;
 
+  if (pageError) {
+    return (
+      <ErrorPage
+        type={pageError}
+        onRetry={fetchData}
+      />
+    );
+  }
   return (
     <div className={styles.page}>
       {/* Search bar */}
