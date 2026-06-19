@@ -1,3 +1,6 @@
+import logger from "../logger/index.js"
+import {AIResponse} from "../models/aiResponse.model.js"
+
 export const logAIResponse = async (userId, prompt, rawResult, response) => {
     const { prompt_tokens, completion_tokens, total_tokens, total_time } = response.usage
 
