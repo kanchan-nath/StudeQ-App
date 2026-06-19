@@ -24,6 +24,11 @@ const llmCall = async (query, topChunks, userId) => {
         .replace("{{QUERY}}", query)
         .replace("{{CHUNKS}}", chunksText)
 
+        // console.log("Prompt:",prompt);
+        // console.log("Chunks:",chunksText);
+        // console.log("Top Chunks:",topChunks);
+        
+        
     let response
     try {
         response = await groq.chat.completions.create({
