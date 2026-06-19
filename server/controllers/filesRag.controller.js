@@ -7,6 +7,7 @@ import { v4 as uuid4 } from "uuid"
 import { ChatRoom } from "../models/chatRoom.model.js"
 import mongoose from "mongoose"
 import { ragQueryValidator } from "../validators/ragQuery.validator.js"
+import logger from "../logger/index.js"
 
 const isValidId = (id)=>{
     return mongoose.Types.ObjectId.isValid(id)
@@ -37,7 +38,8 @@ const uploadFile = asyncHandler(async (req, res) => {
 
     let data
     try {
-        await vectorDB(localFile, userId, documentId)
+        const chunkCount = await vectorDB(localFile, userId, documentId)
+        await Documents.findByIdAndUpdate(documentId, { chunkCount }) 
         data = await ChatRoom.create({
             userId,
             docId: documentId
@@ -227,20 +229,20 @@ const deleteChat = asyncHandler(async (req, res) => {
 
     const userId = req.user.id
 
-    const chatRoom = await ChatRoom.findOneAndDelete({ userId, _id: id })
+    const chatRoom = await ChatRoom.findOneAndDelete({ userId, _id: id })    
 
     if (!chatRoom) {
         throw new ApiError(404, "Chat not found")
     }
 
     if (chatRoom.docId) {
-        const documentId = chatRoom.docId.toString()
+        const documentId = chatRoom.docId
         Promise.all([
             Documents.findByIdAndDelete(documentId).catch(e =>
-                console.error("Doc metadata cleanup failed:", e)
+                logger.error("Doc metadata cleanup failed:", e)
             ),
             deleteDocumentVectors(userId, documentId).catch(e =>
-                console.error("Vector cleanup failed:", e)
+                logger.error("Vector cleanup failed:", e)
             )
         ])
     }
