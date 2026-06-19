@@ -56,14 +56,21 @@ const uploadFile = asyncHandler(async (req, res) => {
 })
 
 const askQuery = asyncHandler(async (req, res) => {
-    const { id } = req.params
+    const { id, docId } = req.params
     
     if (!id) {
         throw new ApiError(400, "Something went wrong")
     }
 
+    if (!docId) {
+        throw new ApiError(400, "Something went wrong")
+    }
+
     if(!isValidId(id)){
         throw new ApiError(400, "Invalid Id")
+    }
+    if (!isValidId(docId)) {
+        throw new ApiError(400, "Invalid Document Id")
     }
 
     const userId = req.user.id
@@ -75,9 +82,9 @@ const askQuery = asyncHandler(async (req, res) => {
     }
     const { query } = data    
 
-    const topChunks = await queryDB(query, userId)
+    const topChunks = await queryDB(query, userId, docId)
     const results = await llmCall(query, topChunks, userId)
-
+    
     await ChatRoom.findOneAndUpdate(
         {
             userId,
