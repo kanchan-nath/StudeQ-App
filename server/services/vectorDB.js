@@ -71,20 +71,24 @@ const deleteDocumentVectors = async(userId, documentId, chunkCount)=>{
     await ns.deleteMany(ids)
 }
 
-const queryDB = async(query, userId)=>{
+const queryDB = async (query, userId, documentId) => {
+    if (!documentId) {
+        throw new Error("queryDB: documentId required to scope search to single document")
+    }
+
     const index = getIndex()
-
     const ns = index.namespace(getNamespace(userId))
-
     const queryVector = await embedText(query)
 
     const results = await ns.query({
         vector: queryVector,
         topK: 5,
-        includeMetadata: true
+        includeMetadata: true,
+        filter: { documentId: { "$eq": documentId } }
     })
-    logger.info(`queryDB: ${results.matches.length} matches for user ${userId}`)
+
+    logger.info(`queryDB: ${results.matches.length} matches for user ${userId}, doc ${documentId}`)
 
     return results.matches.map(m => m.metadata.text)
-}
+}   
 export  {vectorDB, queryDB, deleteDocumentVectors}
