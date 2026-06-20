@@ -5,7 +5,7 @@ export const plansData = [
         description: "Basic access to get started",
         priceMonthly: 0,
         priceYearly: 0,
-        isPopular: false,
+        isPopular: true,
         ctaLabel: "Choose Plan",
         features: ["5 quizzes per month", "Basic flashcards", "Limited chat access"],
     },
