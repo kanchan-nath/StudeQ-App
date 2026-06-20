@@ -1314,3 +1314,273 @@
     transform: none;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════
+   PROFILE DROPDOWN — append these rules to appShell.module.css
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── WRAPPER (gives the avatar button a positioning context) ── */
+.topbar__profile {
+  position: relative;
+}
+
+/* Reset browser button defaults on the avatar — visual styles
+   already live in .topbar__avatar from the original CSS */
+button.topbar__avatar {
+  border: none;
+  padding: 0;
+}
+
+/* ── KEYFRAMES ──────────────────────────────────────────────── */
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.97);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes submenuFadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* ── DROPDOWN PANEL ─────────────────────────────────────────── */
+.profile-dropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  width: 220px;
+  background: var(--theme-surface);
+  border: 1px solid var(--theme-border);
+  border-radius: var(--r-xl);
+  padding: 6px;
+  z-index: 200;
+  transform-origin: top right;
+  animation: dropdownFadeIn var(--duration-fast) var(--ease-out) both;
+}
+
+/* ── HEADER (name + email, non-interactive) ─────────────────── */
+.profile-dropdown__header {
+  padding: 10px 10px 8px;
+  border-bottom: 1px solid var(--theme-border);
+  margin-bottom: 4px;
+}
+
+.profile-dropdown__name {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--theme-text);
+  margin: 0 0 2px;
+  line-height: 1.3;
+}
+
+.profile-dropdown__email {
+  font-size: 0.73rem;
+  color: var(--theme-text-muted);
+  margin: 0;
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── DIVIDER ────────────────────────────────────────────────── */
+.profile-dropdown__divider {
+  height: 1px;
+  background: var(--theme-border);
+  margin: 4px 0;
+}
+
+/* ── MENU ITEM (base) ───────────────────────────────────────── */
+.profile-dropdown__item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 10px;
+  border-radius: var(--r-md);
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--theme-text-secondary);
+  background: transparent;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out);
+}
+
+.profile-dropdown__item:hover {
+  background: var(--theme-purple-dim);
+  color: var(--theme-text);
+}
+
+.profile-dropdown__item:active {
+  opacity: 0.8;
+  transform: scale(0.98);
+  transition-duration: var(--duration-fast);
+}
+
+.profile-dropdown__item:focus-visible {
+  outline: 2px solid var(--theme-accent);
+  outline-offset: -2px;
+  border-radius: var(--r-md);
+}
+
+/* ── ITEM ICON ──────────────────────────────────────────────── */
+.profile-dropdown__item-icon {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  color: var(--theme-text-muted);
+}
+
+.profile-dropdown__item:hover .profile-dropdown__item-icon {
+  color: var(--theme-text-secondary);
+}
+
+/* ── "PRO" BADGE ────────────────────────────────────────────── */
+.profile-dropdown__badge {
+  margin-left: auto;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 2px 7px;
+  border-radius: var(--r-full);
+  background: rgba(34, 197, 94, 0.15);
+  color: var(--clr-accent);
+  border: 1px solid rgba(34, 197, 94, 0.25);
+  flex-shrink: 0;
+}
+
+/* ── DANGER (log out) ───────────────────────────────────────── */
+.profile-dropdown__item--danger {
+  color: var(--theme-red);
+}
+
+.profile-dropdown__item--danger:hover {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--theme-red);
+}
+
+.profile-dropdown__item--danger .profile-dropdown__item-icon {
+  color: var(--theme-red);
+}
+
+.profile-dropdown__item--danger:hover .profile-dropdown__item-icon {
+  color: var(--theme-red);
+}
+
+/* ── CHEVRON (Learn more trigger) ───────────────────────────── */
+.profile-dropdown__chevron {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  color: var(--theme-text-muted);
+  flex-shrink: 0;
+  transition: transform var(--duration-fast) var(--ease-spring);
+}
+
+.profile-dropdown__chevron--open {
+  transform: rotate(90deg);
+}
+
+/* ── SUBMENU ROOT (positioning context for the flyout) ──────── */
+.profile-dropdown__submenu-root {
+  position: relative;
+}
+
+/* ── SUBMENU FLYOUT ─────────────────────────────────────────── */
+/* Floats to the LEFT — avatar sits on the right edge of the
+   viewport so there's no room to fly right. */
+.profile-submenu {
+  position: absolute;
+  right: calc(100% + 8px);
+  top: 0;
+  width: 196px;
+  background: var(--theme-surface);
+  border: 1px solid var(--theme-border);
+  border-radius: var(--r-xl);
+  padding: 6px;
+  z-index: 201;
+  transform-origin: right top;
+  animation: submenuFadeIn var(--duration-fast) var(--ease-out) both;
+}
+
+/* ── SUBMENU ITEM ───────────────────────────────────────────── */
+.profile-submenu__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  border-radius: var(--r-md);
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--theme-text-secondary);
+  text-decoration: none;
+  transition:
+    background var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out);
+}
+
+.profile-submenu__item:hover {
+  background: var(--theme-purple-dim);
+  color: var(--theme-text);
+}
+
+.profile-submenu__item:focus-visible {
+  outline: 2px solid var(--theme-accent);
+  outline-offset: -2px;
+  border-radius: var(--r-md);
+}
+
+/* External link icon */
+.profile-submenu__external {
+  display: flex;
+  align-items: center;
+  opacity: 0.45;
+  flex-shrink: 0;
+}
+
+/* ── MOBILE (≤768px) — submenu becomes inline accordion ─────── */
+@media (max-width: 768px) {
+  .profile-dropdown {
+    width: min(220px, calc(100vw - 16px));
+  }
+
+  .profile-submenu {
+    position: relative;
+    right: auto;
+    top: auto;
+    width: 100%;
+    margin-top: 4px;
+    border-radius: var(--r-md);
+    animation: dropdownFadeIn var(--duration-fast) var(--ease-out) both;
+  }
+}
+
+/* ── REDUCED MOTION ─────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+
+  .profile-dropdown,
+  .profile-submenu {
+    animation: none;
+  }
+
+  .profile-dropdown__chevron {
+    transition: none;
+  }
+}
