@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react"; // ← added useRef
 import { Link, Outlet, useNavigate, useLocation } from "react-router-dom";
 import { apiFetch } from "../../lib/api.js";
 import useUser from "../../ContextApi/useUser.js";
 import styles from "./appShell.module.css";
-import logout from "../../lib/logout.js"
+import logout from "../../lib/logout.js";
 
 import {
   Home03Icon,
@@ -26,77 +26,36 @@ const NAV_MAIN = [
   { to: "/dashboard", label: "Dashboard", icon: Home03Icon, color: "blue" },
   { to: "/notes", label: "Notes", icon: NoteEditIcon, color: "teal" },
   { to: "/quiz", label: "Quiz", icon: Quiz03Icon, color: "purple" },
-  {
-    to: "/flashcards",
-    label: "Flashcards",
-    icon: Cards02Icon,
-    color: "purple",
-  },
-  {
-    to: "/study-room",
-    label: "Study Room",
-    icon: Book01Icon,
-    color: "green",
-  },
+  { to: "/flashcards", label: "Flashcards", icon: Cards02Icon, color: "purple" },
+  { to: "/study-room", label: "Study Room", icon: Book01Icon, color: "green" },
   { to: "/notebook", label: "Notebook", icon: Notebook01Icon, color: "blue" },
 ];
 
 const NAV_AI = [
-  {
-    to: "/search",
-    label: "Search",
-    icon: Calendar03Icon,
-    color: "orange",
-  },
-  {
-    to: "/image-analysis",
-    label: "Image Analysis",
-    icon: SearchList01Icon,
-    color: "pink",
-  },
-  {
-    to: "/pdf-analysis",
-    label: "PDF Analysis",
-    icon: Pdf02Icon,
-    color: "teal",
-  },
+  { to: "/search", label: "Search", icon: Calendar03Icon, color: "orange" },
+  { to: "/image-analysis", label: "Image Analysis", icon: SearchList01Icon, color: "pink" },
+  { to: "/pdf-analysis", label: "PDF Analysis", icon: Pdf02Icon, color: "teal" },
   { to: "/tutor", label: "AI Tutor", icon: TeachingIcon, color: "purple" },
 ];
 
 const NAV_EVENT = [
-  {
-    to: "/time-table",
-    label: "Time Table",
-    icon: Calendar03Icon,
-    color: "orange",
-  },
-  {
-    to: "/event-scheduling/assignments",
-    label: "Assignment",
-    icon: Calendar03Icon,
-    color: "orange",
-  },
-  {
-    to: "/event-scheduling/projects",
-    label: "Schedule Project",
-    icon: Calendar03Icon,
-    color: "orange",
-  },
-  {
-    to: "/event-scheduling/exams",
-    label: "Exam Schedule",
-    icon: Calendar03Icon,
-    color: "orange",
-  },
-  {
-    to: "/event-scheduling",
-    label: "Event",
-    icon: Book01Icon,
-    color: "green",
-  },
+  { to: "/time-table", label: "Time Table", icon: Calendar03Icon, color: "orange" },
+  { to: "/event-scheduling/assignments", label: "Assignment", icon: Calendar03Icon, color: "orange" },
+  { to: "/event-scheduling/projects", label: "Schedule Project", icon: Calendar03Icon, color: "orange" },
+  { to: "/event-scheduling/exams", label: "Exam Schedule", icon: Calendar03Icon, color: "orange" },
+  { to: "/event-scheduling", label: "Event", icon: Book01Icon, color: "green" },
 ];
 
-const AppShell = ({ userName = "" }) => {
+// Submenu links — swap href values to match your routes
+const LEARN_MORE_LINKS = [
+  { label: "Terms & conditions", href: "/terms" },
+  { label: "Privacy policy", href: "/privacy" },
+  { label: "Help center", href: "/help", external: true },
+  { label: "Changelog", href: "/changelog" },
+  { label: "About", href: "/about" },
+];
+
+const AppShell = ({ userName = "", userEmail = "" }) => { // ← added userEmail prop
   const { setUser } = useUser();
   const [isDark, setIsDark] = useState(() => {
     return (localStorage.getItem("sparke-theme") ?? "dark") === "dark";
@@ -105,20 +64,25 @@ const AppShell = ({ userName = "" }) => {
   const location = useLocation();
 
   const [panelOpen, setPanelOpen] = useState(false);
-  // RESPONSIVE — controls the mobile off-canvas drawer
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // ── NEW: profile dropdown state ─────────────────────────────
+  const [profileOpen, setProfileOpen] = useState(false);
+  const [learnMoreOpen, setLearnMoreOpen] = useState(false);
+  const profileRef = useRef(null);
+  // ────────────────────────────────────────────────────────────
 
   useEffect(() => {
     const timer = setTimeout(() => setPanelOpen(true), 2500);
     return () => clearTimeout(timer);
   }, []);
 
-  // RESPONSIVE — auto-close drawer on route change
+  // Auto-close drawer on route change
   useEffect(() => {
     setSidebarOpen(false);
   }, [location.pathname]);
 
-  // RESPONSIVE — body scroll lock while the mobile drawer is open
+  // Body scroll lock while mobile drawer is open
   useEffect(() => {
     document.body.style.overflow = sidebarOpen ? "hidden" : "";
     return () => {
@@ -126,14 +90,33 @@ const AppShell = ({ userName = "" }) => {
     };
   }, [sidebarOpen]);
 
-  // MOTION — ESC key closes the mobile drawer (keyboard accessibility)
+  // ── NEW: click-outside closes profile dropdown ──────────────
+  useEffect(() => {
+    if (!profileOpen) return;
+    const handleOutside = (e) => {
+      if (profileRef.current && !profileRef.current.contains(e.target)) {
+        setProfileOpen(false);
+        setLearnMoreOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleOutside);
+    return () => document.removeEventListener("mousedown", handleOutside);
+  }, [profileOpen]);
+  // ────────────────────────────────────────────────────────────
+
+  // UPDATED: ESC closes submenu → dropdown → sidebar, in that order
   const handleKeyDown = useCallback(
     (e) => {
-      if (e.key === "Escape" && sidebarOpen) {
+      if (e.key !== "Escape") return;
+      if (learnMoreOpen) {
+        setLearnMoreOpen(false);
+      } else if (profileOpen) {
+        setProfileOpen(false);
+      } else if (sidebarOpen) {
         setSidebarOpen(false);
       }
     },
-    [sidebarOpen]
+    [sidebarOpen, profileOpen, learnMoreOpen]
   );
 
   useEffect(() => {
@@ -152,21 +135,19 @@ const AppShell = ({ userName = "" }) => {
 
   const handleLogout = (e) => {
     e.preventDefault();
+    setProfileOpen(false); // ← close dropdown before logging out
     logout(setUser, navigate);
   };
 
   useEffect(() => {
     const html = document.documentElement;
     html.classList.add("theme-transitioning");
-
     const theme = isDark ? "dark" : "light";
     html.setAttribute("data-theme", theme);
     localStorage.setItem("sparke-theme", theme);
-
     const timer = setTimeout(() => {
       html.classList.remove("theme-transitioning");
     }, 350);
-
     return () => clearTimeout(timer);
   }, [isDark]);
 
@@ -175,16 +156,8 @@ const AppShell = ({ userName = "" }) => {
       className={`${styles["app-shell"]}${panelOpen ? ` ${styles["app-shell--panel-open"]}` : ""}`}
     >
       {/* ── TOP BAR ── */}
-      <header
-        className={styles.topbar}
-        role="banner"
-      >
+      <header className={styles.topbar} role="banner">
         <div className={styles["topbar__left"]}>
-          {/*
-            RESPONSIVE — hamburger button.
-            display:none on desktop via CSS; display:flex on ≤768px.
-            aria-expanded reflects drawer state for screen readers.
-          */}
           <button
             className={styles["topbar__hamburger"]}
             aria-label={sidebarOpen ? "Close navigation" : "Open navigation"}
@@ -193,32 +166,12 @@ const AppShell = ({ userName = "" }) => {
             onClick={() => setSidebarOpen((prev) => !prev)}
           >
             {sidebarOpen ? (
-              /* X icon — rendered when drawer is open */
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                aria-hidden="true"
-              >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true">
                 <line x1="18" y1="6" x2="6" y2="18" />
                 <line x1="6" y1="6" x2="18" y2="18" />
               </svg>
             ) : (
-              /* Hamburger icon — rendered when drawer is closed */
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                aria-hidden="true"
-              >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true">
                 <line x1="3" y1="6" x2="21" y2="6" />
                 <line x1="3" y1="12" x2="21" y2="12" />
                 <line x1="3" y1="18" x2="21" y2="18" />
@@ -227,12 +180,8 @@ const AppShell = ({ userName = "" }) => {
           </button>
         </div>
 
-        <button
-          className={styles["topbar__upgrade-btn"]}
-          aria-label="Upgrade to premium"
-        >
+        <button className={styles["topbar__upgrade-btn"]} aria-label="Upgrade to premium">
           <CashbackIcon />
-          {/* RESPONSIVE — text hidden at ≤480px via CSS, icon remains */}
           <span className={styles["topbar__upgrade-label"]}>Upgrade</span>
         </button>
 
@@ -243,17 +192,7 @@ const AppShell = ({ userName = "" }) => {
           onClick={() => setIsDark((prev) => !prev)}
         >
           {isDark ? (
-            <svg
-              width="17"
-              height="17"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
-            >
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <circle cx="12" cy="12" r="5" />
               <line x1="12" y1="1" x2="12" y2="3" />
               <line x1="12" y1="21" x2="12" y2="23" />
@@ -265,37 +204,142 @@ const AppShell = ({ userName = "" }) => {
               <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
             </svg>
           ) : (
-            <svg
-              width="17"
-              height="17"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
-            >
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
             </svg>
           )}
         </button>
 
-        <div
-          className={styles["topbar__avatar"]}
-          role="img"
-          aria-label={`User avatar for ${userName}`}
-        >
-          {initials}
+        {/* ── AVATAR + PROFILE DROPDOWN ────────────────────────────
+            Replaced the old <div role="img"> with a positioned wrapper
+            + <button> trigger + conditional dropdown panel.
+        ── */}
+        <div className={styles["topbar__profile"]} ref={profileRef}>
+          <button
+            className={styles["topbar__avatar"]}
+            onClick={() => {
+              setProfileOpen((prev) => !prev);
+              setLearnMoreOpen(false);
+            }}
+            aria-label={`Open profile menu for ${userName}`}
+            aria-haspopup="menu"
+            aria-expanded={profileOpen}
+          >
+            {initials}
+          </button>
+
+          {profileOpen && (
+            <div
+              className={styles["profile-dropdown"]}
+              role="menu"
+              aria-label="Profile options"
+            >
+              {/* User info — non-interactive */}
+              <div className={styles["profile-dropdown__header"]}>
+                <p className={styles["profile-dropdown__name"]}>{userName || "User"}</p>
+                {userEmail && (
+                  <p className={styles["profile-dropdown__email"]}>{userEmail}</p>
+                )}
+              </div>
+
+              {/* Upgrade plan */}
+              <button
+                role="menuitem"
+                className={styles["profile-dropdown__item"]}
+                onClick={() => {
+                  setProfileOpen(false);
+                  navigate("/upgrade"); // adjust route if needed
+                }}
+              >
+                <span className={styles["profile-dropdown__item-icon"]} aria-hidden="true">
+                  <CashbackIcon size={16} />
+                </span>
+                Upgrade plan
+                <span className={styles["profile-dropdown__badge"]}>Pro</span>
+              </button>
+
+              <div className={styles["profile-dropdown__divider"]} role="separator" />
+
+              {/* Learn more — has flyout submenu */}
+              <div
+                className={styles["profile-dropdown__submenu-root"]}
+                onMouseEnter={() => setLearnMoreOpen(true)}
+                onMouseLeave={() => setLearnMoreOpen(false)}
+              >
+                <button
+                  role="menuitem"
+                  className={`${styles["profile-dropdown__item"]} ${styles["profile-dropdown__item--sub"]}`}
+                  onClick={() => setLearnMoreOpen((prev) => !prev)}
+                  aria-haspopup="menu"
+                  aria-expanded={learnMoreOpen}
+                >
+                  <span className={styles["profile-dropdown__item-icon"]} aria-hidden="true">
+                    <Book01Icon size={16} />
+                  </span>
+                  Learn more
+                  <span
+                    className={`${styles["profile-dropdown__chevron"]}${learnMoreOpen ? ` ${styles["profile-dropdown__chevron--open"]}` : ""
+                      }`}
+                    aria-hidden="true"
+                  >
+                    {/* Inline SVG — no extra icon import needed */}
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                      <polyline points="9 18 15 12 9 6" />
+                    </svg>
+                  </span>
+                </button>
+
+                {learnMoreOpen && (
+                  <div
+                    className={styles["profile-submenu"]}
+                    role="menu"
+                    aria-label="Learn more"
+                  >
+                    {LEARN_MORE_LINKS.map(({ label, href, external }) => (
+                      <a
+                        key={href}
+                        role="menuitem"
+                        href={href}
+                        className={styles["profile-submenu__item"]}
+                        {...(external ? { target: "_blank", rel: "noreferrer" } : {})}
+                        onClick={() => setProfileOpen(false)}
+                      >
+                        {label}
+                        {external && (
+                          <span className={styles["profile-submenu__external"]} aria-label="opens in new tab">
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                              <polyline points="15 3 21 3 21 9" />
+                              <line x1="10" y1="14" x2="21" y2="3" />
+                            </svg>
+                          </span>
+                        )}
+                      </a>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div className={styles["profile-dropdown__divider"]} role="separator" />
+
+              {/* Log out */}
+              <button
+                role="menuitem"
+                className={`${styles["profile-dropdown__item"]} ${styles["profile-dropdown__item--danger"]}`}
+                onClick={handleLogout}
+              >
+                <span className={styles["profile-dropdown__item-icon"]} aria-hidden="true">
+                  <Logout02Icon size={16} />
+                </span>
+                Log out
+              </button>
+            </div>
+          )}
         </div>
+        {/* ── END PROFILE DROPDOWN ── */}
       </header>
 
-      {/*
-        RESPONSIVE — backdrop overlay.
-        Rendered as a sibling to the sidebar in the DOM.
-        CSS display:none on desktop; visible only on ≤768px.
-        Clicking it closes the drawer.
-      */}
+      {/* ── BACKDROP ── */}
       <div
         className={`${styles["sidebar-backdrop"]}${sidebarOpen ? ` ${styles["sidebar-backdrop--visible"]}` : ""}`}
         onClick={() => setSidebarOpen(false)}
@@ -309,11 +353,7 @@ const AppShell = ({ userName = "" }) => {
         role="navigation"
         aria-label="Main navigation"
       >
-        <Link
-          to="/dashboard"
-          className={styles["sidebar__logo"]}
-          aria-label="SPARK.E home"
-        >
+        <Link to="/dashboard" className={styles["sidebar__logo"]} aria-label="SPARK.E home">
           <div className={styles["sidebar__logo-text"]}>
             SPARK<span>.E</span>
           </div>
@@ -321,7 +361,6 @@ const AppShell = ({ userName = "" }) => {
 
         <nav className={styles["sidebar__nav"]}>
           <span className={styles["sidebar__section-label"]}>Main</span>
-
           {NAV_MAIN.map(({ to, label, icon: Icon, color }) => (
             <Link
               key={to}
@@ -329,10 +368,7 @@ const AppShell = ({ userName = "" }) => {
               className={`${styles["sidebar__link"]}${location.pathname === to ? ` ${styles.active}` : ""}`}
               data-color={color}
             >
-              <span
-                className={styles["sidebar__link-icon"]}
-                aria-hidden="true"
-              >
+              <span className={styles["sidebar__link-icon"]} aria-hidden="true">
                 <Icon size={20} color="white" />
               </span>
               {label}
@@ -340,7 +376,6 @@ const AppShell = ({ userName = "" }) => {
           ))}
 
           <span className={styles["sidebar__section-label"]}>AI Tools</span>
-
           {NAV_AI.map(({ to, label, icon: Icon, color }) => (
             <Link
               key={to}
@@ -348,10 +383,7 @@ const AppShell = ({ userName = "" }) => {
               className={`${styles["sidebar__link"]}${location.pathname === to ? ` ${styles.active}` : ""}`}
               data-color={color}
             >
-              <span
-                className={styles["sidebar__link-icon"]}
-                aria-hidden="true"
-              >
+              <span className={styles["sidebar__link-icon"]} aria-hidden="true">
                 <Icon size={20} color="white" />
               </span>
               {label}
@@ -359,7 +391,6 @@ const AppShell = ({ userName = "" }) => {
           ))}
 
           <span className={styles["sidebar__section-label"]}>Events</span>
-
           {NAV_EVENT.map(({ to, label, icon: Icon, color }) => (
             <Link
               key={to}
@@ -367,10 +398,7 @@ const AppShell = ({ userName = "" }) => {
               className={`${styles["sidebar__link"]}${location.pathname === to ? ` ${styles.active}` : ""}`}
               data-color={color}
             >
-              <span
-                className={styles["sidebar__link-icon"]}
-                aria-hidden="true"
-              >
+              <span className={styles["sidebar__link-icon"]} aria-hidden="true">
                 <Icon size={20} color="white" />
               </span>
               {label}
@@ -408,10 +436,7 @@ const AppShell = ({ userName = "" }) => {
 
         <div className={styles["upgrade-card"]}>
           <div className={styles["upgrade-card__header"]}>
-            <div
-              className={styles["upgrade-card__badge"]}
-              aria-hidden="true"
-            >
+            <div className={styles["upgrade-card__badge"]} aria-hidden="true">
               <StarsIcon />
             </div>
             <h3 className={styles["upgrade-card__title"]}>Go Premium</h3>
@@ -426,24 +451,14 @@ const AppShell = ({ userName = "" }) => {
           </button>
         </div>
 
-        <div
-          className={styles["panel-widget"]}
-          aria-labelledby="upcoming-heading"
-        >
-          <h3
-            className={styles["panel-widget__title"]}
-            id="upcoming-heading"
-          >
+        <div className={styles["panel-widget"]} aria-labelledby="upcoming-heading">
+          <h3 className={styles["panel-widget__title"]} id="upcoming-heading">
             📅 Upcoming
           </h3>
           <p className={styles["panel-widget__body"]}>
-            No exams scheduled yet. Add a deadline to get a personalized study
-            plan.
+            No exams scheduled yet. Add a deadline to get a personalized study plan.
           </p>
-          <Link
-            to="/scheduler"
-            className={styles["panel-widget__link"]}
-          >
+          <Link to="/scheduler" className={styles["panel-widget__link"]}>
             Add exam date →
           </Link>
         </div>
@@ -457,36 +472,21 @@ const AppShell = ({ userName = "" }) => {
             <span aria-hidden="true">🔥</span>
             1-day streak!
           </div>
-          <Link
-            to="/"
-            className={styles["streak-widget__link"]}
-          >
+          <Link to="/" className={styles["streak-widget__link"]}>
             Leaderboard →
           </Link>
         </div>
 
-        <div
-          className={styles["panel-widget"]}
-          aria-labelledby="announce-heading"
-        >
-          <h3
-            className={styles["panel-widget__title"]}
-            id="announce-heading"
-          >
+        <div className={styles["panel-widget"]} aria-labelledby="announce-heading">
+          <h3 className={styles["panel-widget__title"]} id="announce-heading">
             🎉 What's New
           </h3>
           <p className={styles["panel-widget__body"]}>
-            <strong className={styles["text-primary"]}>
-              Image Analysis is live!
-            </strong>
+            <strong className={styles["text-primary"]}>Image Analysis is live!</strong>
             <br />
-            Drop any diagram or photo and get an instant AI breakdown. Try it
-            now.
+            Drop any diagram or photo and get an instant AI breakdown. Try it now.
           </p>
-          <Link
-            to="/image-analysis"
-            className={styles["panel-widget__link"]}
-          >
+          <Link to="/image-analysis" className={styles["panel-widget__link"]}>
             Try it →
           </Link>
         </div>
