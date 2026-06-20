@@ -55,8 +55,10 @@ const LEARN_MORE_LINKS = [
   { label: "About", href: "/about" },
 ];
 
-const AppShell = ({ userName = "", userEmail = "" }) => { // ← added userEmail prop
-  const { setUser } = useUser();
+const AppShell = () => {
+  const { user, setUser } = useUser(); // ← pulled user from context, route passes no props
+  const userName = user?.name ?? "";
+  const userEmail = user?.email ?? "";
   const [isDark, setIsDark] = useState(() => {
     return (localStorage.getItem("sparke-theme") ?? "dark") === "dark";
   });
