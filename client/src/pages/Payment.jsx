@@ -39,6 +39,62 @@ const DEFAULT_PLANS = [];
 const DEFAULT_FEATURES = [];
 const DEFAULT_SUBSCRIPTION = { planId: null, billingCycle: "monthly" };
 
+// const DEFAULT_PLANS = [
+//     {
+//         id: "free",
+//         name: "Free",
+//         description: "Basic access to get started",
+//         priceMonthly: 0,
+//         priceYearly: 0,
+//         isPopular: false,
+//         ctaLabel: "Choose Plan",
+//         features: [
+//             "5 quizzes per month",
+//             "Basic flashcards",
+//             "Limited chat access",
+//         ],
+//     },
+//     {
+//         id: "pro",
+//         name: "Pro",
+//         description: "For serious students",
+//         priceMonthly: 9,
+//         priceYearly: 86,
+//         isPopular: true,
+//         ctaLabel: "Upgrade to Pro",
+//         features: [
+//             "Unlimited quizzes",
+//             "Unlimited flashcards",
+//             "AI tutor access",
+//             "Priority support",
+//         ],
+//     },
+//     {
+//         id: "premium",
+//         name: "Premium",
+//         description: "Full power, no limits",
+//         priceMonthly: 19,
+//         priceYearly: 182,
+//         isPopular: false,
+//         ctaLabel: "Go Premium",
+//         features: [
+//             "Everything in Pro",
+//             "Advanced AI models",
+//             "Custom study scheduler",
+//             "Early access features",
+//         ],
+//     },
+// ];
+
+// const DEFAULT_FEATURES = [
+//     { iconKey: "chat", label: "AI Chat Assistant" },
+//     { iconKey: "quiz", label: "Smart Quizzes" },
+//     { iconKey: "flashcards", label: "Flashcards" },
+//     { iconKey: "scheduler", label: "Event Scheduling" },
+// ];
+
+// const DEFAULT_SUBSCRIPTION = { planId: null, billingCycle: "monthly" };
+
 const Payment = () => {
     const { show, hide } = useLoader();
     const navigate = useNavigate();
