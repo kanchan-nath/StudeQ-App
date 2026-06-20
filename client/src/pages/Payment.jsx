@@ -152,9 +152,10 @@ const Payment = () => {
             }
 
             const data = await res.json();
+console.log(data.data.plans);
 
-            setPlans(data?.data?.plans ?? DEFAULT_PLANS);
-            setSharedFeatures(data?.data?.sharedFeatures ?? DEFAULT_FEATURES);
+            setPlans(data.data.plans);
+            setSharedFeatures(data.data.sharedFeatures);
 
             // ── Current subscription (separate call — plans are public, this isn't) ──
             const subRes = await apiFetch("/api/billing/subscription");
@@ -179,7 +180,7 @@ const Payment = () => {
     }, [navigate, notifyError, show, hide]);
 
     useEffect(() => {
-        fetchData();
+        fetchData();          
     }, []);
 
     // ── Plan selection / checkout ────────────────────────────────────────────────
@@ -274,11 +275,11 @@ const Payment = () => {
                         <p className={styles.loadingText}>Loading plans…</p>
                     ) : (
                         plans.map((plan, idx) => {
-                            const isCurrent = plan.id === currentPlanId;
-                            const isProcessing = loadingPlanId === plan.id;
+                            const isCurrent = plan.planId === currentPlanId;
+                            const isProcessing = loadingPlanId === plan.planId;
                             const price = getPrice(plan);
-                            const isPro = plan.id === "pro";
-                            const isPremium = plan.id === "premium";
+                            const isPro = plan.planId === "pro";
+                            const isPremium = plan.planId === "premium";
 
                             const cardClass = [
                                 styles.card,
@@ -290,10 +291,10 @@ const Payment = () => {
 
                             return (
                                 <article
-                                    key={plan.id}
+                                    key={plan.planId}
                                     role="listitem"
                                     aria-current={isCurrent ? "true" : undefined}
-                                    data-testid={`plan-card-${plan.id}`}
+                                    data-testid={`plan-card-${plan.planId}`}
                                     className={cardClass}
                                     style={{ "--stagger-index": idx }}
                                 >
@@ -344,8 +345,8 @@ const Payment = () => {
                                     <button
                                         type="button"
                                         disabled={isCurrent || isProcessing}
-                                        onClick={() => handleSelectPlan(plan.id)}
-                                        data-testid={`plan-cta-${plan.id}`}
+                                        onClick={() => handleSelectPlan(plan.planId)}
+                                        data-testid={`plan-cta-${plan.planId}`}
                                         className={[
                                             styles.cta,
                                             isPro ? styles.ctaPro : "",
