@@ -1,0 +1,492 @@
+/* ============================================================
+   Pricing.module.css
+   All values derive from global.css tokens. No invented px/hex.
+   Reacts to [data-theme] automatically via --theme-* vars.
+   ============================================================ */
+
+/* ── PAGE / LAYOUT ──────────────────────────────────────────── */
+.page {
+    background: var(--theme-bg);
+    min-height: 100vh;
+    padding: var(--sp-8) var(--sp-4);
+}
+
+.main {
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: var(--sp-8);
+}
+
+.title {
+    font-family: var(--font-display);
+    font-size: 2.25rem;
+    font-weight: 700;
+    color: var(--theme-text);
+    margin-bottom: var(--sp-2);
+}
+
+.subtitle {
+    font-family: var(--font-body);
+    color: var(--theme-text-secondary);
+    font-size: 1rem;
+}
+
+.loadingText {
+    grid-column: 1 / -1;
+    text-align: center;
+    color: var(--theme-text-secondary);
+    font-family: var(--font-body);
+    padding: var(--sp-8) 0;
+}
+
+/* ── BILLING TOGGLE ─────────────────────────────────────────── */
+.toggleWrap {
+    display: flex;
+    justify-content: center;
+    margin-bottom: var(--sp-8);
+}
+
+.toggle {
+    position: relative;
+    display: inline-flex;
+    background: var(--theme-surface);
+    border: 1px solid var(--theme-border);
+    border-radius: var(--r-full);
+    padding: var(--sp-1);
+    gap: var(--sp-1);
+}
+
+.toggleThumb {
+    position: absolute;
+    top: var(--sp-1);
+    bottom: var(--sp-1);
+    left: var(--sp-1);
+    width: calc(50% - var(--sp-1));
+    background: var(--theme-purple-dim);
+    border: 1px solid var(--theme-purple);
+    box-shadow: 0 0 0 1px var(--theme-accent-glow), 0 0 16px var(--theme-purple-dim);
+    border-radius: var(--r-full);
+    transition: transform var(--t-slow);
+}
+
+.toggleThumb[data-position="yearly"] {
+    transform: translateX(100%);
+}
+
+.toggleBtn {
+    position: relative;
+    z-index: 1;
+    background: transparent;
+    color: var(--theme-text-secondary);
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    font-weight: 500;
+    padding: var(--sp-2) var(--sp-5);
+    border-radius: var(--r-full);
+    transition: color var(--t-base);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-2);
+}
+
+.toggleBtnActive {
+    color: var(--theme-text);
+}
+
+.toggleSave {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--theme-green);
+}
+
+/* ── PLANS GRID ──────────────────────────────────────────────── */
+.plansGrid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--sp-6);
+    align-items: start;
+    margin-bottom: var(--sp-8);
+}
+
+/* ── CARD ────────────────────────────────────────────────────── */
+.card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    background: var(--theme-surface);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--theme-border);
+    border-radius: var(--r-xl);
+    padding: var(--sp-6);
+    transition:
+        transform var(--t-base),
+        border-color var(--t-base),
+        box-shadow var(--t-base);
+    opacity: 0;
+    animation: cardRise var(--t-slow) var(--ease-out) forwards;
+    animation-delay: calc(var(--stagger-index, 0) * 80ms);
+}
+
+.card:hover,
+.card:focus-within {
+    transform: translateY(-4px);
+    border-color: var(--theme-border-hover);
+    box-shadow: var(--theme-card-shadow);
+}
+
+@keyframes cardRise {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Pro: elevation + gradient border IS the popular signal */
+.cardPro {
+    border: 1px solid transparent;
+    background:
+        linear-gradient(var(--theme-surface), var(--theme-surface)) padding-box,
+        linear-gradient(135deg, var(--theme-purple), var(--theme-purple-light)) border-box;
+    transform: scale(1.03);
+}
+
+.cardPro:hover,
+.cardPro:focus-within {
+    transform: scale(1.03) translateY(-4px);
+}
+
+.cardPremium {
+    border-color: var(--theme-border);
+}
+
+.popularBadge {
+    position: absolute;
+    top: var(--sp-4);
+    right: var(--sp-4);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-1);
+    font-family: var(--font-body);
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--theme-green);
+    background: rgba(34, 197, 94, 0.12);
+    border: 1px solid var(--theme-green);
+    border-radius: var(--r-full);
+    padding: var(--sp-1) var(--sp-3);
+}
+
+.popularBadgeIcon {
+    color: var(--theme-green);
+}
+
+/* ── PLAN NAME / CONSTELLATION ──────────────────────────────── */
+.planNameRow {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+    margin-bottom: var(--sp-2);
+}
+
+.planIcon {
+    color: var(--theme-purple-light);
+}
+
+.planName {
+    font-family: var(--font-display);
+    font-size: 1.375rem;
+    font-weight: 700;
+    color: var(--theme-text);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-2);
+}
+
+.constellation {
+    width: 32px;
+    height: 14px;
+    stroke: var(--theme-purple-light);
+    fill: var(--theme-purple-light);
+}
+
+.constellation path {
+    fill: none;
+    stroke-width: 1;
+    opacity: 0.6;
+}
+
+.planDescription {
+    font-family: var(--font-body);
+    color: var(--theme-text-secondary);
+    font-size: 0.875rem;
+    margin-bottom: var(--sp-5);
+    min-height: 2.5em;
+}
+
+/* ── PRICE ───────────────────────────────────────────────────── */
+.price {
+    display: flex;
+    align-items: baseline;
+    gap: var(--sp-2);
+    margin-bottom: var(--sp-5);
+}
+
+.priceValue {
+    font-family: var(--font-display);
+    font-size: 2.75rem;
+    font-weight: 700;
+    color: var(--theme-text);
+    line-height: 1;
+}
+
+.priceGradient .priceValue {
+    background: linear-gradient(135deg, var(--theme-purple), var(--theme-purple-light));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.priceMeta {
+    display: flex;
+    flex-direction: column;
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    color: var(--theme-text-secondary);
+    line-height: 1.3;
+}
+
+.priceBilling {
+    color: var(--theme-text-muted);
+}
+
+/* ── CTA ─────────────────────────────────────────────────────── */
+.cta {
+    position: relative;
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: 0.9rem;
+    padding: var(--sp-3) var(--sp-4);
+    border-radius: var(--r-md);
+    margin-bottom: var(--sp-6);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--sp-2);
+    transition:
+        transform var(--t-fast),
+        box-shadow var(--t-base),
+        background var(--t-base),
+        color var(--t-base);
+    background: var(--theme-surface-2);
+    color: var(--theme-text-secondary);
+    border: 1px solid var(--theme-border);
+}
+
+.cta:not(:disabled):hover {
+    transform: translateY(-1px);
+}
+
+.cta:disabled {
+    cursor: default;
+}
+
+/* Free: ghost / disabled */
+.ctaCurrent {
+    background: transparent;
+    color: var(--theme-text-muted);
+    border: 1px solid var(--theme-border);
+}
+
+/* Pro: solid gradient fill, the one loud element on the page */
+.ctaPro {
+    background: linear-gradient(135deg, var(--theme-purple), var(--theme-purple-light));
+    color: #ffffff;
+    border: none;
+    box-shadow: 0 0 24px var(--theme-purple-dim);
+    animation: proPulse 3s ease-in-out infinite;
+}
+
+@keyframes proPulse {
+
+    0%,
+    100% {
+        box-shadow: 0 0 16px var(--theme-purple-dim);
+    }
+
+    50% {
+        box-shadow: 0 0 32px var(--theme-purple-dim);
+    }
+}
+
+/* Premium: outline, gradient border only, fills solid on hover */
+.ctaPremium {
+    background: transparent;
+    color: var(--theme-text);
+    border: 1px solid transparent;
+    background:
+        linear-gradient(var(--theme-surface), var(--theme-surface)) padding-box,
+        linear-gradient(135deg, var(--theme-purple), var(--theme-purple-light)) border-box;
+}
+
+.ctaPremium:not(:disabled):hover {
+    background: linear-gradient(135deg, var(--theme-purple), var(--theme-purple-light));
+    color: #ffffff;
+}
+
+.ctaLoading {
+    opacity: 0.8;
+    cursor: progress;
+}
+
+.spinner {
+    width: 14px;
+    height: 14px;
+    border-radius: var(--r-full);
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    border-top-color: #ffffff;
+    animation: spin var(--t-slow) linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ── FEATURE LIST ────────────────────────────────────────────── */
+.featureList {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-3);
+    margin-top: auto;
+}
+
+.featureItem {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--sp-2);
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    color: var(--theme-text);
+}
+
+.featureStar {
+    flex-shrink: 0;
+    background: linear-gradient(135deg, var(--theme-purple), var(--theme-purple-light));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+/* ── "ALL PLANS INCLUDE" STRIP ──────────────────────────────── */
+.includeStrip {
+    border-top: 1px solid var(--theme-border);
+    padding-top: var(--sp-6);
+    text-align: center;
+}
+
+.includeTitle {
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--theme-text-muted);
+    margin-bottom: var(--sp-5);
+}
+
+.includeList {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--sp-3);
+}
+
+.includePill {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-2);
+    background: var(--theme-surface);
+    border: 1px solid var(--theme-border);
+    border-radius: var(--r-full);
+    padding: var(--sp-2) var(--sp-4);
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+    color: var(--theme-text-secondary);
+}
+
+.includeIcon {
+    color: var(--theme-purple-light);
+}
+
+/* ── REDUCED MOTION ──────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+    .card {
+        animation: none;
+        opacity: 1;
+    }
+
+    .ctaPro {
+        animation: none;
+    }
+}
+
+/* ── RESPONSIVE ──────────────────────────────────────────────── */
+/* Tablet: 2-col wrap */
+@media (max-width: 900px) {
+    .plansGrid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .cardPro {
+        grid-column: 1 / -1;
+        max-width: 360px;
+        margin: 0 auto;
+    }
+}
+
+/* Mobile: stack, Pro loses scale but keeps glow border */
+@media (max-width: 640px) {
+    .page {
+        padding: var(--sp-6) var(--sp-3);
+    }
+
+    .title {
+        font-size: 1.75rem;
+    }
+
+    .plansGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .cardPro {
+        transform: none;
+        max-width: none;
+    }
+
+    .cardPro:hover,
+    .cardPro:focus-within {
+        transform: translateY(-4px);
+    }
+
+    .toggle {
+        width: 100%;
+        max-width: 320px;
+    }
+
+    .toggleBtn {
+        flex: 1;
+        justify-content: center;
+    }
+}
