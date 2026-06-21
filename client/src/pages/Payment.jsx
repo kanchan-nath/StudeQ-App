@@ -152,14 +152,12 @@ const Payment = () => {
             }
 
             const data = await res.json();
-console.log(data.data.plans);
 
             setPlans(data.data.plans);
             setSharedFeatures(data.data.sharedFeatures);
 
             // ── Current subscription (separate call — plans are public, this isn't) ──
             const subRes = await apiFetch("/api/billing/subscription");
-            console.log("subRes",subRes);
 
             if (subRes.ok) {
                 const subData = await subRes.json();
@@ -210,7 +208,6 @@ console.log(data.data.plans);
                 }
 
                 const data = await res.json();
-                console.log("subscription", data);
 
                 if (data?.data?.checkoutUrl) {
                     window.location.href = data.data.checkoutUrl;
@@ -297,7 +294,7 @@ console.log(data.data.plans);
                                     role="listitem"
                                     aria-current={isCurrent ? "true" : undefined}
                                     data-testid={`plan-card-${plan.planId}`}
-                                    // className={cardClass}
+                                    className={cardClass}
                                     style={{ "--stagger-index": idx }}
                                 >
                                     {plan.isPopular && (
