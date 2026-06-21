@@ -1,36 +1,78 @@
 import mongoose from "mongoose";
 
-const featureSchema = new mongoose.Schema(
+const paymentSchema = new mongoose.Schema(
     {
-        iconKey: {
-            type: String,
-            enum: ["chat", "quiz", "flashcards", "tutor", "scheduler", "streaming", "codegen"],
+        userId: {
             required: true,
+            index: true,
+            type:String
         },
-        label: { type: String, required: true },
-    },
-    { _id: false }
-);
 
-const planSchema = new mongoose.Schema(
-    {
-        planId: {
+        razorpayOrderId: {
             type: String,
             required: true,
             unique: true,
-            enum: ["free", "pro", "premium"],
+            index: true,
         },
-        name: { type: String, required: true },
-        description: { type: String, required: true },
-        priceMonthly: { type: Number, required: true }, // store in cents/paise
-        priceYearly: { type: Number, required: true },
-        isPopular: { type: Boolean, default: false },
-        ctaLabel: { type: String },
-        features: [{ type: String, required: true }],
-        active: { type: Boolean, default: true },
-        sortOrder: { type: Number, default: 0 },
+
+        razorpayPaymentId: {
+            type: String,
+            unique: true,
+            sparse: true,
+        },
+
+        razorpaySignature: {
+            type: String,
+        },
+
+        amount: {
+            type: Number,
+            required: true,
+            min: 0,
+        },
+
+        currency: {
+            type: String,
+            default: "INR",
+        },
+
+        status: {
+            type: String,
+            enum: [
+                "CREATED",
+                "ATTEMPTED",
+                "VERIFIED",
+                "CAPTURED",
+                "FAILED",
+                "REFUNDED",
+            ],
+            default: "CREATED",
+        },
+
+        productType: {
+            type: String,
+            required: true,
+        },
+
+        productRef: {
+            type: String,
+        },
+
+        webhookEventId: {
+            type: String,
+            unique: true,
+            sparse: true,
+        },
+
+        failureReason: {
+            type: String,
+        },
     },
-    { timestamps: true }
+    {
+        timestamps: true,
+    }
 );
 
-export const Plan = mongoose.model("Plan", planSchema);
+const Payment = mongoose.model("Payment", paymentSchema);
+
+export default Payment;
