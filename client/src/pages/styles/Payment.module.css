@@ -1,0 +1,488 @@
+
+.page {
+    background: rgba(10, 12, 20, 1);
+    min-height: 100vh;
+    padding: var(--sp-8) var(--sp-4);
+}
+
+.main {
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: var(--sp-8);
+}
+
+.title {
+    font-family: var(--font-display);
+    font-size: 2.25rem;
+    font-weight: 700;
+    color: #f0f0f0;
+    margin-bottom: var(--sp-2);
+}
+
+.subtitle {
+    font-family: var(--font-body);
+    color: #8a8a9a;
+    font-size: 1rem;
+}
+
+.loadingText {
+    grid-column: 1 / -1;
+    text-align: center;
+    color: #8a8a9a;
+    font-family: var(--font-body);
+    padding: var(--sp-8) 0;
+}
+
+/* ── BILLING TOGGLE ─────────────────────────────────────────── */
+.toggleWrap {
+    display: flex;
+    justify-content: center;
+    margin-bottom: var(--sp-8);
+}
+
+.toggle {
+    position: relative;
+    display: flex;
+    width: 320px;
+    background: #1c1c1f;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: var(--r-full);
+    padding: var(--sp-1);
+    gap: var(--sp-1);
+}
+
+.toggleThumb {
+    position: absolute;
+    top: var(--sp-1);
+    bottom: var(--sp-1);
+    left: var(--sp-1);
+    width: calc(50% - var(--sp-1));
+    background: rgba(124, 95, 245, 0.15);
+    border: 1px solid #7c5ff5;
+    box-shadow: 0 0 0 1px rgba(255, 209, 102, 0.25), 0 0 16px rgba(124, 95, 245, 0.15);
+    border-radius: var(--r-full);
+    transition: transform var(--t-slow);
+}
+
+.toggleThumb[data-position="yearly"] {
+    transform: translateX(100%);
+}
+
+.toggleBtn {
+    position: relative;
+    z-index: 1;
+    flex: 1 1 0;
+    background: transparent;
+    color: #8a8a9a;
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    font-weight: 500;
+    padding: var(--sp-2) var(--sp-5);
+    border-radius: var(--r-full);
+    transition: color var(--t-base);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    gap: var(--sp-2);
+}
+
+.toggleBtnActive {
+    color: #f0f0f0;
+}
+
+.toggleSave {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #22c55e;
+}
+
+/* ── PLANS GRID ──────────────────────────────────────────────── */
+.plansGrid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--sp-6);
+    align-items: start;
+    margin-bottom: var(--sp-8);
+}
+
+/* ── CARD ────────────────────────────────────────────────────── */
+.card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    background: #1c1c1f;
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: var(--r-xl);
+    padding: var(--sp-6);
+    transition:
+        transform var(--t-base),
+        border-color var(--t-base),
+        box-shadow var(--t-base);
+    opacity: 1;
+    animation: cardRise var(--t-slow) var(--ease-out) forwards;
+    animation-delay: calc(var(--stagger-index, 0) * 80ms);
+}
+
+.card:hover,
+.card:focus-within {
+    transform: translateY(-4px);
+    border-color: rgba(255, 255, 255, 0.16);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+}
+
+@keyframes cardRise {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Pro: elevation + gradient border IS the popular signal */
+.cardPro {
+    border: 1px solid transparent;
+    background:
+        linear-gradient(#1c1c1f, #1c1c1f) padding-box,
+        linear-gradient(135deg, #7c5ff5, #c084fc) border-box;
+    transform: scale(1.03);
+}
+
+.cardPro:hover,
+.cardPro:focus-within {
+    transform: scale(1.03) translateY(-4px);
+}
+
+.cardPremium {
+    border-color: rgba(255, 255, 255, 0.08);
+}
+
+.popularBadge {
+    position: absolute;
+    top: var(--sp-4);
+    right: var(--sp-4);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-1);
+    font-family: var(--font-body);
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #22c55e;
+    background: rgba(34, 197, 94, 0.12);
+    border: 1px solid #22c55e;
+    border-radius: var(--r-full);
+    padding: var(--sp-1) var(--sp-3);
+}
+
+.popularBadgeIcon {
+    color: #22c55e;
+}
+
+/* ── PLAN NAME / CONSTELLATION ──────────────────────────────── */
+.planNameRow {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+    margin-bottom: var(--sp-2);
+}
+
+.planIcon {
+    color: #c084fc;
+}
+
+.planName {
+    font-family: var(--font-display);
+    font-size: 1.375rem;
+    font-weight: 700;
+    color: #f0f0f0;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-2);
+}
+
+.constellation {
+    width: 32px;
+    height: 14px;
+    stroke: #c084fc;
+    fill: #c084fc;
+}
+
+.constellation path {
+    fill: none;
+    stroke-width: 1;
+    opacity: 0.6;
+}
+
+.planDescription {
+    font-family: var(--font-body);
+    color: #8a8a9a;
+    font-size: 0.875rem;
+    margin-bottom: var(--sp-5);
+    min-height: 2.5em;
+}
+
+/* ── PRICE ───────────────────────────────────────────────────── */
+.price {
+    display: flex;
+    align-items: baseline;
+    gap: var(--sp-2);
+    margin-bottom: var(--sp-5);
+}
+
+.priceValue {
+    font-family: var(--font-display);
+    font-size: 2.75rem;
+    font-weight: 700;
+    color: #f0f0f0;
+    line-height: 1;
+}
+
+.priceGradient .priceValue {
+    background: linear-gradient(135deg, #7c5ff5, #c084fc);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.priceMeta {
+    display: flex;
+    flex-direction: column;
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    color: #8a8a9a;
+    line-height: 1.3;
+}
+
+.priceBilling {
+    color: #5a5a6a;
+}
+
+/* ── CTA ─────────────────────────────────────────────────────── */
+.cta {
+    position: relative;
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: 0.9rem;
+    padding: var(--sp-3) var(--sp-4);
+    border-radius: var(--r-md);
+    margin-bottom: var(--sp-6);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--sp-2);
+    transition:
+        transform var(--t-fast),
+        box-shadow var(--t-base),
+        background var(--t-base),
+        color var(--t-base);
+    background: #242428;
+    color: #8a8a9a;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.cta:not(:disabled):hover {
+    transform: translateY(-1px);
+}
+
+.cta:disabled {
+    cursor: default;
+}
+
+/* Free: ghost / disabled */
+.ctaCurrent {
+    background: transparent;
+    color: #5a5a6a;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Pro: solid gradient fill, the one loud element on the page */
+.ctaPro {
+    background: linear-gradient(135deg, #7c5ff5, #c084fc);
+    color: #ffffff;
+    border: none;
+    box-shadow: 0 0 24px rgba(124, 95, 245, 0.15);
+    animation: proPulse 3s ease-in-out infinite;
+}
+
+@keyframes proPulse {
+
+    0%,
+    100% {
+        box-shadow: 0 0 16px rgba(124, 95, 245, 0.15);
+    }
+
+    50% {
+        box-shadow: 0 0 32px rgba(124, 95, 245, 0.15);
+    }
+}
+
+/* Premium: outline, gradient border only, fills solid on hover */
+.ctaPremium {
+    background: transparent;
+    color: #f0f0f0;
+    border: 1px solid transparent;
+    background:
+        linear-gradient(#1c1c1f, #1c1c1f) padding-box,
+        linear-gradient(135deg, #7c5ff5, #c084fc) border-box;
+}
+
+.ctaPremium:not(:disabled):hover {
+    background: linear-gradient(135deg, #7c5ff5, #c084fc);
+    color: #ffffff;
+}
+
+.ctaLoading {
+    opacity: 0.8;
+    cursor: progress;
+}
+
+.spinner {
+    width: 14px;
+    height: 14px;
+    border-radius: var(--r-full);
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    border-top-color: #ffffff;
+    animation: spin var(--t-slow) linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ── FEATURE LIST ────────────────────────────────────────────── */
+.featureList {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-3);
+    margin-top: auto;
+}
+
+.featureItem {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--sp-2);
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    color: #f0f0f0;
+}
+
+.featureStar {
+    flex-shrink: 0;
+    background: linear-gradient(135deg, #7c5ff5, #c084fc);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+/* ── "ALL PLANS INCLUDE" STRIP ──────────────────────────────── */
+.includeStrip {
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding-top: var(--sp-6);
+    text-align: center;
+}
+
+.includeTitle {
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #5a5a6a;
+    margin-bottom: var(--sp-5);
+}
+
+.includeList {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--sp-3);
+}
+
+.includePill {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-2);
+    background: #1c1c1f;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: var(--r-full);
+    padding: var(--sp-2) var(--sp-4);
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+    color: #8a8a9a;
+}
+
+.includeIcon {
+    color: #c084fc;
+}
+
+/* ── REDUCED MOTION ──────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+    .card {
+        animation: none;
+        opacity: 1;
+    }
+
+    .ctaPro {
+        animation: none;
+    }
+}
+
+/* ── RESPONSIVE ──────────────────────────────────────────────── */
+@media (max-width: 900px) {
+    .plansGrid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .cardPro {
+        grid-column: 1 / -1;
+        max-width: 360px;
+        margin: 0 auto;
+    }
+}
+
+@media (max-width: 640px) {
+    .page {
+        padding: var(--sp-6) var(--sp-3);
+    }
+
+    .title {
+        font-size: 1.75rem;
+    }
+
+    .plansGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .cardPro {
+        transform: none;
+        max-width: none;
+    }
+
+    .cardPro:hover,
+    .cardPro:focus-within {
+        transform: translateY(-4px);
+    }
+
+    .toggle {
+        width: 100%;
+        max-width: 320px;
+    }
+
+    .toggleBtn {
+        flex: 1;
+        justify-content: center;
+    }
+}

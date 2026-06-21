@@ -32,6 +32,7 @@ import ProjectSubmissionScheduler from "./pages/Projectsubmissionscheduler.jsx";
 import Assignments from "./pages/Assignments.jsx";
 import SearchResults from "./pages/Searchresults.jsx";
 import ComingSoon from "./components/ComingSoon/Index.jsx";
+import Payment from "./pages/Payment.jsx";
 
 const App = () => {
   const { user } = useUser();
@@ -54,6 +55,10 @@ const App = () => {
         <Route
           path="/login"
           element={<Login />}
+        />
+        <Route
+          path="/upgrade"
+          element={<Payment />}
         />
 
         <Route

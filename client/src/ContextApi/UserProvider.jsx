@@ -29,6 +29,12 @@ const UserProvider = ({ children }) => {
   useEffect(() => {
     let cancelled = false; // guard against unmount race
 
+    const PUBLIC_PATHS = ["/", "/login", "/register"];
+    if (PUBLIC_PATHS.includes(window.location.pathname)) {
+      setStatus(STATUS.UNAUTHENTICATED);
+      return;
+    }
+    
     const fetchUser = async () => {
       // [FIX-2] show INSIDE async fn, tied to this specific fetch
       show("Loading your profile…");
