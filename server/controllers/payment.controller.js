@@ -7,6 +7,7 @@ import { SharedFeature } from "../models/sharedFeature.model.js"
 import mongoose from "mongoose"
 import { razorpay } from "../lib/razorpay.js"
 import Payment from "../models/payment.model.js"
+import { verifyPaymentValidator } from "../validators/payment.validator.js"
 
 const isValidId = (id) => {
     return mongoose.Types.ObjectId.isValid(id)
@@ -112,4 +113,20 @@ const createOrder = asyncHandler(async (req, res) => {
         .status(200)
         .json(new ApiResponse(200, { orderId: order.id, amount, currency, keyId: process.env.RAZORPAY_KEY_ID }, "Payment order created"))
 })
-export { getPaymentPlans, setSubscription, createOrder }
+
+const verifyOrder =asyncHandler(async(req, res)=>{
+    const {validate, error} = verifyPaymentValidator.safeParse(req.body)
+
+    if(error){
+        throw new ApiError(400,"Invalid payment credentials")
+    }
+
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = validate
+
+    if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature){
+        throw new ApiError(400, "Payment credentials missing")
+    }
+
+    
+})
+export { getPaymentPlans, setSubscription, createOrder, verifyOrder }
