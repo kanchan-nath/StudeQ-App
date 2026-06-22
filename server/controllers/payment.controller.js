@@ -8,6 +8,8 @@ import mongoose from "mongoose"
 import { razorpay } from "../lib/razorpay.js"
 import Payment from "../models/payment.model.js"
 import { verifyPaymentValidator } from "../validators/payment.validator.js"
+import crypto from "crypto"
+import logger from "../logger/index.js"
 
 const isValidId = (id) => {
     return mongoose.Types.ObjectId.isValid(id)
@@ -114,19 +116,74 @@ const createOrder = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, { orderId: order.id, amount, currency, keyId: process.env.RAZORPAY_KEY_ID }, "Payment order created"))
 })
 
-const verifyOrder =asyncHandler(async(req, res)=>{
-    const {validate, error} = verifyPaymentValidator.safeParse(req.body)
+const verifyOrder = asyncHandler(async (req, res) => {
+    const { validate, error } = verifyPaymentValidator.safeParse(req.body)
 
-    if(error){
-        throw new ApiError(400,"Invalid payment credentials")
+    if (error) {
+        throw new ApiError(400, "Invalid payment credentials")
     }
 
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = validate
 
-    if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature){
+    if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
         throw new ApiError(400, "Payment credentials missing")
     }
 
-    
+    const expected = crypto
+        .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
+        .update(`${razorpay_order_id}|${razorpay_payment_id}`)
+        .digest("hex")
+
+    const isValid =
+        expected.length === razorpay_signature.length &&
+        crypto.timingSafeEqual(Buffer.from(expected, 'utf8'), Buffer.from(razorpay_signature, 'utf8'));
+
+    if (!isValid) {
+        await Payment.findByIdAndUpdate(
+            {
+                _id: req.user.id,
+                razorpayOrderId: razorpay_order_id
+            },
+            {
+                status: "FAILED",
+                failureReason: 'signature mismatch'
+            }
+        )
+
+        logger.warn('Payment signature mismatch', { orderId: razorpay_order_id, userId: req.user.id });
+
+        return res
+            .status(400)
+            .json({ error: "Payment verification failed" })
+    }
+
+    const payment = await Payment.findOne(
+        {
+            _id: req.user.id,
+            razorpayOrderId: razorpay_order_id
+        }
+    )
+
+    if (!payment || payment.userId !== req.user.id) {
+        return res
+            .status(403)
+            .json({ error: "Order does not belong to this user" })
+    }
+
+    await payment.findByIdAndUpdate(
+        {
+            _id: req.user.id,
+            razorpayOrderId: razorpay_order_id
+        },
+        {
+            razorpayPaymentId: razorpay_payment_id,
+            razorpaySignature: razorpay_signature,
+            status: 'VERIFIED',
+        }
+    )
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, {}, "Confirming with payment provider…"))
 })
 export { getPaymentPlans, setSubscription, createOrder, verifyOrder }
