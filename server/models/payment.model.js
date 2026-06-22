@@ -49,13 +49,9 @@ const paymentSchema = new mongoose.Schema(
             default: "CREATED",
         },
 
-        productType: {
+        receipt: {
             type: String,
             required: true,
-        },
-
-        productRef: {
-            type: String,
         },
 
         webhookEventId: {
