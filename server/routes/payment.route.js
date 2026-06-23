@@ -5,7 +5,7 @@ const router = Router()
 
 router.route("/billing/plans").get(getPaymentPlans)
 router.route("/billing/subscription").get(setSubscription)
-router.route("/billing/subscribe/:id").get(createOrder)
+router.route("/payments/create-order/:id").post(createOrder)
 router.route("/payment/verify-order").get(verifyOrder)
 
 

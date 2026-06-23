@@ -73,6 +73,10 @@ const setSubscription = asyncHandler(async (req, res) => {
 const createOrder = asyncHandler(async (req, res) => {
     const { id } = req.params
 
+    const { billingCycle } = req.body
+    if(!billingCycle){
+        throw new ApiError(400, "Billing plan is not set")
+    }
     if (!id) {
         throw new ApiError(400, "Invalid Plan Id")
     }
@@ -81,7 +85,7 @@ const createOrder = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Invslid Id")
     }
 
-    const userId = req.user.id
+    const userId = 19
 
     const existedPlan = await Plan.findById({ _id: id })
 
@@ -90,8 +94,8 @@ const createOrder = asyncHandler(async (req, res) => {
     }
 
     const amount = billingCycle === 'yearly'
-        ? existedPlan.priceYearly
-        : existedPlan.priceMonthly
+        ? existedPlan.priceYearly *100
+        : existedPlan.priceMonthly* 100
 
     const currency = "INR"
     const order = await razorpay.orders.create(
@@ -101,6 +105,7 @@ const createOrder = asyncHandler(async (req, res) => {
             receipt: `rcpt_${userId}_${Date.now()}`,
         }
     )
+console.log("Order",order);
 
     await Payment.create({
         userId,
@@ -117,13 +122,13 @@ const createOrder = asyncHandler(async (req, res) => {
 })
 
 const verifyOrder = asyncHandler(async (req, res) => {
-    const { validate, error } = verifyPaymentValidator.safeParse(req.body)
+    const { data, error } = verifyPaymentValidator.safeParse(req.body)
 
     if (error) {
         throw new ApiError(400, "Invalid payment credentials")
     }
 
-    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = validate
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = data
 
     if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
         throw new ApiError(400, "Payment credentials missing")
@@ -139,9 +144,9 @@ const verifyOrder = asyncHandler(async (req, res) => {
         crypto.timingSafeEqual(Buffer.from(expected, 'utf8'), Buffer.from(razorpay_signature, 'utf8'));
 
     if (!isValid) {
-        await Payment.findByIdAndUpdate(
+        await Payment.findOneAndUpdate(
             {
-                _id: req.user.id,
+                userId:req.user.id,
                 razorpayOrderId: razorpay_order_id
             },
             {
@@ -150,7 +155,9 @@ const verifyOrder = asyncHandler(async (req, res) => {
             }
         )
 
-        logger.warn('Payment signature mismatch', { orderId: razorpay_order_id, userId: req.user.id });
+        logger.warn('Payment signature mismatch');
+        console.error({ orderId: razorpay_order_id, userId: req.user.id });
+        
 
         return res
             .status(400)
