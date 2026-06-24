@@ -42,7 +42,7 @@ const Navbar = () => {
           <Link to="/image-analysis">Image Analytics</Link>
         </li>
         <li>
-          <Link to="/pdf-analysis">Pdf Analytics</Link>
+          <Link to="/pdf-summary">Pdf Analytics</Link>
         </li>
       </ul>
 

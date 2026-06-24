@@ -34,7 +34,7 @@ const NAV_MAIN = [
 const NAV_AI = [
   { to: "/search", label: "Search", icon: Calendar03Icon, color: "orange" },
   { to: "/image-analysis", label: "Image Analysis", icon: SearchList01Icon, color: "pink" },
-  { to: "/pdf-analysis", label: "PDF Analysis", icon: Pdf02Icon, color: "teal" },
+  { to: "/pdf-summary", label: "PDF Analysis", icon: Pdf02Icon, color: "teal" },
   { to: "/tutor", label: "AI Tutor", icon: TeachingIcon, color: "purple" },
 ];
 

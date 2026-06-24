@@ -190,7 +190,7 @@ const App = () => {
             }
           />
           <Route
-            path="/pdf-analysis"
+            path="/pdf-summary"
             element={
               <ProtectedRoute
                 component={

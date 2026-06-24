@@ -44,7 +44,7 @@ describe("QUICK_ACTIONS", () => {
       "/tutor",
       "/studyroom",
       "/image-analysis",
-      "/pdf-analysis",
+      "/pdf-summary",
     ]);
   });
 });

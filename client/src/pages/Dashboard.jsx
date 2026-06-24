@@ -29,7 +29,7 @@ export const QUICK_ACTIONS = [
   { label: "Chat with AI", icon: Chat01Icon, to: "/tutor" },
   { label: "Study Room", icon: MeetingRoomIcon, to: "/studyroom" },
   { label: "Image Analysis", icon: Image01Icon, to: "/image-analysis" },
-  { label: "PDF Analysis", icon: Pdf02Icon, to: "/pdf-analysis" },
+  { label: "PDF Analysis", icon: Pdf02Icon, to: "/pdf-summary" },
 ];
 export const NAV_ITEMS = [
   { id: "home", icon: Home01Icon, label: "Dashboard", to: "/" },
@@ -52,7 +52,7 @@ export const NAV_ITEMS = [
     id: "pdf-analysis",
     icon: Pdf02Icon,
     label: "PDF Analysis",
-    to: "/pdf-analysis",
+    to: "/pdf-summary",
   },
   {
     id: "flashcards",
@@ -98,7 +98,7 @@ export const FEATURE_CARDS = [
     title: "Break Down a PDF",
     desc: "Upload any PDF and extract key concepts, summaries, and quiz questions in seconds.",
     cta: "Analyze PDF",
-    to: "/pdf-analysis",
+    to: "/pdf-summary",
   },
   {
     icon: CpuChargeIcon,
@@ -612,7 +612,7 @@ const Dashboard = () => {
               content automatically.
             </p>
             <Link
-              to="/pdf-analysis"
+              to="/pdf-summary"
               className={`${styles.cardCta} ${styles.cardCtaRed}`}
             >
               Analyze PDF <span aria-hidden="true">→</span>
