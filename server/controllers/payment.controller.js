@@ -165,37 +165,8 @@ const verifyOrder = asyncHandler(async (req, res) => {
         data: { planId: planIdentifier }
     })
 
-    if (!payment || payment.userId !== String(req.user.id)) {
-        return res
-            .status(403)
-            .json({ error: "Order does not belong to this user" })
-    }
-
-    await Payment.findOneAndUpdate(
-        {
-            userId: req.user.id,
-            razorpayOrderId: razorpay_order_id
-        },
-        {
-            razorpayPaymentId: razorpay_payment_id,
-            razorpaySignature: razorpay_signature,
-            status: 'VERIFIED',
-        }
-    )
-    const planId = await Payment.findOne({ userId: req.user.id, razorpayOrderId: razorpay_order_id }).populate("planId")
-
-    console.log(planId.planId.planId);
-
-    await prisma.user.update({
-        where: { id: req.user.id },
-        data: {
-            // razorpayOrderId: razorpay_order_id,
-            planId: planId.planId.planId
-        }
-
-    })
     return res
         .status(200)
-        .json(new ApiResponse(200, {}, "Confirming with payment provider…"))
+        .json(new ApiResponse(200, {}, "Payment verified successfully"))
 })
 export { getPaymentPlans, setSubscription, createOrder, verifyOrder }
