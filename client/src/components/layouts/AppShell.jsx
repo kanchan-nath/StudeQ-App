@@ -182,9 +182,22 @@ const AppShell = () => {
           </button>
         </div>
 
-        <button className={styles["topbar__upgrade-btn"]} aria-label="Upgrade to premium">
+        <button className={styles["topbar__upgrade-btn"]} aria-label="Upgrade to premium" onClick={() => {
+          setProfileOpen(false);
+          navigate("/upgrade"); // adjust route if needed
+        }}>
           <CashbackIcon />
-          <span className={styles["topbar__upgrade-label"]}>Upgrade</span>
+          <span className={styles["topbar__upgrade-label"]}>
+            {planId === "premium" ? (
+              <span>Premium Plan</span>
+            ) : planId === "pro" ? (
+              <span>Pro Plan </span>
+            ) : (
+              <>
+                Upgrade Plan
+              </>
+            )}
+          </span>
         </button>
 
         {/* ── THEME TOGGLE ── */}
@@ -455,9 +468,20 @@ const AppShell = () => {
             Unlock unlimited AI sessions, advanced PDF analysis, priority tutor
             access, and your full study history.
           </p>
-          <button className={styles["upgrade-card__btn"]}>
+          <button className={styles["upgrade-card__btn"]} onClick={() => {
+            setProfileOpen(false);
+            navigate("/upgrade"); // adjust route if needed
+          }}>
             <CashbackIcon />
-            Upgrade now
+            {planId === "premium" ? (
+              <span>Premium Plan Unlocked</span>
+            ) : planId === "pro" ? (
+              <span>Pro Plan Unlocked</span>
+            ) : (
+              <>
+                Upgrade Plan
+              </>
+            )}
           </button>
         </div>
 
