@@ -109,6 +109,10 @@ const verifyOrder = asyncHandler(async (req, res) => {
 
     const payment = await Payment.findOne({ userId, razorpayOrderId: razorpay_order_id }).populate("planId")
 
+    if(!payment){
+        throw ne
+        w ApiError(403, "Order does not belong to this user")
+    }
     const expected = crypto
         .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
         .update(`${razorpay_order_id}|${razorpay_payment_id}`)
