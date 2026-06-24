@@ -28,7 +28,7 @@ export const QUICK_ACTIONS = [
   { label: "Create Quiz", icon: Quiz04Icon, to: "/quiz" },
   { label: "Chat with AI", icon: Chat01Icon, to: "/tutor" },
   { label: "Study Room", icon: MeetingRoomIcon, to: "/studyroom" },
-  { label: "Image Analysis", icon: Image01Icon, to: "/image-analysis" },
+  { label: "Image Analysis", icon: Image01Icon, to: "/image-analyzer" },
   { label: "PDF Analysis", icon: Pdf02Icon, to: "/pdf-summary" },
 ];
 export const NAV_ITEMS = [
@@ -46,7 +46,7 @@ export const NAV_ITEMS = [
     id: "image-analysis",
     icon: Image01Icon,
     label: "Image Analysis",
-    to: "/image-analysis",
+    to: "/image-analyzer",
   },
   {
     id: "pdf-analysis",
@@ -90,7 +90,7 @@ export const FEATURE_CARDS = [
     title: "Analyze an Image",
     desc: "Drop a diagram, chart, or handwritten page — get a full AI-powered explanation.",
     cta: "Analyze image",
-    to: "/image-analysis",
+    to: "/image-analyzer",
   },
   {
     icon: Pdf02Icon,
@@ -582,7 +582,7 @@ const Dashboard = () => {
               them instantly.
             </p>
             <Link
-              to="/image-analysis"
+              to="/image-analyzer"
               className={`${styles.cardCta} ${styles.cardCtaPink}`}
             >
               Analyze Image <span aria-hidden="true">→</span>

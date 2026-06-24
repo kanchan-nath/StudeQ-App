@@ -43,7 +43,7 @@ describe("QUICK_ACTIONS", () => {
       "/quiz",
       "/tutor",
       "/studyroom",
-      "/image-analysis",
+      "/image-analyzer",
       "/pdf-summary",
     ]);
   });

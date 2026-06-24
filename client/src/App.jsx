@@ -175,7 +175,7 @@ const App = () => {
             }
           />
           <Route
-            path="/image-analysis"
+            path="/image-analyzer"
             element={
               <ProtectedRoute
                 component={
@@ -276,7 +276,7 @@ const App = () => {
             element={<ProtectedRoute component={<Notebook />} />}
           />
           <Route
-            path="/notebook/:chatId"
+            path="/notebook/:id"
             element={<ProtectedRoute component={<Notebook />} />}
           />
           <Route
