@@ -55,7 +55,7 @@ const handleCaptured = async (payload, eventId) => {
         await redisClient.del(`entitlement:${payment.userId}`).catch(err =>
             logger.error('Cache invalidation failed on duplicate capture', { err: err.message })
         )
-        
+
         return;
     }
 
@@ -71,11 +71,14 @@ const handleCaptured = async (payload, eventId) => {
             }
         );
 
-        logger.error('Amount mismatch on capture — possible tampering', {
+        logger.error('Amount mismatch on capture — possible tampering');
+        
+        console.error({
             paymentId: payment._id,
             expected: payment.amount,
             got: paymentEntity.amount,
         });
+        
 
         return;
     }
