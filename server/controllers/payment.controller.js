@@ -109,10 +109,10 @@ const verifyOrder = asyncHandler(async (req, res) => {
 
     const payment = await Payment.findOne({ userId, razorpayOrderId: razorpay_order_id }).populate("planId")
 
-    if(!payment){
-        throw ne
-        w ApiError(403, "Order does not belong to this user")
+    if (!payment) {
+        throw new ApiError(403, "Order does not belong to this user")
     }
+
     const expected = crypto
         .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
         .update(`${razorpay_order_id}|${razorpay_payment_id}`)
@@ -125,7 +125,7 @@ const verifyOrder = asyncHandler(async (req, res) => {
     if (!isValid) {
         await Payment.findOneAndUpdate(
             {
-                userId: req.user.id,
+                userId,
                 razorpayOrderId: razorpay_order_id
             },
             {
@@ -137,10 +137,7 @@ const verifyOrder = asyncHandler(async (req, res) => {
         logger.warn('Payment signature mismatch');
         console.error({ orderId: razorpay_order_id, userId: req.user.id });
 
-
-        return res
-            .status(400)
-            .json({ error: "Payment verification failed" })
+        throw new ApiError(400, "Payment verification failed")
     }
 
     const payment = await Payment.findOne(
