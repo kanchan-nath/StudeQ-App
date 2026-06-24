@@ -77,7 +77,7 @@ const createOrder = asyncHandler(async (req, res) => {
     const order = await razorpay.orders.create(
         {
             amount,
-            currency:"INR",
+            currency: "INR",
             receipt: `rcpt_${userId}_${Date.now()}`,
         }
     )
@@ -94,21 +94,20 @@ const createOrder = asyncHandler(async (req, res) => {
 
     return res
         .status(200)
-        .json(new ApiResponse(200, { orderId: order.id, amount, currency:"INR", keyId: process.env.RAZORPAY_KEY_ID }, "Payment order created"))
+        .json(new ApiResponse(200, { orderId: order.id, amount, currency: "INR", keyId: process.env.RAZORPAY_KEY_ID }, "Payment order created"))
 })
 
 const verifyOrder = asyncHandler(async (req, res) => {
-    const { data, error } = verifyPaymentValidator.safeParse(req.body)
+    const { data: body, error } = verifyPaymentValidator.safeParse(req.body)
 
     if (error) {
         throw new ApiError(400, "Invalid payment credentials")
     }
 
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body
+    const userId = req.user.id
 
-    if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
-        throw new ApiError(400, "Payment credentials missing")
-    }
+    const payment = await Payment.findOne({ userId, razorpayOrderId: razorpay_order_id }).populate("planId")
 
     const expected = crypto
         .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
