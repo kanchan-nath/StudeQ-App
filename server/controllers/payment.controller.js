@@ -85,7 +85,7 @@ const createOrder = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Invslid Id")
     }
 
-    const userId = 19
+    const userId = req.user.id
 
     const existedPlan = await Plan.findById({ _id: id })
 
@@ -106,7 +106,6 @@ const createOrder = asyncHandler(async (req, res) => {
         }
     )
 console.log("Order",order);
-
     await Payment.create({
         userId,
         razorpayOrderId: order.id,
@@ -128,7 +127,7 @@ const verifyOrder = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Invalid payment credentials")
     }
 
-    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = data
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body
 
     if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
         throw new ApiError(400, "Payment credentials missing")
@@ -166,20 +165,20 @@ const verifyOrder = asyncHandler(async (req, res) => {
 
     const payment = await Payment.findOne(
         {
-            _id: req.user.id,
+            userId: req.user.id,
             razorpayOrderId: razorpay_order_id
         }
     )
 
-    if (!payment || payment.userId !== req.user.id) {
+    if (!payment || payment.userId !== String(req.user.id)) {
         return res
             .status(403)
             .json({ error: "Order does not belong to this user" })
     }
 
-    await payment.findByIdAndUpdate(
+    await Payment.findOneAndUpdate(
         {
-            _id: req.user.id,
+            userId: req.user.id,
             razorpayOrderId: razorpay_order_id
         },
         {
