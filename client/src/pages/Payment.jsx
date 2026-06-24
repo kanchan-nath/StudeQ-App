@@ -22,6 +22,7 @@ import { ERROR_TYPES, resolveErrorType } from "../errors/config/errorConfig.js";
 import useErrorHandler from "../errors/hooks/useErrorHandler.jsx";
 
 import styles from "../pages/styles/Payment.module.css";
+import { useRazorpayCheckout } from "../lib/Userazorpaycheckout.js";
 
 // ── Icon lookup for backend-provided feature keys ───────────────────────────────
 const FEATURE_ICON_MAP = {
@@ -98,7 +99,7 @@ const DEFAULT_SUBSCRIPTION = { planId: null, billingCycle: "monthly" };
 const Payment = () => {
     const { show, hide } = useLoader();
     const navigate = useNavigate();
-
+    const { pay } = useRazorpayCheckout();
     // ── Error handler hook ───────────────────────────────────────────────────────
     const { notifyError, notifySuccess } = useErrorHandler();
 
@@ -180,50 +181,86 @@ const Payment = () => {
     }, [navigate, notifyError, show, hide]);
 
     useEffect(() => {
-        fetchData();          
+        fetchData();
     }, []);
 
     // ── Plan selection / checkout ────────────────────────────────────────────────
+    // const handleSelectPlan = useCallback(
+    //     async (planId) => {
+    //         if (planId === currentPlanId || loadingPlanId) return;
+
+    //         setLoadingPlanId(planId);
+
+    //         try {
+    //             const res = await apiFetch("/api/billing/subscribe", {
+    //                 method: "POST",
+    //                 body: JSON.stringify({ planId, billingCycle }),
+    //             });
+
+    //             if (res.status === 401) {
+    //                 notifyError("Session expired. Sign in again.");
+    //                 navigate("/login");
+    //                 return;
+    //             }
+
+    //             if (!res.ok) {
+    //                 notifyError("Could not start checkout. Try again.");
+    //                 return;
+    //             }
+
+    //             const data = await res.json();
+
+    //             if (data?.data?.checkoutUrl) {
+    //                 window.location.href = data.data.checkoutUrl;
+    //                 return;
+    //             }
+
+    //             setCurrentPlanId(planId);
+    //             notifySuccess("Plan updated.");
+    //         } catch (err) {
+    //             console.log(err);
+    //             notifyError("Network error. Try again.");
+    //         } finally {
+    //             setLoadingPlanId(null);
+    //         }
+    //     },
+    //     [currentPlanId, loadingPlanId, billingCycle, navigate, notifyError, notifySuccess],
+    // );
+
     const handleSelectPlan = useCallback(
-        async (planId) => {
-            if (planId === currentPlanId || loadingPlanId) return;
+        async (plan) => {
+            if (plan.planId === currentPlanId || loadingPlanId) return;
+            setLoadingPlanId(plan.planId);
 
-            setLoadingPlanId(planId);
-
-            try {
-                const res = await apiFetch("/api/billing/subscribe", {
-                    method: "POST",
-                    body: JSON.stringify({ planId, billingCycle }),
-                });
-
-                if (res.status === 401) {
-                    notifyError("Session expired. Sign in again.");
-                    navigate("/login");
-                    return;
-                }
-
-                if (!res.ok) {
-                    notifyError("Could not start checkout. Try again.");
-                    return;
-                }
-
-                const data = await res.json();
-
-                if (data?.data?.checkoutUrl) {
-                    window.location.href = data.data.checkoutUrl;
-                    return;
-                }
-
-                setCurrentPlanId(planId);
-                notifySuccess("Plan updated.");
-            } catch (err) {
-                console.log(err);
-                notifyError("Network error. Try again.");
-            } finally {
-                setLoadingPlanId(null);
-            }
+            pay({
+                productType: "plan_upgrade",
+                productRef: plan.planId,
+                id:plan._id,
+                billingCycle: billingCycle,
+                onSuccess: () => {
+                    setCurrentPlanId(plan.planId);
+                    notifySuccess("Plan updated. Confirmation incoming…");
+                    setLoadingPlanId(null);
+                },
+                onError: (err) => {
+                    if (err.status === 401) {
+                        notifyError("Session expired. Sign in again.");
+                        navigate("/login");
+                    } else if (err.status === 403) {
+                        setPageError(ERROR_TYPES.FORBIDDEN);
+                    } else if (err.status >= 500) {
+                        setPageError(ERROR_TYPES.SERVER_ERROR);
+                    } else if (err.status === 0) {
+                        notifyError("Network error. Check connection and try again.");
+                    } else {
+                        notifyError(err.message ?? "Could not start checkout. Try again.");
+                    }
+                    setLoadingPlanId(null);
+                },
+            });
+            // no finally — pay() opens modal async, callbacks fire later
         },
-        [currentPlanId, loadingPlanId, billingCycle, navigate, notifyError, notifySuccess],
+        [currentPlanId, loadingPlanId, pay, navigate, notifyError, notifySuccess],
     );
 
     // ── Full-page error — replaces page entirely ────────────────────────────────
@@ -344,7 +381,7 @@ const Payment = () => {
                                     <button
                                         type="button"
                                         disabled={isCurrent || isProcessing}
-                                        onClick={() => handleSelectPlan(plan.planId)}
+                                        onClick={() => handleSelectPlan(plan)}
                                         data-testid={`plan-cta-${plan.planId}`}
                                         className={[
                                             styles.cta,

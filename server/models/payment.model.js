@@ -5,7 +5,7 @@ const paymentSchema = new mongoose.Schema(
         userId: {
             required: true,
             index: true,
-            type:String
+            type: String
         },
 
         razorpayOrderId: {
@@ -39,12 +39,13 @@ const paymentSchema = new mongoose.Schema(
         status: {
             type: String,
             enum: [
-                "CREATED",
-                "ATTEMPTED",
+                "created",
+                "attempted",
                 "VERIFIED",
                 "CAPTURED",
                 "FAILED",
                 "REFUNDED",
+                "paid"
             ],
             default: "CREATED",
         },
@@ -62,6 +63,12 @@ const paymentSchema = new mongoose.Schema(
 
         failureReason: {
             type: String,
+        },
+        planId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Plan",
+            required: true,
+            index: true,
         },
     },
     {

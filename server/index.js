@@ -10,6 +10,7 @@ import { shutdownRedis } from "./lib/redisClient.js"
 import { closeAIResponseQueue } from "./services/queue.js"
 import { disconnectPrisma } from "./lib/prisma.js"
 import cookie from "cookie"
+import { seedPlansData } from "./controllers/payment.controller.js"
 
 const isProd = process.env.NODE_ENV || "production"
 
@@ -23,7 +24,7 @@ io.use((socket, next) => {
     try {
         const rawCookie = socket.handshake.headers.cookie || ""
         const token = cookie.parse(rawCookie).accessToken
-        
+
         if (!token) {
             return next(new Error("Unauthorized: no token"))
         }
@@ -97,7 +98,8 @@ if (!PORT) {
 
 let httpServer
 connectDB()
-    .then(() => {
+    .then(async () => {
+        await seedPlansData()
         httpServer = server.listen(PORT, '0.0.0.0', () => {
             logger.info(`Server is running at ${PORT}`);
 

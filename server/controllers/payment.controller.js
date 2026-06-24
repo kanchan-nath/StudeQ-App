@@ -10,100 +10,81 @@ import Payment from "../models/payment.model.js"
 import { verifyPaymentValidator } from "../validators/payment.validator.js"
 import crypto from "crypto"
 import logger from "../logger/index.js"
+import prisma from "../lib/prisma.js"
 
-const isValidId = (id) => {
-    return mongoose.Types.ObjectId.isValid(id)
+if (!process.env.RAZORPAY_KEY_SECRET || !process.env.RAZORPAY_KEY_ID) {
+    throw new Error("Missing required env vars: RAZORPAY_KEY_SECRET, RAZORPAY_KEY_ID")
 }
-const getPaymentPlans = asyncHandler(async (req, res) => {
-    const opsPlanData = plansData.map((p) => ({
-        updateOne: {
-            filter: {
-                planId: p.planId
-            },
-            update: {
-                $set: p
-            },
-            upsert: true
-        }
-    })
-    )
 
-    const opsSharedFeaturesSeed = sharedFeaturesSeed.map((f) => ({
-        updateOne: {
-            filter: {
-                iconKey: f.iconKey
-            },
-            update: {
-                $set: f
-            },
-            upsert: true
-        }
+const isValidId = (id) => mongoose.Types.ObjectId.isValid(id)
+
+export const seedPlansData = async () => {
+    const opsPlan = plansData.map(p => ({
+        updateOne: { filter: { planId: p.planId }, update: { $set: p }, upsert: true }
     }))
+    const opsFeatures = sharedFeaturesSeed.map(f => ({
+        updateOne: { filter: { iconKey: f.iconKey }, update: { $set: f }, upsert: true }
+    }))
+    await Plan.bulkWrite(opsPlan)
+    await SharedFeature.bulkWrite(opsFeatures)
+    logger.info("Plans and shared features seeded")
+}
 
-    await Plan.bulkWrite(opsPlanData)
-    await SharedFeature.bulkWrite(opsSharedFeaturesSeed)
-
-    const data = await Plan.find({}).lean();
-    const sharedFeaturesSeedData = await SharedFeature.find({}).lean();
-
+const getPaymentPlans = asyncHandler(async (req, res) => {
+    const [plans, sharedFeatures] = await Promise.all([
+        Plan.find({}).lean(),
+        SharedFeature.find({}).lean()
+    ])
     return res
         .status(200)
-        .json(new ApiResponse(200, { plans: data, sharedFeatures: sharedFeaturesSeedData }, "Plans fetched"))
+        .json(new ApiResponse(200, { plans, sharedFeatures }, "Plans fetched"))
 })
 
 const setSubscription = asyncHandler(async (req, res) => {
-    const userId = req.user?.id; // adjust per your auth middleware
-    // if (!userId) {
-    //     return res.status(401).json({ success: false, message: "Unauthorized" });
-    // }
+    const userId = req.user?.id
+    if (!userId) throw new ApiError(401, "Unauthorized")
 
-    // TODO: replace with real Mongoose lookup, e.g.:
-    // const sub = await Subscription.findOne({ userId });
+    // query Prisma user for current plan
+    const user = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { planId: true }
+    })
 
-    const sub = null; // hardcoded: no active sub yet
-
-    return res.status(200).json({
-        success: true,
-        data: {
-            planId: sub?.planId ?? "free",
-            billingCycle: sub?.billingCycle ?? "monthly",
-        },
-    });
+    return res.status(200).json(new ApiResponse(200, {
+        planId: user?.planId ?? "free",
+    }, "Subscription fetched"))
 })
+
 const createOrder = asyncHandler(async (req, res) => {
     const { id } = req.params
-
-    if (!id) {
-        throw new ApiError(400, "Invalid Plan Id")
-    }
-
-    if (!isValidId(id)) {
-        throw new ApiError(400, "Invslid Id")
-    }
-
+    const { billingCycle } = req.body
     const userId = req.user.id
 
-    const existedPlan = await Plan.findById({ _id: id })
-
-    if (!existedPlan) {
-        throw new ApiError(400, "Invalid request")
+    if (!billingCycle) {
+        throw new ApiError(400, "Billing cycle is required")
+    }
+    if (!id || !isValidId(id)) {
+        throw new ApiError(400, "Invalid plan Id")
     }
 
-    const amount = billingCycle === 'yearly'
-        ? existedPlan.priceYearly
-        : existedPlan.priceMonthly
+    const plan = await Plan.findById(id)
+    if (!plan) throw new ApiError(404, "Plan not found")
 
-    const currency = "INR"
+    const amount = billingCycle === "yearly"
+        ? plan.priceYearly * 100
+        : plan.priceMonthly * 100
+
     const order = await razorpay.orders.create(
         {
             amount,
-            currency,
+            currency: "INR",
             receipt: `rcpt_${userId}_${Date.now()}`,
         }
     )
 
     await Payment.create({
         userId,
+        planId: plan._id,
         razorpayOrderId: order.id,
         amount: order.amount,
         currency: order.currency,
@@ -113,20 +94,23 @@ const createOrder = asyncHandler(async (req, res) => {
 
     return res
         .status(200)
-        .json(new ApiResponse(200, { orderId: order.id, amount, currency, keyId: process.env.RAZORPAY_KEY_ID }, "Payment order created"))
+        .json(new ApiResponse(200, { orderId: order.id, amount, currency: "INR", keyId: process.env.RAZORPAY_KEY_ID }, "Payment order created"))
 })
 
 const verifyOrder = asyncHandler(async (req, res) => {
-    const { validate, error } = verifyPaymentValidator.safeParse(req.body)
+    const { data: body, error } = verifyPaymentValidator.safeParse(req.body)
 
     if (error) {
         throw new ApiError(400, "Invalid payment credentials")
     }
 
-    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = validate
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body
+    const userId = req.user.id
 
-    if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
-        throw new ApiError(400, "Payment credentials missing")
+    const payment = await Payment.findOne({ userId, razorpayOrderId: razorpay_order_id }).populate("planId")
+
+    if (!payment) {
+        throw new ApiError(403, "Order does not belong to this user")
     }
 
     const expected = crypto
@@ -139,9 +123,9 @@ const verifyOrder = asyncHandler(async (req, res) => {
         crypto.timingSafeEqual(Buffer.from(expected, 'utf8'), Buffer.from(razorpay_signature, 'utf8'));
 
     if (!isValid) {
-        await Payment.findByIdAndUpdate(
+        await Payment.findOneAndUpdate(
             {
-                _id: req.user.id,
+                userId,
                 razorpayOrderId: razorpay_order_id
             },
             {
@@ -150,40 +134,39 @@ const verifyOrder = asyncHandler(async (req, res) => {
             }
         )
 
-        logger.warn('Payment signature mismatch', { orderId: razorpay_order_id, userId: req.user.id });
+        logger.warn('Payment signature mismatch');
+        console.error({ orderId: razorpay_order_id, userId: req.user.id });
 
-        return res
-            .status(400)
-            .json({ error: "Payment verification failed" })
+        throw new ApiError(400, "Payment verification failed")
     }
 
-    const payment = await Payment.findOne(
+    const verified = await Payment.findOneAndUpdate(
         {
-            _id: req.user.id,
-            razorpayOrderId: razorpay_order_id
-        }
-    )
-
-    if (!payment || payment.userId !== req.user.id) {
-        return res
-            .status(403)
-            .json({ error: "Order does not belong to this user" })
-    }
-
-    await payment.findByIdAndUpdate(
-        {
-            _id: req.user.id,
+            userId,
             razorpayOrderId: razorpay_order_id
         },
         {
             razorpayPaymentId: razorpay_payment_id,
-            razorpaySignature: razorpay_signature,
-            status: 'VERIFIED',
-        }
-    )
+            status: "VERIFIED",
+        },
+        { new: true }
+    ).populate("planId")
+
+    const planIdentifier = verified?.planId?.planId
+
+    if (!planIdentifier) {
+        logger.error("Plan not found on verified payment")
+        console.error({ paymentId: verified._id });
+        throw new ApiError(500, "Plan resolution failed after payment")
+    }
+
+    await prisma.user.update({
+        where: { id: userId },
+        data: { planId: planIdentifier }
+    })
 
     return res
         .status(200)
-        .json(new ApiResponse(200, {}, "Confirming with payment provider…"))
+        .json(new ApiResponse(200, {}, "Payment verified successfully"))
 })
 export { getPaymentPlans, setSubscription, createOrder, verifyOrder }
