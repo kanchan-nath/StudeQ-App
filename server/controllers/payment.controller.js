@@ -31,40 +31,13 @@ export const seedPlansData = async () => {
 }
 
 const getPaymentPlans = asyncHandler(async (req, res) => {
-    const opsPlanData = plansData.map((p) => ({
-        updateOne: {
-            filter: {
-                planId: p.planId
-            },
-            update: {
-                $set: p
-            },
-            upsert: true
-        }
-    })
-    )
-
-    const opsSharedFeaturesSeed = sharedFeaturesSeed.map((f) => ({
-        updateOne: {
-            filter: {
-                iconKey: f.iconKey
-            },
-            update: {
-                $set: f
-            },
-            upsert: true
-        }
-    }))
-
-    await Plan.bulkWrite(opsPlanData)
-    await SharedFeature.bulkWrite(opsSharedFeaturesSeed)
-
-    const data = await Plan.find({}).lean();
-    const sharedFeaturesSeedData = await SharedFeature.find({}).lean();
-
+    const [plans, sharedFeatures] = await Promise.all([
+        Plan.find({}).lean(),
+        SharedFeature.find({}).lean()
+    ])
     return res
         .status(200)
-        .json(new ApiResponse(200, { plans: data, sharedFeatures: sharedFeaturesSeedData }, "Plans fetched"))
+        .json(new ApiResponse(200, { plans, sharedFeatures }, "Plans fetched"))
 })
 
 const setSubscription = asyncHandler(async (req, res) => {
