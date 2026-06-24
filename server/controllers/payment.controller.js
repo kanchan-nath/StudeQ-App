@@ -140,11 +140,16 @@ const verifyOrder = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Payment verification failed")
     }
 
-    const payment = await Payment.findOne(
+    const verified = await Payment.findOneAndUpdate(
         {
-            userId: req.user.id,
+            userId,
             razorpayOrderId: razorpay_order_id
-        }
+        },
+        {
+            razorpayPaymentId: razorpay_payment_id,
+            status: "VERIFIED",
+        },
+
     )
 
     if (!payment || payment.userId !== String(req.user.id)) {
