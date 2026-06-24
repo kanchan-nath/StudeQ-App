@@ -53,11 +53,12 @@ export function useRazorpayCheckout() {
             order_id: order.orderId,
             handler: async (response) => {
                 setStatus('verifying');
-                try {
-                    const res = await apiFetch('/api/payments/verify', {
+                try {                    
+                    const res = await apiFetch('/api/payments/verify-order', {
                         method: 'POST',
                         body: JSON.stringify(response),
                     });
+console.log("res", res);
 
                     if (!res.ok) {
                         const err = Object.assign(
