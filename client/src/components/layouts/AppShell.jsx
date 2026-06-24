@@ -57,6 +57,7 @@ const LEARN_MORE_LINKS = [
 
 const AppShell = () => {
   const { user, setUser } = useUser(); // ← pulled user from context, route passes no props
+  const planId = user?.planId
   const userName = user?.name ?? "";
   const userEmail = user?.email ?? "";
   const [isDark, setIsDark] = useState(() => {
@@ -73,7 +74,6 @@ const AppShell = () => {
   const [learnMoreOpen, setLearnMoreOpen] = useState(false);
   const profileRef = useRef(null);
   // ────────────────────────────────────────────────────────────
-
   useEffect(() => {
     const timer = setTimeout(() => setPanelOpen(true), 2500);
     return () => clearTimeout(timer);
@@ -182,9 +182,22 @@ const AppShell = () => {
           </button>
         </div>
 
-        <button className={styles["topbar__upgrade-btn"]} aria-label="Upgrade to premium">
+        <button className={styles["topbar__upgrade-btn"]} aria-label="Upgrade to premium" onClick={() => {
+          setProfileOpen(false);
+          navigate("/upgrade"); // adjust route if needed
+        }}>
           <CashbackIcon />
-          <span className={styles["topbar__upgrade-label"]}>Upgrade</span>
+          <span className={styles["topbar__upgrade-label"]}>
+            {planId === "premium" ? (
+              <span>Premium Plan</span>
+            ) : planId === "pro" ? (
+              <span>Pro Plan </span>
+            ) : (
+              <>
+                Upgrade Plan
+              </>
+            )}
+          </span>
         </button>
 
         {/* ── THEME TOGGLE ── */}
@@ -256,8 +269,16 @@ const AppShell = () => {
                 <span className={styles["profile-dropdown__item-icon"]} aria-hidden="true">
                   <CashbackIcon size={16} />
                 </span>
-                Upgrade plan
-                <span className={styles["profile-dropdown__badge"]}>Pro</span>
+                {planId === "premium" ? (
+                  <span>Premium Plan</span>
+                ) : planId === "pro" ? (
+                  <span>Pro Plan</span>
+                ) : (
+                  <>
+                    Upgrade Plan
+                    <span className={styles["profile-dropdown__badge"]}>Pro</span>
+                  </>
+                )}
               </button>
 
               <div className={styles["profile-dropdown__divider"]} role="separator" />
@@ -447,9 +468,20 @@ const AppShell = () => {
             Unlock unlimited AI sessions, advanced PDF analysis, priority tutor
             access, and your full study history.
           </p>
-          <button className={styles["upgrade-card__btn"]}>
+          <button className={styles["upgrade-card__btn"]} onClick={() => {
+            setProfileOpen(false);
+            navigate("/upgrade"); // adjust route if needed
+          }}>
             <CashbackIcon />
-            Upgrade now
+            {planId === "premium" ? (
+              <span>Premium Plan Unlocked</span>
+            ) : planId === "pro" ? (
+              <span>Pro Plan Unlocked</span>
+            ) : (
+              <>
+                Upgrade Plan
+              </>
+            )}
           </button>
         </div>
 
@@ -472,11 +504,11 @@ const AppShell = () => {
         >
           <div className={styles["streak-widget__left"]}>
             <span aria-hidden="true">🔥</span>
-            1-day streak!
+            {user.streak} streak!
           </div>
-          <Link to="/" className={styles["streak-widget__link"]}>
-            Leaderboard →
-          </Link>
+          <span className={styles["streak-widget__link"]}>
+            Keep it up
+          </span>
         </div>
 
         <div className={styles["panel-widget"]} aria-labelledby="announce-heading">
@@ -484,11 +516,11 @@ const AppShell = () => {
             🎉 What's New
           </h3>
           <p className={styles["panel-widget__body"]}>
-            <strong className={styles["text-primary"]}>Image Analysis is live!</strong>
+            <strong className={styles["text-primary"]}>Notebook analysis is live!</strong>
             <br />
             Drop any diagram or photo and get an instant AI breakdown. Try it now.
           </p>
-          <Link to="/image-analysis" className={styles["panel-widget__link"]}>
+          <Link to="/notebook" className={styles["panel-widget__link"]}>
             Try it →
           </Link>
         </div>
