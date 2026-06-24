@@ -16,9 +16,8 @@ if (!process.env.RAZORPAY_KEY_SECRET || !process.env.RAZORPAY_KEY_ID) {
     throw new Error("Missing required env vars: RAZORPAY_KEY_SECRET, RAZORPAY_KEY_ID")
 }
 
-const isValidId = (id) => {
-    return mongoose.Types.ObjectId.isValid(id)
-}
+const isValidId = (id) => mongoose.Types.ObjectId.isValid(id)
+
 const getPaymentPlans = asyncHandler(async (req, res) => {
     const opsPlanData = plansData.map((p) => ({
         updateOne: {
