@@ -57,17 +57,13 @@ const setSubscription = asyncHandler(async (req, res) => {
 
 const createOrder = asyncHandler(async (req, res) => {
     const { id } = req.params
-
     const { billingCycle } = req.body
-    if (!billingCycle) {
-        throw new ApiError(400, "Billing plan is not set")
-    }
-    if (!id) {
-        throw new ApiError(400, "Invalid Plan Id")
-    }
 
-    if (!isValidId(id)) {
-        throw new ApiError(400, "Invslid Id")
+    if (!billingCycle) {
+        throw new ApiError(400, "Billing cycle is required")
+    }
+    if (!id || !isValidId(id)) {
+        throw new ApiError(400, "Invalid plan Id")
     }
 
     const userId = req.user.id
