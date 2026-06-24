@@ -21,7 +21,6 @@ model User {
   refreshToken    String?
   totalXp         Int         @default(0)
   streak          Int         @default(0)
-  // razorpayOrderId String?
   planId          Plan        @default(free)
   lastStudyDate   String?
   notes           Note[]
