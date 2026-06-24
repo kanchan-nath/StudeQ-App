@@ -5,7 +5,7 @@ const paymentSchema = new mongoose.Schema(
         userId: {
             required: true,
             index: true,
-            type:String
+            type: String
         },
 
         razorpayOrderId: {
@@ -63,6 +63,12 @@ const paymentSchema = new mongoose.Schema(
 
         failureReason: {
             type: String,
+        },
+        planId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Plan",
+            required: true,
+            index: true,
         },
     },
     {
