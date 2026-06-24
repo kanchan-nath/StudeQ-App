@@ -74,18 +74,17 @@ const createOrder = asyncHandler(async (req, res) => {
         ? plan.priceYearly * 100
         : plan.priceMonthly * 100
 
-    const currency = "INR"
     const order = await razorpay.orders.create(
         {
             amount,
-            currency,
+            currency:"INR",
             receipt: `rcpt_${userId}_${Date.now()}`,
         }
     )
-    console.log("Order", order);
+
     await Payment.create({
         userId,
-        planId: existedPlan._id,
+        planId: plan._id,
         razorpayOrderId: order.id,
         amount: order.amount,
         currency: order.currency,
@@ -95,7 +94,7 @@ const createOrder = asyncHandler(async (req, res) => {
 
     return res
         .status(200)
-        .json(new ApiResponse(200, { orderId: order.id, amount, currency, keyId: process.env.RAZORPAY_KEY_ID }, "Payment order created"))
+        .json(new ApiResponse(200, { orderId: order.id, amount, currency:"INR", keyId: process.env.RAZORPAY_KEY_ID }, "Payment order created"))
 })
 
 const verifyOrder = asyncHandler(async (req, res) => {
