@@ -10,6 +10,11 @@ import Payment from "../models/payment.model.js"
 import { verifyPaymentValidator } from "../validators/payment.validator.js"
 import crypto from "crypto"
 import logger from "../logger/index.js"
+import prisma from "../lib/prisma.js"
+
+if (!process.env.RAZORPAY_KEY_SECRET || !process.env.RAZORPAY_KEY_ID) {
+    throw new Error("Missing required env vars: RAZORPAY_KEY_SECRET, RAZORPAY_KEY_ID")
+}
 
 const isValidId = (id) => {
     return mongoose.Types.ObjectId.isValid(id)
@@ -74,7 +79,7 @@ const createOrder = asyncHandler(async (req, res) => {
     const { id } = req.params
 
     const { billingCycle } = req.body
-    if(!billingCycle){
+    if (!billingCycle) {
         throw new ApiError(400, "Billing plan is not set")
     }
     if (!id) {
@@ -94,8 +99,8 @@ const createOrder = asyncHandler(async (req, res) => {
     }
 
     const amount = billingCycle === 'yearly'
-        ? existedPlan.priceYearly *100
-        : existedPlan.priceMonthly* 100
+        ? existedPlan.priceYearly * 100
+        : existedPlan.priceMonthly * 100
 
     const currency = "INR"
     const order = await razorpay.orders.create(
@@ -105,9 +110,10 @@ const createOrder = asyncHandler(async (req, res) => {
             receipt: `rcpt_${userId}_${Date.now()}`,
         }
     )
-console.log("Order",order);
+    console.log("Order", order);
     await Payment.create({
         userId,
+        planId: existedPlan._id,
         razorpayOrderId: order.id,
         amount: order.amount,
         currency: order.currency,
@@ -145,7 +151,7 @@ const verifyOrder = asyncHandler(async (req, res) => {
     if (!isValid) {
         await Payment.findOneAndUpdate(
             {
-                userId:req.user.id,
+                userId: req.user.id,
                 razorpayOrderId: razorpay_order_id
             },
             {
@@ -156,7 +162,7 @@ const verifyOrder = asyncHandler(async (req, res) => {
 
         logger.warn('Payment signature mismatch');
         console.error({ orderId: razorpay_order_id, userId: req.user.id });
-        
+
 
         return res
             .status(400)
@@ -176,7 +182,7 @@ const verifyOrder = asyncHandler(async (req, res) => {
             .json({ error: "Order does not belong to this user" })
     }
 
-    await Payment.findOneAndUpdate(
+     await Payment.findOneAndUpdate(
         {
             userId: req.user.id,
             razorpayOrderId: razorpay_order_id
@@ -187,7 +193,18 @@ const verifyOrder = asyncHandler(async (req, res) => {
             status: 'VERIFIED',
         }
     )
+    const planId = await Payment.findOne({userId:req.user.id, razorpayOrderId: razorpay_order_id}).populate("planId")
 
+    console.log(planId.planId.planId);
+    
+    await prisma.user.update({
+        where: { id: req.user.id },
+        data: {
+            // razorpayOrderId: razorpay_order_id,
+            planId:planId.planId.planId
+        }
+
+    })
     return res
         .status(200)
         .json(new ApiResponse(200, {}, "Confirming with payment provider…"))
