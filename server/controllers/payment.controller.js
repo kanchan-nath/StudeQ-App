@@ -41,24 +41,20 @@ const getPaymentPlans = asyncHandler(async (req, res) => {
 })
 
 const setSubscription = asyncHandler(async (req, res) => {
-    const userId = req.user?.id; // adjust per your auth middleware
-    // if (!userId) {
-    //     return res.status(401).json({ success: false, message: "Unauthorized" });
-    // }
+    const userId = req.user?.id
+    if (!userId) throw new ApiError(401, "Unauthorized")
 
-    // TODO: replace with real Mongoose lookup, e.g.:
-    // const sub = await Subscription.findOne({ userId });
+    // query Prisma user for current plan
+    const user = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { planId: true }
+    })
 
-    const sub = null; // hardcoded: no active sub yet
-
-    return res.status(200).json({
-        success: true,
-        data: {
-            planId: sub?.planId ?? "free",
-            billingCycle: sub?.billingCycle ?? "monthly",
-        },
-    });
+    return res.status(200).json(new ApiResponse(200, {
+        planId: user?.planId ?? "free",
+    }, "Subscription fetched"))
 })
+
 const createOrder = asyncHandler(async (req, res) => {
     const { id } = req.params
 
@@ -166,7 +162,7 @@ const verifyOrder = asyncHandler(async (req, res) => {
             .json({ error: "Order does not belong to this user" })
     }
 
-     await Payment.findOneAndUpdate(
+    await Payment.findOneAndUpdate(
         {
             userId: req.user.id,
             razorpayOrderId: razorpay_order_id
@@ -177,15 +173,15 @@ const verifyOrder = asyncHandler(async (req, res) => {
             status: 'VERIFIED',
         }
     )
-    const planId = await Payment.findOne({userId:req.user.id, razorpayOrderId: razorpay_order_id}).populate("planId")
+    const planId = await Payment.findOne({ userId: req.user.id, razorpayOrderId: razorpay_order_id }).populate("planId")
 
     console.log(planId.planId.planId);
-    
+
     await prisma.user.update({
         where: { id: req.user.id },
         data: {
             // razorpayOrderId: razorpay_order_id,
-            planId:planId.planId.planId
+            planId: planId.planId.planId
         }
 
     })
