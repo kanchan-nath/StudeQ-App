@@ -23,7 +23,7 @@ export const paymentWorker = new Worker(
                 break;
 
             default:
-                logger.info('Unhandled razorpay event type', { event, eventId });
+                logger.info('Unhandled razorpay event type');
         }
     },
     {
@@ -32,7 +32,7 @@ export const paymentWorker = new Worker(
     }
 );
 
-async function handleCaptured(payload, eventId) {
+const handleCaptured = async (payload, eventId) => {
     const paymentEntity = payload.payment.entity;
 
     const payment = await Payment.findOne({
@@ -50,11 +50,12 @@ async function handleCaptured(payload, eventId) {
 
     // Idempotency check
     if (payment.status === 'CAPTURED') {
-        logger.info('Duplicate capture event ignored', {
-            paymentId: payment._id,
-            eventId,
-        });
+        logger.info('Duplicate capture event ignored');
 
+        await redisClient.del(`entitlement:${payment.userId}`).catch(err =>
+            logger.error('Cache invalidation failed on duplicate capture', { err: err.message })
+        )
+        
         return;
     }
 
