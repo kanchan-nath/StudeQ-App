@@ -18,6 +18,18 @@ if (!process.env.RAZORPAY_KEY_SECRET || !process.env.RAZORPAY_KEY_ID) {
 
 const isValidId = (id) => mongoose.Types.ObjectId.isValid(id)
 
+export const seedPlansData = async () => {
+    const opsPlan = plansData.map(p => ({
+        updateOne: { filter: { planId: p.planId }, update: { $set: p }, upsert: true }
+    }))
+    const opsFeatures = sharedFeaturesSeed.map(f => ({
+        updateOne: { filter: { iconKey: f.iconKey }, update: { $set: f }, upsert: true }
+    }))
+    await Plan.bulkWrite(opsPlan)
+    await SharedFeature.bulkWrite(opsFeatures)
+    logger.info("Plans and shared features seeded")
+}
+
 const getPaymentPlans = asyncHandler(async (req, res) => {
     const opsPlanData = plansData.map((p) => ({
         updateOne: {
