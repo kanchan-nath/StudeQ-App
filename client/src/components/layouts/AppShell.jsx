@@ -57,6 +57,7 @@ const LEARN_MORE_LINKS = [
 
 const AppShell = () => {
   const { user, setUser } = useUser(); // ← pulled user from context, route passes no props
+  const planId = user?.planId
   const userName = user?.name ?? "";
   const userEmail = user?.email ?? "";
   const [isDark, setIsDark] = useState(() => {
@@ -73,7 +74,6 @@ const AppShell = () => {
   const [learnMoreOpen, setLearnMoreOpen] = useState(false);
   const profileRef = useRef(null);
   // ────────────────────────────────────────────────────────────
-
   useEffect(() => {
     const timer = setTimeout(() => setPanelOpen(true), 2500);
     return () => clearTimeout(timer);
@@ -256,8 +256,16 @@ const AppShell = () => {
                 <span className={styles["profile-dropdown__item-icon"]} aria-hidden="true">
                   <CashbackIcon size={16} />
                 </span>
-                Upgrade plan
-                <span className={styles["profile-dropdown__badge"]}>Pro</span>
+                {planId === "premium" ? (
+                  <span>Premium Plan</span>
+                ) : planId === "pro" ? (
+                  <span>Pro Plan</span>
+                ) : (
+                  <>
+                    Upgrade Plan
+                    <span className={styles["profile-dropdown__badge"]}>Pro</span>
+                  </>
+                )}
               </button>
 
               <div className={styles["profile-dropdown__divider"]} role="separator" />
