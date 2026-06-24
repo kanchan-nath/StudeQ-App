@@ -66,6 +66,9 @@ const createOrder = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Invalid plan Id")
     }
 
+    const plan = await Plan.findById(id)
+    if (!plan) throw new ApiError(404, "Plan not found")
+
     const userId = req.user.id
 
     const existedPlan = await Plan.findById({ _id: id })
