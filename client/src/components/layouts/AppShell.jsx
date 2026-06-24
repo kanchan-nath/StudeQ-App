@@ -504,11 +504,11 @@ const AppShell = () => {
         >
           <div className={styles["streak-widget__left"]}>
             <span aria-hidden="true">🔥</span>
-            1-day streak!
+            {user.streak} streak!
           </div>
-          <Link to="/" className={styles["streak-widget__link"]}>
-            Leaderboard →
-          </Link>
+          <span className={styles["streak-widget__link"]}>
+            Keep it up
+          </span>
         </div>
 
         <div className={styles["panel-widget"]} aria-labelledby="announce-heading">
@@ -516,11 +516,11 @@ const AppShell = () => {
             🎉 What's New
           </h3>
           <p className={styles["panel-widget__body"]}>
-            <strong className={styles["text-primary"]}>Image Analysis is live!</strong>
+            <strong className={styles["text-primary"]}>Notebook analysis is live!</strong>
             <br />
             Drop any diagram or photo and get an instant AI breakdown. Try it now.
           </p>
-          <Link to="/image-analysis" className={styles["panel-widget__link"]}>
+          <Link to="/notebook" className={styles["panel-widget__link"]}>
             Try it →
           </Link>
         </div>
