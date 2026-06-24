@@ -149,8 +149,21 @@ const verifyOrder = asyncHandler(async (req, res) => {
             razorpayPaymentId: razorpay_payment_id,
             status: "VERIFIED",
         },
+        { new: true }
+    ).populate("planId")
 
-    )
+    const planIdentifier = verified?.planId?.planId
+
+    if (!planIdentifier) {
+        logger.error("Plan not found on verified payment")
+        console.error({ paymentId: verified._id });
+        throw new ApiError(500, "Plan resolution failed after payment")
+    }
+
+    await prisma.user.update({
+        where: { id: userId },
+        data: { planId: planIdentifier }
+    })
 
     if (!payment || payment.userId !== String(req.user.id)) {
         return res
