@@ -58,6 +58,7 @@ const setSubscription = asyncHandler(async (req, res) => {
 const createOrder = asyncHandler(async (req, res) => {
     const { id } = req.params
     const { billingCycle } = req.body
+    const userId = req.user.id
 
     if (!billingCycle) {
         throw new ApiError(400, "Billing cycle is required")
@@ -69,17 +70,9 @@ const createOrder = asyncHandler(async (req, res) => {
     const plan = await Plan.findById(id)
     if (!plan) throw new ApiError(404, "Plan not found")
 
-    const userId = req.user.id
-
-    const existedPlan = await Plan.findById({ _id: id })
-
-    if (!existedPlan) {
-        throw new ApiError(400, "Invalid request")
-    }
-
-    const amount = billingCycle === 'yearly'
-        ? existedPlan.priceYearly * 100
-        : existedPlan.priceMonthly * 100
+    const amount = billingCycle === "yearly"
+        ? plan.priceYearly * 100
+        : plan.priceMonthly * 100
 
     const currency = "INR"
     const order = await razorpay.orders.create(
