@@ -300,7 +300,7 @@ const Dashboard = () => {
             </span>
             <div>
               <p className={styles.sessionLabel}>Active Session</p>
-              {userLoading ? (
+              {/* {userLoading ? (
                 <div
                   className={styles.skeletonHeading}
                   aria-hidden="true"
@@ -316,7 +316,16 @@ const Dashboard = () => {
                     {userData.name.toUpperCase()}
                   </span>
                 </h1>
-              )}
+              )} */}
+
+              <h1 data-testid="welcome-heading" className={styles.welcomeHeading}>
+                Welcome back,{" "}
+                <span
+                  className={`${styles.welcomeName} ${userLoading ? styles.welcomeNameSkeleton : ""}`}
+                >
+                  {userLoading ? "\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0" : userData.name.toUpperCase()}
+                </span>
+              </h1>
             </div>
           </div>
           <time
