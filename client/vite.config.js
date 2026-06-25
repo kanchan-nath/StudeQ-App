@@ -31,4 +31,6 @@ export default defineConfig({
     setupFiles: ["./src/test/setup.js"],
     globals: true,
   },
+  minify: 'esbuild',
+  cssMinify: true,
 });
