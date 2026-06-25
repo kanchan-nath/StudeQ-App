@@ -5,6 +5,7 @@ import { useState } from "react";
 import styles from "../pages/styles/login.module.css";
 import { connectSocket } from "../lib/socket.js";
 import useUser from "../ContextApi/useUser.js";
+import { Helmet } from "react-helmet-async"
 
 const Login = () => {
   const navigate = useNavigate();
@@ -60,6 +61,9 @@ const Login = () => {
 
   return (
     <>
+      <Helmet>
+        <meta name="robots" content="noindex, nofollow" />
+      </Helmet>
       {redirecting && (
         <div className={styles["auth-toast"]}>
           <span className={styles["auth-toast-text"]}>
