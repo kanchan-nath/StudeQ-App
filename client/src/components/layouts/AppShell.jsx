@@ -6,44 +6,44 @@ import styles from "./appShell.module.css";
 import logout from "../../lib/logout.js";
 import {Helmet} from "react-helmet-async"
 import {
-  Home03Icon,
-  NoteEditIcon,
-  Quiz03Icon,
-  Cards02Icon,
-  Book01Icon,
-  Calendar03Icon,
-  Notebook01Icon,
-  TeachingIcon,
-  SearchList01Icon,
-  Pdf02Icon,
-  Logout02Icon,
-  CashbackIcon,
-  StarsIcon,
-} from "hugeicons-react";
+  House,
+  FilePenLine,
+  CircleHelp,
+  CreditCard,
+  BookOpen,
+  CalendarDays,
+  NotebookPen,
+  GraduationCap,
+  SearchCheck,
+  FileText,
+  LogOut,
+  Wallet,
+  Sparkles,
+} from "lucide-react";
 import { disConnectSocket } from "../../lib/socket.js";
 
 const NAV_MAIN = [
-  { to: "/dashboard", label: "Dashboard", icon: Home03Icon, color: "blue" },
-  { to: "/notes", label: "Notes", icon: NoteEditIcon, color: "teal" },
-  { to: "/quiz", label: "Quiz", icon: Quiz03Icon, color: "purple" },
-  { to: "/flashcards", label: "Flashcards", icon: Cards02Icon, color: "purple" },
-  { to: "/study-room", label: "Study Room", icon: Book01Icon, color: "green" },
-  { to: "/notebook", label: "Notebook", icon: Notebook01Icon, color: "blue" },
+  { to: "/dashboard", label: "Dashboard", icon: House, color: "blue" },
+  { to: "/notes", label: "Notes", icon: FilePenLine, color: "teal" },
+  { to: "/quiz", label: "Quiz", icon: CircleHelp, color: "purple" },
+  { to: "/flashcards", label: "Flashcards", icon: CreditCard, color: "purple" },
+  { to: "/study-room", label: "Study Room", icon: BookOpen, color: "green" },
+  { to: "/notebook", label: "Notebook", icon: NotebookPen, color: "blue" },
 ];
 
 const NAV_AI = [
-  { to: "/search", label: "Search", icon: Calendar03Icon, color: "orange" },
-  { to: "/image-analyzer", label: "Image Analysis", icon: SearchList01Icon, color: "pink" },
-  { to: "/pdf-summary", label: "PDF Analysis", icon: Pdf02Icon, color: "teal" },
-  { to: "/tutor", label: "AI Tutor", icon: TeachingIcon, color: "purple" },
+  { to: "/search", label: "Search", icon: CalendarDays, color: "orange" },
+  { to: "/image-analyzer", label: "Image Analysis", icon: SearchCheck, color: "pink" },
+  { to: "/pdf-summary", label: "PDF Analysis", icon: FileText, color: "teal" },
+  { to: "/tutor", label: "AI Tutor", icon: GraduationCap, color: "purple" },
 ];
 
 const NAV_EVENT = [
-  { to: "/time-table", label: "Time Table", icon: Calendar03Icon, color: "orange" },
-  { to: "/event-scheduling/assignments", label: "Assignment", icon: Calendar03Icon, color: "orange" },
-  { to: "/event-scheduling/projects", label: "Schedule Project", icon: Calendar03Icon, color: "orange" },
-  { to: "/event-scheduling/exams", label: "Exam Schedule", icon: Calendar03Icon, color: "orange" },
-  { to: "/event-scheduling", label: "Event", icon: Book01Icon, color: "green" },
+  { to: "/time-table", label: "Time Table", icon: CalendarDays, color: "orange" },
+  { to: "/event-scheduling/assignments", label: "Assignment", icon: CalendarDays, color: "orange" },
+  { to: "/event-scheduling/projects", label: "Schedule Project", icon: CalendarDays, color: "orange" },
+  { to: "/event-scheduling/exams", label: "Exam Schedule", icon: CalendarDays, color: "orange" },
+  { to: "/event-scheduling", label: "Event", icon: BookOpen, color: "green" },
 ];
 
 // Submenu links — swap href values to match your routes
@@ -192,7 +192,7 @@ const AppShell = () => {
             setProfileOpen(false);
             navigate("/upgrade"); // adjust route if needed
           }}>
-            <CashbackIcon />
+            <Wallet />
             <span className={styles["topbar__upgrade-label"]}>
               {planId === "premium" ? (
                 <span>Premium Plan</span>
@@ -273,7 +273,7 @@ const AppShell = () => {
                   }}
                 >
                   <span className={styles["profile-dropdown__item-icon"]} aria-hidden="true">
-                    <CashbackIcon size={16} />
+                    <Wallet size={16} />
                   </span>
                   {planId === "premium" ? (
                     <span>Premium Plan</span>
@@ -303,7 +303,7 @@ const AppShell = () => {
                     aria-expanded={learnMoreOpen}
                   >
                     <span className={styles["profile-dropdown__item-icon"]} aria-hidden="true">
-                      <Book01Icon size={16} />
+                      <BookOpen size={16} />
                     </span>
                     Learn more
                     <span
@@ -358,7 +358,7 @@ const AppShell = () => {
                   onClick={handleLogout}
                 >
                   <span className={styles["profile-dropdown__item-icon"]} aria-hidden="true">
-                    <Logout02Icon size={16} />
+                    <LogOut size={16} />
                   </span>
                   Log out
                 </button>
@@ -442,7 +442,7 @@ const AppShell = () => {
               aria-label="Log out"
             >
               <span aria-hidden="true">
-                <Logout02Icon />
+                <LogOut />
               </span>
               Log out
             </button>
@@ -466,7 +466,7 @@ const AppShell = () => {
           <div className={styles["upgrade-card"]}>
             <div className={styles["upgrade-card__header"]}>
               <div className={styles["upgrade-card__badge"]} aria-hidden="true">
-                <StarsIcon />
+                <Sparkles />
               </div>
               <h3 className={styles["upgrade-card__title"]}>Go Premium</h3>
             </div>
@@ -478,7 +478,7 @@ const AppShell = () => {
               setProfileOpen(false);
               navigate("/upgrade"); // adjust route if needed
             }}>
-              <CashbackIcon />
+              <Wallet />
               {planId === "premium" ? (
                 <span>Premium Plan Unlocked</span>
               ) : planId === "pro" ? (
