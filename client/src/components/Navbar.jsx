@@ -36,13 +36,13 @@ const Navbar = () => {
           <Link to="/scheduler">Scheduler</Link>
         </li>
         <li>
-          <Link to="/image-analysis">Image Analytics</Link>
+          <Link to="/image-analyzer">Image Analytics</Link>
         </li>
         <li>
-          <Link to="/image-analysis">Image Analytics</Link>
+          <Link to="/image-analyzer">Image Analytics</Link>
         </li>
         <li>
-          <Link to="/pdf-analysis">Pdf Analytics</Link>
+          <Link to="/pdf-summary">Pdf Analytics</Link>
         </li>
       </ul>
 

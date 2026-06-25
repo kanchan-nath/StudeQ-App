@@ -1,75 +1,104 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { apiFetch } from "../lib/api.js";
 import styles from "./styles/Dashboard.module.css";
 import {
-  Upload01Icon,
-  Quiz04Icon,
-  Chat01Icon,
-  MeetingRoomIcon,
-  Image01Icon,
-  Pdf02Icon,
-  Cards01Icon,
-  CpuChargeIcon,
-  Calendar01Icon,
-  Logout01Icon,
-  Home01Icon,
-} from "hugeicons-react";
+  Upload,
+  CircleHelp,
+  MessageSquare,
+  Users,
+  Image,
+  FileText,
+  CreditCard,
+  Cpu,
+  Calendar,
+  LogOut,
+  House,
+} from "lucide-react";
 import useLoader from "../ContextApi/useLoader.js";
-import BASE_URL from "../lib/api.js";
-
 // ── Error system imports ───────────────────────────────────────────────────────
 import ErrorPage from "../errors/components/ErrorPage.jsx";
 import { ERROR_TYPES, resolveErrorType } from "../errors/config/errorConfig.js";
 import useErrorHandler from "../errors/hooks/useErrorHandler.jsx";
 
 export const QUICK_ACTIONS = [
-  { label: "Upload Material", icon: Upload01Icon, to: "/notes" },
-  { label: "Create Quiz", icon: Quiz04Icon, to: "/quiz" },
-  { label: "Chat with AI", icon: Chat01Icon, to: "/tutor" },
-  { label: "Study Room", icon: MeetingRoomIcon, to: "/studyroom" },
-  { label: "Image Analysis", icon: Image01Icon, to: "/image-analysis" },
-  { label: "PDF Analysis", icon: Pdf02Icon, to: "/pdf-analysis" },
+  {
+    label: "Upload Material",
+    icon: Upload,
+    to: "/notes",
+    primary: true,
+  },
+  {
+    label: "Create Quiz",
+    icon: CircleHelp,
+    to: "/quiz",
+    primary: false,
+  },
+  {
+    label: "Chat with AI",
+    icon: MessageSquare,
+    to: "/tutor",
+    primary: false,
+  },
+  {
+    label: "Study Room",
+    icon: Users,
+    to: "/studyroom",
+    primary: false,
+  },
+  {
+    label: "Image Analysis",
+    icon: Image,
+    to: "/image-analyzer",
+    primary: false,
+  },
+  {
+    label: "PDF Analysis",
+    icon: FileText,
+    to: "/pdf-summary",
+    primary: false,
+  },
 ];
+
 export const NAV_ITEMS = [
-  { id: "home", icon: Home01Icon, label: "Dashboard", to: "/" },
-  { id: "notes", icon: Upload01Icon, label: "Upload Material", to: "/notes" },
-  { id: "quiz", icon: Quiz04Icon, label: "Create Quiz", to: "/quiz" },
-  { id: "tutor", icon: Chat01Icon, label: "AI Tutor Chat", to: "/tutor" },
+  { id: "home", icon: House, label: "Dashboard", to: "/" },
+  { id: "notes", icon: Upload, label: "Upload Material", to: "/notes" },
+  { id: "quiz", icon: CircleHelp, label: "Create Quiz", to: "/quiz" },
+  { id: "tutor", icon: MessageSquare, label: "AI Tutor Chat", to: "/tutor" },
   {
     id: "studyroom",
-    icon: MeetingRoomIcon,
+    icon: Users,
     label: "Study Room",
     to: "/studyroom",
   },
   {
     id: "image-analysis",
-    icon: Image01Icon,
+    icon: Image,
     label: "Image Analysis",
-    to: "/image-analysis",
+    to: "/image-analyzer",
   },
   {
     id: "pdf-analysis",
-    icon: Pdf02Icon,
+    icon: FileText,
     label: "PDF Analysis",
-    to: "/pdf-analysis",
+    to: "/pdf-summary",
   },
   {
     id: "flashcards",
-    icon: Cards01Icon,
+    icon: CreditCard,
     label: "Flashcards",
     to: "/flashcards",
   },
   {
     id: "scheduler",
-    icon: Calendar01Icon,
+    icon: Calendar,
     label: "Scheduler",
     to: "/scheduler",
   },
 ];
 export const FEATURE_CARDS = [
   {
-    icon: Cards01Icon,
+    icon: CreditCard,
     colorClass: "blue",
     title: "Flashcard Practice",
     desc: "Reinforce what you know with smart flashcard sessions built from your uploaded notes.",
@@ -77,7 +106,7 @@ export const FEATURE_CARDS = [
     to: "/flashcards",
   },
   {
-    icon: Quiz04Icon,
+    icon: CircleHelp,
     colorClass: "purple",
     title: "Generate a Quiz",
     desc: "Turn any material into an instant quiz. Get real-time feedback on every answer.",
@@ -85,23 +114,23 @@ export const FEATURE_CARDS = [
     to: "/quiz",
   },
   {
-    icon: Image01Icon,
+    icon: Image,
     colorClass: "teal",
     title: "Analyze an Image",
     desc: "Drop a diagram, chart, or handwritten page — get a full AI-powered explanation.",
     cta: "Analyze image",
-    to: "/image-analysis",
+    to: "/image-analyzer",
   },
   {
-    icon: Pdf02Icon,
+    icon: FileText,
     colorClass: "orange",
     title: "Break Down a PDF",
     desc: "Upload any PDF and extract key concepts, summaries, and quiz questions in seconds.",
     cta: "Analyze PDF",
-    to: "/pdf-analysis",
+    to: "/pdf-summary",
   },
   {
-    icon: CpuChargeIcon,
+    icon: Cpu,
     colorClass: "pink",
     title: "AI Tutor Session",
     desc: "Ask anything. Your personal AI tutor walks you through tough concepts step by step.",
@@ -109,7 +138,7 @@ export const FEATURE_CARDS = [
     to: "/tutor",
   },
   {
-    icon: Calendar01Icon,
+    icon: Calendar,
     colorClass: "green",
     title: "Plan Your Week",
     desc: "Build a smart study schedule around your exams, deadlines, and learning goals.",
@@ -131,20 +160,23 @@ const DEFAULT_PROFILE = {
   xpNextLevel: 2,
 };
 
+const TODAY_DISPLAY = new Date().toLocaleDateString("en-US", {
+  weekday: "short", day: "2-digit", month: "short", year: "numeric",
+});
+const TODAY_ISO = new Date().toISOString().split("T")[0];
+
 const Dashboard = () => {
   const { show, hide } = useLoader();
   const navigate = useNavigate();
 
   // ── Error handler hook ───────────────────────────────────────────────────────
   const { notifyError, notifySuccess } = useErrorHandler();
-
-  const [activeNav, setActiveNav] = useState("home");
   const [userData, setUserData] = useState(DEFAULT_USER);
   const [userLoading, setUserLoading] = useState(true);
 
   // ── Blocking error state — replaces the whole page ──────────────────────────
   // null = no error | ERROR_TYPES key = show full error page
-  const [pageError, setPageError] = useState(null); 
+  const [pageError, setPageError] = useState(null);
 
   // ── Dynamic data states ──────────────────────────────────────────────────────
   const [quizStats, setQuizStats] = useState(DEFAULT_QUIZ);
@@ -158,55 +190,48 @@ const Dashboard = () => {
     setPageError(null);
 
     try {
+      const [res, quizRes, flashRes, profileRes] = await Promise.all([
+        apiFetch("/api/user/userinfo"),
+        apiFetch("/api/quiz/stats"),
+        apiFetch("/api/quiz/flashcards/stats"),
+        apiFetch("/api/stats"),
+      ]);
 
-      const res = await apiFetch("/api/user/userinfo")
-      
-      // ── Auth errors → redirect + toast ──────────────────────────────────────
-      if (res.status === 401) {
-        notifyError("Session expired. Sign in again.");
-        navigate("/login");
-        return;
-      }
+      if (res.status === 401) { notifyError("Session expired. Sign in again."); navigate("/login"); return; }
+      if (res.status === 403) { setPageError(ERROR_TYPES.FORBIDDEN); return; }
+      if (res.status >= 500) { setPageError(ERROR_TYPES.SERVER_ERROR); return; }
+      if (!res.ok) { setPageError(ERROR_TYPES.UNKNOWN); return; }
 
-      if (res.status === 403) {
-        setPageError(ERROR_TYPES.FORBIDDEN);
-        return;
-      }
+      const [data, quizData, flashData, profileData] = await Promise.all([
+        res.json(),
+        quizRes.json(),
+        flashRes.json(),
+        profileRes.ok ? profileRes.json() : Promise.resolve(null),
+      ]);
 
-      // ── Server errors → full-page error ─────────────────────────────────────
-      if (res.status >= 500) {
-        setPageError(ERROR_TYPES.SERVER_ERROR);
-        return;
-      }
-
-      if (!res.ok) {
-        setPageError(ERROR_TYPES.UNKNOWN);
-        return;
-      }
-
-      const data = await res.json();
-      
       setUserData({
         name: data?.data?.name ?? "",
         email: data?.data?.email ?? "",
         grade: data?.data?.grade ?? "",
       });
 
-      // ── Quiz stats (uncomment when route ready) ────────────────────────────
-      const quizRes  = await apiFetch("/api/quiz/stats");
-      const quizData = await quizRes.json();
       setQuizStats({
-        total:     quizData?.data?.total     ?? DEFAULT_QUIZ.total,
+        total: quizData?.data?.total ?? DEFAULT_QUIZ.total,
         lastScore: quizData?.data?.lastScore ?? DEFAULT_QUIZ.lastScore,
-        avgScore:  quizData?.data?.avgScore  ?? DEFAULT_QUIZ.avgScore,
+        avgScore: quizData?.data?.avgScore ?? DEFAULT_QUIZ.avgScore,
       });
 
-      // ── Flashcard stats (uncomment when route ready) ───────────────────────
-      const flashRes  = await apiFetch("/api/quiz/flashcards/stats");
-      const flashData = await flashRes.json();
       setFlashcardStats({
-        total:    flashData?.data?.total    ?? DEFAULT_FLASH.total,
+        total: flashData?.data?.total ?? DEFAULT_FLASH.total,
         dueToday: flashData?.data?.dueToday ?? DEFAULT_FLASH.dueToday,
+      });
+
+      setProfileStats({
+        streak: profileData?.data?.streak ?? DEFAULT_PROFILE.streak,
+        xp: profileData?.data?.xp ?? DEFAULT_PROFILE.xp,
+        level: profileData?.data?.level ?? DEFAULT_PROFILE.level,
+        xpPercent: profileData?.data?.xpPercent ?? DEFAULT_PROFILE.xpPercent,
+        xpNextLevel: profileData?.data?.xpNextLevel ?? DEFAULT_PROFILE.xpNextLevel,
       });
 
       // ── Today's schedule (uncomment when route ready) ──────────────────────
@@ -216,24 +241,12 @@ const Dashboard = () => {
       // const schedData = await schedRes.json();
       // setScheduleItems(schedData?.data ?? DEFAULT_SCHEDULE);
 
-      // ── Profile / gamification stats (uncomment when route ready) ─────────
-      const profileRes = await apiFetch("/api/stats");
 
-      if (profileRes.ok) {
-        const profileData = await profileRes.json();
-        setProfileStats({
-          streak: profileData?.data?.streak ?? DEFAULT_PROFILE.streak,
-          xp: profileData?.data?.xp ?? DEFAULT_PROFILE.xp,
-          level: profileData?.data?.level ?? DEFAULT_PROFILE.level,
-          xpPercent: profileData?.data?.xpPercent ?? DEFAULT_PROFILE.xpPercent,
-          xpNextLevel: profileData?.data?.xpNextLevel ?? DEFAULT_PROFILE.xpNextLevel,
-        });
-      }
     } catch (err) {
       // ── Network / TypeError (no connection) ─────────────────────────────────
       const type = resolveErrorType(err);
       console.log(err);
-      
+
       if (type === ERROR_TYPES.NETWORK) {
         setPageError(ERROR_TYPES.NETWORK);
       } else {
@@ -243,11 +256,11 @@ const Dashboard = () => {
       setUserLoading(false);
       hide();
     }
-  }, [ navigate, notifyError, show, hide]);
+  }, [navigate, notifyError, show, hide]);
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [fetchData]);
 
   // ── Full-page error — replaces dashboard entirely ───────────────────────────
   if (pageError) {
@@ -260,21 +273,12 @@ const Dashboard = () => {
   }
 
   // ── Derived values ───────────────────────────────────────────────────────────
-  const initials = userData?.name
-    ? userData.name
-        .split(" ")
-        .map((w) => w[0])
-        .join("")
-        .slice(0, 2)
-        .toUpperCase()
-    : "YOU";
-
-  const today = new Date().toLocaleDateString("en-US", {
-    weekday: "short",
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  });
+  const initials = useMemo(() =>
+    userData.name
+      ? userData.name.split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase()
+      : "YOU",
+    [userData.name]
+  );
 
   return (
     <div className={styles.appShell}>
@@ -294,33 +298,25 @@ const Dashboard = () => {
               <span className={styles.pulseDotRing} />
               <span className={styles.pulseDotCore} />
             </span>
-            <div>
+            <div style={{ minHeight: 32 }}>
               <p className={styles.sessionLabel}>Active Session</p>
-              {userLoading ? (
-                <div
-                  className={styles.skeletonHeading}
-                  aria-hidden="true"
-                  data-testid="skeleton-heading"
-                />
-              ) : (
-                <h1
-                  data-testid="welcome-heading"
-                  className={styles.welcomeHeading}
+
+              <h1 data-testid="welcome-heading" className={styles.welcomeHeading}>
+                Welcome back,{" "}
+                <span
+                  className={`${styles.welcomeName} ${userLoading ? styles.welcomeNameSkeleton : ""}`}
                 >
-                  Welcome back,{" "}
-                  <span className={styles.welcomeName}>
-                    {userData.name.toUpperCase()}
-                  </span>
-                </h1>
-              )}
+                  {userLoading ? "\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0" : userData.name.toUpperCase()}
+                </span>
+              </h1>
             </div>
           </div>
           <time
             className={styles.dateChip}
-            dateTime={new Date().toISOString()}
+            dateTime={TODAY_ISO}
           >
-            <Calendar01Icon size={14} />
-            {today}
+            <Calendar size={14} />
+            {TODAY_ISO}
           </time>
         </header>
 
@@ -329,11 +325,14 @@ const Dashboard = () => {
           className={styles.quickStrip}
           aria-label="Quick actions"
         >
-          {QUICK_ACTIONS.map(({ label, icon: Icon, to }) => (
+          {QUICK_ACTIONS.map(({ label, icon: Icon, to, primary }) => (
             <Link
               key={to}
               to={to}
-              className={`${styles.stripBtn} ${label === "Upload Material" ? styles.stripBtnPrimary : styles.stripBtnSecondary}`}
+              className={`${styles.stripBtn} ${primary
+                ? styles.stripBtnPrimary
+                : styles.stripBtnSecondary
+                }`}
             >
               <Icon size={14} />
               {label}
@@ -350,9 +349,8 @@ const Dashboard = () => {
               aria-hidden="true"
             />
             <div className={styles.cardIconWrap}>
-              <Chat01Icon
+              <MessageSquare
                 size={18}
-                color="var(--accent-purple)"
               />
             </div>
             <h2 className={styles.cardTitle}>AI Tutor Chat</h2>
@@ -363,7 +361,7 @@ const Dashboard = () => {
             <div className={styles.chatPreview}>
               <div className={styles.chatBubble}>
                 <div className={`${styles.chatAvatar} ${styles.chatAvatarBot}`}>
-                  <CpuChargeIcon
+                  <Cpu
                     size={10}
                     color="var(--accent-purple)"
                   />
@@ -401,9 +399,8 @@ const Dashboard = () => {
             <div className={styles.cardRowHeader}>
               <div className={styles.cardIconGroup}>
                 <div className={styles.cardIconWrap}>
-                  <Quiz04Icon
+                  <CircleHelp
                     size={18}
-                    color="var(--accent-blue)"
                   />
                 </div>
                 <div>
@@ -467,9 +464,8 @@ const Dashboard = () => {
             />
             <div className={styles.cardIconGroup}>
               <div className={styles.cardIconWrap}>
-                <Cards01Icon
+                <CreditCard
                   size={18}
-                  color="var(--accent-green)"
                 />
               </div>
               <div>
@@ -513,9 +509,8 @@ const Dashboard = () => {
             />
             <div className={styles.cardIconGroup}>
               <div className={styles.cardIconWrap}>
-                <Calendar01Icon
+                <Calendar
                   size={18}
-                  color="var(--accent-amber)"
                 />
               </div>
               <div>
@@ -536,7 +531,7 @@ const Dashboard = () => {
               ) : (
                 scheduleItems.map((item, i) => (
                   <li
-                    key={i}
+                    key={item._id ?? item.title}
                     className={styles.scheduleItem}
                   >
                     <span
@@ -565,9 +560,8 @@ const Dashboard = () => {
             />
             <div className={styles.cardIconGroup}>
               <div className={styles.cardIconWrap}>
-                <Image01Icon
+                <Image
                   size={18}
-                  color="var(--accent-pink)"
                 />
               </div>
               <div>
@@ -582,7 +576,7 @@ const Dashboard = () => {
               them instantly.
             </p>
             <Link
-              to="/image-analysis"
+              to="/image-analyzer"
               className={`${styles.cardCta} ${styles.cardCtaPink}`}
             >
               Analyze Image <span aria-hidden="true">→</span>
@@ -597,9 +591,8 @@ const Dashboard = () => {
             />
             <div className={styles.cardIconGroup}>
               <div className={styles.cardIconWrap}>
-                <Pdf02Icon
+                <FileText
                   size={18}
-                  color="var(--accent-red)"
                 />
               </div>
               <div>
@@ -612,7 +605,7 @@ const Dashboard = () => {
               content automatically.
             </p>
             <Link
-              to="/pdf-analysis"
+              to="/pdf-summary"
               className={`${styles.cardCta} ${styles.cardCtaRed}`}
             >
               Analyze PDF <span aria-hidden="true">→</span>
@@ -717,7 +710,7 @@ const Dashboard = () => {
                 <article
                   key={to}
                   className={styles.featureCard}
-                  role="listitem"
+                  role="listItem"
                 >
                   <div
                     className={`${styles.featureIcon} ${styles[`featureIcon--${colorClass}`]}`}

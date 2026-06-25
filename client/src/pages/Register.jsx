@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import BASE_URL from "../lib/api.js";
 import { Link } from "react-router-dom";
 import styles from "../pages/styles/register.module.css";
+import { Helmet } from "react-helmet-async"
 
 /* ─── STAR FIELD ────────────────────────────────────────────────────────── */
 function StarField() {
@@ -99,6 +100,10 @@ const Register = () => {
   }, []);
   return (
     <>
+      <Helmet>
+        <meta name="robots" content="noindex, nofollow" />
+      </Helmet>
+      
       <StarField />
       {redirecting && (
         <div className={styles["auth-toast"]}>

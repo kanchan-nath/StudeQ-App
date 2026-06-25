@@ -2,18 +2,17 @@ import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { apiFetch } from "../lib/api.js";
 import {
-    CreditCardIcon,
-    Crown02Icon,
-    CheckmarkCircle02Icon,
-    StarIcon,
-    Chat01Icon,
-    Quiz04Icon,
-    Cards01Icon,
-    CpuChargeIcon,
-    Calendar01Icon,
-    FlashIcon,
-    CodeIcon,
-} from "hugeicons-react";
+    Crown,
+    CircleCheckBig,
+    Star,
+    MessageSquare,
+    CircleHelp,
+    CreditCard,
+    Cpu,
+    Calendar,
+    Zap,
+    Code,
+} from "lucide-react";
 import useLoader from "../ContextApi/useLoader.js";
 
 // ── Error system imports ───────────────────────────────────────────────────────
@@ -26,13 +25,13 @@ import { useRazorpayCheckout } from "../lib/Userazorpaycheckout.js";
 
 // ── Icon lookup for backend-provided feature keys ───────────────────────────────
 const FEATURE_ICON_MAP = {
-    chat: Chat01Icon,
-    quiz: Quiz04Icon,
-    flashcards: Cards01Icon,
-    tutor: CpuChargeIcon,
-    scheduler: Calendar01Icon,
-    streaming: FlashIcon,
-    codegen: CodeIcon,
+    chat: MessageSquare,
+    quiz: CircleHelp,
+    flashcards: CreditCard,
+    tutor: Cpu,
+    scheduler: Calendar,
+    streaming: Zap,
+    codegen: Code,
 };
 
 // ── Default values ─────────────────────────────────────────────────────────────
@@ -336,16 +335,16 @@ const Payment = () => {
                                 >
                                     {plan.isPopular && (
                                         <span className={styles.popularBadge}>
-                                            <StarIcon size={12} className={styles.popularBadgeIcon} />
+                                            <Star size={12} className={styles.popularBadgeIcon} />
                                             Most Popular
                                         </span>
                                     )}
 
                                     <div className={styles.planNameRow}>
                                         {isPro ? (
-                                            <Crown02Icon size={18} className={styles.planIcon} />
+                                            <Crown size={18} className={styles.planIcon} />
                                         ) : (
-                                            <CreditCardIcon size={18} className={styles.planIcon} />
+                                            <CreditCard size={18} className={styles.planIcon} />
                                         )}
                                         <h2 className={styles.planName}>
                                             {plan.name}
@@ -419,7 +418,7 @@ const Payment = () => {
                     <h2 className={styles.includeTitle}>All plans include</h2>
                     <ul className={styles.includeList}>
                         {sharedFeatures.map((feature, i) => {
-                            const Icon = FEATURE_ICON_MAP[feature.iconKey] ?? CheckmarkCircle02Icon;
+                            const Icon = FEATURE_ICON_MAP[feature.iconKey] ?? CircleCheckBig;
                             return (
                                 <li key={i} className={styles.includePill}>
                                     <Icon size={14} className={styles.includeIcon} />

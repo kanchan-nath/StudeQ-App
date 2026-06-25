@@ -112,17 +112,24 @@
   color: var(--theme-purple);
 }
 
+.welcomeNameSkeleton {
+  display: inline-block;
+  min-width: 120px;
+  background: var(--skeleton-bg, rgba(255, 255, 255, 0.1));
+  border-radius: 4px;
+  color: transparent;
+  animation: shimmer 1.2s infinite;
+}
+
 /* Skeleton for loading state */
 .skeletonHeading {
   height: 26px;
   width: 220px;
   border-radius: var(--r-sm);
-  background: linear-gradient(
-    90deg,
-    var(--theme-surface-2) 25%,
-    var(--theme-surface) 50%,
-    var(--theme-surface-2) 75%
-  );
+  background: linear-gradient(90deg,
+      var(--theme-surface-2) 25%,
+      var(--theme-surface) 50%,
+      var(--theme-surface-2) 75%);
   background-size: 200% 100%;
   animation: shimmer 1.4s infinite;
 }
@@ -131,12 +138,10 @@
   height: 14px;
   width: 140px;
   border-radius: var(--r-sm);
-  background: linear-gradient(
-    90deg,
-    var(--theme-surface-2) 25%,
-    var(--theme-surface) 50%,
-    var(--theme-surface-2) 75%
-  );
+  background: linear-gradient(90deg,
+      var(--theme-surface-2) 25%,
+      var(--theme-surface) 50%,
+      var(--theme-surface-2) 75%);
   background-size: 200% 100%;
   animation: shimmer 1.4s infinite;
   margin-bottom: 4px;
@@ -367,6 +372,7 @@
 .cardCta:hover {
   gap: 4px;
 }
+
 .cardCta svg {
   transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -374,6 +380,7 @@
 .cardCta:hover svg {
   transform: translateX(3px);
 }
+
 .cardCtaGreen {
   color: var(--theme-green);
 }
@@ -940,6 +947,7 @@
 
 /* Later Upadted */
 @media (prefers-reduced-motion: reduce) {
+
   *,
   *::before,
   *::after {

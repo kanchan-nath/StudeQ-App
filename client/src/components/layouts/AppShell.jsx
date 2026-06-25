@@ -4,46 +4,46 @@ import { apiFetch } from "../../lib/api.js";
 import useUser from "../../ContextApi/useUser.js";
 import styles from "./appShell.module.css";
 import logout from "../../lib/logout.js";
-
+import {Helmet} from "react-helmet-async"
 import {
-  Home03Icon,
-  NoteEditIcon,
-  Quiz03Icon,
-  Cards02Icon,
-  Book01Icon,
-  Calendar03Icon,
-  Notebook01Icon,
-  TeachingIcon,
-  SearchList01Icon,
-  Pdf02Icon,
-  Logout02Icon,
-  CashbackIcon,
-  StarsIcon,
-} from "hugeicons-react";
+  House,
+  FilePenLine,
+  CircleHelp,
+  CreditCard,
+  BookOpen,
+  CalendarDays,
+  NotebookPen,
+  GraduationCap,
+  SearchCheck,
+  FileText,
+  LogOut,
+  Wallet,
+  Sparkles,
+} from "lucide-react";
 import { disConnectSocket } from "../../lib/socket.js";
 
 const NAV_MAIN = [
-  { to: "/dashboard", label: "Dashboard", icon: Home03Icon, color: "blue" },
-  { to: "/notes", label: "Notes", icon: NoteEditIcon, color: "teal" },
-  { to: "/quiz", label: "Quiz", icon: Quiz03Icon, color: "purple" },
-  { to: "/flashcards", label: "Flashcards", icon: Cards02Icon, color: "purple" },
-  { to: "/study-room", label: "Study Room", icon: Book01Icon, color: "green" },
-  { to: "/notebook", label: "Notebook", icon: Notebook01Icon, color: "blue" },
+  { to: "/dashboard", label: "Dashboard", icon: House, color: "blue" },
+  { to: "/notes", label: "Notes", icon: FilePenLine, color: "teal" },
+  { to: "/quiz", label: "Quiz", icon: CircleHelp, color: "purple" },
+  { to: "/flashcards", label: "Flashcards", icon: CreditCard, color: "purple" },
+  { to: "/study-room", label: "Study Room", icon: BookOpen, color: "green" },
+  { to: "/notebook", label: "Notebook", icon: NotebookPen, color: "blue" },
 ];
 
 const NAV_AI = [
-  { to: "/search", label: "Search", icon: Calendar03Icon, color: "orange" },
-  { to: "/image-analysis", label: "Image Analysis", icon: SearchList01Icon, color: "pink" },
-  { to: "/pdf-analysis", label: "PDF Analysis", icon: Pdf02Icon, color: "teal" },
-  { to: "/tutor", label: "AI Tutor", icon: TeachingIcon, color: "purple" },
+  { to: "/search", label: "Search", icon: CalendarDays, color: "orange" },
+  { to: "/image-analyzer", label: "Image Analysis", icon: SearchCheck, color: "pink" },
+  { to: "/pdf-summary", label: "PDF Analysis", icon: FileText, color: "teal" },
+  { to: "/tutor", label: "AI Tutor", icon: GraduationCap, color: "purple" },
 ];
 
 const NAV_EVENT = [
-  { to: "/time-table", label: "Time Table", icon: Calendar03Icon, color: "orange" },
-  { to: "/event-scheduling/assignments", label: "Assignment", icon: Calendar03Icon, color: "orange" },
-  { to: "/event-scheduling/projects", label: "Schedule Project", icon: Calendar03Icon, color: "orange" },
-  { to: "/event-scheduling/exams", label: "Exam Schedule", icon: Calendar03Icon, color: "orange" },
-  { to: "/event-scheduling", label: "Event", icon: Book01Icon, color: "green" },
+  { to: "/time-table", label: "Time Table", icon: CalendarDays, color: "orange" },
+  { to: "/event-scheduling/assignments", label: "Assignment", icon: CalendarDays, color: "orange" },
+  { to: "/event-scheduling/projects", label: "Schedule Project", icon: CalendarDays, color: "orange" },
+  { to: "/event-scheduling/exams", label: "Exam Schedule", icon: CalendarDays, color: "orange" },
+  { to: "/event-scheduling", label: "Event", icon: BookOpen, color: "green" },
 ];
 
 // Submenu links — swap href values to match your routes
@@ -154,383 +154,391 @@ const AppShell = () => {
   }, [isDark]);
 
   return (
-    <div
-      className={`${styles["app-shell"]}${panelOpen ? ` ${styles["app-shell--panel-open"]}` : ""}`}
-    >
-      {/* ── TOP BAR ── */}
-      <header className={styles.topbar} role="banner">
-        <div className={styles["topbar__left"]}>
-          <button
-            className={styles["topbar__hamburger"]}
-            aria-label={sidebarOpen ? "Close navigation" : "Open navigation"}
-            aria-expanded={sidebarOpen}
-            aria-controls="app-sidebar"
-            onClick={() => setSidebarOpen((prev) => !prev)}
-          >
-            {sidebarOpen ? (
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true">
-                <line x1="18" y1="6" x2="6" y2="18" />
-                <line x1="6" y1="6" x2="18" y2="18" />
-              </svg>
-            ) : (
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true">
-                <line x1="3" y1="6" x2="21" y2="6" />
-                <line x1="3" y1="12" x2="21" y2="12" />
-                <line x1="3" y1="18" x2="21" y2="18" />
-              </svg>
-            )}
-          </button>
-        </div>
 
-        <button className={styles["topbar__upgrade-btn"]} aria-label="Upgrade to premium" onClick={() => {
-          setProfileOpen(false);
-          navigate("/upgrade"); // adjust route if needed
-        }}>
-          <CashbackIcon />
-          <span className={styles["topbar__upgrade-label"]}>
-            {planId === "premium" ? (
-              <span>Premium Plan</span>
-            ) : planId === "pro" ? (
-              <span>Pro Plan </span>
-            ) : (
-              <>
-                Upgrade Plan
-              </>
-            )}
-          </span>
-        </button>
+    <>
+      <Helmet>
+        <meta name="robots" content="noindex, nofollow" />
+      </Helmet>
 
-        {/* ── THEME TOGGLE ── */}
-        <button
-          className={styles["topbar__theme-toggle"]}
-          aria-label={isDark ? "Switch to light theme" : "Switch to dark theme"}
-          onClick={() => setIsDark((prev) => !prev)}
-        >
-          {isDark ? (
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <circle cx="12" cy="12" r="5" />
-              <line x1="12" y1="1" x2="12" y2="3" />
-              <line x1="12" y1="21" x2="12" y2="23" />
-              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
-              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
-              <line x1="1" y1="12" x2="3" y2="12" />
-              <line x1="21" y1="12" x2="23" y2="12" />
-              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
-              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
-            </svg>
-          ) : (
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-            </svg>
-          )}
-        </button>
-
-        {/* ── AVATAR + PROFILE DROPDOWN ────────────────────────────
-            Replaced the old <div role="img"> with a positioned wrapper
-            + <button> trigger + conditional dropdown panel.
-        ── */}
-        <div className={styles["topbar__profile"]} ref={profileRef}>
-          <button
-            className={styles["topbar__avatar"]}
-            onClick={() => {
-              setProfileOpen((prev) => !prev);
-              setLearnMoreOpen(false);
-            }}
-            aria-label={`Open profile menu for ${userName}`}
-            aria-haspopup="menu"
-            aria-expanded={profileOpen}
-          >
-            {initials}
-          </button>
-
-          {profileOpen && (
-            <div
-              className={styles["profile-dropdown"]}
-              role="menu"
-              aria-label="Profile options"
-            >
-              {/* User info — non-interactive */}
-              <div className={styles["profile-dropdown__header"]}>
-                <p className={styles["profile-dropdown__name"]}>{userName || "User"}</p>
-                {userEmail && (
-                  <p className={styles["profile-dropdown__email"]}>{userEmail}</p>
-                )}
-              </div>
-
-              {/* Upgrade plan */}
-              <button
-                role="menuitem"
-                className={styles["profile-dropdown__item"]}
-                onClick={() => {
-                  setProfileOpen(false);
-                  navigate("/upgrade"); // adjust route if needed
-                }}
-              >
-                <span className={styles["profile-dropdown__item-icon"]} aria-hidden="true">
-                  <CashbackIcon size={16} />
-                </span>
-                {planId === "premium" ? (
-                  <span>Premium Plan</span>
-                ) : planId === "pro" ? (
-                  <span>Pro Plan</span>
-                ) : (
-                  <>
-                    Upgrade Plan
-                    <span className={styles["profile-dropdown__badge"]}>Pro</span>
-                  </>
-                )}
-              </button>
-
-              <div className={styles["profile-dropdown__divider"]} role="separator" />
-
-              {/* Learn more — has flyout submenu */}
-              <div
-                className={styles["profile-dropdown__submenu-root"]}
-                onMouseEnter={() => setLearnMoreOpen(true)}
-                onMouseLeave={() => setLearnMoreOpen(false)}
-              >
-                <button
-                  role="menuitem"
-                  className={`${styles["profile-dropdown__item"]} ${styles["profile-dropdown__item--sub"]}`}
-                  onClick={() => setLearnMoreOpen((prev) => !prev)}
-                  aria-haspopup="menu"
-                  aria-expanded={learnMoreOpen}
-                >
-                  <span className={styles["profile-dropdown__item-icon"]} aria-hidden="true">
-                    <Book01Icon size={16} />
-                  </span>
-                  Learn more
-                  <span
-                    className={`${styles["profile-dropdown__chevron"]}${learnMoreOpen ? ` ${styles["profile-dropdown__chevron--open"]}` : ""
-                      }`}
-                    aria-hidden="true"
-                  >
-                    {/* Inline SVG — no extra icon import needed */}
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-                      <polyline points="9 18 15 12 9 6" />
-                    </svg>
-                  </span>
-                </button>
-
-                {learnMoreOpen && (
-                  <div
-                    className={styles["profile-submenu"]}
-                    role="menu"
-                    aria-label="Learn more"
-                  >
-                    {LEARN_MORE_LINKS.map(({ label, href, external }) => (
-                      <a
-                        key={href}
-                        role="menuitem"
-                        href={href}
-                        className={styles["profile-submenu__item"]}
-                        {...(external ? { target: "_blank", rel: "noreferrer" } : {})}
-                        onClick={() => setProfileOpen(false)}
-                      >
-                        {label}
-                        {external && (
-                          <span className={styles["profile-submenu__external"]} aria-label="opens in new tab">
-                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-                              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                              <polyline points="15 3 21 3 21 9" />
-                              <line x1="10" y1="14" x2="21" y2="3" />
-                            </svg>
-                          </span>
-                        )}
-                      </a>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              <div className={styles["profile-dropdown__divider"]} role="separator" />
-
-              {/* Log out */}
-              <button
-                role="menuitem"
-                className={`${styles["profile-dropdown__item"]} ${styles["profile-dropdown__item--danger"]}`}
-                onClick={handleLogout}
-              >
-                <span className={styles["profile-dropdown__item-icon"]} aria-hidden="true">
-                  <Logout02Icon size={16} />
-                </span>
-                Log out
-              </button>
-            </div>
-          )}
-        </div>
-        {/* ── END PROFILE DROPDOWN ── */}
-      </header>
-
-      {/* ── BACKDROP ── */}
       <div
-        className={`${styles["sidebar-backdrop"]}${sidebarOpen ? ` ${styles["sidebar-backdrop--visible"]}` : ""}`}
-        onClick={() => setSidebarOpen(false)}
-        aria-hidden="true"
-      />
-
-      {/* ── LEFT SIDEBAR ── */}
-      <aside
-        id="app-sidebar"
-        className={`${styles.sidebar}${sidebarOpen ? ` ${styles["sidebar--open"]}` : ""}`}
-        role="navigation"
-        aria-label="Main navigation"
+        className={`${styles["app-shell"]}${panelOpen ? ` ${styles["app-shell--panel-open"]}` : ""}`}
       >
-        <Link to="/dashboard" className={styles["sidebar__logo"]} aria-label="SPARK.E home">
-          <div className={styles["sidebar__logo-text"]}>
-            SPARK<span>.E</span>
+        {/* ── TOP BAR ── */}
+        <header className={styles.topbar} role="banner">
+          <div className={styles["topbar__left"]}>
+            <button
+              className={styles["topbar__hamburger"]}
+              aria-label={sidebarOpen ? "Close navigation" : "Open navigation"}
+              aria-expanded={sidebarOpen}
+              aria-controls="app-sidebar"
+              onClick={() => setSidebarOpen((prev) => !prev)}
+            >
+              {sidebarOpen ? (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true">
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              ) : (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true">
+                  <line x1="3" y1="6" x2="21" y2="6" />
+                  <line x1="3" y1="12" x2="21" y2="12" />
+                  <line x1="3" y1="18" x2="21" y2="18" />
+                </svg>
+              )}
+            </button>
           </div>
-        </Link>
 
-        <nav className={styles["sidebar__nav"]}>
-          <span className={styles["sidebar__section-label"]}>Main</span>
-          {NAV_MAIN.map(({ to, label, icon: Icon, color }) => (
-            <Link
-              key={to}
-              to={to}
-              className={`${styles["sidebar__link"]}${location.pathname === to ? ` ${styles.active}` : ""}`}
-              data-color={color}
-            >
-              <span className={styles["sidebar__link-icon"]} aria-hidden="true">
-                <Icon size={20} color="white" />
-              </span>
-              {label}
-            </Link>
-          ))}
-
-          <span className={styles["sidebar__section-label"]}>AI Tools</span>
-          {NAV_AI.map(({ to, label, icon: Icon, color }) => (
-            <Link
-              key={to}
-              to={to}
-              className={`${styles["sidebar__link"]}${location.pathname === to ? ` ${styles.active}` : ""}`}
-              data-color={color}
-            >
-              <span className={styles["sidebar__link-icon"]} aria-hidden="true">
-                <Icon size={20} color="white" />
-              </span>
-              {label}
-            </Link>
-          ))}
-
-          <span className={styles["sidebar__section-label"]}>Events</span>
-          {NAV_EVENT.map(({ to, label, icon: Icon, color }) => (
-            <Link
-              key={to}
-              to={to}
-              className={`${styles["sidebar__link"]}${location.pathname === to ? ` ${styles.active}` : ""}`}
-              data-color={color}
-            >
-              <span className={styles["sidebar__link-icon"]} aria-hidden="true">
-                <Icon size={20} color="white" />
-              </span>
-              {label}
-            </Link>
-          ))}
-        </nav>
-
-        <div className={styles["sidebar__footer"]}>
-          <button
-            className={styles["sidebar__logout-btn"]}
-            onClick={handleLogout}
-            aria-label="Log out"
-          >
-            <span aria-hidden="true">
-              <Logout02Icon />
-            </span>
-            Log out
-          </button>
-        </div>
-      </aside>
-
-      {/* ── RIGHT SIDEBAR ── */}
-      <aside
-        className={`${styles["right-panel"]}${panelOpen ? ` ${styles["right-panel--open"]}` : ""}`}
-        role="complementary"
-        aria-label="Sidebar widgets"
-      >
-        <button
-          className={styles["panel-close-btn"]}
-          onClick={() => setPanelOpen(false)}
-          aria-label="Close panel"
-        >
-          ✕
-        </button>
-
-        <div className={styles["upgrade-card"]}>
-          <div className={styles["upgrade-card__header"]}>
-            <div className={styles["upgrade-card__badge"]} aria-hidden="true">
-              <StarsIcon />
-            </div>
-            <h3 className={styles["upgrade-card__title"]}>Go Premium</h3>
-          </div>
-          <p className={styles["upgrade-card__desc"]}>
-            Unlock unlimited AI sessions, advanced PDF analysis, priority tutor
-            access, and your full study history.
-          </p>
-          <button className={styles["upgrade-card__btn"]} onClick={() => {
+          <button className={styles["topbar__upgrade-btn"]} aria-label="Upgrade to premium" onClick={() => {
             setProfileOpen(false);
             navigate("/upgrade"); // adjust route if needed
           }}>
-            <CashbackIcon />
-            {planId === "premium" ? (
-              <span>Premium Plan Unlocked</span>
-            ) : planId === "pro" ? (
-              <span>Pro Plan Unlocked</span>
+            <Wallet />
+            <span className={styles["topbar__upgrade-label"]}>
+              {planId === "premium" ? (
+                <span>Premium Plan</span>
+              ) : planId === "pro" ? (
+                <span>Pro Plan </span>
+              ) : (
+                <>
+                  Upgrade Plan
+                </>
+              )}
+            </span>
+          </button>
+
+          {/* ── THEME TOGGLE ── */}
+          <button
+            className={styles["topbar__theme-toggle"]}
+            aria-label={isDark ? "Switch to light theme" : "Switch to dark theme"}
+            onClick={() => setIsDark((prev) => !prev)}
+          >
+            {isDark ? (
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="5" />
+                <line x1="12" y1="1" x2="12" y2="3" />
+                <line x1="12" y1="21" x2="12" y2="23" />
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                <line x1="1" y1="12" x2="3" y2="12" />
+                <line x1="21" y1="12" x2="23" y2="12" />
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+              </svg>
             ) : (
-              <>
-                Upgrade Plan
-              </>
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+              </svg>
             )}
           </button>
-        </div>
 
-        <div className={styles["panel-widget"]} aria-labelledby="upcoming-heading">
-          <h3 className={styles["panel-widget__title"]} id="upcoming-heading">
-            📅 Upcoming
-          </h3>
-          <p className={styles["panel-widget__body"]}>
-            No exams scheduled yet. Add a deadline to get a personalized study plan.
-          </p>
-          <Link to="/scheduler" className={styles["panel-widget__link"]}>
-            Add exam date →
-          </Link>
-        </div>
+          {/* ── AVATAR + PROFILE DROPDOWN ────────────────────────────
+            Replaced the old <div role="img"> with a positioned wrapper
+            + <button> trigger + conditional dropdown panel.
+        ── */}
+          <div className={styles["topbar__profile"]} ref={profileRef}>
+            <button
+              className={styles["topbar__avatar"]}
+              onClick={() => {
+                setProfileOpen((prev) => !prev);
+                setLearnMoreOpen(false);
+              }}
+              aria-label={`Open profile menu for ${userName}`}
+              aria-haspopup="menu"
+              aria-expanded={profileOpen}
+            >
+              {initials}
+            </button>
 
-        <div
-          className={`${styles["panel-widget"]} ${styles["streak-widget"]}`}
-          role="status"
-          aria-label="Current study streak"
-        >
-          <div className={styles["streak-widget__left"]}>
-            <span aria-hidden="true">🔥</span>
-            {user.streak} streak!
+            {profileOpen && (
+              <div
+                className={styles["profile-dropdown"]}
+                role="menu"
+                aria-label="Profile options"
+              >
+                {/* User info — non-interactive */}
+                <div className={styles["profile-dropdown__header"]}>
+                  <p className={styles["profile-dropdown__name"]}>{userName || "User"}</p>
+                  {userEmail && (
+                    <p className={styles["profile-dropdown__email"]}>{userEmail}</p>
+                  )}
+                </div>
+
+                {/* Upgrade plan */}
+                <button
+                  role="menuitem"
+                  className={styles["profile-dropdown__item"]}
+                  onClick={() => {
+                    setProfileOpen(false);
+                    navigate("/upgrade"); // adjust route if needed
+                  }}
+                >
+                  <span className={styles["profile-dropdown__item-icon"]} aria-hidden="true">
+                    <Wallet size={16} />
+                  </span>
+                  {planId === "premium" ? (
+                    <span>Premium Plan</span>
+                  ) : planId === "pro" ? (
+                    <span>Pro Plan</span>
+                  ) : (
+                    <>
+                      Upgrade Plan
+                      <span className={styles["profile-dropdown__badge"]}>Pro</span>
+                    </>
+                  )}
+                </button>
+
+                <div className={styles["profile-dropdown__divider"]} role="separator" />
+
+                {/* Learn more — has flyout submenu */}
+                <div
+                  className={styles["profile-dropdown__submenu-root"]}
+                  onMouseEnter={() => setLearnMoreOpen(true)}
+                  onMouseLeave={() => setLearnMoreOpen(false)}
+                >
+                  <button
+                    role="menuitem"
+                    className={`${styles["profile-dropdown__item"]} ${styles["profile-dropdown__item--sub"]}`}
+                    onClick={() => setLearnMoreOpen((prev) => !prev)}
+                    aria-haspopup="menu"
+                    aria-expanded={learnMoreOpen}
+                  >
+                    <span className={styles["profile-dropdown__item-icon"]} aria-hidden="true">
+                      <BookOpen size={16} />
+                    </span>
+                    Learn more
+                    <span
+                      className={`${styles["profile-dropdown__chevron"]}${learnMoreOpen ? ` ${styles["profile-dropdown__chevron--open"]}` : ""
+                        }`}
+                      aria-hidden="true"
+                    >
+                      {/* Inline SVG — no extra icon import needed */}
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                        <polyline points="9 18 15 12 9 6" />
+                      </svg>
+                    </span>
+                  </button>
+
+                  {learnMoreOpen && (
+                    <div
+                      className={styles["profile-submenu"]}
+                      role="menu"
+                      aria-label="Learn more"
+                    >
+                      {LEARN_MORE_LINKS.map(({ label, href, external }) => (
+                        <a
+                          key={href}
+                          role="menuitem"
+                          href={href}
+                          className={styles["profile-submenu__item"]}
+                          {...(external ? { target: "_blank", rel: "noreferrer" } : {})}
+                          onClick={() => setProfileOpen(false)}
+                        >
+                          {label}
+                          {external && (
+                            <span className={styles["profile-submenu__external"]} aria-label="opens in new tab">
+                              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                                <polyline points="15 3 21 3 21 9" />
+                                <line x1="10" y1="14" x2="21" y2="3" />
+                              </svg>
+                            </span>
+                          )}
+                        </a>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <div className={styles["profile-dropdown__divider"]} role="separator" />
+
+                {/* Log out */}
+                <button
+                  role="menuitem"
+                  className={`${styles["profile-dropdown__item"]} ${styles["profile-dropdown__item--danger"]}`}
+                  onClick={handleLogout}
+                >
+                  <span className={styles["profile-dropdown__item-icon"]} aria-hidden="true">
+                    <LogOut size={16} />
+                  </span>
+                  Log out
+                </button>
+              </div>
+            )}
           </div>
-          <span className={styles["streak-widget__link"]}>
-            Keep it up
-          </span>
-        </div>
+          {/* ── END PROFILE DROPDOWN ── */}
+        </header>
 
-        <div className={styles["panel-widget"]} aria-labelledby="announce-heading">
-          <h3 className={styles["panel-widget__title"]} id="announce-heading">
-            🎉 What's New
-          </h3>
-          <p className={styles["panel-widget__body"]}>
-            <strong className={styles["text-primary"]}>Notebook analysis is live!</strong>
-            <br />
-            Drop any diagram or photo and get an instant AI breakdown. Try it now.
-          </p>
-          <Link to="/notebook" className={styles["panel-widget__link"]}>
-            Try it →
+        {/* ── BACKDROP ── */}
+        <div
+          className={`${styles["sidebar-backdrop"]}${sidebarOpen ? ` ${styles["sidebar-backdrop--visible"]}` : ""}`}
+          onClick={() => setSidebarOpen(false)}
+          aria-hidden="true"
+        />
+
+        {/* ── LEFT SIDEBAR ── */}
+        <aside
+          id="app-sidebar"
+          className={`${styles.sidebar}${sidebarOpen ? ` ${styles["sidebar--open"]}` : ""}`}
+          role="navigation"
+          aria-label="Main navigation"
+        >
+          <Link to="/dashboard" className={styles["sidebar__logo"]} aria-label="SPARK.E home">
+            <div className={styles["sidebar__logo-text"]}>
+              SPARK<span>.E</span>
+            </div>
           </Link>
-        </div>
-      </aside>
 
-      {/* ── PAGE CONTENT ── */}
-      <main className={styles["main-content"]}>
-        <Outlet />
-      </main>
-    </div>
+          <nav className={styles["sidebar__nav"]}>
+            <span className={styles["sidebar__section-label"]}>Main</span>
+            {NAV_MAIN.map(({ to, label, icon: Icon, color }) => (
+              <Link
+                key={to}
+                to={to}
+                className={`${styles["sidebar__link"]}${location.pathname === to ? ` ${styles.active}` : ""}`}
+                data-color={color}
+              >
+                <span className={styles["sidebar__link-icon"]} aria-hidden="true">
+                  <Icon size={20} color="white" />
+                </span>
+                {label}
+              </Link>
+            ))}
+
+            <span className={styles["sidebar__section-label"]}>AI Tools</span>
+            {NAV_AI.map(({ to, label, icon: Icon, color }) => (
+              <Link
+                key={to}
+                to={to}
+                className={`${styles["sidebar__link"]}${location.pathname === to ? ` ${styles.active}` : ""}`}
+                data-color={color}
+              >
+                <span className={styles["sidebar__link-icon"]} aria-hidden="true">
+                  <Icon size={20} color="white" />
+                </span>
+                {label}
+              </Link>
+            ))}
+
+            <span className={styles["sidebar__section-label"]}>Events</span>
+            {NAV_EVENT.map(({ to, label, icon: Icon, color }) => (
+              <Link
+                key={to}
+                to={to}
+                className={`${styles["sidebar__link"]}${location.pathname === to ? ` ${styles.active}` : ""}`}
+                data-color={color}
+              >
+                <span className={styles["sidebar__link-icon"]} aria-hidden="true">
+                  <Icon size={20} color="white" />
+                </span>
+                {label}
+              </Link>
+            ))}
+          </nav>
+
+          <div className={styles["sidebar__footer"]}>
+            <button
+              className={styles["sidebar__logout-btn"]}
+              onClick={handleLogout}
+              aria-label="Log out"
+            >
+              <span aria-hidden="true">
+                <LogOut />
+              </span>
+              Log out
+            </button>
+          </div>
+        </aside>
+
+        {/* ── RIGHT SIDEBAR ── */}
+        <aside
+          className={`${styles["right-panel"]}${panelOpen ? ` ${styles["right-panel--open"]}` : ""}`}
+          role="complementary"
+          aria-label="Sidebar widgets"
+        >
+          <button
+            className={styles["panel-close-btn"]}
+            onClick={() => setPanelOpen(false)}
+            aria-label="Close panel"
+          >
+            ✕
+          </button>
+
+          <div className={styles["upgrade-card"]}>
+            <div className={styles["upgrade-card__header"]}>
+              <div className={styles["upgrade-card__badge"]} aria-hidden="true">
+                <Sparkles />
+              </div>
+              <h3 className={styles["upgrade-card__title"]}>Go Premium</h3>
+            </div>
+            <p className={styles["upgrade-card__desc"]}>
+              Unlock unlimited AI sessions, advanced PDF analysis, priority tutor
+              access, and your full study history.
+            </p>
+            <button className={styles["upgrade-card__btn"]} onClick={() => {
+              setProfileOpen(false);
+              navigate("/upgrade"); // adjust route if needed
+            }}>
+              <Wallet />
+              {planId === "premium" ? (
+                <span>Premium Plan Unlocked</span>
+              ) : planId === "pro" ? (
+                <span>Pro Plan Unlocked</span>
+              ) : (
+                <>
+                  Upgrade Plan
+                </>
+              )}
+            </button>
+          </div>
+
+          <div className={styles["panel-widget"]} aria-labelledby="upcoming-heading">
+            <h3 className={styles["panel-widget__title"]} id="upcoming-heading">
+              📅 Upcoming
+            </h3>
+            <p className={styles["panel-widget__body"]}>
+              No exams scheduled yet. Add a deadline to get a personalized study plan.
+            </p>
+            <Link to="/scheduler" className={styles["panel-widget__link"]}>
+              Add exam date →
+            </Link>
+          </div>
+
+          <div
+            className={`${styles["panel-widget"]} ${styles["streak-widget"]}`}
+            role="status"
+            aria-label="Current study streak"
+          >
+            <div className={styles["streak-widget__left"]}>
+              <span aria-hidden="true">🔥</span>
+              {user.streak} streak!
+            </div>
+            <span className={styles["streak-widget__link"]}>
+              Keep it up
+            </span>
+          </div>
+
+          <div className={styles["panel-widget"]} aria-labelledby="announce-heading">
+            <h3 className={styles["panel-widget__title"]} id="announce-heading">
+              🎉 What's New
+            </h3>
+            <p className={styles["panel-widget__body"]}>
+              <strong className={styles["text-primary"]}>Notebook analysis is live!</strong>
+              <br />
+              Drop any diagram or photo and get an instant AI breakdown. Try it now.
+            </p>
+            <Link to="/notebook" className={styles["panel-widget__link"]}>
+              Try it →
+            </Link>
+          </div>
+        </aside>
+
+        {/* ── PAGE CONTENT ── */}
+        <main className={styles["main-content"]}>
+          <Outlet />
+        </main>
+      </div>
+    </>
+
   );
 };
 

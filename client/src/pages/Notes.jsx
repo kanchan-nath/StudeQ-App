@@ -1,12 +1,10 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect, useCallback, useMemo } from "react";
 import { useLocation, useParams, useNavigate } from "react-router-dom";
-import BASE_URL, { apiFetch } from "../lib/api.js";
-import { jsPDF } from "jspdf";
+import { apiFetch } from "../lib/api.js";
 import styles from "./styles/notes.module.css";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
-import html2canvas from "html2canvas";
 import { getSocket, connectSocket } from "../lib/socket.js";
 
 // ── Error system imports ───────────────────────────────────────────────────────
@@ -417,6 +415,103 @@ export const NoteInputForm = ({
   </div>
 );
 
+const SidebarContent = React.memo(({
+  fetching, fetchError, notes, pinnedNotes, unpinnedNotes,
+  activeNoteId, handleSidebarNoteClick, handleNewNote,
+  setMobileSidebarOpen
+}) => (
+  <div
+    className={styles.sidebarContent}
+    aria-label="Saved notes"
+  >
+    <div className={styles.sidebarHeader}>
+      <h3 className={styles.sidebarTitle}>📝 Your Notes</h3>
+      <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+        <button
+          className={styles.sidebarNewBtn}
+          onClick={handleNewNote}
+          aria-label="Create new note"
+          title="New note"
+        >
+          +
+        </button>
+        {/* ── NEW: close btn inside drawer header (mobile only via CSS) ── */}
+        <button
+          className={styles.sidebarCloseBtn}
+          onClick={() => setMobileSidebarOpen(false)}
+          aria-label="Close notes sidebar"
+        >
+          ✕
+        </button>
+      </div>
+    </div>
+
+    {fetching && <p className={styles.sidebarEmpty}>Loading…</p>}
+    {fetchError && (
+      <p
+        className={styles.sidebarEmpty}
+        role="alert"
+      >
+        {fetchError}
+      </p>
+    )}
+    {!fetching && notes.length === 0 && (
+      <p className={styles.sidebarEmpty}>No notes yet.</p>
+    )}
+
+    {pinnedNotes.length > 0 && (
+      <>
+        <p className={styles.sidebarGroupLabel}>📌 Pinned</p>
+        {pinnedNotes.map((note) => (
+          <div
+            key={note._id}
+            className={`${styles.sidebarItem} ${activeNoteId === note._id ? styles.sidebarItemActive : ""}`}
+            onClick={() => handleSidebarNoteClick(note)}
+            aria-current={activeNoteId === note._id ? "page" : undefined}
+          >
+            <div className={styles.sidebarItemTitle}>
+              {note.title.replace(/\*\*/g, "")}
+            </div>
+            <div className={styles.sidebarItemMeta}>
+              {note.dateLabel}
+            </div>
+          </div>
+        ))}
+      </>
+    )}
+
+    {unpinnedNotes.length > 0 && (
+      <>
+        {pinnedNotes.length > 0 && (
+          <p className={styles.sidebarGroupLabel}>All Notes</p>
+        )}
+        {unpinnedNotes.map((note) => (
+          <div
+            key={note._id}
+            className={`${styles.sidebarItem} ${activeNoteId === note._id ? styles.sidebarItemActive : ""}`}
+            onClick={() => handleSidebarNoteClick(note)}
+          >
+            <div className={styles.sidebarItemTitle}>
+              {note.title.replace(/\*\*/g, "")}
+            </div>
+            <div className={styles.sidebarItemMeta}>
+              {note.dateLabel}
+            </div>
+          </div>
+        ))}
+      </>
+    )}
+  </div>
+));
+
+const checkApiResponse = (res, { navigate, notifyError, setPageError }) => {
+  if (res.status === 401) { notifyError("Session expired. Sign in again."); navigate("/login"); return false; }
+  if (res.status === 403) { setPageError(ERROR_TYPES.FORBIDDEN); return false; }
+  if (res.status >= 500) { setPageError(ERROR_TYPES.SERVER_ERROR); return false; }
+  if (!res.ok) { setPageError(ERROR_TYPES.UNKNOWN); return false; }
+  return true;
+};
+
 /* ═══════════════════════════════════════════════════════════════
   MAIN COMPONENT
 ═══════════════════════════════════════════════════════════════ */
@@ -470,27 +565,28 @@ const Notes = () => {
     };
   }, [mobileSidebarOpen]);
 
+  const handler = (data) => {
+    const { title, summary, keyPoints, _id, isPinned } = data;
+    setSummaryData({ title, summary, keyPoints, _id, isPinned });
+    setGeneratedIds((prev) => new Set(prev).add(_id));
+    showToast("Note created!");
+    fetchNotes();
+    navigate(`/notes/${_id}`);
+  }
   useEffect(() => {
     connectSocket();
     const socket = getSocket();
     if (!socket) return;
 
-    socket.on("ai-response", (data) => {
-      const { title, summary, keyPoints, _id, isPinned } = data;
-      setSummaryData({ title, summary, keyPoints, _id, isPinned });
-      setGeneratedIds((prev) => new Set(prev).add(_id));
-      showToast("Note created!");
-      fetchNotes();
-      navigate(`/notes/${_id}`);
-    });
+    socket.on("ai-response", handler);
 
-    return () => socket.off("ai_response");
+    return () => socket.off("ai-response", handler);
   }, []);
 
-  const showToast = (message, type = "success") => {
+  const showToast = useCallback((message, type = "success") => {
     setToast({ message, type });
     setTimeout(() => setToast(null), 3500);
-  };
+  }, []);
 
   const handleChange = (e) => setContent(e.target.value);
 
@@ -506,28 +602,7 @@ const Notes = () => {
           body: JSON.stringify({ content }),
         });
 
-        // ── Auth errors → redirect + toast ──────────────────────────────────────
-        if (res.status === 401) {
-          notifyError("Session expired. Sign in again.");
-          navigate("/login");
-          return;
-        }
-
-        if (res.status === 403) {
-          setPageError(ERROR_TYPES.FORBIDDEN);
-          return;
-        }
-
-        // ── Server errors → full-page error ─────────────────────────────────────
-        if (res.status >= 500) {
-          setPageError(ERROR_TYPES.SERVER_ERROR);
-          return;
-        }
-
-        if (!res.ok) {
-          setPageError(ERROR_TYPES.UNKNOWN);
-          return;
-        }
+        if (!checkApiResponse(res, { navigate, notifyError, setPageError })) return;
 
         showToast("Note updated successfully!");
         setContent("");
@@ -545,28 +620,7 @@ const Notes = () => {
           body: JSON.stringify({ content }),
         });
 
-        // ── Auth errors → redirect + toast ──────────────────────────────────────
-        if (res.status === 401) {
-          notifyError("Session expired. Sign in again.");
-          navigate("/login");
-          return;
-        }
-
-        if (res.status === 403) {
-          setPageError(ERROR_TYPES.FORBIDDEN);
-          return;
-        }
-
-        // ── Server errors → full-page error ─────────────────────────────────────
-        if (res.status >= 500) {
-          setPageError(ERROR_TYPES.SERVER_ERROR);
-          return;
-        }
-
-        if (!res.ok) {
-          setPageError(ERROR_TYPES.UNKNOWN);
-          return;
-        }
+        if (!checkApiResponse(res, { navigate, notifyError, setPageError })) return;
 
         const data = await res.json();
         const { title, summary, keyPoints, _id, isPinned } = data.data;
@@ -586,31 +640,12 @@ const Notes = () => {
     }
   };
 
-  const fetchNotes = async () => {
+  const fetchNotes = useCallback(async () => {
     setFetching(true);
     try {
       const res = await apiFetch("/api/notes");
 
-      if (res.status === 401) {
-        notifyError("Session expired. Sign in again.");
-        navigate("/login");
-        return;
-      }
-
-      if (res.status === 403) {
-        setPageError(ERROR_TYPES.FORBIDDEN);
-        return;
-      }
-
-      if (res.status >= 500) {
-        setPageError(ERROR_TYPES.SERVER_ERROR);
-        return;
-      }
-
-      if (!res.ok) {
-        setPageError(ERROR_TYPES.UNKNOWN);
-        return;
-      }
+      if (!checkApiResponse(res, { navigate, notifyError, setPageError })) return;
 
       const data = await res.json();
       setNotes(data.data);
@@ -624,34 +659,14 @@ const Notes = () => {
     } finally {
       setFetching(false);
     }
-  };
+  }, [navigate, notifyError]);
 
   const handleSubmitDelete = async (id) => {
     try {
       const res = await apiFetch(`/api/notes/${id}`, {
         method: "DELETE",
       });
-
-      if (res.status === 401) {
-        notifyError("Session expired. Sign in again.");
-        navigate("/login");
-        return;
-      }
-
-      if (res.status === 403) {
-        setPageError(ERROR_TYPES.FORBIDDEN);
-        return;
-      }
-
-      if (res.status >= 500) {
-        setPageError(ERROR_TYPES.SERVER_ERROR);
-        return;
-      }
-
-      if (!res.ok) {
-        setPageError(ERROR_TYPES.UNKNOWN);
-        return;
-      }
+      if (!checkApiResponse(res, { navigate, notifyError, setPageError })) return;
 
       showToast("Note deleted");
       if (activeNoteId === id) {
@@ -664,10 +679,15 @@ const Notes = () => {
     }
   };
 
+  // Use useEffect watching editId:
+  useEffect(() => {
+    if (editId) inputRef.current?.focus();
+  }, [editId]);
+  // Remove setTimeout entirely
+
   const handleSubmitEdit = (note) => {
     setContent(note.summary);
     navigate(`/notes/${note._id}/edit`);
-    setTimeout(() => inputRef.current?.focus(), 100);
   };
 
   const handleCancelEdit = () => {
@@ -724,6 +744,11 @@ const Notes = () => {
     const element = noteDocRef.current;
     if (!element) return showToast("Nothing to export", "error");
 
+    const [{ default: html2canvas }, { jsPDF }] = await Promise.all([
+      import("html2canvas"),
+      import("jspdf"),
+    ]);
+
     showToast("Generating PDF…");
 
     try {
@@ -736,7 +761,6 @@ const Notes = () => {
       });
 
       const imgData = canvas.toDataURL("image/png");
-      const { jsPDF } = await import("jspdf");
 
       const pdf = new jsPDF({
         orientation: "portrait",
@@ -770,27 +794,7 @@ const Notes = () => {
         method: "PATCH",
         body: JSON.stringify({ newPinned }),
       });
-
-      if (res.status === 401) {
-        notifyError("Session expired. Sign in again.");
-        navigate("/login");
-        return;
-      }
-
-      if (res.status === 403) {
-        setPageError(ERROR_TYPES.FORBIDDEN);
-        return;
-      }
-
-      if (res.status >= 500) {
-        setPageError(ERROR_TYPES.SERVER_ERROR);
-        return;
-      }
-
-      if (!res.ok) {
-        setPageError(ERROR_TYPES.UNKNOWN);
-        return;
-      }
+      if (!checkApiResponse(res, { navigate, notifyError, setPageError })) return;
 
       showToast(newPinned ? "Note pinned!" : "Note unpinned");
       if (summaryData && summaryData._id === note._id) {
@@ -824,8 +828,15 @@ const Notes = () => {
     fetchNotes();
   }, []);
 
-  const pinnedNotes = notes.filter((n) => n.isPinned);
-  const unpinnedNotes = notes.filter((n) => !n.isPinned);
+  const notesWithDate = useMemo(() =>
+    notes.map(n => ({ ...n, dateLabel: new Date(n.createdAt).toLocaleDateString() })),
+    [notes]
+  );
+
+  const { pinnedNotes, unpinnedNotes } = useMemo(() => ({
+    pinnedNotes: notesWithDate.filter(n => n.isPinned),
+    unpinnedNotes: notesWithDate.filter(n => !n.isPinned),
+  }), [notes]);
 
   // ── Full-page error — replaces page entirely ─────────────────────────────────
   if (pageError) {
@@ -833,89 +844,6 @@ const Notes = () => {
   }
 
   // ── Shared sidebar content — rendered in both desktop + mobile drawer ──
-  const SidebarContent = () => (
-    <div
-      className={styles.sidebarContent}
-      aria-label="Saved notes"
-    >
-      <div className={styles.sidebarHeader}>
-        <h3 className={styles.sidebarTitle}>📝 Your Notes</h3>
-        <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-          <button
-            className={styles.sidebarNewBtn}
-            onClick={handleNewNote}
-            aria-label="Create new note"
-            title="New note"
-          >
-            +
-          </button>
-          {/* ── NEW: close btn inside drawer header (mobile only via CSS) ── */}
-          <button
-            className={styles.sidebarCloseBtn}
-            onClick={() => setMobileSidebarOpen(false)}
-            aria-label="Close notes sidebar"
-          >
-            ✕
-          </button>
-        </div>
-      </div>
-
-      {fetching && <p className={styles.sidebarEmpty}>Loading…</p>}
-      {fetchError && (
-        <p
-          className={styles.sidebarEmpty}
-          role="alert"
-        >
-          {fetchError}
-        </p>
-      )}
-      {!fetching && notes.length === 0 && (
-        <p className={styles.sidebarEmpty}>No notes yet.</p>
-      )}
-
-      {pinnedNotes.length > 0 && (
-        <>
-          <p className={styles.sidebarGroupLabel}>📌 Pinned</p>
-          {pinnedNotes.map((note) => (
-            <div
-              key={note._id}
-              className={`${styles.sidebarItem} ${activeNoteId === note._id ? styles.sidebarItemActive : ""}`}
-              onClick={() => handleSidebarNoteClick(note)}
-            >
-              <div className={styles.sidebarItemTitle}>
-                {note.title.replace(/\*\*/g, "")}
-              </div>
-              <div className={styles.sidebarItemMeta}>
-                {new Date(note.createdAt).toLocaleDateString()}
-              </div>
-            </div>
-          ))}
-        </>
-      )}
-
-      {unpinnedNotes.length > 0 && (
-        <>
-          {pinnedNotes.length > 0 && (
-            <p className={styles.sidebarGroupLabel}>All Notes</p>
-          )}
-          {unpinnedNotes.map((note) => (
-            <div
-              key={note._id}
-              className={`${styles.sidebarItem} ${activeNoteId === note._id ? styles.sidebarItemActive : ""}`}
-              onClick={() => handleSidebarNoteClick(note)}
-            >
-              <div className={styles.sidebarItemTitle}>
-                {note.title.replace(/\*\*/g, "")}
-              </div>
-              <div className={styles.sidebarItemMeta}>
-                {new Date(note.createdAt).toLocaleDateString()}
-              </div>
-            </div>
-          ))}
-        </>
-      )}
-    </div>
-  );
 
   return (
     <div className={styles["notes-page"]}>
@@ -1013,7 +941,15 @@ const Notes = () => {
           {sidebarOpen ? "→" : "←"}
         </button>
 
-        {sidebarOpen && <SidebarContent />}
+        {sidebarOpen && <SidebarContent fetching={fetching}
+          fetchError={fetchError}
+          notes={notes}
+          pinnedNotes={pinnedNotes}
+          unpinnedNotes={unpinnedNotes}
+          activeNoteId={activeNoteId}
+          handleSidebarNoteClick={handleSidebarNoteClick}
+          handleNewNote={handleNewNote}
+          setMobileSidebarOpen={setMobileSidebarOpen} />}
       </div>
 
       {/* ── MOBILE DRAWER + BACKDROP ── */}

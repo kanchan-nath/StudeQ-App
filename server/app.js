@@ -3,7 +3,7 @@ import express from "express"
 import prisma from "./lib/prisma.js"
 import cookieParser from "cookie-parser";
 import cors from "cors"
-import {generalLimiter, authLimiter, aiLimiter} from "./middlewares/rateLimiter.middleware.js";
+import { generalLimiter, authLimiter, aiLimiter } from "./middlewares/rateLimiter.middleware.js";
 import helmet from "helmet"
 import logger from "./logger/index.js"
 
@@ -20,7 +20,7 @@ app.use(helmet())
 //     }
 // ))
 app.use(cors({
-    origin: ["http://localhost:5173", "http://192.168.1.2:5173"],
+    origin: ["http://localhost:5173", "http://192.168.1.5:5173"],
     credentials: true,
 }))
 
@@ -40,6 +40,8 @@ import filesRagRouter from "./routes/filesRag.route.js"
 import searchAPIRouter from "./routes/searchAPI.route.js"
 import healthRouter from "./routes/health.route.js"
 import statsRouter from "./routes/stats.route.js"
+import paymentRouter from "./routes/payment.route.js"
+import webhookRouter from "./routes/webhook.route.js"
 
 app.use(generalLimiter)
 app.use("/api/auth", userRoute)
@@ -55,27 +57,29 @@ app.use("/api/documents", filesRagRouter)
 app.use("/api", searchAPIRouter)
 app.use("/api/health", healthRouter)
 app.use("/api/stats", statsRouter)
-app.use((req, res)=>{
+app.use("/api", paymentRouter)
+app.use('/api', webhookRouter);
+app.use((req, res) => {
     res.status(404)
-    .json(
-        {
-            success:false,
-            message: "Route not found"
-        }
-    )
+        .json(
+            {
+                success: false,
+                message: "Route not found"
+            }
+        )
 })
-app.use((err, req, res, next)=>{
+app.use((err, req, res, next) => {
     const statusCode = err.statusCode || 500
 
-    logger.error(err)
+    console.error(err)
     res.status(statusCode)
-    .json(
-        {
-            success:false,
-            message: err.message || "Internal Server Error",
-            ...(process.env.NODE_ENV === "development" && {stack: err.stack})
-        }
-    )
+        .json(
+            {
+                success: false,
+                message: err.message || "Internal Server Error",
+                ...(process.env.NODE_ENV === "development" && { stack: err.stack })
+            }
+        )
 })
 
 export { app }

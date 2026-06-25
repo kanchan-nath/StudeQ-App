@@ -43,8 +43,8 @@ describe("QUICK_ACTIONS", () => {
       "/quiz",
       "/tutor",
       "/studyroom",
-      "/image-analysis",
-      "/pdf-analysis",
+      "/image-analyzer",
+      "/pdf-summary",
     ]);
   });
 });

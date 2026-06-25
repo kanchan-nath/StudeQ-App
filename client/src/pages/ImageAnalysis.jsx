@@ -1,7 +1,7 @@
 import React from "react";
 import { useState } from "react";
 import BASE_URL from "../lib/api.js";
-import ReactMarkdown from "react-markdown";
+const ReactMarkdown = React.lazy(() => import("react-markdown"));
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 import "katex/dist/katex.min.css";
