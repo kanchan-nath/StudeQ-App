@@ -158,52 +158,37 @@ const Dashboard = () => {
     setPageError(null);
 
     try {
+      const [res, quizRes, flashRes, profileRes] = await Promise.all([
+        apiFetch("/api/user/userinfo"),
+        apiFetch("/api/quiz/stats"),
+        apiFetch("/api/quiz/flashcards/stats"),
+        apiFetch("/api/stats"),
+      ]);
 
-      const res = await apiFetch("/api/user/userinfo")
-      
-      // ── Auth errors → redirect + toast ──────────────────────────────────────
-      if (res.status === 401) {
-        notifyError("Session expired. Sign in again.");
-        navigate("/login");
-        return;
-      }
+      if (res.status === 401) { notifyError("Session expired. Sign in again."); navigate("/login"); return; }
+      if (res.status === 403) { setPageError(ERROR_TYPES.FORBIDDEN); return; }
+      if (res.status >= 500) { setPageError(ERROR_TYPES.SERVER_ERROR); return; }
+      if (!res.ok) { setPageError(ERROR_TYPES.UNKNOWN); return; }
 
-      if (res.status === 403) {
-        setPageError(ERROR_TYPES.FORBIDDEN);
-        return;
-      }
+      const [data, quizData, flashData, profileData] = await Promise.all([
+        res.json(),
+        quizRes.json(),
+        flashRes.json(),
+        profileRes.ok ? profileRes.json() : Promise.resolve(null),
+      ]);
 
-      // ── Server errors → full-page error ─────────────────────────────────────
-      if (res.status >= 500) {
-        setPageError(ERROR_TYPES.SERVER_ERROR);
-        return;
-      }
-
-      if (!res.ok) {
-        setPageError(ERROR_TYPES.UNKNOWN);
-        return;
-      }
-
-      const data = await res.json();
-      
       setUserData({
         name: data?.data?.name ?? "",
         email: data?.data?.email ?? "",
         grade: data?.data?.grade ?? "",
       });
 
-      // ── Quiz stats (uncomment when route ready) ────────────────────────────
-      const quizRes  = await apiFetch("/api/quiz/stats");
-      const quizData = await quizRes.json();
       setQuizStats({
         total:     quizData?.data?.total     ?? DEFAULT_QUIZ.total,
         lastScore: quizData?.data?.lastScore ?? DEFAULT_QUIZ.lastScore,
         avgScore:  quizData?.data?.avgScore  ?? DEFAULT_QUIZ.avgScore,
       });
 
-      // ── Flashcard stats (uncomment when route ready) ───────────────────────
-      const flashRes  = await apiFetch("/api/quiz/flashcards/stats");
-      const flashData = await flashRes.json();
       setFlashcardStats({
         total:    flashData?.data?.total    ?? DEFAULT_FLASH.total,
         dueToday: flashData?.data?.dueToday ?? DEFAULT_FLASH.dueToday,
@@ -217,8 +202,7 @@ const Dashboard = () => {
       // setScheduleItems(schedData?.data ?? DEFAULT_SCHEDULE);
 
       // ── Profile / gamification stats (uncomment when route ready) ─────────
-      const profileRes = await apiFetch("/api/stats");
-
+      
       if (profileRes.ok) {
         const profileData = await profileRes.json();
         setProfileStats({
