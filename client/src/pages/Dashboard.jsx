@@ -242,14 +242,12 @@ const Dashboard = () => {
   }
 
   // ── Derived values ───────────────────────────────────────────────────────────
-  const initials = userData?.name
-    ? userData.name
-        .split(" ")
-        .map((w) => w[0])
-        .join("")
-        .slice(0, 2)
-        .toUpperCase()
-    : "YOU";
+  const initials = useMemo(() =>
+    userData.name
+      ? userData.name.split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase()
+      : "YOU",
+    [userData.name]
+  );
 
   return (
     <div className={styles.appShell}>
