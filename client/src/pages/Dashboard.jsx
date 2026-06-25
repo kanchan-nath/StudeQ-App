@@ -295,7 +295,7 @@ const Dashboard = () => {
             dateTime={TODAY_ISO}
           >
             <Calendar01Icon size={14} />
-            {today}
+            {TODAY_ISO}
           </time>
         </header>
 
