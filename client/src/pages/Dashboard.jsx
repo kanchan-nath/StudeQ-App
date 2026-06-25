@@ -176,7 +176,7 @@ const Dashboard = () => {
 
   // ── Blocking error state — replaces the whole page ──────────────────────────
   // null = no error | ERROR_TYPES key = show full error page
-  const [pageError, setPageError] = useState(null); 
+  const [pageError, setPageError] = useState(null);
 
   // ── Dynamic data states ──────────────────────────────────────────────────────
   const [quizStats, setQuizStats] = useState(DEFAULT_QUIZ);
@@ -216,13 +216,13 @@ const Dashboard = () => {
       });
 
       setQuizStats({
-        total:     quizData?.data?.total     ?? DEFAULT_QUIZ.total,
+        total: quizData?.data?.total ?? DEFAULT_QUIZ.total,
         lastScore: quizData?.data?.lastScore ?? DEFAULT_QUIZ.lastScore,
-        avgScore:  quizData?.data?.avgScore  ?? DEFAULT_QUIZ.avgScore,
+        avgScore: quizData?.data?.avgScore ?? DEFAULT_QUIZ.avgScore,
       });
 
       setFlashcardStats({
-        total:    flashData?.data?.total    ?? DEFAULT_FLASH.total,
+        total: flashData?.data?.total ?? DEFAULT_FLASH.total,
         dueToday: flashData?.data?.dueToday ?? DEFAULT_FLASH.dueToday,
       });
 
@@ -246,7 +246,7 @@ const Dashboard = () => {
       // ── Network / TypeError (no connection) ─────────────────────────────────
       const type = resolveErrorType(err);
       console.log(err);
-      
+
       if (type === ERROR_TYPES.NETWORK) {
         setPageError(ERROR_TYPES.NETWORK);
       } else {
@@ -256,7 +256,7 @@ const Dashboard = () => {
       setUserLoading(false);
       hide();
     }
-  }, [ navigate, notifyError, show, hide]); 
+  }, [navigate, notifyError, show, hide]);
 
   useEffect(() => {
     fetchData();
@@ -298,25 +298,8 @@ const Dashboard = () => {
               <span className={styles.pulseDotRing} />
               <span className={styles.pulseDotCore} />
             </span>
-            <div>
+            <div style={{ minHeight: 32 }}>
               <p className={styles.sessionLabel}>Active Session</p>
-              {/* {userLoading ? (
-                <div
-                  className={styles.skeletonHeading}
-                  aria-hidden="true"
-                  data-testid="skeleton-heading"
-                />
-              ) : (
-                <h1
-                  data-testid="welcome-heading"
-                  className={styles.welcomeHeading}
-                >
-                  Welcome back,{" "}
-                  <span className={styles.welcomeName}>
-                    {userData.name.toUpperCase()}
-                  </span>
-                </h1>
-              )} */}
 
               <h1 data-testid="welcome-heading" className={styles.welcomeHeading}>
                 Welcome back,{" "}
@@ -347,8 +330,8 @@ const Dashboard = () => {
               key={to}
               to={to}
               className={`${styles.stripBtn} ${primary
-                  ? styles.stripBtnPrimary
-                  : styles.stripBtnSecondary
+                ? styles.stripBtnPrimary
+                : styles.stripBtnSecondary
                 }`}
             >
               <Icon size={14} />
@@ -727,6 +710,7 @@ const Dashboard = () => {
                 <article
                   key={to}
                   className={styles.featureCard}
+                  role="listItem"
                 >
                   <div
                     className={`${styles.featureIcon} ${styles[`featureIcon--${colorClass}`]}`}
