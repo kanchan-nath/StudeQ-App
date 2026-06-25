@@ -16,8 +16,6 @@ import {
   Home01Icon,
 } from "hugeicons-react";
 import useLoader from "../ContextApi/useLoader.js";
-import BASE_URL from "../lib/api.js";
-
 // ── Error system imports ───────────────────────────────────────────────────────
 import ErrorPage from "../errors/components/ErrorPage.jsx";
 import { ERROR_TYPES, resolveErrorType } from "../errors/config/errorConfig.js";
@@ -137,8 +135,6 @@ const Dashboard = () => {
 
   // ── Error handler hook ───────────────────────────────────────────────────────
   const { notifyError, notifySuccess } = useErrorHandler();
-
-  const [activeNav, setActiveNav] = useState("home");
   const [userData, setUserData] = useState(DEFAULT_USER);
   const [userLoading, setUserLoading] = useState(true);
 
@@ -194,6 +190,14 @@ const Dashboard = () => {
         dueToday: flashData?.data?.dueToday ?? DEFAULT_FLASH.dueToday,
       });
 
+      setProfileStats({
+        streak: profileData?.data?.streak ?? DEFAULT_PROFILE.streak,
+        xp: profileData?.data?.xp ?? DEFAULT_PROFILE.xp,
+        level: profileData?.data?.level ?? DEFAULT_PROFILE.level,
+        xpPercent: profileData?.data?.xpPercent ?? DEFAULT_PROFILE.xpPercent,
+        xpNextLevel: profileData?.data?.xpNextLevel ?? DEFAULT_PROFILE.xpNextLevel,
+      });
+
       // ── Today's schedule (uncomment when route ready) ──────────────────────
       // const schedRes  = await fetch(`${BASE_URL}/api/schedule/today`, {
       //   headers: { Authorization: `Bearer ${token}` },
@@ -201,18 +205,7 @@ const Dashboard = () => {
       // const schedData = await schedRes.json();
       // setScheduleItems(schedData?.data ?? DEFAULT_SCHEDULE);
 
-      // ── Profile / gamification stats (uncomment when route ready) ─────────
-      
-      if (profileRes.ok) {
-        const profileData = await profileRes.json();
-        setProfileStats({
-          streak: profileData?.data?.streak ?? DEFAULT_PROFILE.streak,
-          xp: profileData?.data?.xp ?? DEFAULT_PROFILE.xp,
-          level: profileData?.data?.level ?? DEFAULT_PROFILE.level,
-          xpPercent: profileData?.data?.xpPercent ?? DEFAULT_PROFILE.xpPercent,
-          xpNextLevel: profileData?.data?.xpNextLevel ?? DEFAULT_PROFILE.xpNextLevel,
-        });
-      }
+
     } catch (err) {
       // ── Network / TypeError (no connection) ─────────────────────────────────
       const type = resolveErrorType(err);
@@ -227,7 +220,7 @@ const Dashboard = () => {
       setUserLoading(false);
       hide();
     }
-  }, [ navigate, notifyError, show, hide]);
+  }, [ navigate, notifyError, show, hide]); 
 
   useEffect(() => {
     fetchData();
