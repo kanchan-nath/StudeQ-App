@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { apiFetch } from "../lib/api.js";
 import styles from "./styles/Dashboard.module.css";
@@ -22,13 +22,44 @@ import { ERROR_TYPES, resolveErrorType } from "../errors/config/errorConfig.js";
 import useErrorHandler from "../errors/hooks/useErrorHandler.jsx";
 
 export const QUICK_ACTIONS = [
-  { label: "Upload Material", icon: Upload01Icon, to: "/notes" },
-  { label: "Create Quiz", icon: Quiz04Icon, to: "/quiz" },
-  { label: "Chat with AI", icon: Chat01Icon, to: "/tutor" },
-  { label: "Study Room", icon: MeetingRoomIcon, to: "/studyroom" },
-  { label: "Image Analysis", icon: Image01Icon, to: "/image-analyzer" },
-  { label: "PDF Analysis", icon: Pdf02Icon, to: "/pdf-summary" },
+  {
+    label: "Upload Material",
+    icon: Upload01Icon,
+    to: "/notes",
+    primary: true,
+  },
+  {
+    label: "Create Quiz",
+    icon: Quiz04Icon,
+    to: "/quiz",
+    primary: false,
+  },
+  {
+    label: "Chat with AI",
+    icon: Chat01Icon,
+    to: "/tutor",
+    primary: false,
+  },
+  {
+    label: "Study Room",
+    icon: MeetingRoomIcon,
+    to: "/studyroom",
+    primary: false,
+  },
+  {
+    label: "Image Analysis",
+    icon: Image01Icon,
+    to: "/image-analyzer",
+    primary: false,
+  },
+  {
+    label: "PDF Analysis",
+    icon: Pdf02Icon,
+    to: "/pdf-summary",
+    primary: false,
+  },
 ];
+
 export const NAV_ITEMS = [
   { id: "home", icon: Home01Icon, label: "Dashboard", to: "/" },
   { id: "notes", icon: Upload01Icon, label: "Upload Material", to: "/notes" },
@@ -302,11 +333,14 @@ const Dashboard = () => {
           className={styles.quickStrip}
           aria-label="Quick actions"
         >
-          {QUICK_ACTIONS.map(({ label, icon: Icon, to }) => (
+          {QUICK_ACTIONS.map(({ label, icon: Icon, to, primary }) => (
             <Link
               key={to}
               to={to}
-              className={`${styles.stripBtn} ${label === "Upload Material" ? styles.stripBtnPrimary : styles.stripBtnSecondary}`}
+              className={`${styles.stripBtn} ${primary
+                  ? styles.stripBtnPrimary
+                  : styles.stripBtnSecondary
+                }`}
             >
               <Icon size={14} />
               {label}
