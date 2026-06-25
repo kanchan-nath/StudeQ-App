@@ -503,6 +503,14 @@ const SidebarContent = React.memo(({
   </div>
 ));
 
+const checkApiResponse = (res, { navigate, notifyError, setPageError }) => {
+  if (res.status === 401) { notifyError("Session expired. Sign in again."); navigate("/login"); return false; }
+  if (res.status === 403) { setPageError(ERROR_TYPES.FORBIDDEN); return false; }
+  if (res.status >= 500) { setPageError(ERROR_TYPES.SERVER_ERROR); return false; }
+  if (!res.ok) { setPageError(ERROR_TYPES.UNKNOWN); return false; }
+  return true;
+};
+
 /* ═══════════════════════════════════════════════════════════════
   MAIN COMPONENT
 ═══════════════════════════════════════════════════════════════ */
@@ -593,28 +601,7 @@ const Notes = () => {
           body: JSON.stringify({ content }),
         });
 
-        // ── Auth errors → redirect + toast ──────────────────────────────────────
-        if (res.status === 401) {
-          notifyError("Session expired. Sign in again.");
-          navigate("/login");
-          return;
-        }
-
-        if (res.status === 403) {
-          setPageError(ERROR_TYPES.FORBIDDEN);
-          return;
-        }
-
-        // ── Server errors → full-page error ─────────────────────────────────────
-        if (res.status >= 500) {
-          setPageError(ERROR_TYPES.SERVER_ERROR);
-          return;
-        }
-
-        if (!res.ok) {
-          setPageError(ERROR_TYPES.UNKNOWN);
-          return;
-        }
+        if (!checkApiResponse(res, { navigate, notifyError, setPageError })) return;
 
         showToast("Note updated successfully!");
         setContent("");
@@ -632,28 +619,7 @@ const Notes = () => {
           body: JSON.stringify({ content }),
         });
 
-        // ── Auth errors → redirect + toast ──────────────────────────────────────
-        if (res.status === 401) {
-          notifyError("Session expired. Sign in again.");
-          navigate("/login");
-          return;
-        }
-
-        if (res.status === 403) {
-          setPageError(ERROR_TYPES.FORBIDDEN);
-          return;
-        }
-
-        // ── Server errors → full-page error ─────────────────────────────────────
-        if (res.status >= 500) {
-          setPageError(ERROR_TYPES.SERVER_ERROR);
-          return;
-        }
-
-        if (!res.ok) {
-          setPageError(ERROR_TYPES.UNKNOWN);
-          return;
-        }
+        if (!checkApiResponse(res, { navigate, notifyError, setPageError })) return;
 
         const data = await res.json();
         const { title, summary, keyPoints, _id, isPinned } = data.data;
@@ -678,26 +644,7 @@ const Notes = () => {
     try {
       const res = await apiFetch("/api/notes");
 
-      if (res.status === 401) {
-        notifyError("Session expired. Sign in again.");
-        navigate("/login");
-        return;
-      }
-
-      if (res.status === 403) {
-        setPageError(ERROR_TYPES.FORBIDDEN);
-        return;
-      }
-
-      if (res.status >= 500) {
-        setPageError(ERROR_TYPES.SERVER_ERROR);
-        return;
-      }
-
-      if (!res.ok) {
-        setPageError(ERROR_TYPES.UNKNOWN);
-        return;
-      }
+      if (!checkApiResponse(res, { navigate, notifyError, setPageError })) return;
 
       const data = await res.json();
       setNotes(data.data);
@@ -718,27 +665,7 @@ const Notes = () => {
       const res = await apiFetch(`/api/notes/${id}`, {
         method: "DELETE",
       });
-
-      if (res.status === 401) {
-        notifyError("Session expired. Sign in again.");
-        navigate("/login");
-        return;
-      }
-
-      if (res.status === 403) {
-        setPageError(ERROR_TYPES.FORBIDDEN);
-        return;
-      }
-
-      if (res.status >= 500) {
-        setPageError(ERROR_TYPES.SERVER_ERROR);
-        return;
-      }
-
-      if (!res.ok) {
-        setPageError(ERROR_TYPES.UNKNOWN);
-        return;
-      }
+      if (!checkApiResponse(res, { navigate, notifyError, setPageError })) return;
 
       showToast("Note deleted");
       if (activeNoteId === id) {
@@ -861,27 +788,7 @@ const Notes = () => {
         method: "PATCH",
         body: JSON.stringify({ newPinned }),
       });
-
-      if (res.status === 401) {
-        notifyError("Session expired. Sign in again.");
-        navigate("/login");
-        return;
-      }
-
-      if (res.status === 403) {
-        setPageError(ERROR_TYPES.FORBIDDEN);
-        return;
-      }
-
-      if (res.status >= 500) {
-        setPageError(ERROR_TYPES.SERVER_ERROR);
-        return;
-      }
-
-      if (!res.ok) {
-        setPageError(ERROR_TYPES.UNKNOWN);
-        return;
-      }
+      if (!checkApiResponse(res, { navigate, notifyError, setPageError })) return;
 
       showToast(newPinned ? "Note pinned!" : "Note unpinned");
       if (summaryData && summaryData._id === note._id) {
