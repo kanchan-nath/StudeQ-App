@@ -467,6 +467,7 @@ const SidebarContent = React.memo(({
             key={note._id}
             className={`${styles.sidebarItem} ${activeNoteId === note._id ? styles.sidebarItemActive : ""}`}
             onClick={() => handleSidebarNoteClick(note)}
+            aria-current={activeNoteId === note._id ? "page" : undefined}
           >
             <div className={styles.sidebarItemTitle}>
               {note.title.replace(/\*\*/g, "")}
@@ -582,10 +583,10 @@ const Notes = () => {
     return () => socket.off("ai-response", handler);
   }, []);
 
-  const showToast = (message, type = "success") => {
+  const showToast = useCallback((message, type = "success") => {
     setToast({ message, type });
     setTimeout(() => setToast(null), 3500);
-  };
+  }, []);
 
   const handleChange = (e) => setContent(e.target.value);
 
@@ -678,10 +679,15 @@ const Notes = () => {
     }
   };
 
+  // Use useEffect watching editId:
+  useEffect(() => {
+    if (editId) inputRef.current?.focus();
+  }, [editId]);
+  // Remove setTimeout entirely
+
   const handleSubmitEdit = (note) => {
     setContent(note.summary);
     navigate(`/notes/${note._id}/edit`);
-    setTimeout(() => inputRef.current?.focus(), 100);
   };
 
   const handleCancelEdit = () => {
