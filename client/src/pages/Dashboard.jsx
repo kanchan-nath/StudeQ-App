@@ -260,7 +260,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [fetchData]);
 
   // ── Full-page error — replaces dashboard entirely ───────────────────────────
   if (pageError) {
