@@ -129,6 +129,11 @@ const DEFAULT_PROFILE = {
   xpNextLevel: 2,
 };
 
+const TODAY_DISPLAY = new Date().toLocaleDateString("en-US", {
+  weekday: "short", day: "2-digit", month: "short", year: "numeric",
+});
+const TODAY_ISO = new Date().toISOString().split("T")[0];
+
 const Dashboard = () => {
   const { show, hide } = useLoader();
   const navigate = useNavigate();
@@ -246,13 +251,6 @@ const Dashboard = () => {
         .toUpperCase()
     : "YOU";
 
-  const today = new Date().toLocaleDateString("en-US", {
-    weekday: "short",
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  });
-
   return (
     <div className={styles.appShell}>
       {/* ── Main ── */}
@@ -294,7 +292,7 @@ const Dashboard = () => {
           </div>
           <time
             className={styles.dateChip}
-            dateTime={new Date().toISOString()}
+            dateTime={TODAY_ISO}
           >
             <Calendar01Icon size={14} />
             {today}
