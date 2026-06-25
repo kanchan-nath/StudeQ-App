@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect, useCallback } from "react";
 import { useLocation, useParams, useNavigate } from "react-router-dom";
 import { apiFetch } from "../lib/api.js";
 import styles from "./styles/notes.module.css";
@@ -556,21 +556,22 @@ const Notes = () => {
     };
   }, [mobileSidebarOpen]);
 
+  const handler = (data) => {
+    const { title, summary, keyPoints, _id, isPinned } = data;
+    setSummaryData({ title, summary, keyPoints, _id, isPinned });
+    setGeneratedIds((prev) => new Set(prev).add(_id));
+    showToast("Note created!");
+    fetchNotes();
+    navigate(`/notes/${_id}`);
+  }
   useEffect(() => {
     connectSocket();
     const socket = getSocket();
     if (!socket) return;
 
-    socket.on("ai-response", (data) => {
-      const { title, summary, keyPoints, _id, isPinned } = data;
-      setSummaryData({ title, summary, keyPoints, _id, isPinned });
-      setGeneratedIds((prev) => new Set(prev).add(_id));
-      showToast("Note created!");
-      fetchNotes();
-      navigate(`/notes/${_id}`);
-    });
+    socket.on("ai-response", handler);
 
-    return () => socket.off("ai_response");
+    return () => socket.off("ai-response", handler);
   }, []);
 
   const showToast = (message, type = "success") => {
@@ -672,7 +673,7 @@ const Notes = () => {
     }
   };
 
-  const fetchNotes = async () => {
+  const fetchNotes = useCallback(async () => {
     setFetching(true);
     try {
       const res = await apiFetch("/api/notes");
@@ -710,7 +711,7 @@ const Notes = () => {
     } finally {
       setFetching(false);
     }
-  };
+  }, [navigate, notifyError]);
 
   const handleSubmitDelete = async (id) => {
     try {
