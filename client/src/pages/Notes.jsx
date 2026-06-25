@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect, useCallback } from "react";
+import React, { useRef, useState, useEffect, useCallback, useMemo } from "react";
 import { useLocation, useParams, useNavigate } from "react-router-dom";
 import { apiFetch } from "../lib/api.js";
 import styles from "./styles/notes.module.css";
@@ -472,7 +472,7 @@ const SidebarContent = React.memo(({
               {note.title.replace(/\*\*/g, "")}
             </div>
             <div className={styles.sidebarItemMeta}>
-              {new Date(note.createdAt).toLocaleDateString()}
+              {note.dateLabel}
             </div>
           </div>
         ))}
@@ -494,7 +494,7 @@ const SidebarContent = React.memo(({
               {note.title.replace(/\*\*/g, "")}
             </div>
             <div className={styles.sidebarItemMeta}>
-              {new Date(note.createdAt).toLocaleDateString()}
+              {note.dateLabel}
             </div>
           </div>
         ))}
@@ -822,8 +822,15 @@ const Notes = () => {
     fetchNotes();
   }, []);
 
-  const pinnedNotes = notes.filter((n) => n.isPinned);
-  const unpinnedNotes = notes.filter((n) => !n.isPinned);
+  const notesWithDate = useMemo(() =>
+    notes.map(n => ({ ...n, dateLabel: new Date(n.createdAt).toLocaleDateString() })),
+    [notes]
+  );
+
+  const { pinnedNotes, unpinnedNotes } = useMemo(() => ({
+    pinnedNotes: notesWithDate.filter(n => n.isPinned),
+    unpinnedNotes: notesWithDate.filter(n => !n.isPinned),
+  }), [notes]);
 
   // ── Full-page error — replaces page entirely ─────────────────────────────────
   if (pageError) {
