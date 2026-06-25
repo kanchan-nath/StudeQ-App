@@ -3,7 +3,7 @@ import { useState } from "react";
 import BASE_URL from "../lib/api.js";
 import { useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
-import Markdown from "react-markdown";
+const ReactMarkdown = React.lazy(() => import("react-markdown"));
 const Tutor = () => {
   const [question, setQuestion] = useState("");
   const [error, setError] = useState("");

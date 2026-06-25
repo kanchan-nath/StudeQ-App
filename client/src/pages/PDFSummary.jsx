@@ -1,7 +1,7 @@
 import React from "react";
 import { useState } from "react";
 import BASE_URL from "../lib/api.js";
-import Markdown from "react-markdown";
+const ReactMarkdown = React.lazy(() => import("react-markdown"));
 
 const PDFSummary = () => {
   const [pdfFile, setPdfFile] = useState("");

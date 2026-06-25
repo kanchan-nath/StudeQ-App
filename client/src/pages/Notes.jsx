@@ -1,12 +1,10 @@
 import React, { useRef, useState, useEffect } from "react";
 import { useLocation, useParams, useNavigate } from "react-router-dom";
-import BASE_URL, { apiFetch } from "../lib/api.js";
-import { jsPDF } from "jspdf";
+import { apiFetch } from "../lib/api.js";
 import styles from "./styles/notes.module.css";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
-import html2canvas from "html2canvas";
 import { getSocket, connectSocket } from "../lib/socket.js";
 
 // ── Error system imports ───────────────────────────────────────────────────────
@@ -723,6 +721,9 @@ const Notes = () => {
   const handleDownload = async (note) => {
     const element = noteDocRef.current;
     if (!element) return showToast("Nothing to export", "error");
+
+    const html2canvas = (await import("html2canvas")).default;
+    const { jsPDF } = await import("jspdf");
 
     showToast("Generating PDF…");
 

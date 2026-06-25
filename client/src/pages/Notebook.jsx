@@ -2,7 +2,7 @@ import React, { useRef, useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import BASE_URL, { apiFetch } from "../lib/api.js";
 import styles from "./styles/Notebook.module.css";
-import ReactMarkdown from "react-markdown";
+const ReactMarkdown = React.lazy(() => import("react-markdown"));
 import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
 import remarkMath from "remark-math";
