@@ -3,18 +3,18 @@ import { Link, useNavigate } from "react-router-dom";
 import { apiFetch } from "../lib/api.js";
 import styles from "./styles/Dashboard.module.css";
 import {
-  Upload01Icon,
-  Quiz04Icon,
-  Chat01Icon,
-  MeetingRoomIcon,
-  Image01Icon,
-  Pdf02Icon,
-  Cards01Icon,
-  CpuChargeIcon,
-  Calendar01Icon,
-  Logout01Icon,
-  Home01Icon,
-} from "hugeicons-react";
+  Upload,
+  CircleHelp,
+  MessageSquare,
+  Users,
+  Image,
+  FileText,
+  CreditCard,
+  Cpu,
+  Calendar,
+  LogOut,
+  House,
+} from "lucide-react";
 import useLoader from "../ContextApi/useLoader.js";
 // ── Error system imports ───────────────────────────────────────────────────────
 import ErrorPage from "../errors/components/ErrorPage.jsx";
@@ -24,81 +24,81 @@ import useErrorHandler from "../errors/hooks/useErrorHandler.jsx";
 export const QUICK_ACTIONS = [
   {
     label: "Upload Material",
-    icon: Upload01Icon,
+    icon: Upload,
     to: "/notes",
     primary: true,
   },
   {
     label: "Create Quiz",
-    icon: Quiz04Icon,
+    icon: CircleHelp,
     to: "/quiz",
     primary: false,
   },
   {
     label: "Chat with AI",
-    icon: Chat01Icon,
+    icon: MessageSquare,
     to: "/tutor",
     primary: false,
   },
   {
     label: "Study Room",
-    icon: MeetingRoomIcon,
+    icon: Users,
     to: "/studyroom",
     primary: false,
   },
   {
     label: "Image Analysis",
-    icon: Image01Icon,
+    icon: Image,
     to: "/image-analyzer",
     primary: false,
   },
   {
     label: "PDF Analysis",
-    icon: Pdf02Icon,
+    icon: FileText,
     to: "/pdf-summary",
     primary: false,
   },
 ];
 
 export const NAV_ITEMS = [
-  { id: "home", icon: Home01Icon, label: "Dashboard", to: "/" },
-  { id: "notes", icon: Upload01Icon, label: "Upload Material", to: "/notes" },
-  { id: "quiz", icon: Quiz04Icon, label: "Create Quiz", to: "/quiz" },
-  { id: "tutor", icon: Chat01Icon, label: "AI Tutor Chat", to: "/tutor" },
+  { id: "home", icon: House, label: "Dashboard", to: "/" },
+  { id: "notes", icon: Upload, label: "Upload Material", to: "/notes" },
+  { id: "quiz", icon: CircleHelp, label: "Create Quiz", to: "/quiz" },
+  { id: "tutor", icon: MessageSquare, label: "AI Tutor Chat", to: "/tutor" },
   {
     id: "studyroom",
-    icon: MeetingRoomIcon,
+    icon: Users,
     label: "Study Room",
     to: "/studyroom",
   },
   {
     id: "image-analysis",
-    icon: Image01Icon,
+    icon: Image,
     label: "Image Analysis",
     to: "/image-analyzer",
   },
   {
     id: "pdf-analysis",
-    icon: Pdf02Icon,
+    icon: FileText,
     label: "PDF Analysis",
     to: "/pdf-summary",
   },
   {
     id: "flashcards",
-    icon: Cards01Icon,
+    icon: CreditCard,
     label: "Flashcards",
     to: "/flashcards",
   },
   {
     id: "scheduler",
-    icon: Calendar01Icon,
+    icon: Calendar,
     label: "Scheduler",
     to: "/scheduler",
   },
 ];
 export const FEATURE_CARDS = [
   {
-    icon: Cards01Icon,
+    icon: CreditCard,
     colorClass: "blue",
     title: "Flashcard Practice",
     desc: "Reinforce what you know with smart flashcard sessions built from your uploaded notes.",
@@ -106,7 +106,7 @@ export const FEATURE_CARDS = [
     to: "/flashcards",
   },
   {
-    icon: Quiz04Icon,
+    icon: CircleHelp,
     colorClass: "purple",
     title: "Generate a Quiz",
     desc: "Turn any material into an instant quiz. Get real-time feedback on every answer.",
@@ -114,7 +114,7 @@ export const FEATURE_CARDS = [
     to: "/quiz",
   },
   {
-    icon: Image01Icon,
+    icon: Image,
     colorClass: "teal",
     title: "Analyze an Image",
     desc: "Drop a diagram, chart, or handwritten page — get a full AI-powered explanation.",
@@ -122,7 +122,7 @@ export const FEATURE_CARDS = [
     to: "/image-analyzer",
   },
   {
-    icon: Pdf02Icon,
+    icon: FileText,
     colorClass: "orange",
     title: "Break Down a PDF",
     desc: "Upload any PDF and extract key concepts, summaries, and quiz questions in seconds.",
@@ -130,7 +130,7 @@ export const FEATURE_CARDS = [
     to: "/pdf-summary",
   },
   {
-    icon: CpuChargeIcon,
+    icon: Cpu,
     colorClass: "pink",
     title: "AI Tutor Session",
     desc: "Ask anything. Your personal AI tutor walks you through tough concepts step by step.",
@@ -138,7 +138,7 @@ export const FEATURE_CARDS = [
     to: "/tutor",
   },
   {
-    icon: Calendar01Icon,
+    icon: Calendar,
     colorClass: "green",
     title: "Plan Your Week",
     desc: "Build a smart study schedule around your exams, deadlines, and learning goals.",
@@ -323,7 +323,7 @@ const Dashboard = () => {
             className={styles.dateChip}
             dateTime={TODAY_ISO}
           >
-            <Calendar01Icon size={14} />
+            <Calendar size={14} />
             {TODAY_ISO}
           </time>
         </header>
@@ -357,9 +357,8 @@ const Dashboard = () => {
               aria-hidden="true"
             />
             <div className={styles.cardIconWrap}>
-              <Chat01Icon
+              <MessageSquare
                 size={18}
-                color="var(--accent-purple)"
               />
             </div>
             <h2 className={styles.cardTitle}>AI Tutor Chat</h2>
@@ -370,7 +369,7 @@ const Dashboard = () => {
             <div className={styles.chatPreview}>
               <div className={styles.chatBubble}>
                 <div className={`${styles.chatAvatar} ${styles.chatAvatarBot}`}>
-                  <CpuChargeIcon
+                  <Cpu
                     size={10}
                     color="var(--accent-purple)"
                   />
@@ -408,9 +407,8 @@ const Dashboard = () => {
             <div className={styles.cardRowHeader}>
               <div className={styles.cardIconGroup}>
                 <div className={styles.cardIconWrap}>
-                  <Quiz04Icon
+                  <CircleHelp
                     size={18}
-                    color="var(--accent-blue)"
                   />
                 </div>
                 <div>
@@ -474,9 +472,8 @@ const Dashboard = () => {
             />
             <div className={styles.cardIconGroup}>
               <div className={styles.cardIconWrap}>
-                <Cards01Icon
+                <CreditCard
                   size={18}
-                  color="var(--accent-green)"
                 />
               </div>
               <div>
@@ -520,9 +517,8 @@ const Dashboard = () => {
             />
             <div className={styles.cardIconGroup}>
               <div className={styles.cardIconWrap}>
-                <Calendar01Icon
+                <Calendar
                   size={18}
-                  color="var(--accent-amber)"
                 />
               </div>
               <div>
@@ -572,9 +568,8 @@ const Dashboard = () => {
             />
             <div className={styles.cardIconGroup}>
               <div className={styles.cardIconWrap}>
-                <Image01Icon
+                <Image
                   size={18}
-                  color="var(--accent-pink)"
                 />
               </div>
               <div>
@@ -604,9 +599,8 @@ const Dashboard = () => {
             />
             <div className={styles.cardIconGroup}>
               <div className={styles.cardIconWrap}>
-                <Pdf02Icon
+                <FileText
                   size={18}
-                  color="var(--accent-red)"
                 />
               </div>
               <div>
