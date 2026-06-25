@@ -810,8 +810,10 @@ const Notes = () => {
     const element = noteDocRef.current;
     if (!element) return showToast("Nothing to export", "error");
 
-    const html2canvas = (await import("html2canvas")).default;
-    const { jsPDF } = await import("jspdf");
+    const [{ default: html2canvas }, { jsPDF }] = await Promise.all([
+      import("html2canvas"),
+      import("jspdf"),
+    ]);
 
     showToast("Generating PDF…");
 
@@ -825,7 +827,6 @@ const Notes = () => {
       });
 
       const imgData = canvas.toDataURL("image/png");
-      const { jsPDF } = await import("jspdf");
 
       const pdf = new jsPDF({
         orientation: "portrait",
