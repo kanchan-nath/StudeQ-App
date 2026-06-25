@@ -724,7 +724,6 @@ const Dashboard = () => {
                 <article
                   key={to}
                   className={styles.featureCard}
-                  role="listitem"
                 >
                   <div
                     className={`${styles.featureIcon} ${styles[`featureIcon--${colorClass}`]}`}
