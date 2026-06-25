@@ -543,7 +543,7 @@ const Dashboard = () => {
               ) : (
                 scheduleItems.map((item, i) => (
                   <li
-                    key={i}
+                    key={item._id ?? item.title}
                     className={styles.scheduleItem}
                   >
                     <span
