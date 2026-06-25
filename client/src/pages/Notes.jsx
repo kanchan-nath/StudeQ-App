@@ -415,6 +415,94 @@ export const NoteInputForm = ({
   </div>
 );
 
+const SidebarContent = React.memo(({
+  fetching, fetchError, notes, pinnedNotes, unpinnedNotes,
+  activeNoteId, handleSidebarNoteClick, handleNewNote,
+  setMobileSidebarOpen
+}) => (
+  <div
+    className={styles.sidebarContent}
+    aria-label="Saved notes"
+  >
+    <div className={styles.sidebarHeader}>
+      <h3 className={styles.sidebarTitle}>📝 Your Notes</h3>
+      <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+        <button
+          className={styles.sidebarNewBtn}
+          onClick={handleNewNote}
+          aria-label="Create new note"
+          title="New note"
+        >
+          +
+        </button>
+        {/* ── NEW: close btn inside drawer header (mobile only via CSS) ── */}
+        <button
+          className={styles.sidebarCloseBtn}
+          onClick={() => setMobileSidebarOpen(false)}
+          aria-label="Close notes sidebar"
+        >
+          ✕
+        </button>
+      </div>
+    </div>
+
+    {fetching && <p className={styles.sidebarEmpty}>Loading…</p>}
+    {fetchError && (
+      <p
+        className={styles.sidebarEmpty}
+        role="alert"
+      >
+        {fetchError}
+      </p>
+    )}
+    {!fetching && notes.length === 0 && (
+      <p className={styles.sidebarEmpty}>No notes yet.</p>
+    )}
+
+    {pinnedNotes.length > 0 && (
+      <>
+        <p className={styles.sidebarGroupLabel}>📌 Pinned</p>
+        {pinnedNotes.map((note) => (
+          <div
+            key={note._id}
+            className={`${styles.sidebarItem} ${activeNoteId === note._id ? styles.sidebarItemActive : ""}`}
+            onClick={() => handleSidebarNoteClick(note)}
+          >
+            <div className={styles.sidebarItemTitle}>
+              {note.title.replace(/\*\*/g, "")}
+            </div>
+            <div className={styles.sidebarItemMeta}>
+              {new Date(note.createdAt).toLocaleDateString()}
+            </div>
+          </div>
+        ))}
+      </>
+    )}
+
+    {unpinnedNotes.length > 0 && (
+      <>
+        {pinnedNotes.length > 0 && (
+          <p className={styles.sidebarGroupLabel}>All Notes</p>
+        )}
+        {unpinnedNotes.map((note) => (
+          <div
+            key={note._id}
+            className={`${styles.sidebarItem} ${activeNoteId === note._id ? styles.sidebarItemActive : ""}`}
+            onClick={() => handleSidebarNoteClick(note)}
+          >
+            <div className={styles.sidebarItemTitle}>
+              {note.title.replace(/\*\*/g, "")}
+            </div>
+            <div className={styles.sidebarItemMeta}>
+              {new Date(note.createdAt).toLocaleDateString()}
+            </div>
+          </div>
+        ))}
+      </>
+    )}
+  </div>
+));
+
 /* ═══════════════════════════════════════════════════════════════
   MAIN COMPONENT
 ═══════════════════════════════════════════════════════════════ */
@@ -834,89 +922,6 @@ const Notes = () => {
   }
 
   // ── Shared sidebar content — rendered in both desktop + mobile drawer ──
-  const SidebarContent = () => (
-    <div
-      className={styles.sidebarContent}
-      aria-label="Saved notes"
-    >
-      <div className={styles.sidebarHeader}>
-        <h3 className={styles.sidebarTitle}>📝 Your Notes</h3>
-        <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-          <button
-            className={styles.sidebarNewBtn}
-            onClick={handleNewNote}
-            aria-label="Create new note"
-            title="New note"
-          >
-            +
-          </button>
-          {/* ── NEW: close btn inside drawer header (mobile only via CSS) ── */}
-          <button
-            className={styles.sidebarCloseBtn}
-            onClick={() => setMobileSidebarOpen(false)}
-            aria-label="Close notes sidebar"
-          >
-            ✕
-          </button>
-        </div>
-      </div>
-
-      {fetching && <p className={styles.sidebarEmpty}>Loading…</p>}
-      {fetchError && (
-        <p
-          className={styles.sidebarEmpty}
-          role="alert"
-        >
-          {fetchError}
-        </p>
-      )}
-      {!fetching && notes.length === 0 && (
-        <p className={styles.sidebarEmpty}>No notes yet.</p>
-      )}
-
-      {pinnedNotes.length > 0 && (
-        <>
-          <p className={styles.sidebarGroupLabel}>📌 Pinned</p>
-          {pinnedNotes.map((note) => (
-            <div
-              key={note._id}
-              className={`${styles.sidebarItem} ${activeNoteId === note._id ? styles.sidebarItemActive : ""}`}
-              onClick={() => handleSidebarNoteClick(note)}
-            >
-              <div className={styles.sidebarItemTitle}>
-                {note.title.replace(/\*\*/g, "")}
-              </div>
-              <div className={styles.sidebarItemMeta}>
-                {new Date(note.createdAt).toLocaleDateString()}
-              </div>
-            </div>
-          ))}
-        </>
-      )}
-
-      {unpinnedNotes.length > 0 && (
-        <>
-          {pinnedNotes.length > 0 && (
-            <p className={styles.sidebarGroupLabel}>All Notes</p>
-          )}
-          {unpinnedNotes.map((note) => (
-            <div
-              key={note._id}
-              className={`${styles.sidebarItem} ${activeNoteId === note._id ? styles.sidebarItemActive : ""}`}
-              onClick={() => handleSidebarNoteClick(note)}
-            >
-              <div className={styles.sidebarItemTitle}>
-                {note.title.replace(/\*\*/g, "")}
-              </div>
-              <div className={styles.sidebarItemMeta}>
-                {new Date(note.createdAt).toLocaleDateString()}
-              </div>
-            </div>
-          ))}
-        </>
-      )}
-    </div>
-  );
 
   return (
     <div className={styles["notes-page"]}>
@@ -1014,7 +1019,15 @@ const Notes = () => {
           {sidebarOpen ? "→" : "←"}
         </button>
 
-        {sidebarOpen && <SidebarContent />}
+        {sidebarOpen && <SidebarContent fetching={fetching}
+          fetchError={fetchError}
+          notes={notes}
+          pinnedNotes={pinnedNotes}
+          unpinnedNotes={unpinnedNotes}
+          activeNoteId={activeNoteId}
+          handleSidebarNoteClick={handleSidebarNoteClick}
+          handleNewNote={handleNewNote}
+          setMobileSidebarOpen={setMobileSidebarOpen} />}
       </div>
 
       {/* ── MOBILE DRAWER + BACKDROP ── */}
