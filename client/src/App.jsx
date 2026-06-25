@@ -56,22 +56,22 @@ const App = () => {
           path="/login"
           element={<Login />}
         />
-        <Route
-          path="/upgrade"
-          element={<Payment />}
-        />
 
         <Route
           element={<ProtectedRoute component={<AppShell />} />}
           errorElement={<RouteErrorPage />}
         >
-          <Route path='/dashboard' element={<ProtectedRoute component={<Dashboard/>}/>} />
+          <Route path='/dashboard' element={<ProtectedRoute component={<Dashboard />} />} />
+          <Route
+            path="/upgrade"
+            element={<Payment />}
+          />
 
           <Route path="/notes" element={<ProtectedRoute component={<Notes />} />} />
           <Route path="/notes/new" element={<ProtectedRoute component={<Notes />} />} />
           <Route path="/notes/:id" element={<ProtectedRoute component={<Notes />} />} />
           <Route path="/notes/:id/edit" element={<ProtectedRoute component={<Notes />} />} />
-          
+
           <Route
             path="/quiz"
             element={<ProtectedRoute component={<Quiz />} />}
