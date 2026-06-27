@@ -23,8 +23,17 @@ import Home from "../src/pages/Home.jsx";
 import Register from "./pages/Register.jsx";
 import Login from "./pages/Login.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
+import PublicLayout from "./components/layouts/PublicLayout";
+import AuthLayout from "./components/layouts/AuthLayout";
 import AppShell from "./components/layouts/AppShell.jsx";
 import ComingSoon from "./components/ComingSoon/Index.jsx";
+import Features from "./pages/Features.jsx";
+import QuizFeaturePage from "./pages/Quizfeaturepage.jsx";
+import NotesFeaturePage from "./pages/Notesfeaturepage.jsx";
+import NotebookFeaturePage from "./pages/Notebookfeaturepage.jsx";
+import FlashcardFeaturePage from "./pages/Flashcardfeaturepage.jsx";
+import PricingPage from "./pages/Pricingpage.jsx";
+import MissionPage from "./pages/Missionpage.jsx";
 
 // Lazy pages
 const Dashboard = lazy(() => import("./pages/Dashboard.jsx"));
@@ -59,9 +68,28 @@ const App = () => {
       {/* {showNavbar && <Navbar/>} */}
       <Suspense fallback={<SuspenseLoader />}>
         <Routes>
+
           <Route path="/" element={<Home />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/login" element={<Login />} />
+
+          <Route element={<PublicLayout />}>
+            <Route path="/features" element={<Features />} />
+            <Route path="/features/note" element={<NotesFeaturePage />} />
+            <Route path="/features/quiz" element={<QuizFeaturePage />} />
+            <Route path="/features/flashcard" element={<FlashcardFeaturePage />} />
+            <Route path="/features/notebook" element={<NotebookFeaturePage />} />
+            <Route path="/features/study-room" element={<div>Study Room Feature Page</div>} />
+            <Route path="/features/scheduler" element={<div>Scheduler Feature Page</div>} />
+            <Route path="/features/time-table" element={<div>Time Table Feature Page</div>} />
+            <Route path="/features/image-analysis" element={<div>Image Analysis Feature Page</div>} />
+            <Route path="/features/pdf-analysis" element={<div>PDF Analysis Feature Page</div>} />
+            <Route path="/pricing" element={<PricingPage />} />
+            <Route path="/our-mission" element={<MissionPage />} />
+          </Route>
+
+          <Route element={<AuthLayout />}>
+            <Route path="/register" element={<Register />} />
+            <Route path="/login" element={<Login />} />
+          </Route>
 
           <Route
             element={<ProtectedRoute component={<AppShell />} />}

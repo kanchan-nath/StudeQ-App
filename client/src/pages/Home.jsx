@@ -2,7 +2,29 @@ import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import styles from "./styles/Home.module.css";
 import { Helmet } from "react-helmet-async";
+import ThemeToggle from "../components/Themetoggle.jsx";
+// Add to imports
+import {
+  FileText,
+  Bot,
+  Layers,
+  FlaskConical,
+  Users,
+  Image,
+  FileSearch,
+  CalendarClock,
+} from "lucide-react";
 /* ─── DATA ─────────────────────────────────────────────────────────────── */
+const NAV_FEATURES = [
+  { to: "/features/note", Icon: FileText, label: "AI Notes", desc: "PDF → structured notes in seconds" },
+  { to: "/features/notebook", Icon: Bot, label: "AI Tutor", desc: "Subject-aware multi-turn chat" },
+  { to: "/features/flashcard", Icon: Layers, label: "Flashcards", desc: "SM-2 spaced repetition decks" },
+  { to: "/features/quiz", Icon: FlaskConical, label: "AI Quiz", desc: "6 question types, instant feedback" },
+  { to: "/features/study-room", Icon: Users, label: "Study Room", desc: "Live collaborative sessions" },
+  { to: "/features/image-analysis", Icon: Image, label: "Image Analysis", desc: "Diagrams, handwriting, LaTeX" },
+  { to: "/features/pdf-analysis", Icon: FileSearch, label: "PDF Analysis", desc: "Chat with any PDF document" },
+  { to: "/features/scheduler", Icon: CalendarClock, label: "AI Scheduler", desc: "Study plan around your exams" },
+];
 
 const SUBJECTS = [
   "Mathematics",
@@ -550,46 +572,79 @@ const LandingPage = () => {
                 className={styles.navLinks}
                 role="list"
               >
-                <li>
-                  <a
-                    href="#"
+                <li className={`${styles.navItem} ${styles.hasDropdown}`} role="presentation">
+                  <button
                     className={styles.navLink}
+                    aria-haspopup="true"
+                    aria-expanded="false"   // toggled by CSS :focus-within for keyboard
                   >
                     Features
-                  </a>
+                    <span className={styles.navChevron} aria-hidden="true">▾</span>
+                  </button>
+
+                  <div className={styles.navDropdown} role="menu">
+                    <div className={styles.navDropdownArrow} aria-hidden="true" />
+                    <div className={styles.navDropdownGrid}>
+                      {NAV_FEATURES.map((item) => (
+                        <Link
+                          key={item.to}
+                          to={item.to}
+                          className={styles.navDropdownItem}
+                          role="menuitem"
+                        >
+                          <span className={styles.navDropdownIcon} aria-hidden="true">
+                            <item.Icon size={16} strokeWidth={1.8} />
+                          </span>
+                          <span className={styles.navDropdownText}>
+                            <span className={styles.navDropdownLabel}>{item.label}</span>
+                            <span className={styles.navDropdownDesc}>{item.desc}</span>
+                          </span>
+                        </Link>
+                      ))}
+                    </div>
+                    <div className={styles.navDropdownFooter}>
+                      <Link to="/features" className={styles.navDropdownFooterLink}>
+                        View all features →
+                      </Link>
+                    </div>
+                  </div>
                 </li>
                 <li>
-                  <a
-                    href="#"
+                  <Link
+                    to="/pricing"
                     className={styles.navLink}
                   >
                     Pricing
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a
-                    href="#"
+                  <Link
+                    to="/blog"
                     className={styles.navLink}
                   >
                     Blog
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a
-                    href="#"
+                  <Link
+                    to="/how-it-works"
                     className={styles.navLink}
                   >
                     How It Works
-                  </a>
+                  </Link>
                 </li>
               </ul>
             </div>
+            <div className={styles.ctaWrapper}>
+
+            <ThemeToggle/>
             <Link
               to="/register"
               className={styles.navCta}
             >
               Start now
             </Link>
+            </div>
           </div>
         </nav>
 
@@ -613,11 +668,6 @@ const LandingPage = () => {
           />
 
           <div className={styles.heroContent}>
-            <div className={styles.heroBadge}>
-              <span>⚡ Now with Image Analysis &amp; Live Study Rooms</span>
-              <span className={styles.heroBadgeArrow}>→</span>
-            </div>
-
             <h1 className={styles.heroH1}>
               AI Study Platform -
               <br />
@@ -690,7 +740,7 @@ const LandingPage = () => {
 
         {/* ── FEATURE TABS ────────────────────────────────────────── */}
         <section
-          className={styles.section} 
+          className={styles.section}
           id="features"
           aria-label="Features"
         >
@@ -1111,42 +1161,67 @@ const LandingPage = () => {
             <div className={styles.footerLinks}>
               <div className={styles.footerLinkCol}>
                 <span className={styles.footerLinkHeading}>Product</span>
-                <a
-                  href="#"
-                  className={styles.footerLink}
-                >
+
+                <Link to="/features/note" className={styles.footerLink} >
                   AI Notes
-                </a>
-                <a
-                  href="#"
+                </Link>
+                <Link
+                  to="/features/notebook"
                   className={styles.footerLink}
                 >
-                  AI Tutor
-                </a>
-                <a
-                  href="#"
+                  AI Tutor Chat
+                </Link>
+                <Link
+                  to="/features/quiz"
                   className={styles.footerLink}
                 >
-                  Quiz Maker
-                </a>
-                <a
-                  href="#"
+                  Create Quiz
+                </Link>
+                <Link
+                  to="features/flashcard"
                   className={styles.footerLink}
                 >
-                  Flashcards
-                </a>
-                <a
-                  href="#"
+                  AI Flashcards
+                </Link>
+                <Link
+                  to="/features/time-table"
                   className={styles.footerLink}
                 >
-                  Study Rooms
-                </a>
-                <a
-                  href="#"
+                  Time Table
+                </Link>
+                <Link
+                  to="/features/scheduler"
                   className={styles.footerLink}
                 >
-                  Scheduler
-                </a>
+                  AI Scheduler
+                </Link>
+                <Link
+                  to="/features/study-room"
+                  className={styles.footerLink}
+                >
+                  Collaborative Study Room
+                </Link>
+                <Link
+                  to="/features/image-analysis"
+                  className={styles.footerLink}
+                >
+                  Image Analysis
+
+                </Link>
+                <Link
+                  to="/features/pdf-analysis"
+                  className={styles.footerLink}
+                >
+                  Pdf Analysis
+
+                </Link>
+                <Link
+                  to="/features/pdf-analysis"
+                  className={styles.footerLink}
+                >
+                  Pdf Analysis
+
+                </Link>
               </div>
               <div className={styles.footerLinkCol}>
                 <span className={styles.footerLinkHeading}>Use Cases</span>

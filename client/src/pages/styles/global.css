@@ -103,6 +103,15 @@
   --dur-fast: 150ms;
   --dur-mid: 250ms;
   --dur-slow: 400ms;
+  --navbar-h: 64px;
+  --max-w: 1200px;
+  --theme-teal: #0ea5e9;
+  --theme-teal-dim: rgba(14, 165, 233, 0.12);
+  --theme-orange: #f97316;
+  --theme-orange-dim: rgba(249, 115, 22, 0.12);
+  --theme-pink: #ec4899;
+  --theme-pink-dim: rgba(236, 72, 153, 0.12);
+  --theme-green-dim: rgba(34, 197, 94, 0.12);
 }
 
 /* ── RESET ─────────────────────────────────────────────────── */
@@ -174,6 +183,7 @@ ol {
 
 /* ── REDUCED MOTION ────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
+
   *,
   *::before,
   *::after {
@@ -181,6 +191,7 @@ ol {
     transition-duration: 0.01ms !important;
   }
 }
+
 /* ── THEME TRANSITION ──────────────────────────────────────── */
 html.theme-transitioning *,
 html.theme-transitioning *::before,
@@ -192,6 +203,7 @@ html.theme-transitioning *::after {
     color 350ms cubic-bezier(0.4, 0, 0.2, 1),
     box-shadow 350ms cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
+
 /* ================================================================
    THEME SYSTEM — append this block to the END of global.css
    Works via data-theme="dark" | data-theme="light" on <html>
