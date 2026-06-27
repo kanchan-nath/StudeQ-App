@@ -372,7 +372,7 @@
 }
 
 .footerLink:hover {
-    color: white;
+    color: var(--theme-text);
 }
 
 .footerWordmark {
@@ -421,7 +421,7 @@
 
 .footerBottomText {
     font-size: 13px;
-    color: rgba(138, 138, 154, 0.5);
+    color: var(--theme-text-muted);
 }
 
 /* ── RESPONSIVE ── */
