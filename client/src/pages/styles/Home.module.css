@@ -1654,7 +1654,7 @@
   border: 1px solid var(--theme-border-hover);
   border-radius: 16px;
   padding: 14px;
-  min-width: 340px;
+  min-width: 580px;
   z-index: 300;
 
   opacity: 0;
