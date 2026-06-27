@@ -3,57 +3,27 @@ import { Link } from "react-router-dom";
 import styles from "./styles/Home.module.css";
 import { Helmet } from "react-helmet-async";
 import ThemeToggle from "../components/Themetoggle.jsx";
-
+// Add to imports
+import {
+  FileText,
+  Bot,
+  Layers,
+  FlaskConical,
+  Users,
+  Image,
+  FileSearch,
+  CalendarClock,
+} from "lucide-react";
 /* ─── DATA ─────────────────────────────────────────────────────────────── */
 const NAV_FEATURES = [
-  {
-    to: "/features/note",
-    icon: "📝",
-    label: "AI Notes",
-    desc: "PDF → structured notes in seconds",
-  },
-  {
-    to: "/features/notebook",
-    icon: "🤖",
-    label: "AI Tutor",
-    desc: "Subject-aware multi-turn chat",
-  },
-  {
-    to: "/features/flashcard",
-    icon: "🃏",
-    label: "Flashcards",
-    desc: "SM-2 spaced repetition decks",
-  },
-  {
-    to: "/features/quiz",
-    icon: "🧪",
-    label: "AI Quiz",
-    desc: "6 question types, instant feedback",
-  },
-  {
-    to: "/features/study-room",
-    icon: "🏠",
-    label: "Study Room",
-    desc: "Live collaborative sessions",
-  },
-  {
-    to: "/features/image-analysis",
-    icon: "🖼️",
-    label: "Image Analysis",
-    desc: "Diagrams, handwriting, LaTeX",
-  },
-  {
-    to: "/features/pdf-analysis",
-    icon: "📄",
-    label: "PDF Analysis",
-    desc: "Chat with any PDF document",
-  },
-  {
-    to: "/features/scheduler",
-    icon: "📅",
-    label: "AI Scheduler",
-    desc: "Study plan around your exams",
-  },
+  { to: "/features/note", Icon: FileText, label: "AI Notes", desc: "PDF → structured notes in seconds" },
+  { to: "/features/notebook", Icon: Bot, label: "AI Tutor", desc: "Subject-aware multi-turn chat" },
+  { to: "/features/flashcard", Icon: Layers, label: "Flashcards", desc: "SM-2 spaced repetition decks" },
+  { to: "/features/quiz", Icon: FlaskConical, label: "AI Quiz", desc: "6 question types, instant feedback" },
+  { to: "/features/study-room", Icon: Users, label: "Study Room", desc: "Live collaborative sessions" },
+  { to: "/features/image-analysis", Icon: Image, label: "Image Analysis", desc: "Diagrams, handwriting, LaTeX" },
+  { to: "/features/pdf-analysis", Icon: FileSearch, label: "PDF Analysis", desc: "Chat with any PDF document" },
+  { to: "/features/scheduler", Icon: CalendarClock, label: "AI Scheduler", desc: "Study plan around your exams" },
 ];
 
 const SUBJECTS = [
@@ -623,7 +593,7 @@ const LandingPage = () => {
                           role="menuitem"
                         >
                           <span className={styles.navDropdownIcon} aria-hidden="true">
-                            {item.icon}
+                            <item.Icon size={16} strokeWidth={1.8} />
                           </span>
                           <span className={styles.navDropdownText}>
                             <span className={styles.navDropdownLabel}>{item.label}</span>
