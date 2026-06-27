@@ -338,7 +338,7 @@
 
 .socialBtn:hover {
     background: var(--theme-purple-dim);
-    border-color: rgba(124, 95, 245, 0.3);
+    border-color: var(--purple-light);
     color: var(--purple-light);
 }
 
