@@ -439,7 +439,7 @@ export default function NotebookFeaturePage() {
                         Create your first notebook free — upload any document and ask your
                         first question in under 60 seconds.
                     </p>
-                    <a href="/dashboard/notebook/new" className={styles.btnPrimary}>
+                    <a href="/notebook" className={styles.btnPrimary}>
                         Open Notebook →
                     </a>
                 </section>
