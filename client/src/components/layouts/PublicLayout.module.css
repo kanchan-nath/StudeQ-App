@@ -338,8 +338,8 @@
 
 .socialBtn:hover {
     background: var(--theme-purple-dim);
-    border-color: var(--purple-light);
-    color: var(--purple-light);
+    border-color: var(--theme-purple-light);
+    color: var(--theme-purple-light);
 }
 
 .footerLinks {
