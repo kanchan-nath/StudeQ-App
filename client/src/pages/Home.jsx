@@ -610,28 +610,28 @@ const LandingPage = () => {
                   </div>
                 </li>
                 <li>
-                  <a
-                    href="#"
+                  <Link
+                    to="/pricing"
                     className={styles.navLink}
                   >
                     Pricing
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a
-                    href="#"
+                  <Link
+                    to="/blog"
                     className={styles.navLink}
                   >
                     Blog
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a
-                    href="#"
+                  <Link
+                    to="/how-it-works"
                     className={styles.navLink}
                   >
                     How It Works
-                  </a>
+                  </Link>
                 </li>
               </ul>
             </div>
