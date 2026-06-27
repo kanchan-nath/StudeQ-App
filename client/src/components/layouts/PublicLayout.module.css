@@ -28,7 +28,7 @@
 }
 
 .navbarScrolled {
-    background: rgba(10, 12, 20, 0.85);
+    background: var(--theme-navbar-bg);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     box-shadow: 0 1px 0 var(--theme-border);
@@ -58,7 +58,7 @@
     font-weight: 900;
     letter-spacing: 0.1em;
     text-transform: uppercase;
-    color: white;
+    color: var(--theme-text);
     text-decoration: none;
     white-space: nowrap;
 }
@@ -99,11 +99,11 @@
 }
 
 .navLink:hover {
-    color: white;
+    color: var(--theme-text);
 }
 
 .navLinkActive {
-    color: white;
+    color: var(--theme-text);
 }
 
 .navLinkActive::after {
@@ -127,12 +127,12 @@
 }
 
 .navLoginBtn:hover {
-    color: white;
+    color: var(--theme-text);
 }
 
 .navCta {
     background: var(--theme-accent);
-    color: #000;
+    color: var(--theme-bg);
     font-family: var(--font-display);
     font-size: 14px;
     font-weight: 700;
@@ -188,7 +188,7 @@
 .mobileMenu {
     display: flex;
     flex-direction: column;
-    background: rgba(10, 12, 20, 0.97);
+    background: var(--theme-bg);
     backdrop-filter: blur(16px);
     border-bottom: 1px solid var(--theme-border);
     padding: 16px 24px 24px;
@@ -206,7 +206,7 @@
 }
 
 .mobileMenuLink:hover {
-    color: white;
+    color: var(--theme-text);
 }
 
 .mobileMenuActions {
