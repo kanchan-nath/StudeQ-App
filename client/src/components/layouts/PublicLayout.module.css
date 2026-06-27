@@ -360,7 +360,7 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.1em;
-    color: var(--purple-light);
+    color: var(--theme-purple-light);
     margin-bottom: 4px;
 }
 
