@@ -216,7 +216,7 @@ export default function Features() {
                     content="Explore Spark.E's AI tools: quiz generator, smart flashcards, note summarizer, document chat, timetable, and dual search — built for students."
                 />
                 <meta name="robots" content="index, follow" />
-                <link rel="canonical" href="https://sparke.app/features" />
+                <link rel="canonical" href="https://yourdomain.com/features" />
 
                 {/* Open Graph */}
                 <meta property="og:type" content="website" />
