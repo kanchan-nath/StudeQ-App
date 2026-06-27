@@ -308,7 +308,7 @@
 
 .footerCopyright {
     font-size: 13px;
-    color: rgba(138, 138, 154, 0.6);
+    color: var(--theme-text-muted);
     margin: 0;
 }
 
