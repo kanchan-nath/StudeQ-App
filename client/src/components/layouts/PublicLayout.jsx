@@ -21,6 +21,10 @@ const NAV_LINKS = [
 ];
 
 const BREADCRUMB_MAP = {
+    "/features": [
+        { label: "Home", to: "/" },
+        { label: "Features", to: "/features" }, 
+    ],
     "/features/note": [
         { label: "Home", to: "/" },
         { label: "Features", to: "/features" },
