@@ -231,7 +231,7 @@
     flex: 1;
     text-align: center;
     background: var(--theme-accent);
-    color: #000;
+    color: var(--theme-bg);
     font-size: 14px;
     font-weight: 700;
     padding: 12px;
