@@ -291,7 +291,7 @@
     font-weight: 900;
     letter-spacing: 0.1em;
     text-transform: uppercase;
-    color: white;
+    color: var(--theme-text);
     text-decoration: none;
 }
 
