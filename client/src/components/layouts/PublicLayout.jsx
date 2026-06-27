@@ -229,7 +229,7 @@ const PublicLayout = () => {
                 {/* Mobile menu */}
                 {menuOpen && (
                     <div className={styles.mobileMenu}>
-                        {NAV_LINKS.map((link) => (
+                        {NAV_FEATURES.map((link) => (
                             <Link
                                 key={link.to}
                                 to={link.to}
