@@ -14,16 +14,61 @@ function useScrolled(threshold = 40) {
     return scrolled;
 }
 
-const NAV_LINKS = [
-    { label: "Features", to: "/features" },
-    { label: "Pricing", to: "/pricing" },
-    { label: "Our Mission", to: "/our-mission" },
+const NAV_FEATURES = [
+    {
+        to: "/features/note",
+        icon: "📝",
+        label: "AI Notes",
+        desc: "PDF → structured notes in seconds",
+    },
+    {
+        to: "/features/notebook",
+        icon: "🤖",
+        label: "AI Tutor",
+        desc: "Subject-aware multi-turn chat",
+    },
+    {
+        to: "/features/flashcard",
+        icon: "🃏",
+        label: "Flashcards",
+        desc: "SM-2 spaced repetition decks",
+    },
+    {
+        to: "/features/quiz",
+        icon: "🧪",
+        label: "AI Quiz",
+        desc: "6 question types, instant feedback",
+    },
+    {
+        to: "/features/study-room",
+        icon: "🏠",
+        label: "Study Room",
+        desc: "Live collaborative sessions",
+    },
+    {
+        to: "/features/image-analysis",
+        icon: "🖼️",
+        label: "Image Analysis",
+        desc: "Diagrams, handwriting, LaTeX",
+    },
+    {
+        to: "/features/pdf-analysis",
+        icon: "📄",
+        label: "PDF Analysis",
+        desc: "Chat with any PDF document",
+    },
+    {
+        to: "/features/scheduler",
+        icon: "📅",
+        label: "AI Scheduler",
+        desc: "Study plan around your exams",
+    },
 ];
 
 const BREADCRUMB_MAP = {
     "/features": [
         { label: "Home", to: "/" },
-        { label: "Features", to: "/features" }, 
+        { label: "Features", to: "/features" },
     ],
     "/features/note": [
         { label: "Home", to: "/" },
@@ -94,16 +139,67 @@ const PublicLayout = () => {
                             SPARK<span>.E</span>
                         </Link>
                         <ul className={styles.navLinks} role="list">
-                            {NAV_LINKS.map((link) => (
-                                <li key={link.to}>
-                                    <Link
-                                        to={link.to}
-                                        className={`${styles.navLink} ${location.pathname === link.to || location.pathname.startsWith(link.to + "/") ? styles.navLinkActive : ""}`}
-                                    >
-                                        {link.label}
-                                    </Link>
-                                </li>
-                            ))}
+                            <li className={`${styles.navItem} ${styles.hasDropdown}`} role="presentation">
+                                <button
+                                    className={styles.navLink}
+                                    aria-haspopup="true"
+                                    aria-expanded="false"   // toggled by CSS :focus-within for keyboard
+                                >
+                                    Features
+                                    <span className={styles.navChevron} aria-hidden="true">▾</span>
+                                </button>
+
+                                <div className={styles.navDropdown} role="menu">
+                                    <div className={styles.navDropdownArrow} aria-hidden="true" />
+                                    <div className={styles.navDropdownGrid}>
+                                        {NAV_FEATURES.map((item) => (
+                                            <Link
+                                                key={item.to}
+                                                to={item.to}
+                                                className={styles.navDropdownItem}
+                                                role="menuitem"
+                                            >
+                                                <span className={styles.navDropdownIcon} aria-hidden="true">
+                                                    {item.icon}
+                                                </span>
+                                                <span className={styles.navDropdownText}>
+                                                    <span className={styles.navDropdownLabel}>{item.label}</span>
+                                                    <span className={styles.navDropdownDesc}>{item.desc}</span>
+                                                </span>
+                                            </Link>
+                                        ))}
+                                    </div>
+                                    <div className={styles.navDropdownFooter}>
+                                        <Link to="/features" className={styles.navDropdownFooterLink}>
+                                            View all features →
+                                        </Link>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <Link
+                                    to="/pricing"
+                                    className={styles.navLink}
+                                >
+                                    Pricing
+                                </Link>
+                            </li>
+                            <li>
+                                <Link
+                                    to="/blog"
+                                    className={styles.navLink}
+                                >
+                                    Blog
+                                </Link>
+                            </li>
+                            <li>
+                                <Link
+                                    to="/how-it-works"
+                                    className={styles.navLink}
+                                >
+                                    How It Works
+                                </Link>
+                            </li>
                         </ul>
                     </div>
 
