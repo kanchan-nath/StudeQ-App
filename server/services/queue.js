@@ -8,7 +8,7 @@ const connection = {
 const aiResponseQueueInstance = new Queue("ai-response-handler", {connection})
 
 const AIResponseQueue = async (userId, data) => {
-    logger.info('Queue created:', queue.name);
+    logger.info('Queue created:', aiResponseQueueInstance.name);
 
     if(!userId){
         throw new Error("AIResponseQueue: userId is required")
