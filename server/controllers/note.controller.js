@@ -42,7 +42,7 @@ const createNote = asyncHandler(async (req, res) => {
         userId,
         title,
         content,
-        summary: result,
+        summary: response,
     })
     return res
         .status(201)
