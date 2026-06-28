@@ -19,7 +19,7 @@ const CAPABILITIES = [
         id: 'compare',
         icon: '⇄',
         label: 'Compare Sources',
-        desc: 'Upload multiple papers or chapters. Ask SPARK.E to compare theories, find contradictions, or synthesize a unified view across all sources.',
+        desc: 'Upload multiple papers or chapters. Ask StudeQ to compare theories, find contradictions, or synthesize a unified view across all sources.',
     },
     {
         id: 'explain',
@@ -50,7 +50,7 @@ const STEPS = [
     {
         num: '02',
         title: 'Upload Your Sources',
-        body: 'Drop in PDFs, Word docs, slides, or paste text. SPARK.E parses and indexes everything.',
+        body: 'Drop in PDFs, Word docs, slides, or paste text. StudeQ parses and indexes everything.',
     },
     {
         num: '03',
@@ -90,7 +90,7 @@ const USE_CASES = [
 const JSON_LD = {
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
-    name: 'SPARK.E AI Notebook',
+    name: 'StudeQ AI Notebook',
     applicationCategory: 'EducationalApplication',
     operatingSystem: 'Web',
     description:
@@ -104,8 +104,8 @@ const JSON_LD = {
         'Export conversations and notes',
         'Collaborative shared notebooks',
     ],
-    url: 'https://sparke.app/features/notebook',
-    screenshot: 'https://sparke.app/og-notebook.png',
+    url: 'https://studeq.app/features/notebook',
+    screenshot: 'https://studeq.app/og-notebook.png',
 };
 
 export default function NotebookFeaturePage() {
@@ -121,30 +121,30 @@ export default function NotebookFeaturePage() {
     return (
         <>
             <Helmet>
-                <title>AI Notebook — Chat With Your Documents | SPARK.E</title>
+                <title>AI Notebook — Chat With Your Documents | StudeQ</title>
                 <meta
                     name="description"
-                    content="Upload PDFs, research papers, or notes and have AI-powered conversations grounded in your sources. SPARK.E Notebook cites every answer back to your documents."
+                    content="Upload PDFs, research papers, or notes and have AI-powered conversations grounded in your sources. StudeQ Notebook cites every answer back to your documents."
                 />
                 <meta name="robots" content="index, follow" />
-                <link rel="canonical" href="https://sparke.app/features/notebook" />
+                <link rel="canonical" href="https://studeq.app/features/notebook" />
 
                 <meta property="og:type" content="website" />
-                <meta property="og:url" content="https://sparke.app/features/notebook" />
-                <meta property="og:title" content="AI Notebook — Chat With Your Documents | SPARK.E" />
+                <meta property="og:url" content="https://studeq.app/features/notebook" />
+                <meta property="og:title" content="AI Notebook — Chat With Your Documents | StudeQ" />
                 <meta
                     property="og:description"
                     content="Upload your documents and discuss them with AI. Every answer is grounded in your sources with exact citations. No hallucinations."
                 />
-                <meta property="og:image" content="https://sparke.app/og-notebook.png" />
+                <meta property="og:image" content="https://studeq.app/og-notebook.png" />
 
                 <meta name="twitter:card" content="summary_large_image" />
-                <meta name="twitter:title" content="AI Notebook — Chat With Your Documents | SPARK.E" />
+                <meta name="twitter:title" content="AI Notebook — Chat With Your Documents | StudeQ" />
                 <meta
                     name="twitter:description"
                     content="Upload your documents and discuss them with AI. Every answer is grounded in your sources with exact citations."
                 />
-                <meta name="twitter:image" content="https://sparke.app/og-notebook.png" />
+                <meta name="twitter:image" content="https://studeq.app/og-notebook.png" />
 
                 <script type="application/ld+json">{JSON.stringify(JSON_LD)}</script>
             </Helmet>
@@ -170,7 +170,7 @@ export default function NotebookFeaturePage() {
 
                     <p className={styles.heroSub}>
                         Upload any PDF, research paper, or lecture slide — then have a full
-                        conversation with your material. SPARK.E cites every answer directly
+                        conversation with your material. StudeQ cites every answer directly
                         from your sources. No guessing. No hallucinations.
                     </p>
 
@@ -219,7 +219,7 @@ export default function NotebookFeaturePage() {
                                 What is the main argument of Chapter 4?
                             </div>
                             <div className={styles.mockupMsg + ' ' + styles.mockupMsgAi}>
-                                <span className={styles.mockupAiLabel}>SPARK.E</span>
+                                <span className={styles.mockupAiLabel}>StudeQ</span>
                                 Chapter 4 argues that attention mechanisms outperform RNNs for long-range dependencies.
                                 <span className={styles.mockupCite}>📎 paper_01.pdf · p.12</span>
                             </div>
@@ -227,7 +227,7 @@ export default function NotebookFeaturePage() {
                                 How does this compare to the slides?
                             </div>
                             <div className={styles.mockupMsg + ' ' + styles.mockupMsgAi}>
-                                <span className={styles.mockupAiLabel}>SPARK.E</span>
+                                <span className={styles.mockupAiLabel}>StudeQ</span>
                                 The slides simplify this — they only cover self-attention, not cross-attention.
                                 <span className={styles.mockupCite}>📎 slides.pdf · slide 7</span>
                             </div>
@@ -310,7 +310,7 @@ export default function NotebookFeaturePage() {
                                 Every Answer Cites Its Source
                             </h2>
                             <p className={styles.sectionSub}>
-                                Unlike generic AI chatbots, SPARK.E Notebook only answers from
+                                Unlike generic AI chatbots, StudeQ Notebook only answers from
                                 what you uploaded. Every response links back to an exact page,
                                 paragraph, or slide — so you can verify in one click.
                             </p>
@@ -334,7 +334,7 @@ export default function NotebookFeaturePage() {
                                     "Explain the methodology used in the study."
                                 </div>
                                 <div className={styles.citationCardA}>
-                                    <span className={styles.citationCardALabel}>SPARK.E</span>
+                                    <span className={styles.citationCardALabel}>StudeQ</span>
                                     The study used a randomized controlled trial with 240 participants split into two cohorts. Inclusion criteria required prior exposure to the intervention domain.
                                 </div>
                                 <div className={styles.citationPins}>
@@ -381,7 +381,7 @@ export default function NotebookFeaturePage() {
                                 Upload Anything. Discuss Everything.
                             </h2>
                             <p className={styles.sectionSub}>
-                                SPARK.E parses your files deeply — not just surface text. Tables,
+                                StudeQ parses your files deeply — not just surface text. Tables,
                                 figures, footnotes, and headers all indexed.
                             </p>
                             <ul className={styles.sourceList} aria-label="Supported file types">

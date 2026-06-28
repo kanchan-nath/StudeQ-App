@@ -540,7 +540,7 @@ export default function Quiz() {
         <div className={styles.homeWrapper}>
           {/* ── MOBILE TOPBAR ── */}
           <div className={styles.mobileTopbar}>
-            <span className={styles.mobileTopbar__title}>🧠 Spark.E Quiz</span>
+            <span className={styles.mobileTopbar__title}>🧠 StudeQ Quiz</span>
             <button
               className={styles.mobileTopbar__btn}
               onClick={() => setMobileSidebarOpen(true)}

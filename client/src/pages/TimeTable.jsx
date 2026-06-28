@@ -163,7 +163,7 @@ const TimeTable = () => {
 
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [theme, setTheme] = useState(() =>
-    localStorage.getItem("sparke-theme"),
+    localStorage.getItem("studeq-theme"),
   );
 
   useEffect(() => {
@@ -339,7 +339,7 @@ const TimeTable = () => {
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
-        a.download = `sparke-${id}.ics`;
+        a.download = `studeq-${id}.ics`;
         a.click();
         window.URL.revokeObjectURL(url);
       })

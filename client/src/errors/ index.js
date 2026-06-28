@@ -1,4 +1,4 @@
-// errors/index.js — barrel export for the Spark.E error system
+// errors/index.js — barrel export for the StudeQ error system
 
 export { default as ErrorBoundary } from "./components/ErrorBoundary.jsx";
 export {

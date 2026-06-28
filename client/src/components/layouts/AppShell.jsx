@@ -61,7 +61,7 @@ const AppShell = () => {
   const userName = user?.name ?? "";
   const userEmail = user?.email ?? "";
   const [isDark, setIsDark] = useState(() => {
-    return (localStorage.getItem("sparke-theme") ?? "dark") === "dark";
+    return (localStorage.getItem("studeq-theme") ?? "dark") === "dark";
   });
   const navigate = useNavigate();
   const location = useLocation();
@@ -146,7 +146,7 @@ const AppShell = () => {
     html.classList.add("theme-transitioning");
     const theme = isDark ? "dark" : "light";
     html.setAttribute("data-theme", theme);
-    localStorage.setItem("sparke-theme", theme);
+    localStorage.setItem("studeq-theme", theme);
     const timer = setTimeout(() => {
       html.classList.remove("theme-transitioning");
     }, 350);
@@ -382,9 +382,9 @@ const AppShell = () => {
           role="navigation"
           aria-label="Main navigation"
         >
-          <Link to="/dashboard" className={styles["sidebar__logo"]} aria-label="SPARK.E home">
+          <Link to="/dashboard" className={styles["sidebar__logo"]} aria-label="StudeQ home">
             <div className={styles["sidebar__logo-text"]}>
-              SPARK<span>.E</span>
+              Stude<span>Q</span>
             </div>
           </Link>
 

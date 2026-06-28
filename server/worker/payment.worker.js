@@ -1,12 +1,11 @@
 import { Worker } from 'bullmq';
 import mongoose from 'mongoose';
 
-import { redisClient } from '../lib/redisClient.js';
+import redisClient from '../lib/redisClient.js';
 import { grantXP } from '../services/xpService.js';
 import logger from '../logger/index.js'
 
 import Payment from '../models/payment.model.js';
-import UserEntitlement from '../models/userEntitlement.model.js';
 
 export const paymentWorker = new Worker(
     'payment-events',

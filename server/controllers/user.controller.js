@@ -6,9 +6,11 @@ import bcrypt from "bcrypt"
 import { loginValidator, registerValidator } from "../validators/auth.validator.js"
 import logger from "../logger/index.js"
 import { grantDailyLoginXP } from "../services/xpService.js"
+const SLAT_ROUND = process.env.BCRYPT_SALT_ROUNDS
+console.log(SLAT_ROUND);
 
 const hashPassword = async (password) => {
-    const hashed = await bcrypt.hash(password, process.env.BCRYPT_SALT_ROUNDS)
+    const hashed = await bcrypt.hash(password, 10)
     if(!hashed){
         throw new ApiError(500, "Failed to process password")
     }

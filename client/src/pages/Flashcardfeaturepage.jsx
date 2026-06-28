@@ -3,7 +3,7 @@ import { useState, useCallback, useMemo } from 'react';
 import styles from './styles/FlashcardFeaturePage.module.css';
 
 const MODES = [
-    { id: 'classic', icon: '⟳', label: 'Classic Flip', desc: 'Tap to reveal the answer. Rate yourself — Got it, Almost, or Missed. SPARK.E reschedules based on your rating.' },
+    { id: 'classic', icon: '⟳', label: 'Classic Flip', desc: 'Tap to reveal the answer. Rate yourself — Got it, Almost, or Missed. StudeQ reschedules based on your rating.' },
     { id: 'spaced', icon: '📅', label: 'Spaced Repetition', desc: 'SM-2 algorithm surfaces cards at optimal intervals — so you review just before you forget, never earlier.' },
     { id: 'typed', icon: '⌨️', label: 'Type the Answer', desc: 'AI grades your typed response semantically — partial credit for correct concepts, even with different wording.' },
     { id: 'mcq', icon: '◎', label: 'Quiz Mode', desc: 'Each flashcard becomes a 4-option MCQ. Wrong answers are generated from related cards in your deck for maximum challenge.' },
@@ -12,8 +12,8 @@ const MODES = [
 ];
 
 const STEPS = [
-    { num: '01', title: 'Pick a Source', body: 'Upload notes, paste text, enter a topic, or link a URL. SPARK.E reads it all.' },
-    { num: '02', title: 'AI Generates Cards', body: 'SPARK.E extracts key terms, concepts, and relationships. You get a full deck in under 10 seconds.' },
+    { num: '01', title: 'Pick a Source', body: 'Upload notes, paste text, enter a topic, or link a URL. StudeQ reads it all.' },
+    { num: '02', title: 'AI Generates Cards', body: 'StudeQ extracts key terms, concepts, and relationships. You get a full deck in under 10 seconds.' },
     { num: '03', title: 'Review & Customize', body: 'Edit, delete, or add cards. Merge multiple sources into one deck. Tag and organize by topic.' },
     { num: '04', title: 'Study & Track Progress', body: 'Pick your study mode. Watch mastery scores rise. Weak cards resurface automatically.' },
 ];
@@ -30,7 +30,7 @@ const DETAILS = [
 const JSON_LD = {
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
-    name: 'SPARK.E AI Flashcard Maker',
+    name: 'StudeQ AI Flashcard Maker',
     applicationCategory: 'EducationalApplication',
     operatingSystem: 'Web',
     description:
@@ -44,8 +44,8 @@ const JSON_LD = {
         'Anki-compatible export',
         'Deck sharing and collaboration',
     ],
-    url: 'https://sparke.app/features/flashcards',
-    screenshot: 'https://sparke.app/og-flashcards.png',
+    url: 'https://studeq.app/features/flashcards',
+    screenshot: 'https://studeq.app/og-flashcards.png',
 };
 
 export default function FlashcardFeaturePage() {
@@ -61,24 +61,24 @@ export default function FlashcardFeaturePage() {
     return (
         <>
             <Helmet>
-                <title>AI Flashcard Maker — Spaced Repetition from Your Notes | SPARK.E</title>
+                <title>AI Flashcard Maker — Spaced Repetition from Your Notes | StudeQ</title>
                 <meta
                     name="description"
                     content="Generate smart flashcard decks from any notes or PDF. Six study modes, spaced repetition, and AI-powered mastery tracking. Study less, remember more."
                 />
                 <meta name="robots" content="index, follow" />
-                <link rel="canonical" href="https://sparke.app/features/flashcards" />
+                <link rel="canonical" href="https://studeq.app/features/flashcards" />
 
                 <meta property="og:type" content="website" />
-                <meta property="og:url" content="https://sparke.app/features/flashcards" />
-                <meta property="og:title" content="AI Flashcard Maker — Spaced Repetition from Your Notes | SPARK.E" />
+                <meta property="og:url" content="https://studeq.app/features/flashcards" />
+                <meta property="og:title" content="AI Flashcard Maker — Spaced Repetition from Your Notes | StudeQ" />
                 <meta property="og:description" content="Generate smart flashcard decks from any notes or PDF. Six study modes, spaced repetition, and AI-powered mastery tracking." />
-                <meta property="og:image" content="https://sparke.app/og-flashcards.png" />
+                <meta property="og:image" content="https://studeq.app/og-flashcards.png" />
 
                 <meta name="twitter:card" content="summary_large_image" />
-                <meta name="twitter:title" content="AI Flashcard Maker — Spaced Repetition from Your Notes | SPARK.E" />
+                <meta name="twitter:title" content="AI Flashcard Maker — Spaced Repetition from Your Notes | StudeQ" />
                 <meta name="twitter:description" content="Generate smart flashcard decks from any notes or PDF. Six study modes, spaced repetition, and AI-powered mastery tracking." />
-                <meta name="twitter:image" content="https://sparke.app/og-flashcards.png" />
+                <meta name="twitter:image" content="https://studeq.app/og-flashcards.png" />
 
                 <script type="application/ld+json">{JSON.stringify(JSON_LD)}</script>
             </Helmet>
@@ -101,7 +101,7 @@ export default function FlashcardFeaturePage() {
                     </h1>
 
                     <p className={styles.heroSub}>
-                        Upload your notes, paste a topic, or drop a PDF — SPARK.E generates
+                        Upload your notes, paste a topic, or drop a PDF — StudeQ generates
                         a full flashcard deck in seconds. Then studies you with spaced
                         repetition until you actually know the material.
                     </p>
@@ -218,7 +218,7 @@ export default function FlashcardFeaturePage() {
                                 Spaced Repetition —<br />Not Just a Buzzword
                             </h2>
                             <p className={styles.sectionSub}>
-                                SPARK.E uses the SM-2 algorithm — the same engine behind Anki —
+                                StudeQ uses the SM-2 algorithm — the same engine behind Anki —
                                 to schedule every card at the exact moment you're about to forget
                                 it. Review at the right time and memory consolidates 5× faster.
                             </p>
@@ -276,7 +276,7 @@ export default function FlashcardFeaturePage() {
                         Everything Built Around Retention
                     </h2>
                     <p className={styles.sectionSub}>
-                        SPARK.E flashcards aren't a card generator. They're a full memory system.
+                        StudeQ flashcards aren't a card generator. They're a full memory system.
                     </p>
                     <ul className={styles.detailGrid}>
                         {DETAILS.map((d) => (
@@ -298,7 +298,7 @@ export default function FlashcardFeaturePage() {
                                 Anki Compatible. No Lock-In.
                             </h2>
                             <p className={styles.sectionSub}>
-                                Already use Anki? Export any SPARK.E deck as an APKG file and
+                                Already use Anki? Export any StudeQ deck as an APKG file and
                                 import it directly. Or share a deck link with your study group —
                                 they open it in their own notebook, no account needed.
                             </p>

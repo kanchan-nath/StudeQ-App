@@ -1,8 +1,8 @@
 {
   "info": {
-    "name": "SPARK.E API",
+    "name": "StudeQ API",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "description": "Full API collection for SPARK.E backend"
+    "description": "Full API collection for StudeQ backend"
   },
   "variable": [
     { "key": "baseUrl", "value": "http://localhost:3000/api", "type": "string" },
@@ -517,7 +517,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"projectTitle\": \"SPARK.E Study Platform\",\n  \"submissionDate\": \"2025-11-30T23:59:00.000Z\",\n  \"projectLink\": \"https://github.com/yourusername/sparke\",\n  \"phase\": \"development\"\n}"
+              "raw": "{\n  \"projectTitle\": \"StudeQ Study Platform\",\n  \"submissionDate\": \"2025-11-30T23:59:00.000Z\",\n  \"projectLink\": \"https://github.com/yourusername/studeq\",\n  \"phase\": \"development\"\n}"
             }
           }
         },
@@ -552,7 +552,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"projectTitle\": \"SPARK.E Study Platform v2\",\n  \"submissionDate\": \"2025-12-15T23:59:00.000Z\",\n  \"projectLink\": \"https://github.com/yourusername/sparke\",\n  \"phase\": \"testing\"\n}"
+              "raw": "{\n  \"projectTitle\": \"StudeQ Study Platform v2\",\n  \"submissionDate\": \"2025-12-15T23:59:00.000Z\",\n  \"projectLink\": \"https://github.com/yourusername/studeq\",\n  \"phase\": \"testing\"\n}"
             }
           }
         },

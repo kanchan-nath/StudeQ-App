@@ -47,7 +47,7 @@ const paymentSchema = new mongoose.Schema(
                 "REFUNDED",
                 "paid"
             ],
-            default: "CREATED",
+            default: "created",
         },
 
         receipt: {

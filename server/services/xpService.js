@@ -9,6 +9,7 @@ export const XP_TABLE = {
   DOC_UPLOAD: 10,
   CHAT_SESSION: 5,
   DAILY_LOGIN: 5,
+  PREMIUM_UNLOCK_XP:100
 }
 
 const xpForLevel = (n)=> {

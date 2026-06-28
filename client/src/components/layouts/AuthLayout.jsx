@@ -19,7 +19,7 @@ const AuthLayout = () => {
             </main>
 
             <footer className={styles.footer}>
-                <p className={styles.footerText}>© 2026 Spark.E Inc.</p>
+                <p className={styles.footerText}>© 2026 StudeQ Inc.</p>
             </footer>
         </div>
     );

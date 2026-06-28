@@ -24,7 +24,7 @@ const AIResponseQueueWorker = new Worker("ai-response-handler", processJob, { co
 
 
 AIResponseQueueWorker.on('active', (job) => {
-    console.log(">>> ACTIVE:", job.id);
+    logger.info(`>>> ACTIVE: ${job.id}`);
 })
 AIResponseQueueWorker.on('completed', (job, result) => {
     console.log(">>>COMPLETED: ", result);

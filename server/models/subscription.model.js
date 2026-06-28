@@ -1,3 +1,5 @@
+import mongoose from "mongoose";
+
 const subscriptionSchema = new mongoose.Schema(
     {
         userId: { type: Number, required: true, unique: true },

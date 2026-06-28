@@ -12,7 +12,7 @@ const Navbar = () => {
   return (
     <nav>
       <div>
-        <Link to="/dashboard">Spark.E</Link>
+        <Link to="/dashboard">StudeQ</Link>
       </div>
 
       <ul>

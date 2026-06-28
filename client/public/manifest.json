@@ -1,6 +1,6 @@
 {
-    "name": "SPARK.E — AI Powered Study Platform",
-    "short_name": "SPARK.E",
+    "name": "StudeQ — AI Powered Study Platform",
+    "short_name": "StudeQ",
     "description": "Study smarter with AI generated quizzes, flashcards, notes, and personalised timetables.",
     "start_url": "/",
     "display": "standalone",
@@ -31,7 +31,7 @@
             "src": "/screenshots/dashboard.png",
             "sizes": "1280x720",
             "type": "image/png",
-            "label": "SPARK.E Dashboard"
+            "label": "StudeQ Dashboard"
         }
     ]
 }

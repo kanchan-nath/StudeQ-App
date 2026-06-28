@@ -3,7 +3,7 @@ import express from "express"
 import prisma from "./lib/prisma.js"
 import cookieParser from "cookie-parser";
 import cors from "cors"
-import { generalLimiter, authLimiter, aiLimiter } from "./middlewares/rateLimiter.middleware.js";
+import { generalLimiter } from "./middlewares/rateLimiter.middleware.js";
 import helmet from "helmet"
 import logger from "./logger/index.js"
 
@@ -12,17 +12,14 @@ const app = express();
 app.set("trust proxy", 1)
 app.use(helmet())
 
-// const allowOrigins = (process.env.CORS_ORIGINS || "").split(",").filter(Boolean)
-// app.use(cors(
-//     {
-//         origin: allowOrigins.length ? allowOrigins : false,
-//         credentials: true
-//     }
-// ))
-app.use(cors({
-    origin: ["http://localhost:5173", "http://192.168.1.5:5173"],
-    credentials: true,
-}))
+const allowOrigins = (process.env.CORS_ORIGINS || "").split(",").filter(Boolean)
+
+app.use(cors(
+    {
+        origin: allowOrigins.length ? allowOrigins : false,
+        credentials: true
+    }
+))
 
 app.use(express.json({ limit: "20mb" }))
 app.use(express.urlencoded({ extended: true, limit: "20mb" }))

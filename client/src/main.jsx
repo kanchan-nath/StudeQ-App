@@ -17,7 +17,7 @@ import ErrorToastStack from "./errors/components/ErrorToastStack.jsx";
 // ─────────────────────────────────────────────────────────────
 
 try {
-  const savedTheme = localStorage.getItem("sparke-theme") || "dark";
+  const savedTheme = localStorage.getItem("studeq-theme") || "dark";
   document.documentElement.setAttribute("data-theme", savedTheme);
 } catch (e) { }
 

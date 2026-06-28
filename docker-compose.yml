@@ -1,5 +1,5 @@
 ##############################################
-# docker-compose.yml — Spark.E Local Dev
+# docker-compose.yml — StudeQ Local Dev
 # Place at: repo root (alongside client/ and server/)
 # Usage: docker compose up --build
 ##############################################
@@ -27,13 +27,13 @@ services:
     ports:
       - "5432:5432"
     environment:
-      POSTGRES_DB: sparke
-      POSTGRES_USER: sparke
-      POSTGRES_PASSWORD: sparke123
+      POSTGRES_DB: studeq
+      POSTGRES_USER: studeq
+      POSTGRES_PASSWORD: studeq123
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U sparke -d sparke"]
+      test: ["CMD-SHELL", "pg_isready -U studeq -d studeq"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -72,9 +72,9 @@ services:
       # Override localhost values from .env.development with container hostnames:
       REDIS_HOST: redis
       REDIS_PORT: "6379"
-      POSTGRES_URL: postgresql://sparke:sparke123@postgres:5432/sparke
+      POSTGRES_URL: postgresql://studeq:studeq123@postgres:5432/studeq
       MONGO_URI: mongodb://mongo:27017
-      MONGO_DB_NAME: sparke
+      MONGO_DB_NAME: studeq
     depends_on:
       redis:
         condition: service_healthy
@@ -103,7 +103,7 @@ services:
       REDIS_HOST: redis
       REDIS_PORT: "6379"
       MONGO_URI: mongodb://mongo:27017
-      MONGO_DB_NAME: sparke
+      MONGO_DB_NAME: studeq
     depends_on:
       redis:
         condition: service_healthy

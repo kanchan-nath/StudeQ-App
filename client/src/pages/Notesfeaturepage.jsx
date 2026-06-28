@@ -6,15 +6,15 @@ import styles from './styles/NotesFeaturePage.module.css';
 const FAQ_ITEMS = [
     {
         id: 'faq-formats',
-        question: 'What types of notes does Spark.E support?',
+        question: 'What types of notes does StudeQ support?',
         answer:
-            'Spark.E accepts plain text, formatted lecture notes, and PDF uploads. Paste directly from your LMS, type freehand, or drop in a file — the AI processes any format without extra steps.',
+            'StudeQ accepts plain text, formatted lecture notes, and PDF uploads. Paste directly from your LMS, type freehand, or drop in a file — the AI processes any format without extra steps.',
     },
     {
         id: 'faq-how',
         question: 'How does AI summarization work?',
         answer:
-            'Spark.E analyzes note content using LLMs fine-tuned for academic material. It identifies key concepts, condenses lengthy explanations, and structures information into scannable summaries you can actually study from.',
+            'StudeQ analyzes note content using LLMs fine-tuned for academic material. It identifies key concepts, condenses lengthy explanations, and structures information into scannable summaries you can actually study from.',
     },
     {
         id: 'faq-organize',
@@ -32,7 +32,7 @@ const FAQ_ITEMS = [
         id: 'faq-edit',
         question: 'Can I edit AI-generated summaries?',
         answer:
-            'Absolutely. All AI output is fully editable. Think of it as a first draft — Spark.E handles the heavy lifting, you refine it to match your understanding.',
+            'Absolutely. All AI output is fully editable. Think of it as a first draft — StudeQ handles the heavy lifting, you refine it to match your understanding.',
     },
     {
         id: 'faq-privacy',
@@ -69,7 +69,7 @@ const FEATURES = [
         icon: '⬡',
         accentVar: '--theme-purple',
         title: 'Multi-Format Input',
-        desc: 'Paste raw text, type freehand, or upload a PDF. Spark.E handles any format without extra steps.',
+        desc: 'Paste raw text, type freehand, or upload a PDF. StudeQ handles any format without extra steps.',
     },
     {
         id: 'feat-quiz',
@@ -117,12 +117,12 @@ const JSON_LD = JSON.stringify({
     '@graph': [
         {
             '@type': 'SoftwareApplication',
-            name: 'Spark.E AI Notes',
+            name: 'StudeQ AI Notes',
             applicationCategory: 'EducationalApplication',
             operatingSystem: 'Web',
             description:
                 'AI-powered note taking, summarization, and organization tool for university students.',
-            url: 'https://sparke.app/features/notes',
+            url: 'https://studeq.app/features/notes',
             featureList: [
                 'AI note summarization',
                 'Auto-tagging and topic detection',
@@ -136,9 +136,9 @@ const JSON_LD = JSON.stringify({
         {
             '@type': 'BreadcrumbList',
             itemListElement: [
-                { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://sparke.app' },
-                { '@type': 'ListItem', position: 2, name: 'Features', item: 'https://sparke.app/features' },
-                { '@type': 'ListItem', position: 3, name: 'AI Notes', item: 'https://sparke.app/features/notes' },
+                { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://studeq.app' },
+                { '@type': 'ListItem', position: 2, name: 'Features', item: 'https://studeq.app/features' },
+                { '@type': 'ListItem', position: 3, name: 'AI Notes', item: 'https://studeq.app/features/notes' },
             ],
         },
         {
@@ -163,28 +163,28 @@ export default function NotesFeaturePage() {
     return (
         <>
             <Helmet>
-                <title>AI Note Taking for Students — Spark.E Smart Notes</title>
+                <title>AI Note Taking for Students — StudeQ Smart Notes</title>
                 <meta
                     name="description"
-                    content="Summarize lectures, detect key concepts, and convert notes to quizzes or flashcards with AI. Spark.E Notes is built for university students."
+                    content="Summarize lectures, detect key concepts, and convert notes to quizzes or flashcards with AI. StudeQ Notes is built for university students."
                 />
                 <meta name="robots" content="index, follow" />
-                <link rel="canonical" href="https://sparke.app/features/notes" />
+                <link rel="canonical" href="https://studeq.app/features/notes" />
                 <meta property="og:type" content="website" />
-                <meta property="og:url" content="https://sparke.app/features/notes" />
-                <meta property="og:title" content="AI Note Taking for Students — Spark.E Smart Notes" />
+                <meta property="og:url" content="https://studeq.app/features/notes" />
+                <meta property="og:title" content="AI Note Taking for Students — StudeQ Smart Notes" />
                 <meta
                     property="og:description"
                     content="Paste any lecture, get a structured AI summary with key concepts, and convert to quizzes or flashcards instantly."
                 />
-                <meta property="og:image" content="https://sparke.app/og/notes-feature.jpg" />
+                <meta property="og:image" content="https://studeq.app/og/notes-feature.jpg" />
                 <meta name="twitter:card" content="summary_large_image" />
-                <meta name="twitter:title" content="AI Note Taking for Students — Spark.E Smart Notes" />
+                <meta name="twitter:title" content="AI Note Taking for Students — StudeQ Smart Notes" />
                 <meta
                     name="twitter:description"
                     content="Paste any lecture, get a structured AI summary with key concepts, and convert to quizzes or flashcards instantly."
                 />
-                <meta name="twitter:image" content="https://sparke.app/og/notes-feature.jpg" />
+                <meta name="twitter:image" content="https://studeq.app/og/notes-feature.jpg" />
                 <script type="application/ld+json">{JSON_LD}</script>
             </Helmet>
 
@@ -197,7 +197,7 @@ export default function NotesFeaturePage() {
                 {/* ── HERO ── */}
                 <section className={styles.hero} aria-labelledby="hero-heading">
                     <div className={styles.heroContent}>
-                        <span className={styles.heroEyebrow} aria-label="Spark.E Feature: Notes">
+                        <span className={styles.heroEyebrow} aria-label="StudeQ Feature: Notes">
                             ✦ Notes Feature
                         </span>
 
@@ -207,7 +207,7 @@ export default function NotesFeaturePage() {
                         </h1>
 
                         <p className={styles.heroSubtext}>
-                            Paste any lecture text or upload your notes. Spark.E organizes content,
+                            Paste any lecture text or upload your notes. StudeQ organizes content,
                             highlights key concepts, and turns everything into study-ready material — automatically.
                         </p>
 
@@ -336,7 +336,7 @@ export default function NotesFeaturePage() {
                         </p>
                     </div>
 
-                    <ol className={styles.stepsList} aria-label="How Spark.E AI Notes works">
+                    <ol className={styles.stepsList} aria-label="How StudeQ AI Notes works">
                         {STEPS.map((step, idx) => (
                             <li key={step.num} className={styles.stepItem}>
                                 <span className={styles.stepNum} aria-hidden="true">{step.num}</span>
@@ -362,7 +362,7 @@ export default function NotesFeaturePage() {
                             </h2>
                             <p className={styles.sectionSub}>
                                 Notes don't sit in isolation. Every note you create connects directly
-                                to Spark.E's full study ecosystem.
+                                to StudeQ's full study ecosystem.
                             </p>
                         </div>
 
@@ -387,7 +387,7 @@ export default function NotesFeaturePage() {
                             Frequently Asked Questions
                         </h2>
                         <p className={styles.sectionSub}>
-                            Everything you need to know about AI Notes in Spark.E.
+                            Everything you need to know about AI Notes in StudeQ.
                         </p>
                     </div>
 

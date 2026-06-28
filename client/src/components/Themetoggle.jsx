@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import styles from "/Users/kanchannath/Coding/Spark.E/client/src/components/Themetoggle.module.css";
+import styles from "../components/Themetoggle.module.css";
 
 const ThemeToggle = () => {
   const [dark, setDark] = useState(() => {
-    const saved = localStorage.getItem("sparke-theme");
+    const saved = localStorage.getItem("studeq-theme");
     // Default to dark (matches existing site design)
     return saved ? saved === "dark" : true;
   });
@@ -11,7 +11,7 @@ const ThemeToggle = () => {
   useEffect(() => {
     const theme = dark ? "dark" : "light";
     document.documentElement.setAttribute("data-theme", theme);
-    localStorage.setItem("sparke-theme", theme);
+    localStorage.setItem("studeq-theme", theme);
   }, [dark]);
 
   return (

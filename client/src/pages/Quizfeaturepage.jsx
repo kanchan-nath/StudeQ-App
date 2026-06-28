@@ -42,7 +42,7 @@ const QUIZ_TYPES = [
 ];
 
 const STEPS = [
-    { num: '01', title: 'Upload or Paste', body: 'Drop in notes, PDFs, URLs, or type a topic. SPARK.E reads everything.' },
+    { num: '01', title: 'Upload or Paste', body: 'Drop in notes, PDFs, URLs, or type a topic. StudeQ reads everything.' },
     { num: '02', title: 'Configure Quiz', body: 'Pick question types, count, difficulty, and time limit.' },
     { num: '03', title: 'Generate in Seconds', body: 'AI produces a full, structured quiz with answer keys and explanations.' },
     { num: '04', title: 'Take & Track', body: 'Attempt the quiz, get instant feedback, and watch your weak spots surface.' },
@@ -53,7 +53,7 @@ const DETAILS = [
         icon: '🧠',
         title: 'Context-Aware Generation',
         body:
-            'SPARK.E reads your actual study material — not just a topic keyword. Questions are grounded in your content, so no hallucinated facts.',
+            'StudeQ reads your actual study material — not just a topic keyword. Questions are grounded in your content, so no hallucinated facts.',
     },
     {
         icon: '📊',
@@ -65,7 +65,7 @@ const DETAILS = [
         icon: '🔄',
         title: 'Adaptive Difficulty',
         body:
-            'Struggle on a question type? SPARK.E increases those. Ace a topic? It backs off and focuses energy elsewhere.',
+            'Struggle on a question type? StudeQ increases those. Ace a topic? It backs off and focuses energy elsewhere.',
     },
     {
         icon: '📝',
@@ -90,7 +90,7 @@ const DETAILS = [
 const JSON_LD = {
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
-    name: 'SPARK.E AI Quiz Maker',
+    name: 'StudeQ AI Quiz Maker',
     applicationCategory: 'EducationalApplication',
     operatingSystem: 'Web',
     description:
@@ -103,8 +103,8 @@ const JSON_LD = {
         'Spaced repetition flashcards',
         'Quiz sharing and leaderboards',
     ],
-    url: 'https://sparke.app/features/quiz',
-    screenshot: 'https://sparke.app/og-quiz.png',
+    url: 'https://studeq.app/features/quiz',
+    screenshot: 'https://studeq.app/og-quiz.png',
 };
 
 export default function QuizFeaturePage() {
@@ -120,32 +120,32 @@ export default function QuizFeaturePage() {
     return (
         <>
             <Helmet>
-                <title>AI Quiz Maker — Generate Quizzes from Notes | SPARK.E</title>
+                <title>AI Quiz Maker — Generate Quizzes from Notes | StudeQ</title>
                 <meta
                     name="description"
-                    content="Create MCQ, true/false, fill-in-the-blank, and short-answer quizzes from your notes or any topic in seconds. SPARK.E's AI quiz engine adapts to your weaknesses."
+                    content="Create MCQ, true/false, fill-in-the-blank, and short-answer quizzes from your notes or any topic in seconds. StudeQ's AI quiz engine adapts to your weaknesses."
                 />
                 <meta name="robots" content="index, follow" />
-                <link rel="canonical" href="https://sparke.app/features/quiz" />
+                <link rel="canonical" href="https://studeq.app/features/quiz" />
 
                 {/* Open Graph */}
                 <meta property="og:type" content="website" />
-                <meta property="og:url" content="https://sparke.app/features/quiz" />
-                <meta property="og:title" content="AI Quiz Maker — Generate Quizzes from Notes | SPARK.E" />
+                <meta property="og:url" content="https://studeq.app/features/quiz" />
+                <meta property="og:title" content="AI Quiz Maker — Generate Quizzes from Notes | StudeQ" />
                 <meta
                     property="og:description"
                     content="Generate smart quizzes from your notes, PDFs, or topics. Multiple question types, adaptive difficulty, and instant AI explanations."
                 />
-                <meta property="og:image" content="https://sparke.app/og-quiz.png" />
+                <meta property="og:image" content="https://studeq.app/og-quiz.png" />
 
                 {/* Twitter Card */}
                 <meta name="twitter:card" content="summary_large_image" />
-                <meta name="twitter:title" content="AI Quiz Maker — Generate Quizzes from Notes | SPARK.E" />
+                <meta name="twitter:title" content="AI Quiz Maker — Generate Quizzes from Notes | StudeQ" />
                 <meta
                     name="twitter:description"
                     content="Generate smart quizzes from your notes, PDFs, or topics. Multiple question types, adaptive difficulty, and instant AI explanations."
                 />
-                <meta name="twitter:image" content="https://sparke.app/og-quiz.png" />
+                <meta name="twitter:image" content="https://studeq.app/og-quiz.png" />
 
                 {/* JSON-LD */}
                 <script type="application/ld+json">{JSON.stringify(JSON_LD)}</script>
@@ -168,7 +168,7 @@ export default function QuizFeaturePage() {
                         <span className={styles.heroAccent}> Smart Quiz</span>
                     </h1>
                     <p className={styles.heroSub}>
-                        Upload notes, paste a topic, or drop a PDF — SPARK.E generates
+                        Upload notes, paste a topic, or drop a PDF — StudeQ generates
                         high-quality quizzes with answer keys and explanations in seconds.
                         Study smarter, not harder.
                     </p>
@@ -205,7 +205,7 @@ export default function QuizFeaturePage() {
                         Six Ways to Test Your Knowledge
                     </h2>
                     <p className={styles.sectionSub}>
-                        SPARK.E doesn't just do multiple choice. Pick the format that matches your study goal.
+                        StudeQ doesn't just do multiple choice. Pick the format that matches your study goal.
                     </p>
 
                     <div className={styles.typeGrid} role="tablist" aria-label="Quiz question types">
@@ -267,7 +267,7 @@ export default function QuizFeaturePage() {
                         Everything You Need to Actually Learn
                     </h2>
                     <p className={styles.sectionSub}>
-                        SPARK.E quizzes aren't just question generators. They're a full study feedback loop.
+                        StudeQ quizzes aren't just question generators. They're a full study feedback loop.
                     </p>
 
                     <ul className={styles.detailGrid}>
@@ -290,7 +290,7 @@ export default function QuizFeaturePage() {
                                 Works With What You Already Have
                             </h2>
                             <p className={styles.sectionSub}>
-                                No reformatting. No copy-paste marathon. SPARK.E ingests your material as-is.
+                                No reformatting. No copy-paste marathon. StudeQ ingests your material as-is.
                             </p>
                             <ul className={styles.sourceList} aria-label="Supported input types">
                                 {[

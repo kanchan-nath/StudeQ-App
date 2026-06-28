@@ -16,7 +16,7 @@ const developmentLogger = () => {
             json()
         ),
         defaultMeta: {
-            service: "sparke-backend",
+            service: "studeq-backend",
             env: process.env.NODE_ENV,
         },
         transports: [

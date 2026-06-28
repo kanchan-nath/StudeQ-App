@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════════
-   Spark.E – TimeTable.module.css
+     StudeQ – TimeTable.module.css
    Synced to global.css theme tokens (--theme-*, --r-*, --shadow-*)
    Fonts: global.css already imports Sora + DM Sans
    Remove any local font import — global handles it.
@@ -39,6 +39,7 @@
    Layout and colors preserved. Only motion disabled.
 ─────────────────────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
+
   *,
   *::before,
   *::after {
@@ -68,36 +69,24 @@
   position: fixed;
   inset: 0;
   background-image:
-    radial-gradient(
-      1px 1px at 20% 30%,
+    radial-gradient(1px 1px at 20% 30%,
       rgba(255, 255, 255, 0.15) 0%,
-      transparent 100%
-    ),
-    radial-gradient(
-      1px 1px at 70% 20%,
+      transparent 100%),
+    radial-gradient(1px 1px at 70% 20%,
       rgba(255, 255, 255, 0.1) 0%,
-      transparent 100%
-    ),
-    radial-gradient(
-      1px 1px at 50% 80%,
+      transparent 100%),
+    radial-gradient(1px 1px at 50% 80%,
       rgba(255, 255, 255, 0.12) 0%,
-      transparent 100%
-    ),
-    radial-gradient(
-      1px 1px at 85% 60%,
+      transparent 100%),
+    radial-gradient(1px 1px at 85% 60%,
       rgba(255, 255, 255, 0.08) 0%,
-      transparent 100%
-    ),
-    radial-gradient(
-      300px 300px at 10% 10%,
+      transparent 100%),
+    radial-gradient(300px 300px at 10% 10%,
       var(--theme-purple-dim) 0%,
-      transparent 70%
-    ),
-    radial-gradient(
-      400px 400px at 90% 90%,
+      transparent 70%),
+    radial-gradient(400px 400px at 90% 90%,
       rgba(34, 197, 94, 0.04) 0%,
-      transparent 70%
-    );
+      transparent 70%);
   pointer-events: none;
   z-index: 0;
   /* Starfield slowly drifts — extremely subtle parallax feel */
@@ -163,6 +152,7 @@
 }
 
 @keyframes pulse-logo {
+
   0%,
   100% {
     filter: drop-shadow(0 0 8px var(--theme-accent-glow));
@@ -431,8 +421,7 @@
   white-space: nowrap;
   /* Stagger via --pill-i custom prop (set inline in JSX):
        animation-delay: calc(var(--pill-i, 0) * 40ms)               */
-  animation: pill-enter var(--duration-base) var(--ease-out)
-    calc(var(--pill-i, 0) * 40ms) both;
+  animation: pill-enter var(--duration-base) var(--ease-out) calc(var(--pill-i, 0) * 40ms) both;
   transition:
     background var(--duration-fast) var(--ease-out),
     box-shadow var(--duration-fast) var(--ease-out),
@@ -853,8 +842,7 @@
   white-space: nowrap;
   text-overflow: ellipsis;
   z-index: 5;
-  animation: event-enter var(--duration-base) var(--ease-out)
-    calc(var(--chip-i, 0) * 30ms) both;
+  animation: event-enter var(--duration-base) var(--ease-out) calc(var(--chip-i, 0) * 30ms) both;
   transition:
     filter var(--duration-fast) var(--ease-out),
     transform var(--duration-base) var(--ease-spring);
@@ -908,8 +896,7 @@
   flex-direction: column;
   gap: 4px;
   min-height: 80px;
-  animation: cell-enter var(--duration-base) var(--ease-out)
-    calc(var(--cell-i, 0) * 15ms) both;
+  animation: cell-enter var(--duration-base) var(--ease-out) calc(var(--cell-i, 0) * 15ms) both;
   transition: background var(--duration-fast) var(--ease-out);
 }
 
@@ -1050,8 +1037,7 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
-  animation: fade-up var(--duration-slow) var(--ease-out)
-    calc(var(--group-i, 0) * 60ms) both;
+  animation: fade-up var(--duration-slow) var(--ease-out) calc(var(--group-i, 0) * 60ms) both;
 }
 
 .agendaDateHeader {
@@ -1075,8 +1061,7 @@
   padding: 14px 16px;
   cursor: pointer;
   border: 1px solid var(--theme-border);
-  animation: fade-up var(--duration-base) var(--ease-out)
-    calc(var(--item-i, 0) * 40ms) both;
+  animation: fade-up var(--duration-base) var(--ease-out) calc(var(--item-i, 0) * 40ms) both;
   transition:
     border-color var(--duration-base) var(--ease-out),
     background var(--duration-base) var(--ease-out),
@@ -1366,6 +1351,7 @@
 }
 
 @keyframes delete-hint {
+
   0%,
   100% {
     transform: translateX(0);
@@ -1498,8 +1484,7 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
-  animation: fade-up var(--duration-base) var(--ease-out)
-    calc(var(--field-i, 0) * 40ms + 100ms) both;
+  animation: fade-up var(--duration-base) var(--ease-out) calc(var(--field-i, 0) * 40ms + 100ms) both;
 }
 
 .fieldRow {
@@ -1605,11 +1590,9 @@
 }
 
 .catSeg:hover {
-  background: color-mix(
-    in srgb,
-    var(--cat-color, var(--theme-purple)) 15%,
-    transparent
-  );
+  background: color-mix(in srgb,
+      var(--cat-color, var(--theme-purple)) 15%,
+      transparent);
   transform: translateY(-1px);
 }
 
@@ -1619,11 +1602,9 @@
 }
 
 .catSegActive {
-  background: color-mix(
-    in srgb,
-    var(--cat-color, var(--theme-purple)) 20%,
-    transparent
-  ) !important;
+  background: color-mix(in srgb,
+      var(--cat-color, var(--theme-purple)) 20%,
+      transparent) !important;
   font-weight: 700;
   box-shadow: 0 0 0 1px var(--cat-color, var(--theme-purple));
   animation: tab-activate var(--duration-base) var(--ease-spring);
@@ -1645,8 +1626,7 @@
   cursor: pointer;
   outline: none;
   position: relative;
-  animation: dot-pop var(--duration-base) var(--ease-spring)
-    calc(var(--swatch-i, 0) * 25ms) both;
+  animation: dot-pop var(--duration-base) var(--ease-spring) calc(var(--swatch-i, 0) * 25ms) both;
   transition:
     transform var(--duration-base) var(--ease-spring),
     box-shadow var(--duration-base) var(--ease-out),
@@ -1702,6 +1682,7 @@
 }
 
 @keyframes error-shake {
+
   0%,
   100% {
     transform: translateX(0);
@@ -2014,6 +1995,7 @@
 
 /* ── 5. Week horizontal scroll — add touch-scroll momentum ─────────  */
 @media (max-width: 640px) {
+
   .weekBody,
   .weekHeader {
     -webkit-overflow-scrolling: touch;
@@ -2099,6 +2081,7 @@
     padding: 6px 14px;
   }
 }
+
 /* RESPONSIVE: dropdown view-switcher for mobile, replaces hidden viewSwitcher */
 .mobileViewSelect {
   display: none;

@@ -4,7 +4,7 @@ import { titleExtract } from "../controllers/note.controller.js";
 import { Note } from "../models/note.model.js";
 
 const connection = {
-    host:"localhost",
+    host:process.env.REDIS_HOST,
     port:6379
 }
 const aiQueueEvents = async (userSocketMap, io)=>{
