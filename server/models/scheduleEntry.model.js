@@ -3,7 +3,7 @@ import { type, userInfo } from "os"
 
 const scheduleEntrySchema = new mongoose.Schema({
     userId: {
-        type: String,
+        type: Number,
         required: true
     },
     subject: {

@@ -1,6 +1,6 @@
 const subscriptionSchema = new mongoose.Schema(
     {
-        userId: { type: String, required: true, unique: true },
+        userId: { type: Number, required: true, unique: true },
         planId: { type: String, default: "free" },
         billingCycle: { type: String, enum: ["monthly", "yearly"], default: "monthly" },
         status: { type: String, enum: ["active", "cancelled", "past_due"], default: "active" },

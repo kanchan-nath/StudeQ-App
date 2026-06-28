@@ -8,7 +8,7 @@ import logger from "../logger/index.js"
 import { grantDailyLoginXP } from "../services/xpService.js"
 
 const hashPassword = async (password) => {
-    const hashed = await bcrypt.hash(password, /*process.env.BCRYPT_SALT_ROUNDS*/ 10)
+    const hashed = await bcrypt.hash(password, process.env.BCRYPT_SALT_ROUNDS)
     if(!hashed){
         throw new ApiError(500, "Failed to process password")
     }
