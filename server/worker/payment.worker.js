@@ -99,25 +99,25 @@ const handleCaptured = async (payload, eventId) => {
                 { session }
             );
 
-            await UserEntitlement.findOneAndUpdate(
-                {
-                    userId: payment.userId,
-                    productType: payment.productType,
-                },
-                {
-                    $set: {
-                        active: true,
-                    },
-                    $setOnInsert: {
-                        userId: payment.userId,
-                        productType: payment.productType,
-                    },
-                },
-                {
-                    upsert: true,
-                    session,
-                }
-            );
+            // await UserEntitlement.findOneAndUpdate(
+            //     {
+            //         userId: payment.userId,
+            //         productType: payment.productType,
+            //     },
+            //     {
+            //         $set: {
+            //             active: true,
+            //         },
+            //         $setOnInsert: {
+            //             userId: payment.userId,
+            //             productType: payment.productType,
+            //         },
+            //     },
+            //     {
+            //         upsert: true,
+            //         session,
+            //     }
+            // );
         });
     } finally {
         await session.endSession();
