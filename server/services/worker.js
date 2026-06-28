@@ -3,7 +3,7 @@ import { summarizeText } from "../lib/groq/summarizer.js"
 import { Note } from "../models/note.model.js";
 import logger from "../logger/index.js";
 
-const host = process.env.CORS_ORIGINS
+const host = process.env.REDIS_HOST
 logger.info(`Worker started, listening on ${host}`);
 
 const connection = {
