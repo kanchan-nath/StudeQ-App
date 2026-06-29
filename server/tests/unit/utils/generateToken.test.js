@@ -10,7 +10,6 @@ const generateAccessToken = (user) =>
   );
 
 const generateRefreshToken = (user) => {
-  const { randomUUID } = await import("crypto").then((m) => m);
   return jwt.sign(
     { userId: user.id, type: "refresh", jti: "test-jti" },
     process.env.REFRESH_TOKEN_SECRET,
