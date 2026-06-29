@@ -1,7 +1,7 @@
 import { AIResponse } from "../../models/aiResponse.model.js"
 import groq from "./groq.js"
 import { promptOptimizer } from "../../services/promptOptimizer.js"
-import {logAIResponse} from "../../utils/logAIResponseUtils.js"
+import {logAIResponse} from "../../utils/logAIResponse.utils.js"
 
 const MODEL = process.env.GROQ_RAG_MODEL || "llama-3.3-70b-versatile"
 

@@ -1,7 +1,7 @@
 import groq from "./groq.js";
-import {extractJSON} from "../../utils/llmUtils.js"
+import {extractJSON} from "../../utils/llm.utils.js"
 import { AIResponse } from "../../models/aiResponse.model.js"
-import { logAIResponse } from "../../utils/logAIResponseUtils.js"
+import { logAIResponse } from "../../utils/logAIResponse.utils.js"
 
 const MODEL = process.env.GROQ_FLASHCARD_MODEL || "meta-llama/llama-4-scout-17b-16e-instruct"
 

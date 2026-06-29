@@ -9,7 +9,7 @@ import { v4 as uuidv4 } from "uuid" // ✅ ADDED: need this to generate unique q
 import { Flascards } from "../models/flashcard.model.js"
 import textExtractor from "../services/textExtractor.js"
 import mongoose from "mongoose"
-import { answersValidator, quizValidator, generateQuizFromFilesValidator } from "../validators/quizValidator.js"
+import { answersValidator, quizValidator, generateQuizFromFilesValidator } from "../validators/quiz.validator.js"
 import { flashcardValidator } from "../validators/flashcard.validator.js"
 import { idParamValidator } from "../validators/params.validator.js"
 import { grantXP } from "../services/xpService.js"

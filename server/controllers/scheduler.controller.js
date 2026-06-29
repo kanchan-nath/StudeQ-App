@@ -10,7 +10,7 @@ import {
     ToDoList
 } from "../models/scheduleEntry.model.js"
 import { generateStudyPlan } from "../lib/groq/generateStudyPlan.js"
-import { StudyPlan } from "../models/studyPlan.js"
+import { StudyPlan } from "../models/studyPlan.model.js"
 import pdfToImages from "../services/pdfToImages.js"
 import { PDFParse } from "pdf-parse"
 import fs, { rmSync } from "fs"

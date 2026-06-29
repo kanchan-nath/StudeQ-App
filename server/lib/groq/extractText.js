@@ -5,7 +5,7 @@ import { prompt_TextExtraction } from "../prompt.js"
 import logger from "../../logger/index.js"
 import { fileTypeFromFile } from "file-type"
 import { ApiError } from "../../utils/Async.js"
-import {logAIResponse} from "../../utils/logAIResponseUtils.js"
+import {logAIResponse} from "../../utils/logAIResponse.utils.js"
 
 const MODEL = process.env.GROQ_VISION_MODEL || "meta-llama/llama-4-scout-17b-16e-instruct"
 
