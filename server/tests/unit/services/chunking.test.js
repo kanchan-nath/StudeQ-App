@@ -14,7 +14,7 @@ jest.mock("../../logger/index.js", () => ({
   default: { error: jest.fn(), warn: jest.fn(), info: jest.fn() },
 }));
 
-import chunking from "../../services/chunking.js";
+import chunking from "../../../services/chunking.js";
 
 describe("services/chunking.js", () => {
   beforeEach(() => {
