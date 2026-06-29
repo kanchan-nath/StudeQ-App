@@ -8,7 +8,7 @@ export default {
   testMatch: [
     "**/tests/**/*.test.js",
   ],
-  setupFilesAfterFramework: [],
+  // setupFilesAfterEach: [],
   setupFiles: ["./setup.js"],
   collectCoverageFrom: [
     "../controllers/**/*.js",
@@ -20,7 +20,7 @@ export default {
     "../helpers/**/*.js",
     "../worker/**/*.js",
   ],
-  coverageThresholds: {
+  coverageThreshold: {
     global: {
       branches: 70,
       functions: 80,

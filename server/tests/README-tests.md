@@ -1,4 +1,4 @@
-# StudeQ Backend Test Suite
+# Spark.E Backend Test Suite
 
 ## Stack
 

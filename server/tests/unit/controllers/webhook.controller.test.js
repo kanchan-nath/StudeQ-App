@@ -9,6 +9,12 @@ jest.mock("../../../lib/redisClient.js", () => ({
   default: { set: mockRedisSet },
 }));
 
+// FIX 1: paymentQueue was not mocked — caused real BullMQ to load real redisClient.js,
+// which hit logger.error on a null logger → TypeError crash
+jest.mock("../../../queue/payment.queue.js", () => ({
+  paymentQueue: { add: mockPaymentQueueAdd },
+}));
+
 jest.mock("../../../logger/index.js", () => ({
   default: { error: jest.fn(), warn: jest.fn(), info: jest.fn() },
 }));
@@ -34,6 +40,8 @@ describe("controllers/webhook.controller.js", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    // FIX 2: set env var explicitly so tests don't depend on external env
+    process.env.RAZORPAY_WEBHOOK_SECRET = WEBHOOK_SECRET;
     mockRedisSet.mockResolvedValue("OK");
   });
 
@@ -121,6 +129,13 @@ describe("controllers/webhook.controller.js", () => {
     const next = mockNext();
 
     await razorpayWebhookHandler(req, res, next);
+    // FIX 3 (primary): asyncHandler does not return its .catch(next) Promise, so
+    // `await handler(...)` resolves immediately (awaiting undefined). The throw inside
+    // the handler happens *after* `await redisClient.set()` resumes — one microtask
+    // tick later. Without this extra tick the assertion races ahead of next() being called.
+    // 400-level tests pass because those throws are synchronous (before any await),
+    // so .catch(next) fires in the same microtask batch.
+    await Promise.resolve();
 
     expect(next).toHaveBeenCalledWith(
       expect.objectContaining({ statusCode: 200, message: "duplicate_ignored" })
