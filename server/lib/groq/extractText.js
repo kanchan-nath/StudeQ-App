@@ -47,7 +47,7 @@ const getMimeType = async (filePath) => {
     return { result, isImageFile }
 }
 const extract = async (outputDir, userId) => {
-    // const folder = "/Users/kanchannath/Coding/Spark.E/server/uploads/images"
+    // const folder = "/Users/kanchannath/Coding/StudeQ/server/uploads/images"
     if (!outputDir) {
         throw new Error("extract: outputDir is required")
     }
