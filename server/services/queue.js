@@ -7,14 +7,13 @@ const connection = {
     password: process.env.REDIS_PASSWORD || undefined
 }
 
-const jobId = crypto
-    .createHash("sha256")
-    .update(userId + JSON.stringify(data))
-    .digest("hex");
-
 const aiResponseQueueInstance = new Queue("ai-response-handler", { connection })
 
 const AIResponseQueue = async (userId, data) => {
+    const jobId = crypto
+        .createHash("sha256")
+        .update(userId + JSON.stringify(data))
+        .digest("hex");
     logger.info('Queue created:', aiResponseQueueInstance.name);
 
     if (!userId) {
