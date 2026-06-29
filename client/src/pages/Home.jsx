@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import styles from "./styles/Home.module.css";
 import { Helmet } from "react-helmet-async";
-import ThemeToggle from "../components/Themetoggle.jsx";
+import ThemeToggle from "../components/ThemeToggle.jsx";
 // Add to imports
 import {
   FileText,
