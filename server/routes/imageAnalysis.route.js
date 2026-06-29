@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
-import {analyze} from "../controllers/analyzeImage.controller.js"
+import {analyze} from "../controllers/imageAnalyze.controller.js"
 import {upload} from "../middlewares/multer.middleware.js"
 
 const router = Router()

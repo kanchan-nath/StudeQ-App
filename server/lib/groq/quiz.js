@@ -1,7 +1,7 @@
 import groq from "./groq.js";
 import { AIResponse } from "../../models/aiResponse.model.js"
 import logger from "../../logger/index.js";
-import { extractJSON } from "../../utils/llmUtils.js";
+import { extractJSON } from "../../utils/llm.utils.js";
 
 const MODEL = process.env.GROQ_QUIZ_MODEL || "llama-3.3-70b-versatile"
 

@@ -1,6 +1,6 @@
 import { asyncHandler } from "../utils/asyncHandler.js"
 import { ApiError, ApiResponse } from "../utils/Async.js"
-import { questionAnswer } from "../lib/groq/question-answer.js"
+import { questionAnswer } from "../lib/groq/questionAnswer.js"
 import { Tutorchat } from "../models/tutorchat.model.js"
 
 const ask = asyncHandler(async (req, res) => {

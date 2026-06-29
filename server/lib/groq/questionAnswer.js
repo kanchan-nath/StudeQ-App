@@ -2,7 +2,7 @@ import groq from "./groq.js"
 import { webSearch } from "../websearch.js"
 import logger from "../../logger/index.js"
 import { AIResponse } from "../../models/aiResponse.model.js"
-import { logAIResponse } from "../../utils/logAIResponseUtils.js"
+import { logAIResponse } from "../../utils/logAIResponse.utils.js"
 
 const MODEL = process.env.GROQ_QA_MODEL || "llama-3.3-70b-versatile"
 const MAX_SEARCH_CHARS = 12_000
