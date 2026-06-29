@@ -2,6 +2,7 @@ import { jest } from "@jest/globals";
 
 // ─── Env ──────────────────────────────────────────────────────
 process.env.NODE_ENV = "test";
+process.env.POSTGRES_URL = "postgresql://test:test@localhost:5432/testdb";
 process.env.ACCESS_TOKEN_SECRET = "test-access-secret";
 process.env.REFRESH_TOKEN_SECRET = "test-refresh-secret";
 process.env.ACCESS_TOKEN_EXPIRY = "15m";
