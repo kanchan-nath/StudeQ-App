@@ -3,7 +3,7 @@ import {verifyJWT} from "../middlewares/auth.middleware.js"
 import {
     createRoom,
     getAllRoom
-} from "../controllers/studyroom.controller.js"
+} from "../controllers/studyRoom.controller.js"
 const router = Router()
 
 router.route("/rooms").post(verifyJWT, createRoom)
