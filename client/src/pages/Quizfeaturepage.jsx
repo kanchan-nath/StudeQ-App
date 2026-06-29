@@ -1,6 +1,6 @@
 import { Helmet } from 'react-helmet-async';
 import { useState, useCallback, useMemo, lazy, Suspense } from 'react';
-import styles from './styles/QuizFeaturePage.module.css';
+import styles from './styles/QuizFeaturepage.module.css';
 
 const QUIZ_TYPES = [
     {
