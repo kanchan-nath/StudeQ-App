@@ -273,7 +273,7 @@ const PublicLayout = () => {
                             SPARK<span>.E</span>
                         </Link>
                         <p className={styles.footerTagline}>Your AI-powered study companion.</p>
-                        <p className={styles.footerCopyright}>© 2026 Spark.E Inc.</p>
+                        <p className={styles.footerCopyright}>© 2026 StudeQ Inc.</p>
                         <div className={styles.footerSocials}>
                             <a href="#" className={styles.socialBtn} aria-label="X / Twitter">𝕏</a>
                             <a href="#" className={styles.socialBtn} aria-label="LinkedIn">in</a>
@@ -314,18 +314,18 @@ const PublicLayout = () => {
                         </div>
                         <div className={styles.footerLinkCol}>
                             <span className={styles.footerLinkHeading}>Contact</span>
-                            <a href="mailto:hello@sparke.ai" className={styles.footerLink}>hello@sparke.ai</a>
+                            <a href="mailto:hello@studeq.ai" className={styles.footerLink}>hello@studeq.ai</a>
                             <a href="#" className={styles.footerLink}>Discord Community</a>
                         </div>
                     </div>
                 </div>
 
                 <div className={styles.footerWordmark} aria-hidden="true">
-                    <span className={styles.footerWordmarkText}>SPARK.E</span>
+                    <span className={styles.footerWordmarkText}>StudeQ</span>
                 </div>
 
                 <div className={styles.footerBottom}>
-                    <p className={styles.footerBottomText}>© 2026 Spark.E Inc. — Learn smarter, not harder.</p>
+                    <p className={styles.footerBottomText}>© 2026 StudeQ Inc. — Learn smarter, not harder.</p>
                 </div>
             </footer>
         </div>

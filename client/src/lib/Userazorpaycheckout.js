@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 import { useRazorpayScript } from './useRazorpayScript';
-import { apiFetch } from '../lib/api.js'; // match your Spark.E path
+import { apiFetch } from '../lib/api.js'; // match your StudeQ path
 
 export function useRazorpayCheckout() {
     const scriptLoaded = useRazorpayScript();
@@ -48,7 +48,7 @@ export function useRazorpayCheckout() {
             key: order.keyId,
             amount: order.amount,
             currency: order.currency,
-            name: 'Spark.E',
+            name: 'StudeQ',
             description: 'Premium Feature Unlock',
             order_id: order.orderId,
             handler: async (response) => {

@@ -638,7 +638,7 @@ export default function SearchResults() {
   const [pageError, setPageError] = useState(null);
   const [filterChip, setFilterChip] = useState("All");
   const [dark, setDark] = useState(() => {
-    return localStorage.getItem("sparke-theme");
+    return localStorage.getItem("studeq-theme");
   });
 
   // ── Saved items: store full result objects keyed by link ──

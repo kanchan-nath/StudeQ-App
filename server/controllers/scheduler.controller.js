@@ -679,7 +679,7 @@ const uploadFile = asyncHandler(async (req, res) => {
     const mimeType = file?.mimeType
     const filePath = file?.path
 
-    const outputDir = "/Users/kanchannath/Coding/Spark.E/server/uploads/scheduler"
+    const outputDir = "../uploads/scheduler"
 
     const dataBuffer = fs.readFileSync(filePath)
     const uint8array = new Uint8Array(dataBuffer)
@@ -942,7 +942,7 @@ const sendICSFile = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Time table is not exist.")
     }
 
-    const folder = "/Users/kanchannath/Coding/Spark.E/server/uploads/icsFiles"
+    const folder = "../uploads/icsFiles"
 
     try {
         const outputPath = await icsFileGeneretor(isDataExist, folder)

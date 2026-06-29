@@ -11,7 +11,7 @@ import { generalLimiter, authLimiter, aiLimiter } from "../middlewares/rateLimit
 
 const router  = Router()
 
-router.route("/register").post(register)
+router.route("/register").post(authLimiter, register)
 router.route("/login").post( authLimiter, login)
 router.route("/logout").post(authLimiter, verifyJWT, logout)
 router.route("/userinfo").get(verifyJWT, getUserData)

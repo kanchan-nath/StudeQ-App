@@ -1,0 +1,138 @@
+##############################################
+# docker-compose.yml — StudeQ Local Dev
+# Place at: repo root (alongside client/ and server/)
+# Usage: docker compose up --build
+##############################################
+
+services:
+
+  # ─────────────────────────────────────────
+  # Infrastructure
+  # ─────────────────────────────────────────
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: studeq
+      POSTGRES_USER: studeq
+      POSTGRES_PASSWORD: studeq123
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U studeq -d studeq"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  mongo:
+    image: mongo:7
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ─────────────────────────────────────────
+  # Backend — Express + Socket.io
+  # ─────────────────────────────────────────
+
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    # Override entrypoint: skip prisma migrate in dev (run manually or add below)
+    entrypoint: []
+    command: ["sh", "-c", "npx prisma migrate deploy && npm run dev"]
+    env_file:
+      - ./server/.env.development       # API keys, JWT secrets, etc.
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      # Override localhost values from .env.development with container hostnames:
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+      POSTGRES_URL: postgresql://studeq:studeq123@postgres:5432/studeq
+      MONGO_URI: mongodb://mongo:27017
+      MONGO_DB_NAME: studeq
+    depends_on:
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      mongo:
+        condition: service_healthy
+    volumes:
+      - ./server:/app             # hot-reload: local source mounts into container
+      - /app/node_modules         # keep container's node_modules, don't override with host
+
+  # ─────────────────────────────────────────
+  # BullMQ Worker
+  # ─────────────────────────────────────────
+
+  worker:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    entrypoint: []
+    command: npm run dev-worker
+    env_file:
+      - ./server/.env.development
+    environment:
+      NODE_ENV: development
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+      MONGO_URI: mongodb://mongo:27017
+      MONGO_DB_NAME: studeq
+    depends_on:
+      redis:
+        condition: service_healthy
+      mongo:
+        condition: service_healthy
+    volumes:
+      - ./server:/app
+      - /app/node_modules
+
+  # ─────────────────────────────────────────
+  # Frontend — React/Vite Dev Server
+  # ─────────────────────────────────────────
+
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    ports:
+      - "5173:5173"
+    environment:
+      VITE_API_URL: http://localhost:3000
+    volumes:
+      - ./client:/app             # hot-reload
+      - /app/node_modules         # keep container's node_modules
+
+# ─────────────────────────────────────────
+# Persistent volumes
+# ─────────────────────────────────────────
+
+volumes:
+  postgres_data:
+  mongo_data:

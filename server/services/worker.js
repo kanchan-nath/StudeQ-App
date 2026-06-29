@@ -1,11 +1,13 @@
 import { Worker } from "bullmq";
 import { summarizeText } from "../lib/groq/summarizer.js"
 import { Note } from "../models/note.model.js";
+import logger from "../logger/index.js";
 
-console.log("Worker started, listening on PORT 6379");
+const host = process.env.REDIS_HOST
+logger.info(`Worker started, listening on ${host}`);
 
 const connection = {
-    host: "localhost",
+    host: host,
     port: 6379
 }
 const processJob = async (job) => {
@@ -22,7 +24,7 @@ const AIResponseQueueWorker = new Worker("ai-response-handler", processJob, { co
 
 
 AIResponseQueueWorker.on('active', (job) => {
-    console.log(">>> ACTIVE:", job.id);
+    logger.info(`>>> ACTIVE: ${job.id}`);
 })
 AIResponseQueueWorker.on('completed', (job, result) => {
     console.log(">>>COMPLETED: ", result);

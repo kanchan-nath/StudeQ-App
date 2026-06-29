@@ -124,34 +124,34 @@ const TABS = [
 const COMPARISON = [
   {
     feature: "Input types",
-    sparke: "PDFs, images, typed text, pasted notes — any format you have",
+    studeq: "PDFs, images, typed text, pasted notes — any format you have",
     other: "Text input only",
   },
   {
     feature: "AI Tutor",
-    sparke: "Subject-aware multi-turn tutor that remembers your session",
+    studeq: "Subject-aware multi-turn tutor that remembers your session",
     other: "Generic chatbot, no subject context",
   },
   {
     feature: "Quiz types",
-    sparke:
+    studeq:
       "6 types: MCQ, True/False, Fill-blank, Short Answer, Free Response, Passage",
     other: "Basic MCQ only",
   },
   {
     feature: "Image analysis",
-    sparke:
+    studeq:
       "Upload diagrams, charts, handwritten pages — full AI explanation with LaTeX",
     other: "Cannot process images",
   },
   {
     feature: "Collaboration",
-    sparke: "Live Study Rooms — create and join sessions in real time",
+    studeq: "Live Study Rooms — create and join sessions in real time",
     other: "Solo only",
   },
   {
     feature: "Scheduler",
-    sparke: "AI-generated study plan built around your exams and goals",
+    studeq: "AI-generated study plan built around your exams and goals",
     other: "No scheduling at all",
   },
 ];
@@ -167,7 +167,7 @@ const STEPS = [
     num: "02",
     pill: "Upload",
     title: "Add your study material",
-    desc: "Upload a PDF, paste notes, drop an image, or type a topic. Spark.E handles every format.",
+    desc: "Upload a PDF, paste notes, drop an image, or type a topic. StudeQ handles every format.",
   },
   {
     num: "03",
@@ -194,7 +194,7 @@ const TESTIMONIALS = [
     name: "Priya S.",
     role: "IIT Delhi · Physics",
     quote:
-      "Spark.E turned my 200-page module into flashcards in seconds. My quiz scores went from 60% to 88% in two weeks.",
+      "StudeQ turned my 200-page module into flashcards in seconds. My quiz scores went from 60% to 88% in two weeks.",
     highlight: "flashcards in seconds",
   },
   {
@@ -208,14 +208,14 @@ const TESTIMONIALS = [
     name: "Sarah K.",
     role: "Stanford · Organic Chemistry",
     quote:
-      "I have ADHD. Study Rooms with friends keep me accountable. Spark.E is the first tool that actually worked for me.",
+      "I have ADHD. Study Rooms with friends keep me accountable. StudeQ is the first tool that actually worked for me.",
     highlight: "actually worked for me",
   },
   {
     name: "Elena R.",
     role: "MIT · Education PhD",
     quote:
-      "I upload lecture slides and Spark.E gives me passage-based questions. Nothing else comes close.",
+      "I upload lecture slides and StudeQ gives me passage-based questions. Nothing else comes close.",
     highlight: "passage-based questions",
   },
   {
@@ -236,23 +236,23 @@ const TESTIMONIALS = [
 
 const FAQS = [
   {
-    q: "What is Spark.E?",
-    a: "Spark.E is an AI-powered study platform. Upload any material and instantly get smart notes, flashcards, quizzes, and access to a personal AI Tutor that knows your subject.",
+    q: "What is StudeQ?",
+    a: "StudeQ is an AI-powered study platform. Upload any material and instantly get smart notes, flashcards, quizzes, and access to a personal AI Tutor that knows your subject.",
   },
   {
-    q: "Is Spark.E free?",
-    a: "Yes — Spark.E has a generous free tier including note generation, flashcards, and quizzes. Upgrade for unlimited access and advanced features.",
+    q: "Is StudeQ free?",
+    a: "Yes — StudeQ has a generous free tier including note generation, flashcards, and quizzes. Upgrade for unlimited access and advanced features.",
   },
   {
     q: "What file types can I upload?",
-    a: "PDFs, images (JPG/PNG), and plain text. You can also paste content directly or type a topic — Spark.E works with whatever you have.",
+    a: "PDFs, images (JPG/PNG), and plain text. You can also paste content directly or type a topic — StudeQ works with whatever you have.",
   },
   {
     q: "How does the AI Tutor work?",
     a: "Select a subject, type your question, and have a full conversation. The tutor remembers your session history so follow-ups are natural and contextual.",
   },
   {
-    q: "What quiz types does Spark.E support?",
+    q: "What quiz types does StudeQ support?",
     a: "Multiple Choice, True/False, Fill-in-the-blank, Short Answer, Free Response, and Multi-Layered Passage questions — six types built for real exams.",
   },
   {
@@ -261,11 +261,11 @@ const FAQS = [
   },
   {
     q: "How does Image Analysis work?",
-    a: "Upload any image — a diagram, chart, or handwritten notes — and Spark.E explains it with full LaTeX support for mathematical formulas.",
+    a: "Upload any image — a diagram, chart, or handwritten notes — and StudeQ explains it with full LaTeX support for mathematical formulas.",
   },
   {
     q: "Does the Scheduler use AI?",
-    a: "Yes. Tell Spark.E your subjects, available hours, and goal date — it builds a personalised study plan that adjusts around your life.",
+    a: "Yes. Tell StudeQ your subjects, available hours, and goal date — it builds a personalised study plan that adjusts around your life.",
   },
 ];
 
@@ -505,23 +505,23 @@ const LandingPage = () => {
   return (
     <>
       <Helmet>
-        <title>SPARK.E — AI Powered Study Platform for Students</title>
+        <title>StudeQ — AI Powered Study Platform for Students</title>
         <meta name="description" content="Turn any PDF, image, or notes into flashcards, quizzes, and summaries in seconds. Free AI study tools — notes, tutor, quiz maker, and live study rooms." />
         <link rel="canonical" href="https://yourdomain.com/" />
         <meta property="og:type" content="website" />
-        <meta property="og:title" content="SPARK.E — AI Study Platform" />
+        <meta property="og:title" content="StudeQ — AI Study Platform" />
         <meta property="og:description" content="Turn any PDF into flashcards, quizzes, and notes instantly. Free to start." />
         <meta property="og:image" content="https://yourdomain.com/og-image.jpg" />
         <meta property="og:url" content="https://yourdomain.com/" />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="SPARK.E — AI Study Platform" />
+        <meta name="twitter:title" content="StudeQ — AI Study Platform" />
         <meta name="twitter:description" content="Turn any PDF into flashcards, quizzes, and notes instantly." />
         <meta name="twitter:image" content="https://yourdomain.com/og-image.jpg" />
 
         <script type="application/ld+json">{JSON.stringify({
           "@context": "https://schema.org",
           "@type": "SoftwareApplication",
-          "name": "SPARK.E",
+          "name": "StudeQ",
           "applicationCategory": "EducationApplication",
           "description": "AI-powered study platform with quizzes, flashcards, notes, AI tutor, and live study rooms.",
           "url": "https://yourdomain.com",
@@ -541,12 +541,12 @@ const LandingPage = () => {
           {JSON.stringify({
             "@context": "https://schema.org",
             "@type": "ItemList",
-            "name": "Spark.E vs Other Study Apps",
+            "name": "StudeQ vs Other Study Apps",
             "itemListElement": COMPARISON.map((item, index) => ({
               "@type": "ListItem",
               "position": index + 1,
               "name": item.feature,
-              "description": `Spark.E: ${item.sparke}. Other apps: ${item.other}`
+              "description": `StudeQ: ${item.studeq}. Other apps: ${item.other}`
             }))
           })}
         </script>
@@ -752,7 +752,7 @@ const LandingPage = () => {
                   Everything you need to actually remember what you studied
                 </h2>
                 <p className={styles.sectionSub}>
-                  From raw material to exam-ready — Spark.E handles every step of
+                  From raw material to exam-ready — StudeQ handles every step of
                   the study journey.
                 </p>
               </div>
@@ -817,7 +817,7 @@ const LandingPage = () => {
                   Study anywhere. Pick up where you left off.
                 </h2>
                 <p className={styles.sectionSub}>
-                  Spark.E works seamlessly on web and mobile. Your notes,
+                  StudeQ works seamlessly on web and mobile. Your notes,
                   flashcards, and chat history sync instantly.
                 </p>
               </div>
@@ -832,7 +832,7 @@ const LandingPage = () => {
                       aria-hidden="true"
                     />
                     <div className={styles.laptopScreenContent}>
-                      <div className={styles.mockNoteTitle}>⚡ SPARK.E</div>
+                      <div className={styles.mockNoteTitle}>⚡ StudeQ</div>
                       <div
                         className={styles.mockNoteTitle}
                         style={{
@@ -886,10 +886,10 @@ const LandingPage = () => {
           <div className={styles.sectionInner}>
             <Reveal>
               <div className={styles.centered}>
-                <span className={styles.sectionBadge}>Why Spark.E</span>
-                <h2 className={styles.sectionH2}>Why Spark.E hits different</h2>
+                <span className={styles.sectionBadge}>Why StudeQ</span>
+                <h2 className={styles.sectionH2}>Why StudeQ hits different</h2>
                 <p className={styles.sectionSub}>
-                  Not all study tools are equal. Here's what sets Spark.E apart
+                  Not all study tools are equal. Here's what sets StudeQ apart
                   from everything else.
                 </p>
               </div>
@@ -897,7 +897,7 @@ const LandingPage = () => {
 
             <Reveal delay={80}>
               <div className={styles.comparisonGrid}>
-                {/* Left — Spark.E */}
+                {/* Left — StudeQ */}
                 <div className={`${styles.compCol} ${styles.compColLeft}`}>
                   <div className={styles.compHeader}>
                     <span className={styles.compLogo}>
@@ -918,7 +918,7 @@ const LandingPage = () => {
                             {row.feature}
                           </span>
                           <span className={styles.compTextGood}>
-                            {row.sparke}
+                            {row.studeq}
                           </span>
                         </div>
                       </li>
@@ -959,7 +959,7 @@ const LandingPage = () => {
         <section
           className={`${styles.section} ${styles.timelineSection}`}
           id="how-it-works"
-          aria-label="How Spark.E works"
+          aria-label="How StudeQ works"
         >
           <div className={styles.sectionInner}>
             <div className={styles.centered}>
@@ -1125,7 +1125,7 @@ const LandingPage = () => {
               <p className={styles.footerTagline}>
                 Your AI-powered study companion.
               </p>
-              <p className={styles.footerCopyright}>© 2026 Spark.E Inc.</p>
+              <p className={styles.footerCopyright}>© 2026 StudeQ Inc.</p>
               <div className={styles.footerSocials}>
                 <a
                   href="#"
@@ -1298,10 +1298,10 @@ const LandingPage = () => {
               <div className={styles.footerLinkCol}>
                 <span className={styles.footerLinkHeading}>Contact</span>
                 <a
-                  href="mailto:hello@sparke.ai"
+                  href="mailto:hello@studeq.ai"
                   className={styles.footerLink}
                 >
-                  hello@sparke.ai
+                  hello@studeq.ai
                 </a>
                 <a
                   href="#"
@@ -1317,12 +1317,12 @@ const LandingPage = () => {
             className={styles.footerWordmark}
             aria-hidden="true"
           >
-            <span className={styles.footerWordmarkText}>SPARK.E</span>
+            <span className={styles.footerWordmarkText}>StudeQ</span>
           </div>
 
           <div className={styles.footerBottom}>
             <p className={styles.footerBottomText}>
-              © 2026 Spark.E Inc. — Learn smarter, not harder.
+              © 2026 StudeQ Inc. — Learn smarter, not harder.
             </p>
           </div>
         </footer>

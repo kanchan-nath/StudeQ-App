@@ -2,7 +2,7 @@ import mongoose  from "mongoose";
 
 const studyPlanSchema = new mongoose.Schema({
     userId:{
-        type:String,
+        type:Number,
         required:true
     },
     subjects:[String],

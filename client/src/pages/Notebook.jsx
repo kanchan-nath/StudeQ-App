@@ -149,7 +149,7 @@ const Notebook = () => {
 
   const [toasts, setToasts] = useState([]);
   const [theme, setTheme] = useState(
-    () => localStorage.getItem("sparke-theme") || "dark",
+    () => localStorage.getItem("studeq-theme") || "dark",
   );
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const inputRef = useRef(null);

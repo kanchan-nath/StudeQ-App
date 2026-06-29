@@ -8,7 +8,10 @@
     "dev-worker": "NODE_ENV=development nodemon services/worker.js",
     "start": "NODE_ENV=production node index.js",
     "debug": "node index.js 2>&1",
-    "debug:full": "node --inspect index.js 2>&1 | tee logs/debug.log"
+    "debug:full": "node --inspect index.js 2>&1 | tee logs/debug.log",
+    "test": "NODE_OPTIONS='--experimental-vm-modules' jest --config tests/jest.config.js",
+    "test:watch": "NODE_OPTIONS='--experimental-vm-modules' jest --config tests/jest.config.js --watch",
+    "test:coverage": "NODE_OPTIONS='--experimental-vm-modules' jest --config tests/jest.config.js --coverage"
   },
   "keywords": [],
   "author": "KANCHAN NATH",
@@ -66,6 +69,9 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
-    "prisma": "^7.8.0"
+    "jest": "^30.4.2",
+    "mongodb-memory-server": "^11.2.0",
+    "prisma": "^7.8.0",
+    "supertest": "^7.2.2"
   }
 }

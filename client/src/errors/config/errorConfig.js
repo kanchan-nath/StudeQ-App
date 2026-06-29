@@ -1,5 +1,5 @@
 /**
- * Spark.E Error Config
+ * StudeQ Error Config
  * Maps error types → UI content + metadata
  * Used by ErrorPage, ErrorBoundary, useErrorHandler
  */
@@ -109,7 +109,7 @@ export const ERROR_CONFIG = {
     icon: "network",
     headline: "No connection",
     description:
-      "Spark.E can't reach the server. Check your internet connection and try again.",
+      "StudeQ can't reach the server. Check your internet connection and try again.",
     ctas: [
       { label: "Retry", action: "retry" },
       { label: "Go home", action: "home" },

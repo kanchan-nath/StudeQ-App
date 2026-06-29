@@ -2,7 +2,7 @@ import mongoose, { mongo } from "mongoose";
 
 const flashcardsSchema = new mongoose.Schema({
     userId: {
-        type:String,
+        type:Number,
         required: true
     },
     flashcards:[

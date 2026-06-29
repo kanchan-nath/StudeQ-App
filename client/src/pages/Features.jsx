@@ -7,7 +7,7 @@ import styles from './styles/Features.module.css';
 const SCHEMA = {
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
-    name: 'Spark.E',
+    name: 'StudeQ',
     applicationCategory: 'EducationApplication',
     description:
         'AI-powered study platform with quiz generation, smart flashcards, document chat, and intelligent scheduling for students.',
@@ -32,10 +32,10 @@ const FAQ_SCHEMA = {
     mainEntity: [
         {
             '@type': 'Question',
-            name: 'What file types does Spark.E support for quiz generation?',
+            name: 'What file types does StudeQ support for quiz generation?',
             acceptedAnswer: {
                 '@type': 'Answer',
-                text: 'Spark.E supports PDF, PowerPoint, Excel, Word documents, and images for quiz generation.',
+                text: 'StudeQ supports PDF, PowerPoint, Excel, Word documents, and images for quiz generation.',
             },
         },
         {
@@ -43,7 +43,7 @@ const FAQ_SCHEMA = {
             name: 'How does the document chat feature work?',
             acceptedAnswer: {
                 '@type': 'Answer',
-                text: 'Upload any document up to 20 MB and ask questions about it. Spark.E uses retrieval-augmented generation (RAG) to answer from your document with full markdown and math rendering.',
+                text: 'Upload any document up to 20 MB and ask questions about it. StudeQ uses retrieval-augmented generation (RAG) to answer from your document with full markdown and math rendering.',
             },
         },
         {
@@ -210,32 +210,32 @@ export default function Features() {
     return (
         <>
             <Helmet>
-                <title>Features — Spark.E AI Study Platform</title>
+                <title>Features — StudeQ AI Study Platform</title>
                 <meta
                     name="description"
-                    content="Explore Spark.E's AI tools: quiz generator, smart flashcards, note summarizer, document chat, timetable, and dual search — built for students."
+                    content="Explore StudeQ's AI tools: quiz generator, smart flashcards, note summarizer, document chat, timetable, and dual search — built for students."
                 />
                 <meta name="robots" content="index, follow" />
                 <link rel="canonical" href="https://yourdomain.com/features" />
 
                 {/* Open Graph */}
                 <meta property="og:type" content="website" />
-                <meta property="og:title" content="Features — Spark.E AI Study Platform" />
+                <meta property="og:title" content="Features — StudeQ AI Study Platform" />
                 <meta
                     property="og:description"
                     content="Quiz generator, document chat, AI flashcards, timetable & more. Everything a student needs to study smarter."
                 />
-                <meta property="og:image" content="https://sparke.app/og-features.jpg" />
-                <meta property="og:url" content="https://sparke.app/features" />
+                <meta property="og:image" content="https://studeq.app/og-features.jpg" />
+                <meta property="og:url" content="https://studeq.app/features" />
 
                 {/* Twitter Card */}
                 <meta name="twitter:card" content="summary_large_image" />
-                <meta name="twitter:title" content="Features — Spark.E AI Study Platform" />
+                <meta name="twitter:title" content="Features — StudeQ AI Study Platform" />
                 <meta
                     name="twitter:description"
                     content="Quiz generator, document chat, AI flashcards, timetable & more. Everything a student needs to study smarter."
                 />
-                <meta name="twitter:image" content="https://sparke.app/og-features.jpg" />
+                <meta name="twitter:image" content="https://studeq.app/og-features.jpg" />
 
                 {/* Structured data */}
                 <script type="application/ld+json">{JSON.stringify(SCHEMA)}</script>
@@ -257,7 +257,7 @@ export default function Features() {
                             <span className={styles.heroAccent}>for how students actually study</span>
                         </h1>
                         <p className={styles.heroSub}>
-                            From pasting a paragraph to a polished quiz — Spark.E handles the busywork so you can focus on understanding.
+                            From pasting a paragraph to a polished quiz — StudeQ handles the busywork so you can focus on understanding.
                         </p>
                         <div className={styles.heroCta} role="group" aria-label="Get started actions">
                             <Link to="/register" className={styles.ctaPrimary}>
