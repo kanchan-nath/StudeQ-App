@@ -21,7 +21,7 @@ import { ERROR_TYPES, resolveErrorType } from "../errors/config/errorConfig.js";
 import useErrorHandler from "../errors/hooks/useErrorHandler.jsx";
 
 import styles from "../pages/styles/Payment.module.css";
-import { useRazorpayCheckout } from "../lib/useRazorpayScript.js";
+import { useRazorpayCheckout } from "../lib/useRazorpaycheckout.js"
 
 // ── Icon lookup for backend-provided feature keys ───────────────────────────────
 const FEATURE_ICON_MAP = {
