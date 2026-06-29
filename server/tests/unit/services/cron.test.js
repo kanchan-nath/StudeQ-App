@@ -17,7 +17,7 @@ jest.mock("croner", () => ({
   }),
 }));
 
-import recurringTasks from "../../lib/cronJobs/cron.js";
+import recurringTasks from "../../../lib/cronJobs/cron.js";
 
 describe("lib/cronJobs/cron.js", () => {
   beforeEach(() => {
