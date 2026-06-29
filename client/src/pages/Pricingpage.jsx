@@ -76,7 +76,7 @@ const jsonLd = {
     '@type': 'WebPage',
     name: 'Pricing — StudyAI',
     description: 'Compare Free, Pro, and Premium plans for StudyAI. AI-powered quizzes, flashcards, and tutor access from $0/month.',
-    url: 'https://studyai.app/pricing',
+    url: 'https://studeq.onrender.com/pricing',
     mainEntity: {
         '@type': 'ItemList',
         itemListElement: PLANS.map((p, i) => ({

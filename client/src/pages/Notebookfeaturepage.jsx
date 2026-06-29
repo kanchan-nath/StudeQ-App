@@ -104,8 +104,8 @@ const JSON_LD = {
         'Export conversations and notes',
         'Collaborative shared notebooks',
     ],
-    url: 'https://studeq.app/features/notebook',
-    screenshot: 'https://studeq.app/og-notebook.png',
+    url: 'https://studeq.onrender.com/features/notebook',
+    screenshot: 'https://studeq.onrender.com/og-notebook.png',
 };
 
 export default function NotebookFeaturePage() {

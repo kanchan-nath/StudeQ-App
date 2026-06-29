@@ -8,14 +8,14 @@ const jsonLd = {
     name: 'Our Mission — StudeQ AI Study Platform',
     description:
         'StudeQ is an AI-powered study platform helping students learn faster with adaptive quizzes, flashcards, real-time AI tutoring, and smart scheduling.',
-    url: 'https://studeq.app/mission',
+    url: 'https://studeq.onrender.com/our-mission',
     publisher: {
         '@type': 'Organization',
         name: 'StudeQ',
-        url: 'https://studeq.app',
+        url: 'https://studeq.onrender.com',
         logo: {
             '@type': 'ImageObject',
-            url: 'https://studeq.app/logo.png',
+            url: 'https://studeq.onrender.com/favicon.png',
         },
         sameAs: [
             'https://twitter.com/studeqapp',

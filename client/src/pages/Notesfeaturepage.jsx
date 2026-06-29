@@ -122,7 +122,7 @@ const JSON_LD = JSON.stringify({
             operatingSystem: 'Web',
             description:
                 'AI-powered note taking, summarization, and organization tool for university students.',
-            url: 'https://studeq.app/features/notes',
+            url: 'https://studeq.onrender.com/features/notes',
             featureList: [
                 'AI note summarization',
                 'Auto-tagging and topic detection',
