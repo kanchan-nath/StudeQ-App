@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, Outlet, useLocation } from "react-router-dom";
-import ThemeToggle from "../Themetoggle.jsx";
+import ThemeToggle from "../ThemeToggle.jsx";
 import Breadcrumb from "../Breadcrumb.jsx";
 import styles from "./PublicLayout.module.css";
 
