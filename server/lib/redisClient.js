@@ -1,13 +1,12 @@
 import Redis from "ioredis"
 import logger from "../logger/index.js"
 
-const redisClient = new Redis(
-    {
-        host: process.env.REDIS_HOST || "localhost",
-        port: process.env.REDIS_PORT || 6379,
-        lazyConnect: true,
-    }
-)
+const redisClient = new Redis(process.env.REDIS_URL || "redis://localhost:6379", {
+    tls: process.env.REDIS_URL?.startsWith("rediss://") ? {} : undefined,
+    maxRetriesPerRequest: null,
+    enableReadyCheck: false,
+    lazyConnect: true,
+});
 
 redisClient.on("connect", () => logger.info("Redis connected"))
 redisClient.on("ready", () => logger.info(" Redis: ready to accept commands"))
