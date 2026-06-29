@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { useRazorpayScript } from './useRazorpayScript';
+import { useRazorpayScript } from './useRazorpayScript.js';
 import { apiFetch } from '../lib/api.js'; // match your StudeQ path
 
 export function useRazorpayCheckout() {
