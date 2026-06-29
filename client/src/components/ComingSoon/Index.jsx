@@ -1,5 +1,5 @@
 import { useState, memo } from "react";
-import styles from "./ComingSoon.module.css";
+import styles from "./Comingsoon.module.css";
 
 const ComingSoon = memo(({ label, eta, showNotifyForm = false }) => {
   const [email, setEmail] = useState("");
