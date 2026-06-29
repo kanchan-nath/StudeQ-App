@@ -1,5 +1,5 @@
 /**
- * USAGE EXAMPLES — Spark.E Error System
+ * USAGE EXAMPLES — StudeQ Error System
  * One example per error category.
  */
 
