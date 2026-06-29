@@ -44,8 +44,8 @@ const JSON_LD = {
         'Anki-compatible export',
         'Deck sharing and collaboration',
     ],
-    url: 'https://studeq.app/features/flashcards',
-    screenshot: 'https://studeq.app/og-flashcards.png',
+    url: 'https://studeq.onrender.com/features/flashcards',
+    screenshot: 'https://studeq.onrender.com/og-flashcards.png',
 };
 
 export default function FlashcardFeaturePage() {

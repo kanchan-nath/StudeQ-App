@@ -103,8 +103,8 @@ const JSON_LD = {
         'Spaced repetition flashcards',
         'Quiz sharing and leaderboards',
     ],
-    url: 'https://studeq.app/features/quiz',
-    screenshot: 'https://studeq.app/og-quiz.png',
+    url: 'https://studeq.onrender.com/features/quiz',
+    screenshot: 'https://studeq.onrender.com/og-quiz.png',
 };
 
 export default function QuizFeaturePage() {
