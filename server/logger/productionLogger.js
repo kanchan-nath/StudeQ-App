@@ -1,7 +1,7 @@
 import { createLogger, format, transports } from "winston"
 import { WinstonTransport as AxiomTransport } from '@axiomhq/winston';
 
-const developmentLogger = () => {
+const productionLogger = () => {
     const { combine, timestamp, errors, json, colorize, printf } = format;
 
     const consoleFormat = printf(({ level, message, timestamp, stack }) => {
@@ -43,4 +43,4 @@ const developmentLogger = () => {
     return logger
 }
 
-export default developmentLogger
+export default productionLogger
