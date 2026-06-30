@@ -8,9 +8,7 @@ const ProtectedRoute = ({ component }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!loading && !user) {
-      logout(() => { }, navigate);
-    }
+    if (!loading && !user) navigate("/login", { replace: true });
   }, [loading, user]);
 
   if (loading) return null;

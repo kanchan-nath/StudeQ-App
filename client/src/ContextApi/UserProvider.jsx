@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from "react"; // [FIX-8] drop React import
 import UserContext from "./UserContext.js";
-import { apiFetch } from "../lib/api.js";
+import { apiFetch, registerUnauthorizedHandler } from "../lib/api.js";
 import useLoader from "./useLoader.js";
 
 // [FIX-5] explicit status enum — consumer knows WHY user is null
@@ -26,6 +26,13 @@ const UserProvider = ({ children }) => {
     setUserInternal(userData);
   }, []);
 
+  useEffect(() => {
+    registerUnauthorizedHandler(() => {
+      setUserInternal(null);
+      setStatus(STATUS.UNAUTHENTICATED);
+    });
+  }, []);
+  
   useEffect(() => {
     let cancelled = false; // guard against unmount race
 

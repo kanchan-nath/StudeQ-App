@@ -1,10 +1,13 @@
-const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000" || "http://192.168.1.90:3000" ;
+const BASE_URL = import.meta.env.VITE_API_URL || "http://192.168.1.12:3000" ;
 export default BASE_URL;
 
-export const apiFetch = (path, options = {}) => {
+let onUnauthorized = null;
+export const registerUnauthorizedHandler = (fn) => { onUnauthorized = fn; };
+
+export const apiFetch = async(path, options = {}) => {
     const isFormData = options.body instanceof FormData;
 
-    return fetch(`${BASE_URL}${path}`, {
+    const res = await fetch(`${BASE_URL}${path}`, {
         ...options,
         credentials: "include",
         headers: {
@@ -12,4 +15,8 @@ export const apiFetch = (path, options = {}) => {
             ...options.headers,
         },
     });
+
+    if (res.status === 401) onUnauthorized?.();
+
+    return res
 };
