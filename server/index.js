@@ -1,3 +1,4 @@
+import "./configs/env.js"
 import { app } from "./app.js"
 import { connectDB } from "./lib/mongoClient.js"
 import http from "http"
