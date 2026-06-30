@@ -136,9 +136,9 @@ const JSON_LD = JSON.stringify({
         {
             '@type': 'BreadcrumbList',
             itemListElement: [
-                { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://studeq.app' },
-                { '@type': 'ListItem', position: 2, name: 'Features', item: 'https://studeq.app/features' },
-                { '@type': 'ListItem', position: 3, name: 'AI Notes', item: 'https://studeq.app/features/notes' },
+                { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://studeq.onrender.com' },
+                { '@type': 'ListItem', position: 2, name: 'Features', item: 'https://studeq.onrender.com/features' },
+                { '@type': 'ListItem', position: 3, name: 'AI Notes', item: 'https://studeq.onrender.com/features/notes' },
             ],
         },
         {
@@ -169,22 +169,22 @@ export default function NotesFeaturePage() {
                     content="Summarize lectures, detect key concepts, and convert notes to quizzes or flashcards with AI. StudeQ Notes is built for university students."
                 />
                 <meta name="robots" content="index, follow" />
-                <link rel="canonical" href="https://studeq.app/features/notes" />
+                <link rel="canonical" href="https://studeq.onrender.com/features/notes" />
                 <meta property="og:type" content="website" />
-                <meta property="og:url" content="https://studeq.app/features/notes" />
+                <meta property="og:url" content="https://studeq.onrender.com/features/notes" />
                 <meta property="og:title" content="AI Note Taking for Students — StudeQ Smart Notes" />
                 <meta
                     property="og:description"
                     content="Paste any lecture, get a structured AI summary with key concepts, and convert to quizzes or flashcards instantly."
                 />
-                <meta property="og:image" content="https://studeq.app/og/notes-feature.jpg" />
+                <meta property="og:image" content="https://studeq.onrender.com/og/notes-feature.jpg" />
                 <meta name="twitter:card" content="summary_large_image" />
                 <meta name="twitter:title" content="AI Note Taking for Students — StudeQ Smart Notes" />
                 <meta
                     name="twitter:description"
                     content="Paste any lecture, get a structured AI summary with key concepts, and convert to quizzes or flashcards instantly."
                 />
-                <meta name="twitter:image" content="https://studeq.app/og/notes-feature.jpg" />
+                <meta name="twitter:image" content="https://studeq.onrender.com/og/notes-feature.jpg" />
                 <script type="application/ld+json">{JSON_LD}</script>
             </Helmet>
 
