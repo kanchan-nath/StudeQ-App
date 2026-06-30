@@ -1,4 +1,3 @@
-import "./configs/env.js"
 import express from "express"
 import prisma from "./lib/prisma.js"
 import cookieParser from "cookie-parser";
