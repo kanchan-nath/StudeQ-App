@@ -24,4 +24,4 @@ Disallow: /upgrade
 Disallow: /login
 Disallow: /register
 
-Sitemap: https://yourdomain.com/sitemap.xml
+Sitemap: https://studeq.onrender.com/sitemap.xml
