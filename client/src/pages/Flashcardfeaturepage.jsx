@@ -67,18 +67,18 @@ export default function FlashcardFeaturePage() {
                     content="Generate smart flashcard decks from any notes or PDF. Six study modes, spaced repetition, and AI-powered mastery tracking. Study less, remember more."
                 />
                 <meta name="robots" content="index, follow" />
-                <link rel="canonical" href="https://studeq.app/features/flashcards" />
+                <link rel="canonical" href="https://studeq.onrender.com/features/flashcards" />
 
                 <meta property="og:type" content="website" />
-                <meta property="og:url" content="https://studeq.app/features/flashcards" />
+                <meta property="og:url" content="https://studeq.onrender.com/features/flashcards" />
                 <meta property="og:title" content="AI Flashcard Maker — Spaced Repetition from Your Notes | StudeQ" />
                 <meta property="og:description" content="Generate smart flashcard decks from any notes or PDF. Six study modes, spaced repetition, and AI-powered mastery tracking." />
-                <meta property="og:image" content="https://studeq.app/og-flashcards.png" />
+                <meta property="og:image" content="https://studeq.onrender.com/og-flashcards.png" />
 
                 <meta name="twitter:card" content="summary_large_image" />
                 <meta name="twitter:title" content="AI Flashcard Maker — Spaced Repetition from Your Notes | StudeQ" />
                 <meta name="twitter:description" content="Generate smart flashcard decks from any notes or PDF. Six study modes, spaced repetition, and AI-powered mastery tracking." />
-                <meta name="twitter:image" content="https://studeq.app/og-flashcards.png" />
+                <meta name="twitter:image" content="https://studeq.onrender.com/og-flashcards.png" />
 
                 <script type="application/ld+json">{JSON.stringify(JSON_LD)}</script>
             </Helmet>
