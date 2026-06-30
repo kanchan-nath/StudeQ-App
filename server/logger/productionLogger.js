@@ -30,7 +30,7 @@ const productionLogger = () => {
         ],
         exitOnError: false,
     });
-
++
 
     logger.exceptions.handle(
         new transports.Console({ format: combine(timestamp(), consoleFormat) })
