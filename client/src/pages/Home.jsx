@@ -507,16 +507,16 @@ const LandingPage = () => {
       <Helmet>
         <title>StudeQ — AI Powered Study Platform for Students</title>
         <meta name="description" content="Turn any PDF, image, or notes into flashcards, quizzes, and summaries in seconds. Free AI study tools — notes, tutor, quiz maker, and live study rooms." />
-        <link rel="canonical" href="https://yourdomain.com/" />
+        <link rel="canonical" href="https://studeq.onrender.com/" />
         <meta property="og:type" content="website" />
         <meta property="og:title" content="StudeQ — AI Study Platform" />
         <meta property="og:description" content="Turn any PDF into flashcards, quizzes, and notes instantly. Free to start." />
-        <meta property="og:image" content="https://yourdomain.com/og-image.jpg" />
-        <meta property="og:url" content="https://yourdomain.com/" />
+        <meta property="og:image" content="https://studeq.onrender.com/og-image.jpg" />
+        <meta property="og:url" content="https://studeq.onrender.com/" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="StudeQ — AI Study Platform" />
         <meta name="twitter:description" content="Turn any PDF into flashcards, quizzes, and notes instantly." />
-        <meta name="twitter:image" content="https://yourdomain.com/og-image.jpg" />
+        <meta name="twitter:image" content="https://studeq.onrender.com/og-image.jpg" />
 
         <script type="application/ld+json">{JSON.stringify({
           "@context": "https://schema.org",
@@ -524,7 +524,7 @@ const LandingPage = () => {
           "name": "StudeQ",
           "applicationCategory": "EducationApplication",
           "description": "AI-powered study platform with quizzes, flashcards, notes, AI tutor, and live study rooms.",
-          "url": "https://yourdomain.com",
+          "url": "https://studeq.onrender.com",
           "offers": { "@type": "Offer", "price": "0", "priceCurrency": "INR" },
           "featureList": "AI Notes, AI Tutor, Flashcards, Quiz Maker, Live Study Rooms, Scheduler"
         })}</script>
