@@ -3,10 +3,11 @@ import { ApiError } from "../utils/Async.js";
 import { titleExtract } from "../controllers/note.controller.js";
 import { Note } from "../models/note.model.js";
 
-const connection = {
-    host:process.env.REDIS_HOST,
-    port:6379
-}
+import { Redis } from "ioredis"
+const connection = new Redis(process.env.REDIS_URL, {
+    maxRetriesPerRequest: null,
+    tls: process.env.REDIS_URL?.startsWith("rediss://") ? {} : undefined,
+})
 const aiQueueEvents = async (userSocketMap, io)=>{
     const queueEvent = new QueueEvents("ai-response-handler", {connection})
 

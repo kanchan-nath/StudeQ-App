@@ -6,10 +6,11 @@ import logger from "../logger/index.js";
 const host = process.env.REDIS_HOST
 logger.info(`Worker started, listening on ${host}`);
 
-const connection = {
-    host: host,
-    port: 6379
-}
+import { Redis } from "ioredis"
+const connection = new Redis(process.env.REDIS_URL, {
+    maxRetriesPerRequest: null,
+    tls: process.env.REDIS_URL?.startsWith("rediss://") ? {} : undefined,
+})
 const processJob = async (job) => {
     const { data, userId } = job.data
     const result = await summarizeText(data)
