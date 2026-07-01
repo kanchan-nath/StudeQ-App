@@ -78,7 +78,7 @@ const Login = () => {
           <header className={styles["auth-header"]}>
             <div className={styles["auth-logo"]}>
               <span className={styles["auth-logo-icon"]}>✦</span>
-              <span className={styles["auth-logo-text"]}>StudyFlow</span>
+              <span className={styles["auth-logo-text"]}>StudeQ</span>
             </div>
           </header>
 
@@ -221,7 +221,7 @@ const Login = () => {
             <div className={styles["auth-stat-banner"]}>
               <span className={styles["auth-stat-number"]}>92%</span>
               <span className={styles["auth-stat-label"]}>
-                of students get higher grades with StudyFlow
+                of students get higher grades with StudeQ
               </span>
             </div>
 
