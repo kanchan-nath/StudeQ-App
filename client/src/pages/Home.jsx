@@ -567,7 +567,7 @@ const LandingPage = () => {
                 to="/"
                 className={styles.navLogo}
               >
-                SPARK<span>.E</span>
+                Stude<span>Q</span>
               </Link>
               <ul
                 className={styles.navLinks}
@@ -902,7 +902,7 @@ const LandingPage = () => {
                 <div className={`${styles.compCol} ${styles.compColLeft}`}>
                   <div className={styles.compHeader}>
                     <span className={styles.compLogo}>
-                      SPARK<span className={styles.compLogoAccent}>.E</span>
+                      Stude<span className={styles.compLogoAccent}>Q</span>
                     </span>
                   </div>
                   <ul className={styles.compList}>
@@ -1121,10 +1121,10 @@ const LandingPage = () => {
                 to="/"
                 className={styles.footerLogo}
               >
-                SPARK<span>.E</span>
+                Stude<span>Q</span>
               </Link>
               <p className={styles.footerTagline}>
-                Your AI-powered study companion.
+                Your AI powered study companion.
               </p>
               <p className={styles.footerCopyright}>© 2026 StudeQ Inc.</p>
               <div className={styles.footerSocials}>
