@@ -136,7 +136,7 @@ const PublicLayout = () => {
                 <div className={styles.navInner}>
                     <div className={styles.navLeft}>
                         <Link to="/" className={styles.navLogo}>
-                            SPARK<span>.E</span>
+                            Stude<span>Q</span>
                         </Link>
                         <ul className={styles.navLinks} role="list">
                             <li className={`${styles.navItem} ${styles.hasDropdown}`} role="presentation">
@@ -270,7 +270,7 @@ const PublicLayout = () => {
                 <div className={styles.footerTop}>
                     <div className={styles.footerLogoBlock}>
                         <Link to="/" className={styles.footerLogo}>
-                            SPARK<span>.E</span>
+                            Stude<span>Q</span>
                         </Link>
                         <p className={styles.footerTagline}>Your AI-powered study companion.</p>
                         <p className={styles.footerCopyright}>© 2026 StudeQ Inc.</p>
