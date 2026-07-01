@@ -1129,21 +1129,21 @@ const LandingPage = () => {
               <p className={styles.footerCopyright}>© 2026 StudeQ Inc.</p>
               <div className={styles.footerSocials}>
                 <a
-                  href="#"
+                  href="https://x.com/KanchanNathDev"
                   className={styles.socialBtn}
                   aria-label="X / Twitter"
                 >
                   𝕏
                 </a>
                 <a
-                  href="#"
+                  href="https://www.linkedin.com/company/studeq"
                   className={styles.socialBtn}
                   aria-label="LinkedIn"
                 >
                   in
                 </a>
                 <a
-                  href="#"
+                  href="https://www.instagram.com/kanchannath.webdev/"
                   className={styles.socialBtn}
                   aria-label="Instagram"
                 >
