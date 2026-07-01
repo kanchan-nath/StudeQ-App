@@ -126,17 +126,17 @@ export default function QuizFeaturePage() {
                     content="Create MCQ, true/false, fill-in-the-blank, and short-answer quizzes from your notes or any topic in seconds. StudeQ's AI quiz engine adapts to your weaknesses."
                 />
                 <meta name="robots" content="index, follow" />
-                <link rel="canonical" href="https://studeq.app/features/quiz" />
+                <link rel="canonical" href="https://studeq.onrender.com/features/quiz" />
 
                 {/* Open Graph */}
                 <meta property="og:type" content="website" />
-                <meta property="og:url" content="https://studeq.app/features/quiz" />
+                <meta property="og:url" content="https://studeq.onrender.com/features/quiz" />
                 <meta property="og:title" content="AI Quiz Maker — Generate Quizzes from Notes | StudeQ" />
                 <meta
                     property="og:description"
                     content="Generate smart quizzes from your notes, PDFs, or topics. Multiple question types, adaptive difficulty, and instant AI explanations."
                 />
-                <meta property="og:image" content="https://studeq.app/og-quiz.png" />
+                <meta property="og:image" content="https://studeq.onrender.com/og-quiz.png" />
 
                 {/* Twitter Card */}
                 <meta name="twitter:card" content="summary_large_image" />
@@ -145,7 +145,7 @@ export default function QuizFeaturePage() {
                     name="twitter:description"
                     content="Generate smart quizzes from your notes, PDFs, or topics. Multiple question types, adaptive difficulty, and instant AI explanations."
                 />
-                <meta name="twitter:image" content="https://studeq.app/og-quiz.png" />
+                <meta name="twitter:image" content="https://studeq.onrender.com/og-quiz.png" />
 
                 {/* JSON-LD */}
                 <script type="application/ld+json">{JSON.stringify(JSON_LD)}</script>

@@ -509,6 +509,7 @@ const LandingPage = () => {
         <meta name="description" content="Turn any PDF, image, or notes into flashcards, quizzes, and summaries in seconds. Free AI study tools — notes, tutor, quiz maker, and live study rooms." />
         <link rel="canonical" href="https://studeq.onrender.com/" />
         <meta property="og:type" content="website" />
+        <meta property="og:site_name" content="StudeQ" />
         <meta property="og:title" content="StudeQ — AI Study Platform" />
         <meta property="og:description" content="Turn any PDF into flashcards, quizzes, and notes instantly. Free to start." />
         <meta property="og:image" content="https://studeq.onrender.com/og-image.jpg" />

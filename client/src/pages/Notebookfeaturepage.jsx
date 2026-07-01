@@ -127,16 +127,16 @@ export default function NotebookFeaturePage() {
                     content="Upload PDFs, research papers, or notes and have AI-powered conversations grounded in your sources. StudeQ Notebook cites every answer back to your documents."
                 />
                 <meta name="robots" content="index, follow" />
-                <link rel="canonical" href="https://studeq.app/features/notebook" />
+                <link rel="canonical" href="https://studeq.onrender.com/features/notebook" />
 
                 <meta property="og:type" content="website" />
-                <meta property="og:url" content="https://studeq.app/features/notebook" />
+                <meta property="og:url" content="https://studeq.onrender.com/features/notebook" />
                 <meta property="og:title" content="AI Notebook — Chat With Your Documents | StudeQ" />
                 <meta
                     property="og:description"
                     content="Upload your documents and discuss them with AI. Every answer is grounded in your sources with exact citations. No hallucinations."
                 />
-                <meta property="og:image" content="https://studeq.app/og-notebook.png" />
+                <meta property="og:image" content="https://studeq.onrender.com/og-notebook.png" />
 
                 <meta name="twitter:card" content="summary_large_image" />
                 <meta name="twitter:title" content="AI Notebook — Chat With Your Documents | StudeQ" />
@@ -144,7 +144,7 @@ export default function NotebookFeaturePage() {
                     name="twitter:description"
                     content="Upload your documents and discuss them with AI. Every answer is grounded in your sources with exact citations."
                 />
-                <meta name="twitter:image" content="https://studeq.app/og-notebook.png" />
+                <meta name="twitter:image" content="https://studeq.onrender.com/og-notebook.png" />
 
                 <script type="application/ld+json">{JSON.stringify(JSON_LD)}</script>
             </Helmet>

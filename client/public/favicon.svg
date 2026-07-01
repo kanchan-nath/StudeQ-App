@@ -1,6 +1,8 @@
 <svg width="120" height="120" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
-  <!-- Dark bg + gold Q — matches existing favicon color -->
+  <!-- Dark bg + gold Q (vector path, no font dependency) -->
   <rect width="120" height="120" rx="26" fill="#13141f"/>
   <rect x="3" y="3" width="114" height="114" rx="24" fill="none" stroke="#ffd166" stroke-width="1.5" opacity="0.3"/>
-  <text x="60" y="82" font-family="Sora, Arial, sans-serif" font-size="72" font-weight="700" fill="#ffd166" text-anchor="middle">Q</text>
+  <!-- Q as ring + tail, pure vector shapes -->
+  <circle cx="60" cy="56" r="28" fill="none" stroke="#ffd166" stroke-width="13"/>
+  <line x1="72" y1="70" x2="92" y2="90" stroke="#ffd166" stroke-width="13" stroke-linecap="round"/>
 </svg>
