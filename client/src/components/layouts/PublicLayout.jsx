@@ -275,9 +275,9 @@ const PublicLayout = () => {
                         <p className={styles.footerTagline}>Your AI-powered study companion.</p>
                         <p className={styles.footerCopyright}>© 2026 StudeQ Inc.</p>
                         <div className={styles.footerSocials}>
-                            <a href="#" className={styles.socialBtn} aria-label="X / Twitter">𝕏</a>
-                            <a href="#" className={styles.socialBtn} aria-label="LinkedIn">in</a>
-                            <a href="#" className={styles.socialBtn} aria-label="Instagram">◎</a>
+                            <a href="https://x.com/KanchanNathDev" className={styles.socialBtn} aria-label="X / Twitter">𝕏</a>
+                            <a href="https://www.linkedin.com/company/studeq/" className={styles.socialBtn} aria-label="LinkedIn">in</a>
+                            <a href="https://www.instagram.com/kanchannath.webdev/" className={styles.socialBtn} aria-label="Instagram">◎</a>
                             <a href="#" className={styles.socialBtn} aria-label="Discord">⊕</a>
                         </div>
                     </div>
