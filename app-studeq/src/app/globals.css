@@ -1,0 +1,276 @@
+/* ============================================================
+   global.css — import ONCE in main.jsx or App.jsx
+   Contains: fonts, CSS variables, reset, scrollbar
+   ============================================================ */
+
+@import url("https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap");
+
+/* ── APP SHELL / DASHBOARD TOKENS ─────────────────────────── */
+:root {
+  --clr-bg: var(--theme-bg);
+  --clr-surface: #ffffff;
+  --clr-border: #e2e8f0;
+  --clr-primary: #3b5bdb;
+  --clr-primary-dark: #2f4ac4;
+  --clr-primary-light: #eef2ff;
+  --clr-accent: #22c55e;
+  --clr-accent-dark: #16a34a;
+  --clr-purple: #7c3aed;
+  --clr-pink: #ec4899;
+  --clr-teal: #0ea5e9;
+  --clr-orange: #f97316;
+  --clr-text-primary: #0f172a;
+  --clr-text-secondary: #64748b;
+  --clr-text-muted: #94a3b8;
+  --clr-text-on-dark: #ffffff;
+
+  --sidebar-w: 230px;
+  --topbar-h: 56px;
+  --rightpanel-w: 300px;
+
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 20px;
+  --sp-6: 24px;
+  --sp-8: 32px;
+
+  --r-sm: 6px;
+  --r-md: 12px;
+  --r-lg: 16px;
+  --r-xl: 20px;
+  --r-full: 9999px;
+
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.06);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.07);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.1);
+  --shadow-card: 0 2px 12px rgba(59, 91, 219, 0.08);
+
+  --t-fast: 150ms ease;
+  --t-base: 220ms ease;
+  --t-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  --font-display: "Sora", sans-serif;
+  --font-body: "DM Sans", sans-serif;
+
+  /* ── AUTH (Login / Register) TOKENS ─────────────────────── */
+  --color-primary: #2563eb;
+  --color-primary-hover: #1d4ed8;
+  --color-primary-light: #eff6ff;
+  --color-bg-left: #ffffff;
+  --color-text-heading: #0f172a;
+  --color-text-body: #334155;
+  --color-text-muted: #94a3b8;
+  --color-border: #e2e8f0;
+  --color-input-bg: #f8fafc;
+  --color-input-focus-bg: #ffffff;
+  --color-error-bg: #fef2f2;
+  --color-error-text: #dc2626;
+  --color-error-border: #fecaca;
+  --color-link: #2563eb;
+  --color-tip-bg: #eff6ff;
+  --color-tip-border: #bfdbfe;
+  --color-tip-text: #1d4ed8;
+  --color-right-from: #1e3a8a;
+  --color-right-mid: #312e81;
+  --color-right-to: #581c87;
+  --color-glass-bg: rgba(255, 255, 255, 0.1);
+  --color-glass-border: rgba(255, 255, 255, 0.18);
+  --color-stat-bg: rgba(37, 99, 235, 0.5);
+
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+
+  --radius-sm: 0.5rem;
+  --radius-md: 0.875rem;
+  --radius-lg: 1.25rem;
+  --radius-xl: 1.75rem;
+  --radius-full: 9999px;
+
+  --shadow-input: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-btn: 0 4px 14px rgba(37, 99, 235, 0.35);
+  --shadow-btn-hover: 0 6px 20px rgba(37, 99, 235, 0.5);
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur-fast: 150ms;
+  --dur-mid: 250ms;
+  --dur-slow: 400ms;
+  --navbar-h: 64px;
+  --max-w: 1200px;
+  --theme-teal: #0ea5e9;
+  --theme-teal-dim: rgba(14, 165, 233, 0.12);
+  --theme-orange: #f97316;
+  --theme-orange-dim: rgba(249, 115, 22, 0.12);
+  --theme-pink: #ec4899;
+  --theme-pink-dim: rgba(236, 72, 153, 0.12);
+  --theme-green-dim: rgba(34, 197, 94, 0.12);
+}
+
+/* ── RESET ─────────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--theme-bg);
+  color: var(--theme-text);
+  line-height: 1.6;
+  /* transition:
+    background 0.3s ease,
+    color 0.3s ease; */
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  outline: none;
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+ul,
+ol {
+  list-style: none;
+}
+
+/* ── SCROLLBAR ─────────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--theme-border);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  /* hover */
+  background: var(--theme-text-muted);
+}
+
+/* ── REDUCED MOTION ────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ── THEME TRANSITION ──────────────────────────────────────── */
+html.theme-transitioning *,
+html.theme-transitioning *::before,
+html.theme-transitioning *::after {
+  transition:
+    background 350ms cubic-bezier(0.4, 0, 0.2, 1),
+    background-color 350ms cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 350ms cubic-bezier(0.4, 0, 0.2, 1),
+    color 350ms cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 350ms cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* ================================================================
+   THEME SYSTEM — append this block to the END of global.css
+   Works via data-theme="dark" | data-theme="light" on <html>
+   ================================================================ */
+
+/* ── DARK (default — matches existing site) ───────────────── */
+:root,
+[data-theme="dark"] {
+  --theme-bg: rgba(10, 12, 20, 1);
+  --theme-bg-secondary: #13141f;
+  --theme-surface: #1c1c1f;
+  --theme-surface-2: #242428;
+  --theme-border: rgba(255, 255, 255, 0.08);
+  --theme-border-hover: rgba(255, 255, 255, 0.16);
+  --theme-text: #f0f0f0;
+  --theme-text-secondary: #8a8a9a;
+  --theme-text-muted: #5a5a6a;
+  --theme-accent: #ffd166;
+  --theme-accent-dim: rgba(255, 209, 102, 0.12);
+  --theme-accent-glow: rgba(255, 209, 102, 0.25);
+  --theme-purple: #7c5ff5;
+  --theme-purple-light: #c084fc;
+  --theme-purple-dim: rgba(124, 95, 245, 0.15);
+  --theme-green: #22c55e;
+  --theme-red: #ef4444;
+  --theme-card-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+  --theme-navbar-bg: rgba(255, 255, 255, 0.04);
+  --theme-navbar-blur: blur(12px);
+  --theme-input-bg: rgba(255, 255, 255, 0.05);
+  --theme-input-border: rgba(255, 255, 255, 0.12);
+
+  /* Toggle button appearance */
+  --toggle-track-bg: rgba(255, 255, 255, 0.1);
+  --toggle-track-border: rgba(255, 255, 255, 0.15);
+  --toggle-thumb-bg: #1c1c2e;
+  --toggle-accent: #7c5ff5;
+}
+
+/* ── LIGHT ────────────────────────────────────────────────── */
+[data-theme="light"] {
+  --theme-bg: #f7f8fc;
+  --theme-bg-secondary: #eef0f6;
+  --theme-surface: #ffffff;
+  --theme-surface-2: #f0f2f8;
+  --theme-border: rgba(0, 0, 0, 0.08);
+  --theme-border-hover: rgba(0, 0, 0, 0.16);
+  --theme-text: #0d0e14;
+  --theme-text-secondary: #4a4a5a;
+  --theme-text-muted: #8a8a9a;
+  --theme-accent: #c49a00;
+  /* darkened yellow for light bg contrast */
+  --theme-accent-dim: rgba(196, 154, 0, 0.1);
+  --theme-accent-glow: rgba(196, 154, 0, 0.2);
+  --theme-purple: #5b3fd4;
+  --theme-purple-light: #7c5ff5;
+  --theme-purple-dim: rgba(91, 63, 212, 0.12);
+  --theme-green: #16a34a;
+  --theme-red: #dc2626;
+  --theme-card-shadow: 0 2px 16px rgba(0, 0, 0, 0.08);
+  --theme-navbar-bg: rgba(255, 255, 255, 0.85);
+  --theme-navbar-blur: blur(16px);
+  --theme-input-bg: #ffffff;
+  --theme-input-border: rgba(0, 0, 0, 0.12);
+
+  /* Toggle button appearance */
+  --toggle-track-bg: #e2e4ef;
+  --toggle-track-border: #c8cadc;
+  --toggle-thumb-bg: #ffffff;
+  --toggle-accent: #5b3fd4;
+}
