@@ -588,7 +588,7 @@ const LandingPage = () => {
                 href="/"
                 className={styles.navLogo}
               >
-                SPARK<span>.E</span>
+                Stude<span>Q</span>
               </Link>
               <ul
                 className={styles.navLinks}
