@@ -348,23 +348,28 @@ function useCountUp(target, visible, duration = 1500) {
 
 /* ─── STAR FIELD ────────────────────────────────────────────────────────── */
 function StarField() {
-  const stars = Array.from({ length: 80 }, (_, i) => {
-    const rand = Math.random();
-    const size = rand < 0.6 ? 1 : rand < 0.9 ? 2 : 3;
-    return {
-      id: i,
-      top: `${Math.random() * 100}%`,
-      left: `${Math.random() * 100}%`,
-      dur: `${2 + Math.random() * 4}s`,
-      delay: `${Math.random() * 4}s`,
-      size: `${size}px`,
-    };
-  });
+  const [stars, setStars] = useState([]);
+
+  useEffect(() => {
+    const generated = Array.from({ length: 80 }, (_, i) => {
+      const rand = Math.random();
+      const size = rand < 0.6 ? 1 : rand < 0.9 ? 2 : 3;
+
+      return {
+        id: i,
+        top: `${Math.random() * 100}%`,
+        left: `${Math.random() * 100}%`,
+        dur: `${1.5 + Math.random() * 3}s`,
+        delay: `${Math.random() * 5}s`,
+        size: `${size}px`,
+      };
+    });
+
+    setStars(generated);
+  }, []);
+
   return (
-    <div
-      className={styles.stars}
-      aria-hidden="true"
-    >
+    <div className={styles.stars}>
       {stars.map((s) => (
         <div
           key={s.id}
@@ -381,7 +386,6 @@ function StarField() {
     </div>
   );
 }
-
 /* ─── LIVE TICKER ───────────────────────────────────────────────────────── */
 function LiveTicker() {
   const [idx, setIdx] = useState(0);
