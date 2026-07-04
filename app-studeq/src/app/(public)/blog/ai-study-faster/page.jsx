@@ -1,6 +1,6 @@
 import { Suspense, lazy } from "react";
 import styles from "./page.module.css";
-import ExploreStudeQ from '@/components/ExploreStudeQ';
+import ExploreStudeQ from './ExploreStudeQ.jsx';
 
 const SITE_URL = "https://studeq.app";
 const POST_SLUG = "how-to-use-ai-to-study-faster";
