@@ -2,7 +2,7 @@
 
 import { lazy, Suspense } from 'react';
 import styles from './page.module.css';
-import ExploreStudeQ from '@/components/ExploreStudeQ';
+import ExploreStudeQ from './ExploreStudeQ.jsx';
 
 export const metadata = {
     title: 'What Is the 10/20/70 Rule of AI? A Practical Framework',
