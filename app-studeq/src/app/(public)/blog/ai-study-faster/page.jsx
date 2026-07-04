@@ -1,7 +1,6 @@
 import { Suspense, lazy } from "react";
 import styles from "./page.module.css";
-
-const RelatedReads = lazy(() => import("./RelatedReads"));
+import ExploreStudeQ from '@/components/ExploreStudeQ';
 
 const SITE_URL = "https://studeq.app";
 const POST_SLUG = "how-to-use-ai-to-study-faster";
@@ -107,7 +106,7 @@ export default function BlogPost() {
                             width={1200}
                             height={630}
                             loading="eager"
-                            fetchpriority="high"
+                            fetchPriority="high"
                             decoding="async"
                         />
                     </header>
@@ -307,9 +306,7 @@ export default function BlogPost() {
                     </section>
                 </article>
 
-                <Suspense fallback={<div className={styles.relatedFallback} aria-live="polite">Loading related reads…</div>}>
-                    <RelatedReads />
-                </Suspense>
+                <ExploreStudeQ />
             </main>
         </>
     );

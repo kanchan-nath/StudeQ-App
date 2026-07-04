@@ -2,8 +2,7 @@
 
 import { lazy, Suspense } from 'react';
 import styles from './page.module.css';
-
-const RelatedReads = lazy(() => import('./Relatedreads.jsx'));
+import ExploreStudeQ from '@/components/ExploreStudeQ';
 
 export const metadata = {
     title: 'What Is the 10/20/70 Rule of AI? A Practical Framework',
@@ -436,19 +435,8 @@ export default function TenTwentySeventyRulePage() {
                         </p>
                     </section>
                 </article>
+                <ExploreStudeQ />
 
-                {/* Related Reads (Lazy-loaded PAA section) */}
-                <Suspense
-                    fallback={
-                        <div className={styles.relatedFallback} aria-label="Loading related articles">
-                            <div className={styles.relatedSkeleton} />
-                            <div className={styles.relatedSkeleton} />
-                            <div className={styles.relatedSkeleton} />
-                        </div>
-                    }
-                >
-                    <RelatedReads />
-                </Suspense>
             </main>
         </>
     );

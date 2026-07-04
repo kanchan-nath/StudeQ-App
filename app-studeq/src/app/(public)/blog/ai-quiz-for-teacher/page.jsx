@@ -1,10 +1,11 @@
 import { lazy, Suspense, useMemo } from "react";
 import styles from "./page.module.css";
+import ExploreStudeQ from '@/components/ExploreStudeQ';
 
 // ---------------------------------------------------------------------------
 // Lazy‑loaded below‑fold section
 // ---------------------------------------------------------------------------
-const RelatedReads = lazy(() => import("./RelatedReads"));
+
 
 // ---------------------------------------------------------------------------
 // SEO metadata (App Router server component export)
@@ -373,22 +374,7 @@ export default function AIQuizForTeachersPage() {
                     {/* PAA placeholder → lazy loaded below fold                */}
                     {/* -------------------------------------------------------- */}
                 </article>
-
-                <Suspense
-                    fallback={
-                        <div
-                            className={styles.relatedFallback}
-                            aria-label="Loading related articles"
-                            role="status"
-                        >
-                            <span className={styles.relatedFallbackText}>
-                                Loading related articles…
-                            </span>
-                        </div>
-                    }
-                >
-                    <RelatedReads />
-                </Suspense>
+                <ExploreStudeQ />
             </main>
         </>
     );

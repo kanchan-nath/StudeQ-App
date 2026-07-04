@@ -1,14 +1,7 @@
 import { lazy, Suspense, useMemo } from "react";
 import styles from "./page.module.css";
+import ExploreStudeQ from '@/components/ExploreStudeQ';
 
-// ---------------------------------------------------------------------------
-// Lazy-loaded below-fold section
-// ---------------------------------------------------------------------------
-const RelatedReads = lazy(() => import("./RelatedReads"));
-
-// ---------------------------------------------------------------------------
-// SEO metadata (App Router server component export)
-// ---------------------------------------------------------------------------
 export const metadata = {
     title: "How to Generate a Quiz from Notes with AI (Free & Online) | StudeQ",
     description:
@@ -484,24 +477,7 @@ export default function QuizFromNotesPage() {
                     </section>
                 </article>
 
-                {/* =========================================================== */}
-                {/* RELATED READS — lazy loaded below fold                     */}
-                {/* =========================================================== */}
-                <Suspense
-                    fallback={
-                        <div
-                            className={styles.relatedFallback}
-                            aria-label="Loading related articles"
-                            role="status"
-                        >
-                            <span className={styles.relatedFallbackText}>
-                                Loading related articles…
-                            </span>
-                        </div>
-                    }
-                >
-                    <RelatedReads />
-                </Suspense>
+                <ExploreStudeQ/>
             </main>
         </>
     );

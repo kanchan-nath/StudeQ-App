@@ -3,7 +3,7 @@ import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import styles from './page.module.css';
-import RelatedReads from './RelatedReads';
+import ExploreStudeQ from '@/components/ExploreStudeQ';
 
 // --- METADATA ---
 export const metadata = {
@@ -335,10 +335,7 @@ export default function BestAIToolsForTeachersPage() {
                         </p>
                     </div>
 
-                    {/* ====== RELATED READS (Lazy-loaded) ====== */}
-                    <React.Suspense fallback={<div className={styles.relatedFallback}>Loading related articles...</div>}>
-                        <RelatedReads />
-                    </React.Suspense>
+                    <ExploreStudeQ/>
                 </article>
             </main>
         </>
