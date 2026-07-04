@@ -690,11 +690,11 @@ const LandingPage = () => {
             <div className={styles.ctaWrapper}>
 
               <ThemeToggle />
-              <Link href="https://app.studeq.onrender.com/login" className={styles.navLoginBtn}>
+              <Link href="https://app-studeq.onrender.com/login" className={styles.navLoginBtn}>
                 Log in
               </Link>
               <Link
-                href="https://app.studeq.onrender.com/register"
+                href="https://app-studeq.onrender.com/register"
                 className={styles.navCta}
               >
                 Start now
@@ -748,7 +748,7 @@ const LandingPage = () => {
 
             <div className={styles.heroActions}>
               <Link
-                href="https://app.studeq.onrender.com/register"
+                href="https://app-studeq.onrender.com/register"
                 className={styles.heroCta}
               >
                 Get Started — It's Free
@@ -1159,7 +1159,7 @@ const LandingPage = () => {
               Your AI study partner — available 24/7, knows every subject.
             </p>
             <Link
-              href="https://app.studeq.onrender.com/register"
+              href="https://app-studeq.onrender.com/register"
               className={styles.ctaBannerBtn}
             >
               Get Started — It's Free

@@ -354,7 +354,7 @@ export default function QuizFromNotesPage() {
                                 <span className={styles.mockupDot} aria-hidden="true" />
                                 <span className={styles.mockupDot} aria-hidden="true" />
                                 <span className={styles.mockupUrl}>
-                                    app.studeq.com/notes-to-quiz
+                                    app-studeq.com/notes-to-quiz
                                 </span>
                             </div>
                             <div className={styles.mockupBody}>

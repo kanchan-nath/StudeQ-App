@@ -235,7 +235,7 @@ export default function AiQuizGeneratorPage() {
                                 <span className={styles.browserDot} style={{ background: '#ff5f56' }}></span>
                                 <span className={styles.browserDot} style={{ background: '#ffbd2e' }}></span>
                                 <span className={styles.browserDot} style={{ background: '#27c93f' }}></span>
-                                <span className={styles.browserUrl}>https://app.studeq.com/quiz/generate</span>
+                                <span className={styles.browserUrl}>https://app-studeq.com/quiz/generate</span>
                             </div>
                             <div className={styles.mockupContent}>
                                 <div className={styles.mockupHeader}>
