@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" fill="none">
+  <defs>
+    <linearGradient id="cookieGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#C4B5FD"/>
+      <stop offset="50%" stop-color="#A78BFA"/>
+      <stop offset="100%" stop-color="#7B5CFC"/>
+    </linearGradient>
+    <radialGradient id="cookieHighlight" cx="0.35" cy="0.3" r="0.5">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="chipGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#2D1B69"/>
+      <stop offset="100%" stop-color="#4F3CF5"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Cookie body (circle with bite) -->
+  <path d="M16 3C9.925 3 5 7.925 5 14C5 20.075 9.925 25 16 25C19.5 25 22.6 23.2 24.5 20.5C23.8 20.8 23 21 22.2 21C19.4 21 17.2 18.8 17.2 16C17.2 13.2 19.4 11 22.2 11C23 11 23.8 11.2 24.5 11.5C24.8 9.2 24.5 6.8 23.5 4.8C22 3.7 19.2 3 16 3Z"
+        fill="url(#cookieGrad)" stroke="#7B5CFC" stroke-width="0.8"/>
+
+  <!-- Cookie bite mark (darker inner edge) -->
+  <path d="M22.5 12C20.2 12 18.5 13.7 18.5 16C18.5 18.3 20.2 20 22.5 20"
+        fill="none" stroke="#4F3CF5" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/>
+
+  <!-- Highlight/shine -->
+  <path d="M16 3C9.925 3 5 7.925 5 14C5 20.075 9.925 25 16 25C19.5 25 22.6 23.2 24.5 20.5C23.8 20.8 23 21 22.2 21C19.4 21 17.2 18.8 17.2 16C17.2 13.2 19.4 11 22.2 11C23 11 23.8 11.2 24.5 11.5C24.8 9.2 24.5 6.8 23.5 4.8C22 3.7 19.2 3 16 3Z"
+        fill="url(#cookieHighlight)"/>
+
+  <!-- Chocolate chips -->
+  <circle cx="11" cy="13" r="2.2" fill="url(#chipGrad)" opacity="0.85"/>
+  <circle cx="10" cy="12.5" r="0.8" fill="#FFFFFF" opacity="0.15"/>
+
+  <circle cx="17" cy="9" r="1.8" fill="url(#chipGrad)" opacity="0.85"/>
+  <circle cx="16.5" cy="8.6" r="0.6" fill="#FFFFFF" opacity="0.15"/>
+
+  <circle cx="14" cy="19" r="2" fill="url(#chipGrad)" opacity="0.85"/>
+  <circle cx="13.3" cy="18.5" r="0.7" fill="#FFFFFF" opacity="0.15"/>
+
+  <circle cx="9" cy="17.5" r="1.5" fill="url(#chipGrad)" opacity="0.7"/>
+
+  <circle cx="19" cy="16.5" r="1.6" fill="url(#chipGrad)" opacity="0.7"/>
+</svg>

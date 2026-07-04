@@ -1,0 +1,652 @@
+/* ============================================================
+   MissionPage.module.css
+   Mobile-first · CSS vars from global.css only · No hardcoded colors
+   ============================================================ */
+
+/* ── SKIP LINK ─────────────────────────────────────────────── */
+.skipLink {
+    position: absolute;
+    top: -100%;
+    left: var(--sp-4);
+    z-index: 9999;
+    padding: var(--sp-2) var(--sp-4);
+    background: var(--theme-purple);
+    color: #ffffff;
+    border-radius: var(--r-full);
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    font-weight: 600;
+    transition: top var(--t-fast);
+}
+
+.skipLink:focus {
+    top: var(--sp-4);
+}
+
+/* ── MAIN ───────────────────────────────────────────────────── */
+.main {
+    width: 100%;
+    background: var(--theme-bg);
+    color: var(--theme-text);
+    font-family: var(--font-body);
+}
+
+/* ── SHARED SECTION INNER ───────────────────────────────────── */
+.sectionInner {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 var(--sp-4);
+}
+
+.sectionEyebrow {
+    font-family: var(--font-body);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--theme-purple-light);
+    margin-bottom: var(--sp-3);
+}
+
+.sectionTitle {
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 3.5vw, 2.25rem);
+    font-weight: 700;
+    color: var(--theme-text);
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    margin-bottom: var(--sp-4);
+}
+
+.sectionSub {
+    font-size: 1rem;
+    color: var(--theme-text-secondary);
+    line-height: 1.7;
+    max-width: 680px;
+    margin-bottom: 2.5rem;
+}
+
+/* ── HERO ───────────────────────────────────────────────────── */
+.hero {
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+    padding: 5rem var(--sp-4) 4rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.heroGlow {
+    position: absolute;
+    top: -120px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 700px;
+    height: 400px;
+    background: radial-gradient(ellipse at center, var(--theme-purple-dim) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.heroEyebrow {
+    position: relative;
+    z-index: 1;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--theme-purple-light);
+    margin-bottom: var(--sp-4);
+}
+
+.heroTitle {
+    position: relative;
+    z-index: 1;
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 6vw, 3.75rem);
+    font-weight: 700;
+    color: var(--theme-text);
+    line-height: 1.08;
+    letter-spacing: -0.03em;
+    margin-bottom: var(--sp-5);
+    max-width: 820px;
+}
+
+.heroAccent {
+    color: var(--theme-purple-light);
+    position: relative;
+}
+
+.heroBody {
+    position: relative;
+    z-index: 1;
+    font-size: clamp(1rem, 2vw, 1.125rem);
+    color: var(--theme-text-secondary);
+    line-height: 1.75;
+    max-width: 640px;
+    margin-bottom: var(--sp-8);
+}
+
+.heroCtas {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    gap: var(--sp-3);
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+/* ── BUTTONS ────────────────────────────────────────────────── */
+.btnPrimary {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.75rem 1.625rem;
+    background: linear-gradient(135deg, var(--theme-purple) 0%, var(--theme-purple-light) 100%);
+    color: #ffffff;
+    border-radius: var(--r-full);
+    font-family: var(--font-body);
+    font-size: 0.9375rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: opacity var(--t-base), transform var(--t-fast);
+}
+
+.btnPrimary:hover {
+    opacity: 0.88;
+    transform: translateY(-1px);
+}
+
+.btnPrimary:focus-visible {
+    outline: 2px solid var(--theme-purple-light);
+    outline-offset: 3px;
+}
+
+.btnGhost {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.75rem 1.625rem;
+    background: transparent;
+    color: var(--theme-text-secondary);
+    border: 1px solid var(--theme-border);
+    border-radius: var(--r-full);
+    font-family: var(--font-body);
+    font-size: 0.9375rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: border-color var(--t-base), color var(--t-base), transform var(--t-fast);
+}
+
+.btnGhost:hover {
+    border-color: var(--theme-border-hover);
+    color: var(--theme-text);
+    transform: translateY(-1px);
+}
+
+.btnGhost:focus-visible {
+    outline: 2px solid var(--theme-purple);
+    outline-offset: 3px;
+}
+
+/* ── STATS BAR ──────────────────────────────────────────────── */
+.statsBar {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1px;
+    background: var(--theme-border);
+    border-top: 1px solid var(--theme-border);
+    border-bottom: 1px solid var(--theme-border);
+}
+
+@media (min-width: 768px) {
+    .statsBar {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+.statItem {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 2rem var(--sp-4);
+    background: var(--theme-bg);
+    gap: 0.25rem;
+}
+
+.statNumber {
+    font-family: var(--font-display);
+    font-size: clamp(1.75rem, 4vw, 2.5rem);
+    font-weight: 700;
+    color: var(--theme-purple-light);
+    line-height: 1;
+}
+
+.statLabel {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--theme-text);
+}
+
+.statSub {
+    font-size: 0.75rem;
+    color: var(--theme-text-muted);
+}
+
+/* ── PROBLEM SECTION ────────────────────────────────────────── */
+.problemSection {
+    padding: 5rem 0;
+}
+
+.problemGrid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: 1fr;
+}
+
+@media (min-width: 768px) {
+    .problemGrid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 1024px) {
+    .problemGrid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+.problemCard {
+    background: var(--theme-surface);
+    border: 1px solid var(--theme-border);
+    border-radius: var(--r-xl);
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem;
+    transition: border-color var(--t-base), transform var(--t-slow);
+}
+
+.problemCard:hover {
+    border-color: var(--theme-purple);
+    transform: translateY(-2px);
+}
+
+.problemEmoji {
+    font-size: 1.75rem;
+    line-height: 1;
+}
+
+.problemTitle {
+    font-family: var(--font-display);
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--theme-text-secondary);
+    line-height: 1.4;
+}
+
+.problemDivider {
+    font-size: 1.125rem;
+    color: var(--theme-purple-light);
+    font-weight: 700;
+}
+
+.problemSolution {
+    font-size: 0.9375rem;
+    color: var(--theme-text);
+    line-height: 1.65;
+}
+
+/* ── HOW IT WORKS ───────────────────────────────────────────── */
+.howSection {
+    padding: 5rem 0;
+    background: var(--theme-bg-secondary);
+    border-top: 1px solid var(--theme-border);
+    border-bottom: 1px solid var(--theme-border);
+}
+
+.stepList {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    list-style: none;
+    counter-reset: none;
+}
+
+.stepItem {
+    display: flex;
+    gap: 1.5rem;
+    align-items: flex-start;
+}
+
+.stepNum {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--theme-purple-dim);
+    line-height: 1;
+    flex-shrink: 0;
+    min-width: 2.5rem;
+    color: var(--theme-purple);
+    opacity: 0.4;
+}
+
+.stepContent {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.stepTitle {
+    font-family: var(--font-display);
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--theme-text);
+}
+
+.stepBody {
+    font-size: 0.9375rem;
+    color: var(--theme-text-secondary);
+    line-height: 1.7;
+    max-width: 600px;
+}
+
+/* ── VALUES ─────────────────────────────────────────────────── */
+.valuesSection {
+    padding: 5rem 0;
+}
+
+.valuesGrid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: 1fr;
+}
+
+@media (min-width: 768px) {
+    .valuesGrid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 1024px) {
+    .valuesGrid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+.valueCard {
+    background: var(--theme-surface);
+    border: 1px solid var(--theme-border);
+    border-radius: var(--r-xl);
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.valueIcon {
+    font-size: 1.5rem;
+    line-height: 1;
+}
+
+.valueTitle {
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--theme-text);
+}
+
+.valueBody {
+    font-size: 0.875rem;
+    color: var(--theme-text-secondary);
+    line-height: 1.7;
+}
+
+/* ── TRUST SECTION ──────────────────────────────────────────── */
+.trustSection {
+    padding: 5rem 0;
+    background: var(--theme-bg-secondary);
+    border-top: 1px solid var(--theme-border);
+    border-bottom: 1px solid var(--theme-border);
+}
+
+.trustGrid {
+    display: grid;
+    gap: 1.25rem;
+    grid-template-columns: 1fr;
+}
+
+@media (min-width: 768px) {
+    .trustGrid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.trustBlock {
+    background: var(--theme-surface);
+    border: 1px solid var(--theme-border);
+    border-radius: var(--r-xl);
+    padding: 1.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.trustBlockTitle {
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--theme-text);
+}
+
+.trustBlockBody {
+    font-size: 0.9375rem;
+    color: var(--theme-text-secondary);
+    line-height: 1.7;
+}
+
+/* ── ROADMAP ────────────────────────────────────────────────── */
+.roadmapSection {
+    padding: 5rem 0;
+}
+
+.roadmapGrid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: 1fr;
+}
+
+@media (min-width: 768px) {
+    .roadmapGrid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 1024px) {
+    .roadmapGrid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+.roadmapCard {
+    background: var(--theme-surface);
+    border: 1px solid var(--theme-border);
+    border-radius: var(--r-xl);
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    border-top-width: 3px;
+}
+
+.road_purple {
+    border-top-color: var(--theme-purple);
+}
+
+.road_teal {
+    border-top-color: var(--clr-teal);
+}
+
+.road_accent {
+    border-top-color: var(--theme-accent);
+}
+
+.road_pink {
+    border-top-color: var(--clr-pink);
+}
+
+.roadmapPhase {
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--theme-text-muted);
+}
+
+.roadmapTitle {
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--theme-text);
+}
+
+.roadmapList {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    list-style: none;
+}
+
+.roadmapItem {
+    font-size: 0.875rem;
+    color: var(--theme-text-secondary);
+    line-height: 1.5;
+    display: flex;
+    gap: 0.375rem;
+}
+
+/* ── SUBJECTS ───────────────────────────────────────────────── */
+.subjectsSection {
+    padding: 5rem 0;
+    background: var(--theme-bg-secondary);
+    border-top: 1px solid var(--theme-border);
+    border-bottom: 1px solid var(--theme-border);
+}
+
+.subjectsPills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.625rem;
+}
+
+.subjectPill {
+    display: inline-flex;
+    padding: 0.4375rem 1rem;
+    background: var(--theme-surface);
+    border: 1px solid var(--theme-border);
+    border-radius: var(--r-full);
+    font-size: 0.875rem;
+    color: var(--theme-text-secondary);
+    transition: border-color var(--t-fast), color var(--t-fast);
+}
+
+.subjectPill:hover {
+    border-color: var(--theme-purple);
+    color: var(--theme-purple-light);
+}
+
+/* ── FAQ ────────────────────────────────────────────────────── */
+.faqSection {
+    padding: 5rem 0;
+}
+
+.faqList {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    max-width: 780px;
+}
+
+.faqItem {
+    border-bottom: 1px solid var(--theme-border);
+    padding: 1.5rem 0;
+}
+
+.faqQ {
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--theme-text);
+    margin-bottom: 0.625rem;
+}
+
+.faqA {
+    font-size: 0.9375rem;
+    color: var(--theme-text-secondary);
+    line-height: 1.75;
+}
+
+/* ── CTA FOOTER ─────────────────────────────────────────────── */
+.ctaSection {
+    position: relative;
+    overflow: hidden;
+    padding: 6rem var(--sp-4);
+    text-align: center;
+    border-top: 1px solid var(--theme-border);
+}
+
+.ctaGlow {
+    position: absolute;
+    top: -80px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 600px;
+    height: 350px;
+    background: radial-gradient(ellipse at center, var(--theme-purple-dim) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+.ctaInner {
+    position: relative;
+    z-index: 1;
+    max-width: 680px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--sp-5);
+}
+
+.ctaTitle {
+    font-family: var(--font-display);
+    font-size: clamp(1.75rem, 4vw, 2.75rem);
+    font-weight: 700;
+    color: var(--theme-text);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+}
+
+.ctaBody {
+    font-size: 1rem;
+    color: var(--theme-text-secondary);
+    line-height: 1.7;
+}
+
+.ctaBtns {
+    display: flex;
+    gap: var(--sp-3);
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+/* ── REDUCED MOTION ─────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+
+    .btnPrimary,
+    .btnGhost,
+    .problemCard,
+    .subjectPill {
+        transition: none !important;
+        transform: none !important;
+    }
+}

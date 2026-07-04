@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" fill="none">
+  <defs>
+    <linearGradient id="shieldGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#7B5CFC"/>
+      <stop offset="100%" stop-color="#4F3CF5"/>
+    </linearGradient>
+    <linearGradient id="lockGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#D4CCFF"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Shield body -->
+  <path d="M16 3C16 3 25 6 25 14C25 22 16 29 16 29C16 29 7 22 7 14C7 6 16 3 16 3Z"
+        fill="url(#shieldGrad)" stroke="#A78BFA" stroke-width="0.8"/>
+
+  <!-- Shield highlight edge -->
+  <path d="M16 4C16 4 23.5 6.5 23.5 14C23.5 20.5 16 27 16 27"
+        fill="none" stroke="#C4B5FD" stroke-width="0.5" opacity="0.5"/>
+
+  <!-- Lock body -->
+  <rect x="11.5" y="14" width="9" height="7.5" rx="1.5" fill="url(#lockGrad)"/>
+
+  <!-- Lock shackle -->
+  <path d="M13.5 14V11.5C13.5 10.1 14.6 9 16 9C17.4 9 18.5 10.1 18.5 11.5V14"
+        fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round"/>
+
+  <!-- Keyhole -->
+  <circle cx="16" cy="17.5" r="1.2" fill="#4F3CF5"/>
+  <rect x="15.3" y="17.5" width="1.4" height="2.5" rx="0.5" fill="#4F3CF5"/>
+</svg>

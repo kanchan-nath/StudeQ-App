@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none">
+  <defs>
+    <linearGradient id="termsGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#A78BFA"/>
+      <stop offset="100%" stop-color="#7B5CFC"/>
+    </linearGradient>
+    <linearGradient id="sealGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#D4CCFF"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Document body -->
+  <rect x="3" y="2" width="18" height="20" rx="2.5" fill="url(#termsGrad)" stroke="#4F3CF5" stroke-width="0.6"/>
+
+  <!-- Document fold -->
+  <path d="M17 2L21 6H18C17.4 6 17 5.6 17 5V2Z" fill="#D4CCFF" stroke="#4F3CF5" stroke-width="0.4"/>
+
+  <!-- Text lines (legal document style) -->
+  <rect x="6" y="9" width="9" height="1.4" rx="0.7" fill="#FFFFFF" opacity="0.7"/>
+  <rect x="6" y="12" width="10" height="1.4" rx="0.7" fill="#FFFFFF" opacity="0.5"/>
+  <rect x="6" y="15" width="8" height="1.4" rx="0.7" fill="#FFFFFF" opacity="0.4"/>
+  <rect x="6" y="18" width="7" height="1.4" rx="0.7" fill="#FFFFFF" opacity="0.35"/>
+
+  <!-- Approved stamp/seal -->
+  <circle cx="19" cy="17" r="5.5" fill="none" stroke="url(#sealGrad)" stroke-width="1.5" opacity="0.8"/>
+  <circle cx="19" cy="17" r="4.5" fill="none" stroke="url(#sealGrad)" stroke-width="0.5" opacity="0.6"/>
+
+  <!-- Checkmark in seal -->
+  <polyline points="16.5,17 18.3,18.8 21.2,15.5" fill="none" stroke="#FFFFFF" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
