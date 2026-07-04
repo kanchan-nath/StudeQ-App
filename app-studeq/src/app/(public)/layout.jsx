@@ -271,15 +271,15 @@ export default function PublicLayout({ children }) {
                 <div className={styles.footerTop}>
                     <div className={styles.footerLogoBlock}>
                         <Link href="/" className={styles.footerLogo}>
-                            SPARK<span>.E</span>
+                            Stude<span>Q</span>
                         </Link>
-                        <p className={styles.footerTagline}>Your AI-powered study companion.</p>
+                        <p className={styles.footerTagline}>Your AI powered study companion.</p>
                         <p className={styles.footerCopyright}>© 2026 StudeQ Inc.</p>
                         <div className={styles.footerSocials}>
-                            <a href="#" className={styles.socialBtn} aria-label="X / Twitter">𝕏</a>
-                            <a href="#" className={styles.socialBtn} aria-label="LinkedIn">in</a>
-                            <a href="#" className={styles.socialBtn} aria-label="Instagram">◎</a>
-                            <a href="#" className={styles.socialBtn} aria-label="Discord">⊕</a>
+                            <a href="https://x.com/KanchanNathDev" className={styles.socialBtn} aria-label="X / Twitter">𝕏</a>
+                            <a href="https://www.linkedin.com/company/studeq/" className={styles.socialBtn} aria-label="LinkedIn">in</a>
+                            <a href="https://www.instagram.com/kanchannath.webdev" className={styles.socialBtn} aria-label="Instagram">◎</a>
+                            {/* <a href="#" className={styles.socialBtn} aria-label="Discord">⊕</a> */}
                         </div>
                     </div>
 
@@ -290,11 +290,11 @@ export default function PublicLayout({ children }) {
                             <Link href="/features/notebook" className={styles.footerLink}>AI Tutor Chat</Link>
                             <Link href="/features/quiz" className={styles.footerLink}>Create Quiz</Link>
                             <Link href="/features/flashcard" className={styles.footerLink}>AI Flashcards</Link>
-                            <Link href="/features/time-table" className={styles.footerLink}>Time Table</Link>
+                            {/* <Link href="/features/time-table" className={styles.footerLink}>Time Table</Link>
                             <Link href="/features/scheduler" className={styles.footerLink}>AI Scheduler</Link>
                             <Link href="/features/study-room" className={styles.footerLink}>Collaborative Study Room</Link>
                             <Link href="/features/image-analysis" className={styles.footerLink}>Image Analysis</Link>
-                            <Link href="/features/pdf-analysis" className={styles.footerLink}>PDF Analysis</Link>
+                            <Link href="/features/pdf-analysis" className={styles.footerLink}>PDF Analysis</Link> */}
                         </div>
                         <div className={styles.footerLinkCol}>
                             <span className={styles.footerLinkHeading}>Use Cases</span>
@@ -307,16 +307,17 @@ export default function PublicLayout({ children }) {
                         </div>
                         <div className={styles.footerLinkCol}>
                             <span className={styles.footerLinkHeading}>Company</span>
-                            <a href="#" className={styles.footerLink}>About</a>
-                            <a href="#" className={styles.footerLink}>Blog</a>
-                            <a href="#" className={styles.footerLink}>Careers</a>
-                            <a href="#" className={styles.footerLink}>Terms of Use</a>
-                            <a href="#" className={styles.footerLink}>Privacy Policy</a>
+                            <Link href="/about" className={styles.footerLink}>About</Link>
+                            <Link href="/profile" className={styles.footerLink}>Profile</Link>
+                            <Link href="/blog" className={styles.footerLink}>Blog</Link>
+                            <Link href="/careers" className={styles.footerLink}>Careers</Link>
+                            <Link href="/term-of-use" className={styles.footerLink}>Terms of Use</Link>
+                            <Link href="privacy-policy" className={styles.footerLink}>Privacy Policy</Link>
                         </div>
                         <div className={styles.footerLinkCol}>
                             <span className={styles.footerLinkHeading}>Contact</span>
-                            <a href="mailto:hello@studeq.ai" className={styles.footerLink}>hello@studeq.ai</a>
-                            <a href="#" className={styles.footerLink}>Discord Community</a>
+                            <a href="mailto:kanchannath.webdev@gmail.com" className={styles.footerLink}>kanchannath.webdev@gmail.com</a>
+                            {/* <a href="#" className={styles.footerLink}>Discord Community</a> */}
                         </div>
                     </div>
                 </div>

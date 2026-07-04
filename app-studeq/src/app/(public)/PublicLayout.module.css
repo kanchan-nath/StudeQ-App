@@ -57,7 +57,6 @@
     font-size: 1.15rem;
     font-weight: 900;
     letter-spacing: 0.1em;
-    text-transform: uppercase;
     color: var(--theme-text);
     text-decoration: none;
     white-space: nowrap;
@@ -291,7 +290,6 @@
     font-size: 1.3rem;
     font-weight: 900;
     letter-spacing: 0.1em;
-    text-transform: uppercase;
     color: var(--theme-text);
     text-decoration: none;
 }
