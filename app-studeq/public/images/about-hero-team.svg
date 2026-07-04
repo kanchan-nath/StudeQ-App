@@ -1,0 +1,179 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" width="1200" height="900">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1a2e"/>
+      <stop offset="50%" style="stop-color:#16213e"/>
+      <stop offset="100%" style="stop-color:#0f3460"/>
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#7c3aed"/>
+      <stop offset="100%" style="stop-color:#4f46e5"/>
+    </linearGradient>
+    <linearGradient id="glowGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#8b5cf6;stop-opacity:0.4"/>
+      <stop offset="100%" style="stop-color:#4f46e5;stop-opacity:0"/>
+    </linearGradient>
+    <linearGradient id="whiteboardGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#e0e7ff"/>
+      <stop offset="100%" style="stop-color:#c7d2fe"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="shadow">
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#000" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="900" fill="url(#bgGrad)"/>
+
+  <!-- Subtle grid pattern -->
+  <g opacity="0.05">
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#fff" stroke-width="0.5"/>
+    </pattern>
+    <rect width="1200" height="900" fill="url(#grid)"/>
+  </g>
+
+  <!-- Glow orbs -->
+  <circle cx="200" cy="700" r="300" fill="url(#glowGrad)"/>
+  <circle cx="950" cy="200" r="250" fill="url(#glowGrad)" opacity="0.5"/>
+
+  <!-- Whiteboard / canvas area - hero element 50% canvas -->
+  <g filter="url(#shadow)" transform="translate(260, 210)">
+    <!-- Whiteboard base -->
+    <rect x="0" y="0" width="680" height="480" rx="12" fill="url(#whiteboardGrad)" stroke="#818cf8" stroke-width="3"/>
+    
+    <!-- Whiteboard frame -->
+    <rect x="-8" y="-8" width="696" height="496" rx="16" fill="none" stroke="#6366f1" stroke-width="2" opacity="0.3"/>
+
+    <!-- Whiteboard content - sketches -->
+    <!-- Sketchy circle / product wheel -->
+    <g stroke="#1e293b" stroke-width="2.5" fill="none" opacity="0.7">
+      <circle cx="220" cy="200" r="80"/>
+      <circle cx="220" cy="200" r="45"/>
+      <line x1="220" y1="120" x2="220" y2="280"/>
+      <line x1="140" y1="200" x2="300" y2="200"/>
+      <!-- Dots on circle -->
+      <circle cx="220" cy="125" r="6" fill="#1e293b"/>
+      <circle cx="220" cy="275" r="6" fill="#1e293b"/>
+      <circle cx="145" cy="200" r="6" fill="#1e293b"/>
+      <circle cx="295" cy="200" r="6" fill="#1e293b"/>
+    </g>
+
+    <!-- Sketchy flowchart -->
+    <g stroke="#1e293b" stroke-width="2" fill="none" opacity="0.5">
+      <rect x="370" y="130" width="90" height="50" rx="6"/>
+      <rect x="500" y="130" width="90" height="50" rx="6"/>
+      <rect x="435" y="230" width="90" height="50" rx="6"/>
+      <line x1="460" y1="180" x2="460" y2="230"/>
+      <line x1="545" y1="155" x2="480" y2="255"/>
+      <line x1="390" y1="155" x2="435" y2="255"/>
+      <!-- Small text scribbles -->
+      <line x1="380" y1="143" x2="450" y2="143" stroke-width="1.5"/>
+      <line x1="380" y1="152" x2="430" y2="152" stroke-width="1.5"/>
+      <line x1="510" y1="143" x2="580" y2="143" stroke-width="1.5"/>
+      <line x1="445" y1="245" x2="515" y2="245" stroke-width="1.5"/>
+    </g>
+
+    <!-- Sketchy graph/chart -->
+    <g stroke="#1e293b" stroke-width="2" fill="none" opacity="0.5">
+      <polyline points="120,320 190,270 260,295 330,220 400,260 470,180"/>
+      <circle cx="120" cy="320" r="4" fill="#1e293b"/>
+      <circle cx="190" cy="270" r="4" fill="#1e293b"/>
+      <circle cx="260" cy="295" r="4" fill="#1e293b"/>
+      <circle cx="330" cy="220" r="4" fill="#1e293b"/>
+      <circle cx="400" cy="260" r="4" fill="#1e293b"/>
+      <circle cx="470" cy="180" r="4" fill="#1e293b"/>
+    </g>
+
+    <!-- Sticky note 1 -->
+    <g transform="translate(570, 320) rotate(-8)">
+      <rect width="95" height="75" rx="2" fill="#fef08a" stroke="#ca8a04" stroke-width="1" opacity="0.8"/>
+      <line x1="10" y1="20" x2="85" y2="20" stroke="#854d0e" stroke-width="1.5" opacity="0.5"/>
+      <line x1="10" y1="32" x2="75" y2="32" stroke="#854d0e" stroke-width="1.5" opacity="0.5"/>
+      <line x1="10" y1="44" x2="80" y2="44" stroke="#854d0e" stroke-width="1.5" opacity="0.5"/>
+      <!-- Pin -->
+      <circle cx="47" cy="6" r="4" fill="#ef4444"/>
+    </g>
+
+    <!-- Sticky note 2 -->
+    <g transform="translate(25, 320) rotate(5)">
+      <rect width="90" height="70" rx="2" fill="#a7f3d0" stroke="#059669" stroke-width="1" opacity="0.8"/>
+      <line x1="8" y1="18" x2="82" y2="18" stroke="#064e3b" stroke-width="1.5" opacity="0.5"/>
+      <line x1="8" y1="30" x2="70" y2="30" stroke="#064e3b" stroke-width="1.5" opacity="0.5"/>
+    </g>
+
+    <!-- People silhouettes around whiteboard -->
+    <!-- Person 1 - left -->
+    <g transform="translate(50, 420)" fill="#1e293b" opacity="0.4">
+      <circle cx="18" cy="12" r="12"/>
+      <rect x="6" y="22" width="24" height="30" rx="3"/>
+      <line x1="6" y1="30" x2="-12" y2="24" stroke="#1e293b" stroke-width="4" stroke-linecap="round"/>
+      <line x1="30" y1="30" x2="48" y2="24" stroke="#1e293b" stroke-width="4" stroke-linecap="round"/>
+    </g>
+
+    <!-- Person 2 - right -->
+    <g transform="translate(620, 410)" fill="#1e293b" opacity="0.4">
+      <circle cx="18" cy="12" r="12"/>
+      <rect x="6" y="22" width="24" height="30" rx="3"/>
+      <line x1="6" y1="30" x2="-12" y2="24" stroke="#1e293b" stroke-width="4" stroke-linecap="round"/>
+      <line x1="30" y1="30" x2="48" y2="24" stroke="#1e293b" stroke-width="4" stroke-linecap="round"/>
+    </g>
+
+    <!-- Person 3 - center back -->
+    <g transform="translate(340, 400)" fill="#1e293b" opacity="0.3">
+      <circle cx="18" cy="12" r="12"/>
+      <rect x="6" y="22" width="24" height="30" rx="3"/>
+    </g>
+
+    <!-- Person 4 - far left -->
+    <g transform="translate(-20, 430)" fill="#1e293b" opacity="0.25">
+      <circle cx="18" cy="12" r="12"/>
+      <rect x="6" y="22" width="24" height="30" rx="3"/>
+    </g>
+
+    <!-- Thought cloud from person -->
+    <g transform="translate(30, 400)" opacity="0.3">
+      <ellipse cx="22" cy="17" rx="20" ry="14" fill="#fff"/>
+      <circle cx="12" cy="38" r="5" fill="#fff"/>
+      <circle cx="6" cy="48" r="3.5" fill="#fff"/>
+      <circle cx="25" cy="48" r="3.5" fill="#fff"/>
+    </g>
+
+    <!-- Sparkle / idea icon -->
+    <g transform="translate(340, 80)" filter="url(#glow)">
+      <path d="M0,0 L10,-25 L20,0 L45,10 L20,20 L10,45 L0,20 L-25,10 Z" fill="#7c3aed" opacity="0.6"/>
+    </g>
+  </g>
+
+  <!-- Keyword text - big bold, F-pattern top-left zone -->
+  <text x="80" y="110" font-family="'Segoe UI', system-ui, -apple-system, sans-serif" font-size="64" font-weight="900" fill="#fff" letter-spacing="1.5">
+    WE <tspan fill="#8b5cf6">BUILD</tspan>
+  </text>
+  <text x="80" y="190" font-family="'Segoe UI', system-ui, -apple-system, sans-serif" font-size="64" font-weight="900" fill="#fff" letter-spacing="1.5">
+    TOGETHER
+  </text>
+
+  <!-- Subtitle -->
+  <text x="80" y="245" font-family="'Segoe UI', system-ui, -apple-system, sans-serif" font-size="20" font-weight="400" fill="#a5b4fc" letter-spacing="2.5">
+    THE STUDEQ TEAM AT WORK
+  </text>
+
+  <!-- Accent line -->
+  <rect x="80" y="265" width="100" height="5" rx="2.5" fill="url(#accentGrad)"/>
+
+  <!-- Bottom right tagline -->
+  <text x="1120" y="860" font-family="'Segoe UI', system-ui, -apple-system, sans-serif" font-size="14" font-weight="300" fill="#64748b" text-anchor="end" letter-spacing="3.5">
+    STUDENT · PRODUCT · COLLABORATION
+  </text>
+
+  <!-- Decorative corner elements -->
+  <rect x="30" y="830" width="60" height="3" rx="1.5" fill="#4f46e5" opacity="0.3"/>
+  <rect x="1110" y="30" width="60" height="3" rx="1.5" fill="#4f46e5" opacity="0.3"/>
+</svg>
