@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none">
+  <defs>
+    <linearGradient id="aboutGrad1" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#A78BFA"/>
+      <stop offset="100%" stop-color="#7B5CFC"/>
+    </linearGradient>
+    <linearGradient id="aboutGrad2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#C4B5FD"/>
+      <stop offset="100%" stop-color="#8B6CF8"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Person 1 (left) -->
+  <circle cx="9" cy="6" r="3.5" fill="url(#aboutGrad1)" stroke="#4F3CF5" stroke-width="0.4"/>
+  <path d="M3 19.5C3 15.9 5.9 13 9.5 13C13.1 13 16 15.9 16 19.5"
+        fill="url(#aboutGrad1)" stroke="#4F3CF5" stroke-width="0.4"/>
+
+  <!-- Person 2 (right, slightly back) -->
+  <circle cx="17" cy="7" r="3" fill="url(#aboutGrad2)" stroke="#4F3CF5" stroke-width="0.4" opacity="0.85"/>
+  <path d="M12 19.5C12 16.5 14.5 14 17.5 14C20.5 14 23 16.5 23 19.5"
+        fill="url(#aboutGrad2)" stroke="#4F3CF5" stroke-width="0.4" opacity="0.85"/>
+
+  <!-- Highlights -->
+  <circle cx="8" cy="4.8" r="1" fill="#FFFFFF" opacity="0.15"/>
+  <circle cx="16.3" cy="6" r="0.8" fill="#FFFFFF" opacity="0.12"/>
+</svg>

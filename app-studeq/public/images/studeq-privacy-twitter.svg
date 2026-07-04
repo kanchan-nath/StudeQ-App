@@ -1,0 +1,172 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" width="1200" height="675">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0F0F23"/>
+      <stop offset="50%" stop-color="#1A1A3E"/>
+      <stop offset="100%" stop-color="#0D0D2B"/>
+    </linearGradient>
+    <linearGradient id="shieldGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#7B5CFC"/>
+      <stop offset="100%" stop-color="#4F3CF5"/>
+    </linearGradient>
+    <linearGradient id="docGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#D4CCFF"/>
+    </linearGradient>
+    <linearGradient id="accentLine" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#7B5CFC" stop-opacity="0"/>
+      <stop offset="50%" stop-color="#7B5CFC" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#7B5CFC" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="12" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+    <filter id="softGlow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="28" result="blur"/>
+      <feColorMatrix in="blur" type="matrix" values="0 0 0 0 0.48  0 0 0 0 0.36  0 0 0 0 0.99  0 0 0 0.18 0"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="675" fill="url(#bgGrad)"/>
+
+  <!-- Subtle grid -->
+  <g opacity="0.03" stroke="#7B5CFC" stroke-width="0.5">
+    <line x1="0" y1="112" x2="1200" y2="112"/>
+    <line x1="0" y1="225" x2="1200" y2="225"/>
+    <line x1="0" y1="337" x2="1200" y2="337"/>
+    <line x1="0" y1="450" x2="1200" y2="450"/>
+    <line x1="0" y1="562" x2="1200" y2="562"/>
+    <line x1="300" y1="0" x2="300" y2="675"/>
+    <line x1="600" y1="0" x2="600" y2="675"/>
+    <line x1="900" y1="0" x2="900" y2="675"/>
+  </g>
+
+  <!-- Ambient glow behind icon -->
+  <ellipse cx="880" cy="340" rx="240" ry="220" fill="#7B5CFC" opacity="0.06" filter="url(#softGlow)"/>
+
+  <!-- ==================== ICON: DOCUMENT-SHIELD ==================== -->
+  <g filter="url(#glow)">
+    <!-- Shield outer -->
+    <path d="M880 100Q1030 160 1030 360Q1030 530 880 585Q730 530 730 360Q730 160 880 100Z"
+          fill="url(#shieldGrad)" opacity="0.12" stroke="#7B5CFC" stroke-width="2.5"/>
+
+    <!-- Shield body -->
+    <path d="M880 138Q995 185 995 360Q995 505 880 548Q765 505 765 360Q765 185 880 138Z"
+          fill="url(#shieldGrad)" opacity="0.85" stroke="#A78BFA" stroke-width="1.8"/>
+
+    <!-- Shield highlight -->
+    <path d="M880 138Q995 185 995 360Q995 505 880 548"
+          fill="none" stroke="#C4B5FD" stroke-width="1.2" opacity="0.3"/>
+
+    <!-- Document inside shield -->
+    <g transform="translate(880, 320)">
+      <rect x="-65" y="-60" width="130" height="150" rx="10" fill="url(#docGrad)" opacity="0.95"/>
+
+      <!-- Document fold -->
+      <path d="M40 -60L65 -35L65 -60Z" fill="#D4CCFF" opacity="0.6"/>
+
+      <!-- Document text lines -->
+      <rect x="-44" y="-33" width="65" height="8" rx="4" fill="#4F3CF5" opacity="0.5"/>
+      <rect x="-44" y="-15" width="85" height="8" rx="4" fill="#4F3CF5" opacity="0.35"/>
+      <rect x="-44" y="3" width="72" height="8" rx="4" fill="#4F3CF5" opacity="0.35"/>
+      <rect x="-44" y="21" width="80" height="8" rx="4" fill="#4F3CF5" opacity="0.3"/>
+      <rect x="-44" y="39" width="56" height="8" rx="4" fill="#4F3CF5" opacity="0.25"/>
+
+      <!-- Checkmark badge -->
+      <circle cx="65" cy="-60" r="22" fill="#7B5CFC"/>
+      <circle cx="65" cy="-60" r="22" fill="none" stroke="#A78BFA" stroke-width="1.5" opacity="0.5"/>
+      <polyline points="55,-60 62,-53 75,-68" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+
+      <!-- Lock on document -->
+      <rect x="48" y="-8" width="22" height="18" rx="4" fill="#4F3CF5"/>
+      <path d="M52 -8L52 -19A7 7 0 0 1 66 -19L66 -8"
+            fill="none" stroke="#4F3CF5" stroke-width="4" stroke-linecap="round"/>
+      <circle cx="59" cy="4" r="3.5" fill="#FFFFFF" opacity="0.9"/>
+      <rect x="57" y="4" width="4" height="5.5" rx="1.5" fill="#FFFFFF" opacity="0.9"/>
+    </g>
+  </g>
+
+  <!-- Decorative data dots -->
+  <g opacity="0.4">
+    <circle cx="680" cy="210" r="5" fill="#7B5CFC"/>
+    <circle cx="680" cy="210" r="9" fill="none" stroke="#7B5CFC" stroke-width="0.8"/>
+    <circle cx="1080" cy="210" r="5" fill="#A78BFA"/>
+    <circle cx="1080" cy="210" r="9" fill="none" stroke="#A78BFA" stroke-width="0.8"/>
+    <circle cx="680" cy="460" r="5" fill="#A78BFA"/>
+    <circle cx="680" cy="460" r="9" fill="none" stroke="#A78BFA" stroke-width="0.8"/>
+    <circle cx="1080" cy="460" r="5" fill="#7B5CFC"/>
+    <circle cx="1080" cy="460" r="9" fill="none" stroke="#7B5CFC" stroke-width="0.8"/>
+  </g>
+
+  <!-- Subtle connection lines -->
+  <g stroke="#7B5CFC" stroke-width="0.8" opacity="0.12">
+    <line x1="689" y1="210" x2="765" y2="245"/>
+    <line x1="1071" y1="210" x2="995" y2="245"/>
+    <line x1="689" y1="460" x2="765" y2="420"/>
+    <line x1="1071" y1="460" x2="995" y2="420"/>
+  </g>
+
+  <!-- ==================== TEXT ZONE ==================== -->
+  <!-- Brand badge -->
+  <rect x="60" y="100" width="120" height="38" rx="19" fill="#7B5CFC" opacity="0.15"/>
+  <rect x="60" y="100" width="120" height="38" rx="19" fill="none" stroke="#7B5CFC" stroke-width="1.5"/>
+  <text x="120" y="125" font-family="'Segoe UI', 'Inter', Arial, sans-serif" font-weight="700" font-size="16" fill="#C4B5FD" text-anchor="middle" letter-spacing="3.5">
+    StudeQ
+  </text>
+
+  <!-- Main headline - large, bold -->
+  <text x="60" y="225" font-family="'Segoe UI', 'Inter', Arial, sans-serif" font-weight="900" font-size="62" fill="#FFFFFF" letter-spacing="-0.5">
+    Privacy Policy
+  </text>
+
+  <!-- Sub-headline -->
+  <text x="60" y="290" font-family="'Segoe UI', 'Inter', Arial, sans-serif" font-weight="500" font-size="26" fill="#A78BFA" letter-spacing="0.3">
+    Your Data, Your Trust
+  </text>
+
+  <!-- Divider line -->
+  <line x1="60" y1="325" x2="450" y2="325" stroke="url(#accentLine)" stroke-width="1.8"/>
+
+  <!-- Key points -->
+  <g font-family="'Segoe UI', 'Inter', Arial, sans-serif" font-weight="500" font-size="19" fill="#8B8BA8" letter-spacing="0.3">
+    <text x="60" y="380">• Transparent data collection</text>
+    <text x="60" y="418">• Cookie usage &amp; control</text>
+    <text x="60" y="456">• Third-party sharing policy</text>
+    <text x="60" y="494">• Your rights &amp; choices</text>
+  </g>
+
+  <!-- Bottom tagline -->
+  <text x="60" y="565" font-family="'Segoe UI', 'Inter', Arial, sans-serif" font-weight="500" font-size="17" fill="#6B6B8A" letter-spacing="2.5">
+    ENCRYPTED · SECURE · TRANSPARENT
+  </text>
+
+  <!-- URL -->
+  <text x="60" y="615" font-family="'Segoe UI', 'Inter', Arial, sans-serif" font-weight="400" font-size="16" fill="#5B5B7A" letter-spacing="1.5">
+    studeq.com/privacy-policy
+  </text>
+
+  <!-- Right-side badge pills -->
+  <g opacity="0.55">
+    <rect x="740" y="575" width="145" height="40" rx="20" fill="none" stroke="#7B5CFC" stroke-width="1.5"/>
+    <text x="812" y="600" font-family="'Segoe UI', 'Inter', Arial, sans-serif" font-weight="600" font-size="14" fill="#A78BFA" text-anchor="middle" letter-spacing="2.5">
+      SSL 256-BIT
+    </text>
+  </g>
+  <g opacity="0.55">
+    <rect x="900" y="575" width="145" height="40" rx="20" fill="none" stroke="#7B5CFC" stroke-width="1.5"/>
+    <text x="972" y="600" font-family="'Segoe UI', 'Inter', Arial, sans-serif" font-weight="600" font-size="14" fill="#A78BFA" text-anchor="middle" letter-spacing="2.5">
+      GDPR READY
+    </text>
+  </g>
+  <g opacity="0.55">
+    <rect x="1060" y="575" width="130" height="40" rx="20" fill="none" stroke="#7B5CFC" stroke-width="1.5"/>
+    <text x="1125" y="600" font-family="'Segoe UI', 'Inter', Arial, sans-serif" font-weight="600" font-size="14" fill="#A78BFA" text-anchor="middle" letter-spacing="2.5">
+      ZERO LEAK
+    </text>
+  </g>
+
+  <!-- Bottom accent line -->
+  <line x1="60" y1="645" x2="1140" y2="645" stroke="url(#accentLine)" stroke-width="1.5"/>
+</svg>

@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" fill="none">
+  <defs>
+    <linearGradient id="docGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#E8E4FF"/>
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#7B5CFC"/>
+      <stop offset="100%" stop-color="#4F3CF5"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Document body -->
+  <rect x="6" y="5" width="20" height="24" rx="3" fill="url(#docGrad)" stroke="#7B5CFC" stroke-width="0.8"/>
+
+  <!-- Document fold -->
+  <path d="M21 5L26 10H23C21.9 10 21 9.1 21 8V5Z" fill="#D4CCFF" stroke="#7B5CFC" stroke-width="0.5"/>
+
+  <!-- Document text lines -->
+  <rect x="10" y="13" width="8" height="1.8" rx="0.9" fill="#4F3CF5" opacity="0.5"/>
+  <rect x="10" y="17.5" width="12" height="1.8" rx="0.9" fill="#4F3CF5" opacity="0.35"/>
+  <rect x="10" y="22" width="6" height="1.8" rx="0.9" fill="#4F3CF5" opacity="0.3"/>
+
+  <!-- Collection nodes (data points being gathered) -->
+  <!-- Top-left node -->
+  <circle cx="3" cy="10" r="2.5" fill="url(#accentGrad)"/>
+  <circle cx="3" cy="10" r="4" fill="none" stroke="#7B5CFC" stroke-width="0.6" opacity="0.5"/>
+
+  <!-- Top-right node -->
+  <circle cx="29" cy="8" r="2.5" fill="url(#accentGrad)"/>
+  <circle cx="29" cy="8" r="4" fill="none" stroke="#7B5CFC" stroke-width="0.6" opacity="0.5"/>
+
+  <!-- Bottom-right node -->
+  <circle cx="28" cy="22" r="2.5" fill="url(#accentGrad)"/>
+  <circle cx="28" cy="22" r="4" fill="none" stroke="#7B5CFC" stroke-width="0.6" opacity="0.5"/>
+
+  <!-- Bottom-left node -->
+  <circle cx="4" cy="24" r="2.5" fill="url(#accentGrad)"/>
+  <circle cx="4" cy="24" r="4" fill="none" stroke="#7B5CFC" stroke-width="0.6" opacity="0.5"/>
+
+  <!-- Connection arrows toward document -->
+  <path d="M7 10.5L9 13" stroke="#7B5CFC" stroke-width="1" stroke-linecap="round" opacity="0.6"/>
+  <path d="M27 9L24 13" stroke="#7B5CFC" stroke-width="1" stroke-linecap="round" opacity="0.6"/>
+  <path d="M25 21L22 21" stroke="#7B5CFC" stroke-width="1" stroke-linecap="round" opacity="0.6"/>
+  <path d="M7 23L9 21.5" stroke="#7B5CFC" stroke-width="1" stroke-linecap="round" opacity="0.6"/>
+</svg>

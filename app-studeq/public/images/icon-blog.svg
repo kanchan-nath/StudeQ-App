@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none">
+  <defs>
+    <linearGradient id="blogGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#A78BFA"/>
+      <stop offset="100%" stop-color="#7B5CFC"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Document -->
+  <rect x="3" y="3" width="17" height="19" rx="2.5" fill="url(#blogGrad)" stroke="#4F3CF5" stroke-width="0.6"/>
+
+  <!-- Document fold -->
+  <path d="M16 3L20 7H17C16.4 7 16 6.6 16 6V3Z" fill="#D4CCFF" stroke="#4F3CF5" stroke-width="0.4"/>
+
+  <!-- Text lines -->
+  <rect x="6" y="10" width="7" height="1.5" rx="0.75" fill="#FFFFFF" opacity="0.7"/>
+  <rect x="6" y="13.5" width="10" height="1.5" rx="0.75" fill="#FFFFFF" opacity="0.5"/>
+  <rect x="6" y="17" width="8" height="1.5" rx="0.75" fill="#FFFFFF" opacity="0.4"/>
+  <rect x="6" y="20.5" width="6" height="1.5" rx="0.75" fill="#FFFFFF" opacity="0.3"/>
+
+  <!-- Pen nib decoration -->
+  <path d="M15 17.5L13 19.5L11 17.5" fill="none" stroke="#FFFFFF" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" opacity="0.4"/>
+  <line x1="13" y1="19.5" x2="13" y2="14" stroke="#FFFFFF" stroke-width="1.2" stroke-linecap="round" opacity="0.4"/>
+</svg>
