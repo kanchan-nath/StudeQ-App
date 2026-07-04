@@ -1617,7 +1617,6 @@
   font-size: clamp(4rem, 12vw, 10rem);
   font-weight: 800;
   letter-spacing: 0.05em;
-  text-transform: uppercase;
   background: linear-gradient(to bottom,
       var(--theme-purple-light) 0%,
       transparent 100%);
