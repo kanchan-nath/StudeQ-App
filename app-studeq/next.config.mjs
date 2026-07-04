@@ -1,4 +1,6 @@
 const nextConfig = {
+  output: 'export',
+  trailingSlash: true, // This ensures index.html is served correctly
   async headers() {
     return [
       {
