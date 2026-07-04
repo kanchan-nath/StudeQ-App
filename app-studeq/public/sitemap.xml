@@ -4,35 +4,52 @@
         xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
         http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
 
-  <!-- Homepage -->
+  <!-- ==================== PUBLIC / STATIC ROUTES ==================== -->
   <url>
     <loc>https://studeq.onrender.com/</loc>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
 
-  <!-- Features hub -->
+  <url>
+    <loc>https://studeq.onrender.com/about</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <url>
+    <loc>https://studeq.onrender.com/our-mission</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https://studeq.onrender.com/pricing</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <url>
+    <loc>https://studeq.onrender.com/privacy-policy</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <!-- ==================== FEATURES HUB & INDIVIDUAL FEATURES ==================== -->
   <url>
     <loc>https://studeq.onrender.com/features</loc>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
 
-  <!-- Individual feature pages -->
-  <url>
-    <loc>https://studeq.onrender.com/features/note</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
-    <loc>https://studeq.onrender.com/features/quiz</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
   <url>
     <loc>https://studeq.onrender.com/features/flashcard</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://studeq.onrender.com/features/note</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -44,45 +61,50 @@
   </url>
 
   <url>
-    <loc>https://studeq.onrender.com/features/study-room</loc>
+    <loc>https://studeq.onrender.com/features/quiz</loc>
     <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- ==================== BLOG ==================== -->
+  <url>
+    <loc>https://studeq.onrender.com/blog/10-20-70-rule-of-ai</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
   </url>
 
   <url>
-    <loc>https://studeq.onrender.com/features/scheduler</loc>
+    <loc>https://studeq.onrender.com/blog/ai-quiz-for-teacher</loc>
     <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
+    <priority>0.6</priority>
   </url>
 
   <url>
-    <loc>https://studeq.onrender.com/features/time-table</loc>
+    <loc>https://studeq.onrender.com/blog/ai-quiz-generator</loc>
     <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
+    <priority>0.6</priority>
   </url>
 
   <url>
-    <loc>https://studeq.onrender.com/features/image-analysis</loc>
+    <loc>https://studeq.onrender.com/blog/ai-study-faster</loc>
     <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
+    <priority>0.6</priority>
   </url>
 
   <url>
-    <loc>https://studeq.onrender.com/features/pdf-analysis</loc>
+    <loc>https://studeq.onrender.com/blog/best-ai-tools-for-teachers</loc>
     <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
+    <priority>0.6</priority>
   </url>
 
-  <!-- Pricing -->
   <url>
-    <loc>https://studeq.onrender.com/pricing</loc>
+    <loc>https://studeq.onrender.com/blog/how-to-memorize-10x-faster</loc>
     <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
+    <priority>0.6</priority>
   </url>
 
-  <!-- Mission -->
   <url>
-    <loc>https://studeq.onrender.com/our-mission</loc>
+    <loc>https://studeq.onrender.com/blog/quiz-from-notes</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
