@@ -676,14 +676,14 @@ const LandingPage = () => {
                     </div>
                   </div>
                 </li>
-                <li>
+                {/* <li>
                   <Link
                     href="/how-it-works"
                     className={styles.navLink}
                   >
                     How It Works
                   </Link>
-                </li>
+                </li> */}
               </ul>
             </div>
             <div className={styles.ctaWrapper}>
