@@ -267,7 +267,7 @@ export default function AboutPage() {
                             features, report bugs, and tell us what actually matters to them.
                         </p>
                         <a
-                            href="mailto:team@studeq.onrender.com"
+                            href="mailto:kanchannath.webdev@gmail.com"
                             className={styles.ctaLink}
                         >
                             Get in touch
