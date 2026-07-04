@@ -119,7 +119,7 @@ export default function PublicLayout({ children }) {
                 <div className={styles.navInner}>
                     <div className={styles.navLeft}>
                         <Link href="/" className={styles.navLogo}>
-                            SPARK<span>.E</span>
+                            Stude<span>Q</span>
                         </Link>
                         <ul className={styles.navLinks} role="list">
                             <li className={`${styles.navItem} ${styles.hasDropdown}`} role="presentation">
