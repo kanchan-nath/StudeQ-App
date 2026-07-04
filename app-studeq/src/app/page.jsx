@@ -689,6 +689,9 @@ const LandingPage = () => {
             <div className={styles.ctaWrapper}>
 
               <ThemeToggle />
+              <Link href="/login" className={styles.navLoginBtn}>
+                Log in
+              </Link>
               <Link
                 href="/register"
                 className={styles.navCta}

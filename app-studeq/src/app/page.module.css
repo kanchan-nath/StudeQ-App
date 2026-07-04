@@ -1958,3 +1958,17 @@
     display: none;
   }
 }
+
+.navLoginBtn {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--theme-text-muted);
+  text-decoration: none;
+  padding: 8px 16px;
+  border-radius: var(--r-full);
+  transition: color var(--t-fast);
+}
+
+.navLoginBtn:hover {
+  color: var(--theme-text);
+}
