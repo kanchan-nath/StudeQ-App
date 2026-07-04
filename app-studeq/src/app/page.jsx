@@ -507,6 +507,7 @@ const LandingPage = () => {
       line.style.height = pct + "%";
 
       items.forEach((item) => {
+        console.log(item);
         const lineH = (pct / 100) * wrap.offsetHeight;
         if (lineH >= item.offsetTop + 20) {
           item.classList.add(styles.timelineItemVisible);
@@ -747,7 +748,7 @@ const LandingPage = () => {
 
             <div className={styles.heroActions}>
               <Link
-                href="/register"
+                href="https://app.studeq.onrender.com/register"
                 className={styles.heroCta}
               >
                 Get Started — It's Free
@@ -767,7 +768,7 @@ const LandingPage = () => {
         {/* ── MARQUEE ─────────────────────────────────────────────── */}
         <section
           className={styles.marqueeSection}
-          aria-label="Trusted by students at"
+          aria-label="One tool , every subject, any exam."
         >
           <p className={styles.marqueeLabel}>
             One tool, Every subject, Any exam.{" "}
@@ -955,7 +956,7 @@ const LandingPage = () => {
                 <div className={`${styles.compCol} ${styles.compColLeft}`}>
                   <div className={styles.compHeader}>
                     <span className={styles.compLogo}>
-                      SPARK<span className={styles.compLogoAccent}>.E</span>
+                      Stude<span className={styles.compLogoAccent}>Q</span>
                     </span>
                   </div>
                   <ul className={styles.compList}>
@@ -1158,7 +1159,7 @@ const LandingPage = () => {
               Your AI study partner — available 24/7, knows every subject.
             </p>
             <Link
-              href="/register"
+              href="https://app.studeq.onrender.com/register"
               className={styles.ctaBannerBtn}
             >
               Get Started — It's Free
@@ -1174,41 +1175,41 @@ const LandingPage = () => {
                 href="/"
                 className={styles.footerLogo}
               >
-                SPARK<span>.E</span>
+                Stude<span>Q</span>
               </Link>
               <p className={styles.footerTagline}>
-                Your AI-powered study companion.
+                Your AI powered study companion.
               </p>
               <p className={styles.footerCopyright}>© 2026 StudeQ Inc.</p>
               <div className={styles.footerSocials}>
                 <a
-                  href="#"
+                  href="https://x.com/KanchanNathDev"
                   className={styles.socialBtn}
                   aria-label="X / Twitter"
                 >
                   𝕏
                 </a>
                 <a
-                  href="#"
+                  href="https://www.linkedin.com/company/studeq/"
                   className={styles.socialBtn}
                   aria-label="LinkedIn"
                 >
                   in
                 </a>
                 <a
-                  href="#"
+                  href="https://www.instagram.com/kanchannath.webdev"
                   className={styles.socialBtn}
                   aria-label="Instagram"
                 >
                   ◎
                 </a>
-                <a
+                {/* <a
                   href="#"
                   className={styles.socialBtn}
                   aria-label="Discord"
                 >
                   ⊕
-                </a>
+                </a> */}
               </div>
             </div>
 
@@ -1229,7 +1230,7 @@ const LandingPage = () => {
                   href="/features/quiz"
                   className={styles.footerLink}
                 >
-                  Create Quiz
+                  AI Quiz
                 </Link>
                 <Link
                   href="/features/flashcard"
@@ -1237,45 +1238,45 @@ const LandingPage = () => {
                 >
                   AI Flashcards
                 </Link>
-                <Link
+                {/* <Link
                   href="/features/time-table"
                   className={styles.footerLink}
                 >
                   Time Table
-                </Link>
-                <Link
+                </Link> */}
+                {/* <Link
                   href="/features/scheduler"
                   className={styles.footerLink}
                 >
                   AI Scheduler
-                </Link>
-                <Link
+                </Link> */}
+                {/* <Link
                   href="/features/study-room"
                   className={styles.footerLink}
                 >
                   Collaborative Study Room
-                </Link>
-                <Link
+                </Link> */}
+                {/* <Link
                   href="/features/image-analysis"
                   className={styles.footerLink}
                 >
                   Image Analysis
 
-                </Link>
-                <Link
+                </Link> */}
+                {/* <Link
                   href="/features/pdf-analysis"
                   className={styles.footerLink}
                 >
                   Pdf Analysis
 
-                </Link>
-                <Link
+                </Link> */}
+                {/* <Link
                   href="/features/pdf-analysis"
                   className={styles.footerLink}
                 >
                   Pdf Analysis
 
-                </Link>
+                </Link> */}
               </div>
               <div className={styles.footerLinkCol}>
                 <span className={styles.footerLinkHeading}>Use Cases</span>
@@ -1318,51 +1319,57 @@ const LandingPage = () => {
               </div>
               <div className={styles.footerLinkCol}>
                 <span className={styles.footerLinkHeading}>Company</span>
-                <a
-                  href="#"
+                <Link
+                  href="/about"
                   className={styles.footerLink}
                 >
                   About
-                </a>
-                <a
-                  href="#"
+                </Link>
+                <Link
+                  href="/profile"
+                  className={styles.footerLink}
+                >
+                  Profile
+                </Link>
+                <Link
+                  href="/blog"
                   className={styles.footerLink}
                 >
                   Blog
-                </a>
-                <a
-                  href="#"
+                </Link>
+                <Link
+                  href="/careers"
                   className={styles.footerLink}
                 >
                   Careers
-                </a>
-                <a
-                  href="#"
+                </Link>
+                <Link
+                  href="term-of-use"
                   className={styles.footerLink}
                 >
                   Terms of Use
-                </a>
-                <a
-                  href="#"
+                </Link>
+                <Link
+                  href="privacy-policy"
                   className={styles.footerLink}
                 >
                   Privacy Policy
-                </a>
+                </Link>
               </div>
               <div className={styles.footerLinkCol}>
                 <span className={styles.footerLinkHeading}>Contact</span>
                 <a
-                  href="mailto:hello@studeq.ai"
+                  href="mailto:kanchannath.webdev@gmail.com"
                   className={styles.footerLink}
                 >
-                  hello@studeq.ai
+                  kanchannath.webdev@gmail.com
                 </a>
-                <a
+                {/* <a
                   href="#"
                   className={styles.footerLink}
                 >
                   Discord Community
-                </a>
+                </a> */}
               </div>
             </div>
           </div>
