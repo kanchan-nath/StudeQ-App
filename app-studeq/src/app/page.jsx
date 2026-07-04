@@ -18,8 +18,8 @@ import {
 } from "lucide-react";
 /* ─── DATA ─────────────────────────────────────────────────────────────── */
 const NAV_FEATURES = [
-  { to: "/features/note", Icon: FileText, label: "AI Notes", desc: "PDF → structured notes in seconds" },
-  { to: "/features/notebook", Icon: Bot, label: "AI Tutor", desc: "Subject-aware multi-turn chat" },
+  { to: "/features/note", Icon: FileText, label: "AI Notes", desc: "PDF to structured notes in seconds" },
+  { to: "/features/notebook", Icon: Bot, label: "AI Tutor", desc: "Subject aware multi turn chat" },
   { to: "/features/flashcard", Icon: Layers, label: "Flashcards", desc: "SM-2 spaced repetition decks" },
   { to: "/features/quiz", Icon: FlaskConical, label: "AI Quiz", desc: "6 question types, instant feedback" },
   { to: "/features/study-room", Icon: Users, label: "Study Room", desc: "Live collaborative sessions" },
