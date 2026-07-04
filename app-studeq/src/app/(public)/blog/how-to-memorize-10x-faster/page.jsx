@@ -234,7 +234,7 @@ export default function HowToMemorizeFasterPage() {
                                 <span className={styles.browserDot} style={{ background: '#ff5f56' }}></span>
                                 <span className={styles.browserDot} style={{ background: '#ffbd2e' }}></span>
                                 <span className={styles.browserDot} style={{ background: '#27c93f' }}></span>
-                                <span className={styles.browserUrl}>https://app.studeq.com/study/memorize-faster</span>
+                                <span className={styles.browserUrl}>https://app-studeq.com/study/memorize-faster</span>
                             </div>
                             <div className={styles.mockupContent}>
                                 <div className={styles.mockupHeader}>
