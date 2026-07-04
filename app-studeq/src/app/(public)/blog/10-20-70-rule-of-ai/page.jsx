@@ -230,7 +230,7 @@ export default function TenTwentySeventyRulePage() {
                                 <span className={styles.mockupDot} aria-hidden="true" />
                                 <span className={styles.mockupDot} aria-hidden="true" />
                                 <span className={styles.mockupDot} aria-hidden="true" />
-                                <span className={styles.mockupUrl}>app.studeq.com/deck/biology-101</span>
+                                <span className={styles.mockupUrl}>app-studeq.com/deck/biology-101</span>
                             </div>
                             <div className={styles.mockupBody}>
                                 <div className={styles.mockupFlashcard}>
