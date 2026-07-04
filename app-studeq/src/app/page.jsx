@@ -730,7 +730,7 @@ const LandingPage = () => {
             </h1>
 
             <p className={styles.heroSub}>
-              Your AI-powered study companion. Learn smarter, not harder.
+              Your AI powered study companion. Learn smarter, not harder.
             </p>
 
             <div className={styles.heroSubjectRow}>
