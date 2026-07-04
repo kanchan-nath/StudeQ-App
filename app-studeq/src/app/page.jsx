@@ -65,9 +65,9 @@ const TABS = [
     id: "2",
     label: "AI Tutor",
     features: [
-      "Subject-aware tutor across Maths, Physics, Chemistry, Biology, and more.",
-      "Full multi-turn conversations — it remembers what you discussed.",
-      "Ask follow-up questions, request re-explanations, go deeper.",
+      "Subject aware tutor across Maths, Physics, Chemistry, Biology, and more.",
+      "Full multi turn conversations — it remembers what you discussed.",
+      "Ask follow-up questions, request re explanations, go deeper.",
       "LaTeX rendering for formulas and equations built in.",
     ],
   },
@@ -78,7 +78,7 @@ const TABS = [
       "SM-2 Spaced Repetition flashcards — proven to make you remember.",
       "6 quiz types: MCQ, True/False, Fill-blank, Short Answer, Free Response, Passage.",
       "Generate quizzes from your own notes or any topic on demand.",
-      "Live Study Rooms — study with friends in real-time.",
+      "Live Study Rooms — study with friends in real time.",
     ],
   },
   {
@@ -125,9 +125,9 @@ const TABS = [
     id: "8",
     label: "Doubt Solving",
     features: [
-      "Snap a photo of any question — handwritten or printed — and get a step-by-step solution.",
-      "Subject-aware explanations adapt to your level, not just the answer.",
-      "Ask follow-ups until the concept actually clicks.",
+      "Snap a photo of any question — handwritten or printed and get a step by step solution.",
+      "Subject aware explanations adapt to your level, not just the answer.",
+      "Ask follow ups until the concept actually clicks.",
       "All solved doubts saved to your history for revision later.",
     ],
   },
@@ -141,7 +141,7 @@ const COMPARISON = [
   },
   {
     feature: "AI Tutor",
-    studeq: "Subject-aware multi-turn tutor that remembers your session",
+    studeq: "Subject aware multi turn tutor that remembers your session",
     other: "Generic chatbot, no subject context",
   },
   {
@@ -163,7 +163,7 @@ const COMPARISON = [
   },
   {
     feature: "Scheduler",
-    studeq: "AI-generated study plan built around your exams and goals",
+    studeq: "AI generated study plan built around your exams and goals",
     other: "No scheduling at all",
   },
 ];
@@ -191,7 +191,7 @@ const STEPS = [
     num: "04",
     pill: "Study",
     title: "Use the AI Tutor or Study Room",
-    desc: "Ask your subject-aware AI Tutor anything. Or join a live Study Room and learn with friends.",
+    desc: "Ask your subject aware AI Tutor anything. Or join a live Study Room and learn with friends.",
   },
   {
     num: "05",
@@ -206,7 +206,7 @@ const TESTIMONIALS = [
     name: "Priya S.",
     role: "IIT Delhi · Physics",
     quote:
-      "StudeQ turned my 200-page module into flashcards in seconds. My quiz scores went from 60% to 88% in two weeks.",
+      "StudeQ turned my 200 page module into flashcards in seconds. My quiz scores went from 60% to 88% in two weeks.",
     highlight: "flashcards in seconds",
   },
   {
@@ -227,8 +227,8 @@ const TESTIMONIALS = [
     name: "Elena R.",
     role: "MIT · Education PhD",
     quote:
-      "I upload lecture slides and StudeQ gives me passage-based questions. Nothing else comes close.",
-    highlight: "passage-based questions",
+      "I upload lecture slides and StudeQ gives me passage based questions. Nothing else comes close.",
+    highlight: "passage based questions",
   },
   {
     name: "Jason A.",
@@ -249,7 +249,7 @@ const TESTIMONIALS = [
 const FAQS = [
   {
     q: "What is StudeQ?",
-    a: "StudeQ is an AI-powered study platform. Upload any material and instantly get smart notes, flashcards, quizzes, and access to a personal AI Tutor that knows your subject.",
+    a: "StudeQ is an AI powered study platform. Upload any material and instantly get smart notes, flashcards, quizzes, and access to a personal AI Tutor that knows your subject.",
   },
   {
     q: "Is StudeQ free?",
@@ -261,15 +261,15 @@ const FAQS = [
   },
   {
     q: "How does the AI Tutor work?",
-    a: "Select a subject, type your question, and have a full conversation. The tutor remembers your session history so follow-ups are natural and contextual.",
+    a: "Select a subject, type your question, and have a full conversation. The tutor remembers your session history so follow ups are natural and contextual.",
   },
   {
     q: "What quiz types does StudeQ support?",
-    a: "Multiple Choice, True/False, Fill-in-the-blank, Short Answer, Free Response, and Multi-Layered Passage questions — six types built for real exams.",
+    a: "Multiple Choice, True/False, Fill in the blank, Short Answer, Free Response, and Multi Layered Passage questions — six types built for real exams.",
   },
   {
     q: "What are Study Rooms?",
-    a: "Live collaborative spaces where you and friends can study together, share notes, and chat in real-time — like a virtual library group session.",
+    a: "Live collaborative spaces where you and friends can study together, share notes, and chat in real time — like a virtual library group session.",
   },
   {
     q: "How does Image Analysis work?",
@@ -282,9 +282,9 @@ const FAQS = [
 ];
 
 const TICKER_MESSAGES = [
-  " Early access — shape the product with us",
+  " Early access, shape the product with us",
   " Built for students, by a student",
-  "New: AI-powered notes & quizzes live now",
+  "New: AI powered notes & quizzes live now",
   " Feedback? We read every message",
 ];
 
@@ -295,7 +295,7 @@ const MARQUEE_LOGOS = [
   "Practice Quizzes",
   "Doubt Solving",
   "Revision Cards",
-  "One-One AI Tutor",
+  "One to One AI Tutor",
 ];
 
 /* ─── HOOKS ─────────────────────────────────────────────────────────────── */
