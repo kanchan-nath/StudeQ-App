@@ -1,6 +1,6 @@
 import { lazy, Suspense, useMemo } from "react";
 import styles from "./page.module.css";
-import ExploreStudeQ from '@/components/ExploreStudeQ';
+import ExploreStudeQ from './ExploreStudeQ.jsx';
 
 // ---------------------------------------------------------------------------
 // Lazy‑loaded below‑fold section

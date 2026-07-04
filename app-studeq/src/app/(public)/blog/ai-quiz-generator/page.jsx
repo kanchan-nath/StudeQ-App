@@ -3,7 +3,7 @@ import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import styles from './page.module.css';
-import ExploreStudeQ from '@/components/ExploreStudeQ';
+import ExploreStudeQ from './ExploreStudeQ.jsx';
 
 // --- METADATA ---
 export const metadata = {
