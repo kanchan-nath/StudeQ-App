@@ -689,11 +689,11 @@ const LandingPage = () => {
             <div className={styles.ctaWrapper}>
 
               <ThemeToggle />
-              <Link href="/login" className={styles.navLoginBtn}>
+              <Link href="https://app.studeq.onrender.com/login" className={styles.navLoginBtn}>
                 Log in
               </Link>
               <Link
-                href="/register"
+                href="https://app.studeq.onrender.com/register"
                 className={styles.navCta}
               >
                 Start now
