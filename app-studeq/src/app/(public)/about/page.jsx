@@ -17,7 +17,7 @@ export const metadata = {
         type: "website",
         images: [
             {
-                url: "https://studeq.onrender.com/images/og-about.jpg",
+                url: "https://studeq.onrender.com/images/og-about.svg",
                 width: 1200,
                 height: 630,
                 alt: "StudeQ team working together on a better study experience",
@@ -29,7 +29,7 @@ export const metadata = {
         title: "About StudeQ — Our Mission to Transform How Students Learn",
         description:
             "Meet the team behind StudeQ. We are building a platform that makes deep, focused studying accessible to every university student through smart tools and community-driven design.",
-        images: ["https://studeq.onrender.com/images/og-about.jpg"],
+        images: ["https://studeq.onrender.com/images/og-about.svg"],
     },
 };
 
