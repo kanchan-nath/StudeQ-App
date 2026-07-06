@@ -11,16 +11,16 @@ export const metadata = {
     description: 'Learn how to memorize faster for students. Discover the 7 3 2 1 method, the 20/20/20 rule, and other proven strategies to retain information longer.',
     robots: 'index, follow',
     alternates: {
-        canonical: 'https://studeq.com/blog/how-to-memorize-faster',
+        canonical: 'https://studeq.onrender.com/blog/how-to-memorize-faster',
     },
     openGraph: {
         title: 'How to Memorize Faster: Science-Backed Techniques for Students',
         description: 'Learn how to memorize faster for students. Discover the 7 3 2 1 method, the 20/20/20 rule, and other proven strategies to retain information longer.',
-        url: 'https://studeq.com/blog/how-to-memorize-faster',
+        url: 'https://studeq.onrender.com/blog/how-to-memorize-faster',
         type: 'article',
         images: [
             {
-                url: 'https://studeq.com/images/blog/memorize-faster-hero.jpg',
+                url: 'https://studeq.onrender.com/images/blog/memorize-faster-hero.svg',
                 width: 1200,
                 height: 630,
                 alt: 'A student using active recall and spaced repetition to memorize faster.',
@@ -31,7 +31,7 @@ export const metadata = {
         card: 'summary_large_image',
         title: 'How to Memorize Faster: Science-Backed Techniques for Students',
         description: 'Learn how to memorize faster for students. Discover the 7 3 2 1 method, the 20/20/20 rule, and other proven strategies to retain information longer.',
-        images: ['https://studeq.com/images/blog/memorize-faster-hero.jpg'],
+        images: ['https://studeq.onrender.com/images/blog/memorize-faster-hero.svg'],
     },
 };
 
@@ -41,7 +41,7 @@ const structuredData = {
     '@type': 'Article',
     headline: 'How to Memorize Faster: 5 Science-Backed Techniques for Students',
     description: 'Learn how to memorize faster for students. Discover the 7 3 2 1 method, the 20/20/20 rule, and other proven strategies to retain information longer.',
-    image: 'https://studeq.com/images/blog/memorize-faster-hero.jpg',
+    image: 'https://studeq.onrender.com/images/blog/memorize-faster-hero.svg',
     author: {
         '@type': 'Person',
         name: 'Dr. Sarah Chen',
@@ -51,14 +51,14 @@ const structuredData = {
         name: 'StudeQ',
         logo: {
             '@type': 'ImageObject',
-            url: 'https://studeq.com/images/logo.png',
+            url: 'https://studeq.onrender.com/images/logo.svg',
         },
     },
     datePublished: '2026-06-28T08:00:00+00:00',
     dateModified: '2026-07-03T10:00:00+00:00',
     mainEntityOfPage: {
         '@type': 'WebPage',
-        '@id': 'https://studeq.com/blog/how-to-memorize-faster',
+        '@id': 'https://studeq.onrender.com/blog/how-to-memorize-faster',
     },
 };
 
