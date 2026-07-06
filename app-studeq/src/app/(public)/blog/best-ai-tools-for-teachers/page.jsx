@@ -20,7 +20,7 @@ export const metadata = {
         type: 'article',
         images: [
             {
-                url: 'https://studeq.com/images/blog/ai-tools-for-teachers-hero.jpg',
+                url: 'https://studeq.onrender.com/images/blog/ai-tools-for-teachers-hero.svg',
                 width: 1200,
                 height: 630,
                 alt: 'Teacher using AI tools on laptop to create lesson plans and presentations',
@@ -31,7 +31,7 @@ export const metadata = {
         card: 'summary_large_image',
         title: 'Best AI Tools for Teachers in 2026: Free & Paid Options',
         description: 'Discover the best AI tools for teachers including free options, lesson plan generators, and presentation tools.',
-        images: ['https://studeq.com/images/blog/ai-tools-for-teachers-hero.jpg'],
+        images: ['https://studeq.onrender.com/images/blog/ai-tools-for-teachers-hero.svg'],
     },
 };
 
@@ -41,7 +41,7 @@ const structuredData = {
     '@type': 'Article',
     headline: 'Best AI Tools for Teachers in 2026: Free & Paid Options',
     description: 'Discover the best AI tools for teachers including free options, lesson plan generators, and presentation tools. Perfect for educators in India and worldwide.',
-    image: 'https://studeq.com/images/blog/ai-tools-for-teachers-hero.jpg',
+    image: 'https://studeq.onrender.com/images/blog/ai-tools-for-teachers-hero.svg',
     author: {
         '@type': 'Person',
         name: 'Dr. Emily Rodriguez',
@@ -51,7 +51,7 @@ const structuredData = {
         name: 'StudeQ',
         logo: {
             '@type': 'ImageObject',
-            url: 'https://studeq.com/images/logo.png',
+            url: 'https://studeq.onrender.com/images/logo.svg',
         },
     },
     datePublished: '2026-07-01T08:00:00+00:00',

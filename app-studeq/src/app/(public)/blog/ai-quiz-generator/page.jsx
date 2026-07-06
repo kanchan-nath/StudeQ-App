@@ -31,7 +31,7 @@ export const metadata = {
         card: 'summary_large_image',
         title: 'AI Quiz Generator: Create Tests from PDF & Text in Seconds',
         description: 'Discover the best AI quiz generator for students. Generate free quizzes from PDF, text, and study materials with StudeQ and Jotform alternatives.',
-        images: ['https://studeq.com/images/blog/ai-quiz-generator-hero.svg'],
+        images: ['https://studeq.onrender.com/images/blog/ai-quiz-generator-hero.svg'],
     },
 };
 
@@ -51,7 +51,7 @@ const structuredData = {
         name: 'StudeQ',
         logo: {
             '@type': 'ImageObject',
-            url: 'https://studeq.com/images/logo.png',
+            url: 'https://studeq.onrender.com/images/logo.svg',
         },
     },
     datePublished: '2026-06-30T08:00:00+00:00',
