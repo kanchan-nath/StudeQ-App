@@ -11,12 +11,12 @@ export const metadata = {
     description: 'Discover the best AI tools for teachers including free options, lesson plan generators, and presentation tools. Perfect for educators in India and worldwide.',
     robots: 'index, follow',
     alternates: {
-        canonical: 'https://studeq.com/blog/best-ai-tools-for-teachers',
+        canonical: 'https://studeq.onrender.com/blog/best-ai-tools-for-teachers',
     },
     openGraph: {
         title: 'Best AI Tools for Teachers in 2026: Free & Paid Options',
         description: 'Discover the best AI tools for teachers including free options, lesson plan generators, and presentation tools. Perfect for educators in India and worldwide.',
-        url: 'https://studeq.com/blog/best-ai-tools-for-teachers',
+        url: 'https://studeq.onrender.com/blog/best-ai-tools-for-teachers',
         type: 'article',
         images: [
             {
@@ -58,7 +58,7 @@ const structuredData = {
     dateModified: '2026-07-03T10:00:00+00:00',
     mainEntityOfPage: {
         '@type': 'WebPage',
-        '@id': 'https://studeq.com/blog/best-ai-tools-for-teachers',
+        '@id': 'https://studeq.onrender.com/blog/best-ai-tools-for-teachers',
     },
 };
 
