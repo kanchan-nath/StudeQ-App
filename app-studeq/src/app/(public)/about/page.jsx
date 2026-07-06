@@ -12,7 +12,7 @@ export const metadata = {
     openGraph: {
         title: "About StudeQ — Our Mission to Transform How Students Learn",
         description:
-            "Meet the team behind StudeQ. We are building a platform that makes deep, focused studying accessible to every university student through smart tools and community driven design.",
+            "Meet the person behind StudeQ. Learn how Kanchan is building smart study tools, AI powered features, and a community driven platform for university students.",
         url: "https://studeq.onrender.com/about",
         type: "website",
         images: [
