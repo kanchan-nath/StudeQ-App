@@ -1,5 +1,6 @@
 // app/our-mission/page.jsx (Server Component)
 import styles from './page.module.css';
+import Link from 'next/link';
 
 /* ── METADATA ────────────────────────────────────────────────── */
 export const metadata = {
@@ -363,7 +364,33 @@ export default function MissionPage() {
                                     <div className={styles.problemDivider} aria-hidden="true">
                                         →
                                     </div>
-                                    <p className={styles.problemSolution}>{p.solution}</p>
+                                    <p className={styles.problemSolution}>
+                                        {p.solution.includes('active quizzes and flashcards') ? (
+                                            <>
+                                                StudeQ converts any topic into{' '}
+                                                <Link href="/features/flashcard" className={styles.inlineLink}>
+                                                    active quizzes and flashcards
+                                                </Link>
+                                                {' '}in seconds — forcing recall, not recognition.
+                                            </>
+                                        ) : p.solution.includes('Smart scheduling') ? (
+                                            <>
+                                                <Link href="/features/quiz" className={styles.inlineLink}>
+                                                    Smart scheduling
+                                                </Link>
+                                                {' '}uses spaced repetition science to spread reviews across days, so knowledge sticks long-term.
+                                            </>
+                                        ) : p.solution.includes('Confidence scoring') ? (
+                                            <>
+                                                <Link href="/features/quiz" className={styles.inlineLink}>
+                                                    Confidence scoring
+                                                </Link>
+                                                {' '}maps your knowledge gaps visually — you always know exactly where to focus next.
+                                            </>
+                                        ) : (
+                                            p.solution
+                                        )}
+                                    </p>
                                 </article>
                             ))}
                         </div>
@@ -621,7 +648,35 @@ export default function MissionPage() {
                             {FAQS.map(({ q, a }) => (
                                 <div key={q} className={styles.faqItem}>
                                     <dt className={styles.faqQ}>{q}</dt>
-                                    <dd className={styles.faqA}>{a}</dd>
+                                    <dd className={styles.faqA}>
+                                        {a.includes('adaptive flashcards') ? (
+                                            <>
+                                                StudeQ is an AI-powered study platform that helps students learn faster using{' '}
+                                                <Link href="/features/flashcard" className={styles.inlineLink}>
+                                                    adaptive flashcards
+                                                </Link>
+                                                , unlimited AI quizzes, a real-time AI tutor, and smart study scheduling.
+                                            </>
+                                        ) : a.includes('schedules review sessions') ? (
+                                            <>
+                                                StudeQ identifies your weak areas, generates personalized quizzes, explains concepts step-by-step via AI tutor, and{' '}
+                                                <Link href="/features/quiz" className={styles.inlineLink}>
+                                                    schedules review sessions
+                                                </Link>
+                                                {' '}using spaced repetition — so you retain more in less time.
+                                            </>
+                                        ) : a.includes('create custom quiz sets') ? (
+                                            <>
+                                                Absolutely. StudeQ is designed for exam prep.{' '}
+                                                <Link href="/features/quiz" className={styles.inlineLink}>
+                                                    Create custom quiz sets
+                                                </Link>
+                                                {' '}by topic, simulate timed tests, review mistakes with AI explanations, and track your confidence score before exam day.
+                                            </>
+                                        ) : (
+                                            a
+                                        )}
+                                    </dd>
                                 </div>
                             ))}
                         </dl>
