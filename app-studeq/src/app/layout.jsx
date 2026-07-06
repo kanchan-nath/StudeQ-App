@@ -21,6 +21,9 @@ export const metadata = {
 
   verification: {
     google: "nuIuORa0PeSDcS_sze1GxUt1ET5hyhVBU5Vh3x1HWrc",
+    other: {
+      "msvalidate.01": "84C19D9F44AD40DB58C75CE622092E5A",
+    },
   },
   
   openGraph: {
