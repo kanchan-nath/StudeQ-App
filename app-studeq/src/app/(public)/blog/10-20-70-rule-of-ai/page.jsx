@@ -20,7 +20,7 @@ export const metadata = {
         type: 'article',
         images: [
             {
-                url: 'https://studeq.onrender.com/images/blog/10-20-70-rule-og.jpg',
+                url: 'https://studeq.onrender.com/images/blog/10-20-70-rule-og.svg',
                 width: 1200,
                 height: 630,
                 alt: '10/20/70 Rule of AI illustrated with three segments',
@@ -32,7 +32,7 @@ export const metadata = {
         title: 'What Is the 10/20/70 Rule of AI? A Practical Framework',
         description:
             'Learn how the 10/20/70 rule breaks down AI project success into algorithms, data, and change management.',
-        images: ['https://studeq.onrender.com/images/blog/10-20-70-rule-og.jpg'],
+        images: ['https://studeq.onrender.com/images/blog/10-20-70-rule-og.svg'],
     },
 };
 
@@ -43,7 +43,7 @@ export default function TenTwentySeventyRulePage() {
         headline: 'What Is the 10/20/70 Rule of AI? A Practical Framework',
         description:
             'The 10/20/70 rule breaks AI success into 10% algorithms, 20% data and infrastructure, and 70% people and process change. This guide explains each layer with examples.',
-        image: 'https://studeq.onrender.com/images/blog/10-20-70-rule-og.jpg',
+        image: 'https://studeq.onrender.com/images/blog/10-20-70-rule-og.svg',
         author: {
             '@type': 'Person',
             name: 'StudeQ Editorial Team',
@@ -53,7 +53,7 @@ export default function TenTwentySeventyRulePage() {
             name: 'StudeQ',
             logo: {
                 '@type': 'ImageObject',
-                url: 'https://studeq.onrender.com/images/studeq-logo.png',
+                url: 'https://studeq.onrender.com/images/logo.svg',
             },
         },
         datePublished: '2026-06-28T08:00:00+00:00',
