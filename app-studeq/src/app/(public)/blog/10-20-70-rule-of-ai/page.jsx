@@ -1,4 +1,4 @@
-// app/(public)/blog/what-is-the-10-20-70-rule-of-ai/page.jsx
+// app/(public)/blog/10-20-70-rule-of-ai/page.jsx
 
 import { lazy, Suspense } from 'react';
 import styles from './page.module.css';
@@ -10,13 +10,13 @@ export const metadata = {
         'Learn how the 10/20/70 rule breaks down AI project success into algorithms, data, and change management. Real examples and a StudeQ demo inside.',
     robots: 'index, follow',
     alternates: {
-        canonical: 'https://studeq.onrender.com/blog/what-is-the-10-20-70-rule-of-ai',
+        canonical: 'https://studeq.onrender.com/blog/10-20-70-rule-of-ai',
     },
     openGraph: {
         title: 'What Is the 10/20/70 Rule of AI? A Practical Framework',
         description:
             'Learn how the 10/20/70 rule breaks down AI project success into algorithms, data, and change management. Real examples and a StudeQ demo inside.',
-        url: 'https://studeq.onrender.com/blog/what-is-the-10-20-70-rule-of-ai',
+        url: 'https://studeq.onrender.com/blog/10-20-70-rule-of-ai',
         type: 'article',
         images: [
             {
@@ -60,7 +60,7 @@ export default function TenTwentySeventyRulePage() {
         dateModified: '2026-07-03T10:00:00+00:00',
         mainEntityOfPage: {
             '@type': 'WebPage',
-            '@id': 'https://studeq.onrender.com/blog/what-is-the-10-20-70-rule-of-ai',
+            '@id': 'https://studeq.onrender.com/blog/10-20-70-rule-of-ai',
         },
     };
 
