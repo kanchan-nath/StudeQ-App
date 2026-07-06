@@ -9,13 +9,13 @@ export const metadata = {
         'Read the StudeQ privacy policy to understand how we collect, use, and safeguard your personal information while you study smarter.',
     robots: 'index, follow',
     alternates: {
-        canonical: 'https://www.studeq.onrender.com/privacy-policy',
+        canonical: 'https://studeq.onrender.com/privacy-policy',
     },
     openGraph: {
         title: 'StudeQ Privacy Policy — Your Data, Your Trust',
         description:
-            'Transparent details on data collection, cookies, third-party sharing, and your rights under our privacy framework.',
-        url: 'https://www.studeq.com/privacy-policy',
+            'Transparent details on data collection, cookies, third party sharing, and your rights under our privacy framework.',
+        url: 'https://studeq.onrender.com/privacy-policy',
         type: 'website',
         images: [
             {
@@ -45,25 +45,25 @@ export default function PrivacyPolicyPage() {
         headline: 'StudeQ Privacy Policy',
         description:
             'Comprehensive privacy policy detailing how StudeQ collects, uses, and protects user data in compliance with global regulations.',
-        image: '/images/studeq-privacy-hero.jpg',
+        image: '/images/studeq-privacy-og.svg',
         author: {
             '@type': 'Organization',
             name: 'StudeQ',
-            url: 'https://www.studeq.com',
+            url: 'https://studeq.onrender.com',
         },
         publisher: {
             '@type': 'Organization',
             name: 'StudeQ',
             logo: {
                 '@type': 'ImageObject',
-                url: '/images/studeq-logo.png',
+                url: '/logo.svg',
             },
         },
         datePublished: publishedDate,
         dateModified: lastUpdated,
         mainEntityOfPage: {
             '@type': 'WebPage',
-            '@id': 'https://www.studeq.com/privacy-policy',
+            '@id': 'https://studeq.onrender.com/privacy-policy',
         },
     };
 
@@ -73,10 +73,6 @@ export default function PrivacyPolicyPage() {
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
             />
-
-            <a href="#main-content" className={styles.skipLink}>
-                Skip to main content
-            </a>
 
             <main id="main-content" className={styles.page}>
                 {/* ── Hero Section ── */}
