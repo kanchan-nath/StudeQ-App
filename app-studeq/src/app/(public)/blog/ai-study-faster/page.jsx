@@ -2,8 +2,8 @@ import { Suspense, lazy } from "react";
 import styles from "./page.module.css";
 import ExploreStudeQ from './ExploreStudeQ.jsx';
 
-const SITE_URL = "https://studeq.app";
-const POST_SLUG = "how-to-use-ai-to-study-faster";
+const SITE_URL = "https://studeq.onrender.com";
+const POST_SLUG = "ai-study-faster";
 const POST_URL = `${SITE_URL}/blog/${POST_SLUG}`;
 const HERO_IMAGE = "/images/post/how-to-use-ai-to-study-faster.png";
 const PUBLISHED_DATE = "2026-07-03";
