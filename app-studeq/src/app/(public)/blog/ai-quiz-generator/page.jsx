@@ -11,16 +11,16 @@ export const metadata = {
     description: 'Discover the best AI quiz generator for students. Generate free quizzes from PDF, text, and study materials with StudeQ and Jotform alternatives.',
     robots: 'index, follow',
     alternates: {
-        canonical: 'https://studeq.com/blog/ai-quiz-generator',
+        canonical: 'https://studeq.onrender.com/blog/ai-quiz-generator',
     },
     openGraph: {
         title: 'AI Quiz Generator: Create Tests from PDF & Text in Seconds',
         description: 'Discover the best AI quiz generator for students. Generate free quizzes from PDF, text, and study materials with StudeQ and Jotform alternatives.',
-        url: 'https://studeq.com/blog/ai-quiz-generator',
+        url: 'https://studeq.onrender.com/blog/ai-quiz-generator',
         type: 'article',
         images: [
             {
-                url: 'https://studeq.com/images/blog/ai-quiz-generator-hero.jpg',
+                url: 'https://studeq.onrender.com/images/blog/ai-quiz-generator-hero.svg',
                 width: 1200,
                 height: 630,
                 alt: 'Student using AI quiz generator to create practice tests from study materials',
@@ -31,7 +31,7 @@ export const metadata = {
         card: 'summary_large_image',
         title: 'AI Quiz Generator: Create Tests from PDF & Text in Seconds',
         description: 'Discover the best AI quiz generator for students. Generate free quizzes from PDF, text, and study materials with StudeQ and Jotform alternatives.',
-        images: ['https://studeq.com/images/blog/ai-quiz-generator-hero.jpg'],
+        images: ['https://studeq.com/images/blog/ai-quiz-generator-hero.svg'],
     },
 };
 
@@ -41,7 +41,7 @@ const structuredData = {
     '@type': 'Article',
     headline: 'AI Quiz Generator: Create Tests from PDF & Text in Seconds',
     description: 'Discover the best AI quiz generator for students. Generate free quizzes from PDF, text, and study materials with StudeQ and Jotform alternatives.',
-    image: 'https://studeq.com/images/blog/ai-quiz-generator-hero.jpg',
+    image: 'https://studeq.onrender.com/images/blog/ai-quiz-generator-hero.svg',
     author: {
         '@type': 'Person',
         name: 'Dr. Michael Torres',
@@ -58,7 +58,7 @@ const structuredData = {
     dateModified: '2026-07-03T10:00:00+00:00',
     mainEntityOfPage: {
         '@type': 'WebPage',
-        '@id': 'https://studeq.com/blog/ai-quiz-generator',
+        '@id': 'https://studeq.onrender.com/blog/ai-quiz-generator',
     },
 };
 
@@ -91,7 +91,7 @@ export default function AiQuizGeneratorPage() {
                         </div>
                         <div className={styles.heroImageWrapper}>
                             <Image
-                                src="/images/blog/ai-quiz-generator-hero.jpg"
+                                src="/images/blog/ai-quiz-generator-hero.svg"
                                 alt="Student using AI quiz generator on laptop with PDF and study materials visible"
                                 width={1200}
                                 height={630}
