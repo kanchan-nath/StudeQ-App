@@ -7,7 +7,7 @@ import ExploreStudeQ from './ExploreStudeQ.jsx';
 
 // --- METADATA ---
 export const metadata = {
-    title: 'How to Memorize Faster: 5 Science-Backed Techniques for Students',
+    title: '5 Science Backed Techniques to Memorize Faster',
     description: 'Learn how to memorize faster for students. Discover the 7 3 2 1 method, the 20/20/20 rule, and other proven strategies to retain information longer.',
     robots: 'index, follow',
     alternates: {
