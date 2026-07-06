@@ -1,0 +1,201 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0F0B1F"/>
+      <stop offset="50%" style="stop-color:#1A1235"/>
+      <stop offset="100%" style="stop-color:#0D0A1E"/>
+    </linearGradient>
+    <linearGradient id="chatBubble1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#7C3AED"/>
+      <stop offset="100%" style="stop-color:#6D28D9"/>
+    </linearGradient>
+    <linearGradient id="chatBubble2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#8B5CF6"/>
+      <stop offset="100%" style="stop-color:#7C3AED"/>
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#7C3AED"/>
+      <stop offset="100%" style="stop-color:#5B21B6"/>
+    </linearGradient>
+    <linearGradient id="badgeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#A78BFA"/>
+      <stop offset="100%" style="stop-color:#7C3AED"/>
+    </linearGradient>
+    <linearGradient id="lineGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#7C3AED;stop-opacity:0"/>
+      <stop offset="50%" style="stop-color:#A78BFA;stop-opacity:0.6"/>
+      <stop offset="100%" style="stop-color:#7C3AED;stop-opacity:0"/>
+    </linearGradient>
+    <linearGradient id="sourceGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#10B981"/>
+      <stop offset="100%" style="stop-color:#059669"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="softGlow">
+      <feGaussianBlur stdDeviation="10" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="cardShadow">
+      <feDropShadow dx="3" dy="6" stdDeviation="10" flood-color="#7C3AED" flood-opacity="0.12"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bgGrad)"/>
+
+  <!-- Top glow line -->
+  <line x1="0" y1="0" x2="1200" y2="0" stroke="url(#lineGrad)" stroke-width="2"/>
+
+  <!-- Subtle background orbs -->
+  <circle cx="200" cy="500" r="220" fill="#7C3AED" opacity="0.04"/>
+  <circle cx="1000" cy="100" r="200" fill="#8B5CF6" opacity="0.04"/>
+  <circle cx="600" cy="315" r="350" fill="#A78BFA" opacity="0.02"/>
+
+  <!-- LEFT SIDE: Chat Interface Visual (dominant ~45% canvas) -->
+  <g transform="translate(180, 315)">
+    
+    <!-- Chat container -->
+    <rect x="-110" y="-140" width="220" height="280" rx="16" fill="#1A1235" stroke="#7C3AED" stroke-width="2" filter="url(#cardShadow)"/>
+    <rect x="-110" y="-140" width="220" height="280" rx="16" fill="url(#accentGrad)" opacity="0.04"/>
+    
+    <!-- Chat header -->
+    <rect x="-110" y="-140" width="220" height="40" rx="16" fill="#7C3AED" opacity="0.12"/>
+    <rect x="-110" y="-108" width="220" height="8" fill="#1A1235"/>
+    <circle cx="-90" cy="-120" r="10" fill="#7C3AED" opacity="0.15"/>
+    <text x="-80" y="-116" font-family="'Segoe UI', Arial, sans-serif" font-size="14" fill="#A78BFA" font-weight="700">📄 Document Chat</text>
+    <circle cx="80" cy="-120" r="5" fill="#10B981" opacity="0.8"/>
+    
+    <!-- Document icon in chat -->
+    <g transform="translate(-90, -80)">
+      <rect x="0" y="0" width="16" height="20" rx="2" fill="#7C3AED" opacity="0.2"/>
+      <line x1="3" y1="6" x2="13" y2="6" stroke="#A78BFA" stroke-width="1" opacity="0.3"/>
+      <line x1="3" y1="10" x2="13" y2="10" stroke="#A78BFA" stroke-width="1" opacity="0.2"/>
+      <line x1="3" y1="14" x2="10" y2="14" stroke="#A78BFA" stroke-width="1" opacity="0.2"/>
+    </g>
+    <text x="-65" y="-65" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#C4B5FD" font-weight="400">AI_101_Lecture.pdf</text>
+
+    <!-- Chat messages -->
+    <!-- User message -->
+    <g transform="translate(-90, -40)">
+      <rect x="0" y="0" width="160" height="24" rx="12" fill="#7C3AED" opacity="0.15"/>
+      <text x="15" y="16" font-family="'Segoe UI', Arial, sans-serif" font-size="12" fill="#A78BFA" font-weight="400">What are neural networks?</text>
+    </g>
+
+    <!-- AI response with citations -->
+    <g transform="translate(-90, -5)">
+      <rect x="0" y="0" width="175" height="65" rx="12" fill="#1A1235" stroke="#7C3AED" stroke-width="1" opacity="0.8"/>
+      
+      <text x="12" y="16" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#FFFFFF" font-weight="400">Neural networks are computing</text>
+      <text x="12" y="30" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#FFFFFF" font-weight="400">systems inspired by the human</text>
+      <text x="12" y="44" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#FFFFFF" font-weight="400">brain. They learn from data.</text>
+      
+      <!-- Citation badge -->
+      <rect x="12" y="50" width="80" height="12" rx="6" fill="#10B981" opacity="0.15"/>
+      <text x="17" y="59" font-family="'Segoe UI', Arial, sans-serif" font-size="8" fill="#34D399" font-weight="600">📄 p. 3, 5, 7</text>
+    </g>
+
+    <!-- Follow-up user message -->
+    <g transform="translate(-90, 52)">
+      <rect x="0" y="0" width="140" height="24" rx="12" fill="#7C3AED" opacity="0.15"/>
+      <text x="15" y="16" font-family="'Segoe UI', Arial, sans-serif" font-size="12" fill="#A78BFA" font-weight="400">Give examples please</text>
+    </g>
+
+    <!-- AI response with sources -->
+    <g transform="translate(-90, 85)">
+      <rect x="0" y="0" width="180" height="50" rx="12" fill="#1A1235" stroke="#7C3AED" stroke-width="1" opacity="0.8"/>
+      
+      <text x="12" y="16" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#FFFFFF" font-weight="400">Image recognition, NLP,</text>
+      <text x="12" y="30" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#FFFFFF" font-weight="400">and game playing (e.g., chess).</text>
+      
+      <!-- Citation badges -->
+      <rect x="12" y="36" width="65" height="12" rx="6" fill="#10B981" opacity="0.15"/>
+      <text x="17" y="45" font-family="'Segoe UI', Arial, sans-serif" font-size="8" fill="#34D399" font-weight="600">📄 p. 12, 15</text>
+      
+      <rect x="82" y="36" width="70" height="12" rx="6" fill="#8B5CF6" opacity="0.15"/>
+      <text x="87" y="45" font-family="'Segoe UI', Arial, sans-serif" font-size="8" fill="#A78BFA" font-weight="600">📄 p. 8-10</text>
+    </g>
+
+    <!-- Input bar -->
+    <g transform="translate(-90, 148)">
+      <rect x="0" y="0" width="180" height="32" rx="16" fill="#1A1235" stroke="#7C3AED" stroke-width="1.5" opacity="0.8"/>
+      <text x="15" y="20" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#5B21B6" font-weight="400">Ask about your document...</text>
+      <circle cx="155" cy="16" r="12" fill="#7C3AED"/>
+      <text x="155" y="20" font-family="'Segoe UI', Arial, sans-serif" font-size="12" fill="#FFFFFF" text-anchor="middle">→</text>
+    </g>
+
+    <!-- "No hallucinations" trust badge -->
+    <g transform="translate(-75, 195)">
+      <rect x="0" y="0" width="150" height="20" rx="10" fill="#10B981" opacity="0.08"/>
+      <rect x="0" y="0" width="150" height="20" rx="10" fill="none" stroke="#10B981" stroke-width="0.5" opacity="0.3"/>
+      <text x="75" y="14" font-family="'Segoe UI', Arial, sans-serif" font-size="9" fill="#34D399" text-anchor="middle" font-weight="600">✓ Grounded in your sources</text>
+    </g>
+  </g>
+
+  <!-- RIGHT SIDE: Text Content (F-pattern, clear negative space) -->
+  <g transform="translate(545, 50)">
+    
+    <!-- Badge -->
+    <rect x="0" y="0" width="170" height="30" rx="15" fill="url(#badgeGrad)" opacity="0.12"/>
+    <rect x="0" y="0" width="170" height="30" rx="15" fill="none" stroke="#A78BFA" stroke-width="1"/>
+    <text x="85" y="20" font-family="'Segoe UI', Arial, sans-serif" font-size="12" fill="#A78BFA" text-anchor="middle" font-weight="700" letter-spacing="1">💬 AI DOCUMENT CHAT</text>
+
+    <!-- Main bold headline - dominant -->
+    <text x="0" y="75" font-family="'Segoe UI', Arial, sans-serif" font-size="60" fill="#FFFFFF" font-weight="900" letter-spacing="-1">
+      Chat With Your
+    </text>
+    <text x="0" y="145" font-family="'Segoe UI', Arial, sans-serif" font-size="60" fill="url(#badgeGrad)" font-weight="900" letter-spacing="-1">
+      Documents
+    </text>
+
+    <!-- Decorative underline -->
+    <rect x="0" y="163" width="200" height="4" rx="2" fill="url(#badgeGrad)" opacity="0.6"/>
+    <rect x="0" y="163" width="80" height="4" rx="2" fill="url(#chatBubble2)" opacity="0.9"/>
+
+    <!-- Description -->
+    <text x="0" y="205" font-family="'Segoe UI', Arial, sans-serif" font-size="18" fill="#C4B5FD" font-weight="400" opacity="0.9">
+      Upload your documents and discuss
+    </text>
+    <text x="0" y="233" font-family="'Segoe UI', Arial, sans-serif" font-size="18" fill="#C4B5FD" font-weight="400" opacity="0.9">
+      them with AI. Every answer is
+    </text>
+    <text x="0" y="261" font-family="'Segoe UI', Arial, sans-serif" font-size="18" fill="#C4B5FD" font-weight="400" opacity="0.9">
+      grounded in your sources. 🎯
+    </text>
+
+    <!-- Feature chips -->
+    <g transform="translate(0, 300)">
+      <rect x="0" y="0" width="160" height="32" rx="16" fill="#1A1235" stroke="#7C3AED" stroke-width="1" opacity="0.8"/>
+      <text x="80" y="21" font-family="'Segoe UI', Arial, sans-serif" font-size="13" fill="#A78BFA" text-anchor="middle" font-weight="600">Exact Citations</text>
+
+      <rect x="175" y="0" width="145" height="32" rx="16" fill="#1A1235" stroke="#10B981" stroke-width="1" opacity="0.8"/>
+      <text x="247" y="21" font-family="'Segoe UI', Arial, sans-serif" font-size="13" fill="#34D399" text-anchor="middle" font-weight="600">No Hallucinations</text>
+
+      <rect x="0" y="45" width="170" height="32" rx="16" fill="#1A1235" stroke="#8B5CF6" stroke-width="1" opacity="0.8"/>
+      <text x="85" y="66" font-family="'Segoe UI', Arial, sans-serif" font-size="13" fill="#A78BFA" text-anchor="middle" font-weight="600">Any Document Type</text>
+    </g>
+
+    <!-- CTA Button -->
+    <g transform="translate(0, 395)">
+      <rect x="0" y="0" width="250" height="52" rx="26" fill="url(#accentGrad)" filter="url(#glow)"/>
+      <text x="125" y="32" font-family="'Segoe UI', Arial, sans-serif" font-size="17" fill="#FFFFFF" text-anchor="middle" font-weight="700">Start Chatting →</text>
+    </g>
+  </g>
+
+  <!-- Bottom right brand -->
+  <text x="1140" y="615" font-family="'Segoe UI', Arial, sans-serif" font-size="13" fill="#5B21B6" text-anchor="end" font-weight="600" letter-spacing="3" opacity="0.5">STUDEQ</text>
+
+  <!-- Corner decorations -->
+  <rect x="20" y="20" width="40" height="3" rx="1.5" fill="#7C3AED" opacity="0.3"/>
+  <rect x="20" y="20" width="3" height="40" rx="1.5" fill="#7C3AED" opacity="0.3"/>
+  <rect x="1140" y="20" width="40" height="3" rx="1.5" fill="#7C3AED" opacity="0.3"/>
+  <rect x="1177" y="20" width="3" height="40" rx="1.5" fill="#7C3AED" opacity="0.3"/>
+</svg>
