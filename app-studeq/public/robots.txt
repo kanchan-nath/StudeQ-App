@@ -1,24 +1,4 @@
 User-agent: *
-Allow: /
-Allow: /features
-Allow: /pricing
-Allow: /our-mission
-
-# Block auth-gated routes
-Disallow: /dashboard
-Disallow: /notes
-Disallow: /quiz
-Disallow: /flashcards
-Disallow: /tutor
-Disallow: /study-room
-Disallow: /image-analyzer
-Disallow: /pdf-summary
-Disallow: /scheduler
-Disallow: /time-table
-Disallow: /event-scheduling
-Disallow: /notebook
-Disallow: /search
-Disallow: /upgrade
 
 # Block auth pages (no value for crawlers)
 Disallow: /login
