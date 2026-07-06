@@ -10,17 +10,17 @@ export const metadata = {
         'Learn how the 10/20/70 rule breaks down AI project success into algorithms, data, and change management. Real examples and a StudeQ demo inside.',
     robots: 'index, follow',
     alternates: {
-        canonical: 'https://studeq.com/blog/what-is-the-10-20-70-rule-of-ai',
+        canonical: 'https://studeq.onrender.com/blog/what-is-the-10-20-70-rule-of-ai',
     },
     openGraph: {
         title: 'What Is the 10/20/70 Rule of AI? A Practical Framework',
         description:
             'Learn how the 10/20/70 rule breaks down AI project success into algorithms, data, and change management. Real examples and a StudeQ demo inside.',
-        url: 'https://studeq.com/blog/what-is-the-10-20-70-rule-of-ai',
+        url: 'https://studeq.onrender.com/blog/what-is-the-10-20-70-rule-of-ai',
         type: 'article',
         images: [
             {
-                url: 'https://studeq.com/images/blog/10-20-70-rule-og.jpg',
+                url: 'https://studeq.onrender.com/images/blog/10-20-70-rule-og.jpg',
                 width: 1200,
                 height: 630,
                 alt: '10/20/70 Rule of AI illustrated with three segments',
@@ -32,7 +32,7 @@ export const metadata = {
         title: 'What Is the 10/20/70 Rule of AI? A Practical Framework',
         description:
             'Learn how the 10/20/70 rule breaks down AI project success into algorithms, data, and change management.',
-        images: ['https://studeq.com/images/blog/10-20-70-rule-og.jpg'],
+        images: ['https://studeq.onrender.com/images/blog/10-20-70-rule-og.jpg'],
     },
 };
 
@@ -43,7 +43,7 @@ export default function TenTwentySeventyRulePage() {
         headline: 'What Is the 10/20/70 Rule of AI? A Practical Framework',
         description:
             'The 10/20/70 rule breaks AI success into 10% algorithms, 20% data and infrastructure, and 70% people and process change. This guide explains each layer with examples.',
-        image: 'https://studeq.com/images/blog/10-20-70-rule-og.jpg',
+        image: 'https://studeq.onrender.com/images/blog/10-20-70-rule-og.jpg',
         author: {
             '@type': 'Person',
             name: 'StudeQ Editorial Team',
@@ -53,14 +53,14 @@ export default function TenTwentySeventyRulePage() {
             name: 'StudeQ',
             logo: {
                 '@type': 'ImageObject',
-                url: 'https://studeq.com/images/studeq-logo.png',
+                url: 'https://studeq.onrender.com/images/studeq-logo.png',
             },
         },
         datePublished: '2026-06-28T08:00:00+00:00',
         dateModified: '2026-07-03T10:00:00+00:00',
         mainEntityOfPage: {
             '@type': 'WebPage',
-            '@id': 'https://studeq.com/blog/what-is-the-10-20-70-rule-of-ai',
+            '@id': 'https://studeq.onrender.com/blog/what-is-the-10-20-70-rule-of-ai',
         },
     };
 
