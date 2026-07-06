@@ -1,6 +1,38 @@
-"use client"
-import Head from 'next/head';
+// app/our-mission/page.jsx (Server Component)
 import styles from './page.module.css';
+
+/* ── METADATA ────────────────────────────────────────────────── */
+export const metadata = {
+    title: 'Our Mission — StudeQ | AI Study Platform for Students',
+    description:
+        'StudeQ is an AI study platform helping students learn faster with adaptive quizzes, AI tutoring, smart flashcards, and personalized learning.',
+    robots: 'index, follow',
+    alternates: {
+        canonical: 'https://studeq.onrender.com/our-mission',
+    },
+    openGraph: {
+        title: 'Our Mission — StudeQ AI Study Platform',
+        description:
+            "StudeQ is an AI study platform helping students learn faster with adaptive quizzes, AI tutoring, smart flashcards, and personalized learning.",
+        url: 'https://studeq.onrender.com/our-mission',
+        type: 'website',
+        images: [
+            {
+                url: 'https://studeq.onrender.com/og-mission.svg',
+                width: 1200,
+                height: 630,
+                alt: 'StudeQ AI Study Platform Mission',
+            },
+        ],
+    },
+    twitter: {
+        card: 'summary_large_image',
+        title: 'Our Mission — StudeQ AI Study Platform',
+        description:
+            'AI powered quizzes, flashcards, and real time tutoring. Built for students who want to learn smarter, not harder.',
+        images: ['https://studeq.onrender.com/og-mission.svg'],
+    },
+};
 
 /* ── JSON-LD SCHEMA ────────────────────────────────────────── */
 const jsonLd = {
@@ -8,7 +40,7 @@ const jsonLd = {
     '@type': 'AboutPage',
     name: 'Our Mission — StudeQ AI Study Platform',
     description:
-        'StudeQ is an AI-powered study platform helping students learn faster with adaptive quizzes, flashcards, real-time AI tutoring, and smart scheduling.',
+        'StudeQ is an AI powered study platform helping students learn faster with adaptive quizzes, flashcards, real time AI tutoring, and smart scheduling.',
     url: 'https://studeq.onrender.com/our-mission',
     publisher: {
         '@type': 'Organization',
@@ -16,11 +48,16 @@ const jsonLd = {
         url: 'https://studeq.onrender.com',
         logo: {
             '@type': 'ImageObject',
-            url: 'https://studeq.onrender.com/favicon.png',
+            url: 'https://studeq.onrender.com/logo.svg',
         },
         sameAs: [
-            'https://twitter.com/studeqapp',
-            'https://linkedin.com/company/studeqapp',
+            'https://x.com/KanchanNathDev',
+            'https://www.linkedin.com/in/kanchan-nath',
+            'https://www.linkedin.com/company/studeq',
+            'https://www.instagram.com/kanchannath.webdev',
+            'https://kanchannath.hashnode.dev',
+            'https://github.com/kanchan-nath',
+            'https://github.com/kanchan-nath/StudeQ'
         ],
     },
 };
@@ -34,7 +71,7 @@ const faqSchema = {
             name: 'What is StudeQ?',
             acceptedAnswer: {
                 '@type': 'Answer',
-                text: 'StudeQ is an AI-powered study platform that helps students learn faster using adaptive flashcards, unlimited AI quizzes, a real-time AI tutor, and smart study scheduling.',
+                text: 'StudeQ is an AI powered study platform that helps students learn faster using adaptive flashcards, unlimited AI quizzes, a real time AI tutor, and smart study scheduling.',
             },
         },
         {
@@ -42,7 +79,7 @@ const faqSchema = {
             name: 'How does StudeQ help students study better?',
             acceptedAnswer: {
                 '@type': 'Answer',
-                text: 'StudeQ identifies your weak areas, generates personalized quizzes, explains concepts step-by-step via AI tutor, and schedules review sessions using spaced repetition — so you retain more in less time.',
+                text: 'StudeQ identifies your weak areas, generates personalized quizzes, explains concepts step by step via AI tutor, and schedules review sessions using spaced repetition, so you retain more in less time.',
             },
         },
         {
@@ -50,7 +87,7 @@ const faqSchema = {
             name: 'Is StudeQ safe and private for students?',
             acceptedAnswer: {
                 '@type': 'Answer',
-                text: 'Yes. StudeQ is COPPA and FERPA-aware. We never sell student data. All conversations with the AI tutor are encrypted and private.',
+                text: 'Yes. StudeQ is COPPA and FERPA aware. We never sell student data. All conversations with the AI tutor are encrypted and private.',
             },
         },
         {
@@ -58,7 +95,7 @@ const faqSchema = {
             name: 'What subjects does StudeQ cover?',
             acceptedAnswer: {
                 '@type': 'Answer',
-                text: 'StudeQ covers all major subjects including Mathematics, Science, History, English, Computer Science, Economics, and more — across middle school, high school, and college levels.',
+                text: 'StudeQ covers all major subjects including Mathematics, Science, History, English, Computer Science, Economics, and more, across middle school, high school, and college levels.',
             },
         },
         {
@@ -66,7 +103,7 @@ const faqSchema = {
             name: 'How is StudeQ different from ChatGPT or other AI tools?',
             acceptedAnswer: {
                 '@type': 'Answer',
-                text: 'Unlike general AI tools, StudeQ is purpose-built for learning. It tracks your progress, adapts to your knowledge gaps, generates exam-style questions, and keeps a study history — giving you a structured learning path, not just answers.',
+                text: 'Unlike general AI tools, StudeQ is purpose built for learning. It tracks your progress, adapts to your knowledge gaps, generates exam-style questions, and keeps a study history, giving you a structured learning path, not just answers.',
             },
         },
         {
@@ -199,12 +236,12 @@ const VALUES = [
     {
         icon: '🎯',
         title: 'Precision over volume',
-        body: 'We don\'t flood you with content. We find the exact gap in your knowledge and close it.',
+        body: "We don't flood you with content. We find the exact gap in your knowledge and close it.",
     },
     {
         icon: '🔓',
         title: 'Access over privilege',
-        body: 'A student in a rural town deserves the same tutor quality as one at an elite school. StudeQ is that equalizer.',
+        body: "A student in a rural town deserves the same tutor quality as one at an elite school. StudeQ is that equalizer.",
     },
     {
         icon: '🔬',
@@ -244,68 +281,45 @@ const FAQS = [
 export default function MissionPage() {
     return (
         <>
-            <Head>
-                <title>Our Mission — StudeQ | AI Study Platform for Students</title>
-                <meta
-                    name="description"
-                    content="StudeQ is an AI study platform helping students learn faster with adaptive quizzes, AI tutoring, and smart flashcards. Discover our mission, technology, and roadmap."
-                />
-                <meta name="robots" content="index, follow" />
-                <link rel="canonical" href="https://studeq.app/mission" />
+            {/* ── JSON-LD STRUCTURED DATA ──────────────────────────── */}
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+            />
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+            />
 
-                {/* Open Graph */}
-                <meta property="og:title" content="Our Mission — StudeQ AI Study Platform" />
-                <meta
-                    property="og:description"
-                    content="We built StudeQ to give every student access to a world-class AI tutor. Learn how we're solving the biggest problems in education with AI."
-                />
-                <meta property="og:image" content="https://studeq.app/og-mission.png" />
-                <meta property="og:url" content="https://studeq.app/mission" />
-                <meta property="og:type" content="website" />
+            {/* ── SKIP LINK ─────────────────────────────────────────── */}
+            <a href="#main-content" className={styles.skipLink}>
+                Skip to main content
+            </a>
 
-                {/* Twitter */}
-                <meta name="twitter:card" content="summary_large_image" />
-                <meta name="twitter:title" content="Our Mission — StudeQ AI Study Platform" />
-                <meta name="twitter:description" content="AI-powered quizzes, flashcards, and real-time tutoring. Built for students who want to learn smarter, not harder." />
-                <meta name="twitter:image" content="https://studeq.app/og-mission.png" />
-
-                {/* Keywords (supplementary signal) */}
-                <meta
-                    name="keywords"
-                    content="AI study platform, AI tutor for students, adaptive learning app, study with AI, best AI app for students, AI flashcards, AI quiz generator, exam preparation AI, StudeQ"
-                />
-
-                {/* Structured data */}
-                <script
-                    type="application/ld+json"
-                    dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-                />
-                <script
-                    type="application/ld+json"
-                    dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
-                />
-            </Head>
-
-            <a href="#main-content" className={styles.skipLink}>Skip to main content</a>
-
+            {/* ── MAIN CONTENT ──────────────────────────────────────── */}
             <main id="main-content" className={styles.main}>
-
                 {/* ── HERO ──────────────────────────────────────────── */}
                 <section className={styles.hero} aria-labelledby="mission-heading">
                     <div className={styles.heroEyebrow}>Our Mission</div>
                     <h1 id="mission-heading" className={styles.heroTitle}>
                         Every student deserves a{' '}
                         <span className={styles.heroAccent}>world-class tutor</span>
-                        <br />in their pocket.
+                        <br />
+                        in their pocket.
                     </h1>
                     <p className={styles.heroBody}>
-                        StudeQ is an AI study platform built on one belief: the quality of your education
-                        shouldn't depend on your zip code, your school's budget, or your parents' income.
-                        We're closing the gap — one quiz, one flashcard, one answered question at a time.
+                        StudeQ is an AI study platform built on one belief: the quality of
+                        your education shouldn't depend on your zip code, your school's
+                        budget, or your parents' income. We're closing the gap — one quiz,
+                        one flashcard, one answered question at a time.
                     </p>
                     <div className={styles.heroCtas}>
-                        <a href="/signup" className={styles.btnPrimary}>Start learning free</a>
-                        <a href="/pricing" className={styles.btnGhost}>Compare plans</a>
+                        <a href="/signup" className={styles.btnPrimary}>
+                            Start learning free
+                        </a>
+                        <a href="/pricing" className={styles.btnGhost}>
+                            Compare plans
+                        </a>
                     </div>
                     <div className={styles.heroGlow} aria-hidden="true" />
                 </section>
@@ -322,22 +336,33 @@ export default function MissionPage() {
                 </section>
 
                 {/* ── PROBLEM → SOLUTION ────────────────────────────── */}
-                <section className={styles.problemSection} aria-labelledby="problems-heading">
+                <section
+                    className={styles.problemSection}
+                    aria-labelledby="problems-heading"
+                >
                     <div className={styles.sectionInner}>
                         <div className={styles.sectionEyebrow}>The Problem</div>
                         <h2 id="problems-heading" className={styles.sectionTitle}>
                             Why students struggle — and how StudeQ fixes it
                         </h2>
                         <p className={styles.sectionSub}>
-                            Traditional studying is broken. Here are the six biggest problems students face, and
-                            what StudeQ does about each one.
+                            Traditional studying is broken. Here are the six biggest problems
+                            students face, and what StudeQ does about each one.
                         </p>
                         <div className={styles.problemGrid}>
                             {PROBLEMS.map((p) => (
-                                <article key={p.problem} className={styles.problemCard} aria-label={p.problem}>
-                                    <div className={styles.problemEmoji} aria-hidden="true">{p.icon}</div>
+                                <article
+                                    key={p.problem}
+                                    className={styles.problemCard}
+                                    aria-label={p.problem}
+                                >
+                                    <div className={styles.problemEmoji} aria-hidden="true">
+                                        {p.icon}
+                                    </div>
                                     <h3 className={styles.problemTitle}>{p.problem}</h3>
-                                    <div className={styles.problemDivider} aria-hidden="true">→</div>
+                                    <div className={styles.problemDivider} aria-hidden="true">
+                                        →
+                                    </div>
                                     <p className={styles.problemSolution}>{p.solution}</p>
                                 </article>
                             ))}
@@ -354,42 +379,62 @@ export default function MissionPage() {
                         </h2>
                         <ol className={styles.stepList} aria-label="How StudeQ works">
                             <li className={styles.stepItem}>
-                                <span className={styles.stepNum} aria-hidden="true">01</span>
+                                <span className={styles.stepNum} aria-hidden="true">
+                                    01
+                                </span>
                                 <div className={styles.stepContent}>
-                                    <h3 className={styles.stepTitle}>Tell StudeQ what you're studying</h3>
+                                    <h3 className={styles.stepTitle}>
+                                        Tell StudeQ what you're studying
+                                    </h3>
                                     <p className={styles.stepBody}>
-                                        Type a topic, paste your notes, or upload a textbook chapter. StudeQ reads it
-                                        and maps the key concepts instantly.
+                                        Type a topic, paste your notes, or upload a textbook
+                                        chapter. StudeQ reads it and maps the key concepts
+                                        instantly.
                                     </p>
                                 </div>
                             </li>
                             <li className={styles.stepItem}>
-                                <span className={styles.stepNum} aria-hidden="true">02</span>
+                                <span className={styles.stepNum} aria-hidden="true">
+                                    02
+                                </span>
                                 <div className={styles.stepContent}>
-                                    <h3 className={styles.stepTitle}>Get a personalised quiz and flashcard deck</h3>
+                                    <h3 className={styles.stepTitle}>
+                                        Get a personalised quiz and flashcard deck
+                                    </h3>
                                     <p className={styles.stepBody}>
-                                        The AI generates exam-style questions tuned to your level — not generic templates,
-                                        but questions that probe the concepts you actually need to know.
+                                        The AI generates exam-style questions tuned to your level —
+                                        not generic templates, but questions that probe the concepts
+                                        you actually need to know.
                                     </p>
                                 </div>
                             </li>
                             <li className={styles.stepItem}>
-                                <span className={styles.stepNum} aria-hidden="true">03</span>
+                                <span className={styles.stepNum} aria-hidden="true">
+                                    03
+                                </span>
                                 <div className={styles.stepContent}>
-                                    <h3 className={styles.stepTitle}>Ask the AI tutor anything</h3>
+                                    <h3 className={styles.stepTitle}>
+                                        Ask the AI tutor anything
+                                    </h3>
                                     <p className={styles.stepBody}>
-                                        Stuck on a question? The AI tutor explains it step-by-step, suggests a different
-                                        approach, and checks if you understood before moving on.
+                                        Stuck on a question? The AI tutor explains it step-by-step,
+                                        suggests a different approach, and checks if you understood
+                                        before moving on.
                                     </p>
                                 </div>
                             </li>
                             <li className={styles.stepItem}>
-                                <span className={styles.stepNum} aria-hidden="true">04</span>
+                                <span className={styles.stepNum} aria-hidden="true">
+                                    04
+                                </span>
                                 <div className={styles.stepContent}>
-                                    <h3 className={styles.stepTitle}>Review on a smart schedule</h3>
+                                    <h3 className={styles.stepTitle}>
+                                        Review on a smart schedule
+                                    </h3>
                                     <p className={styles.stepBody}>
-                                        StudeQ schedules your next review at the exact moment you're about to forget —
-                                        using spaced repetition science to move knowledge from short-term to long-term memory.
+                                        StudeQ schedules your next review at the exact moment you're
+                                        about to forget — using spaced repetition science to move
+                                        knowledge from short-term to long-term memory.
                                     </p>
                                 </div>
                             </li>
@@ -398,14 +443,21 @@ export default function MissionPage() {
                 </section>
 
                 {/* ── VALUES ────────────────────────────────────────── */}
-                <section className={styles.valuesSection} aria-labelledby="values-heading">
+                <section
+                    className={styles.valuesSection}
+                    aria-labelledby="values-heading"
+                >
                     <div className={styles.sectionInner}>
                         <div className={styles.sectionEyebrow}>What We Believe</div>
-                        <h2 id="values-heading" className={styles.sectionTitle}>The principles behind every decision</h2>
+                        <h2 id="values-heading" className={styles.sectionTitle}>
+                            The principles behind every decision
+                        </h2>
                         <div className={styles.valuesGrid}>
                             {VALUES.map((v) => (
                                 <article key={v.title} className={styles.valueCard}>
-                                    <span className={styles.valueIcon} aria-hidden="true">{v.icon}</span>
+                                    <span className={styles.valueIcon} aria-hidden="true">
+                                        {v.icon}
+                                    </span>
                                     <h3 className={styles.valueTitle}>{v.title}</h3>
                                     <p className={styles.valueBody}>{v.body}</p>
                                 </article>
@@ -415,7 +467,10 @@ export default function MissionPage() {
                 </section>
 
                 {/* ── TRUST / PRIVACY ───────────────────────────────── */}
-                <section className={styles.trustSection} aria-labelledby="trust-heading">
+                <section
+                    className={styles.trustSection}
+                    aria-labelledby="trust-heading"
+                >
                     <div className={styles.sectionInner}>
                         <div className={styles.sectionEyebrow}>Why Trust Us</div>
                         <h2 id="trust-heading" className={styles.sectionTitle}>
@@ -423,35 +478,45 @@ export default function MissionPage() {
                         </h2>
                         <div className={styles.trustGrid}>
                             <div className={styles.trustBlock}>
-                                <h3 className={styles.trustBlockTitle}>🔒 Your data is yours</h3>
+                                <h3 className={styles.trustBlockTitle}>
+                                    🔒 Your data is yours
+                                </h3>
                                 <p className={styles.trustBlockBody}>
-                                    We never sell student data to advertisers. StudeQ is ad-free. Your study history,
-                                    conversations with the AI tutor, and performance metrics are private and encrypted.
-                                    You can export or delete your data at any time.
+                                    We never sell student data to advertisers. StudeQ is ad-free.
+                                    Your study history, conversations with the AI tutor, and
+                                    performance metrics are private and encrypted. You can export
+                                    or delete your data at any time.
                                 </p>
                             </div>
                             <div className={styles.trustBlock}>
-                                <h3 className={styles.trustBlockTitle}>🏫 Built with educators</h3>
+                                <h3 className={styles.trustBlockTitle}>
+                                    🏫 Built with educators
+                                </h3>
                                 <p className={styles.trustBlockBody}>
-                                    Our curriculum team includes former classroom teachers, IIT and IIM alumni, and
-                                    cognitive science researchers. Every feature is reviewed for pedagogical soundness
-                                    before it ships.
+                                    Our curriculum team includes former classroom teachers, IIT
+                                    and IIM alumni, and cognitive science researchers. Every
+                                    feature is reviewed for pedagogical soundness before it ships.
                                 </p>
                             </div>
                             <div className={styles.trustBlock}>
-                                <h3 className={styles.trustBlockTitle}>🧪 Grounded in learning science</h3>
+                                <h3 className={styles.trustBlockTitle}>
+                                    🧪 Grounded in learning science
+                                </h3>
                                 <p className={styles.trustBlockBody}>
-                                    StudeQ implements proven techniques — spaced repetition (Ebbinghaus forgetting
-                                    curve), active recall, interleaved practice, and elaborative interrogation —
-                                    not just AI novelty.
+                                    StudeQ implements proven techniques — spaced repetition
+                                    (Ebbinghaus forgetting curve), active recall, interleaved
+                                    practice, and elaborative interrogation — not just AI novelty.
                                 </p>
                             </div>
                             <div className={styles.trustBlock}>
-                                <h3 className={styles.trustBlockTitle}>🌍 Designed for every student</h3>
+                                <h3 className={styles.trustBlockTitle}>
+                                    🌍 Designed for every student
+                                </h3>
                                 <p className={styles.trustBlockBody}>
-                                    StudeQ works on low-end devices and slow connections. We support CBSE, ICSE,
-                                    State Boards, IB, A-Levels, SAT, GRE, UPSC, JEE, NEET and more — and we're
-                                    adding new curricula every month.
+                                    StudeQ works on low-end devices and slow connections. We
+                                    support CBSE, ICSE, State Boards, IB, A-Levels, SAT, GRE,
+                                    UPSC, JEE, NEET and more — and we're adding new curricula
+                                    every month.
                                 </p>
                             </div>
                         </div>
@@ -459,21 +524,31 @@ export default function MissionPage() {
                 </section>
 
                 {/* ── ROADMAP ───────────────────────────────────────── */}
-                <section className={styles.roadmapSection} aria-labelledby="roadmap-heading">
+                <section
+                    className={styles.roadmapSection}
+                    aria-labelledby="roadmap-heading"
+                >
                     <div className={styles.sectionInner}>
                         <div className={styles.sectionEyebrow}>The Roadmap</div>
                         <h2 id="roadmap-heading" className={styles.sectionTitle}>
                             How we're making StudeQ smarter every quarter
                         </h2>
                         <p className={styles.sectionSub}>
-                            We ship every two weeks. Here's what's live, what's coming, and where we're headed.
+                            We ship every two weeks. Here's what's live, what's coming, and
+                            where we're headed.
                         </p>
                         <div className={styles.roadmapGrid}>
                             {ROADMAP.map((r) => (
-                                <article key={r.phase} className={`${styles.roadmapCard} ${styles[`road_${r.accent}`]}`}>
+                                <article
+                                    key={r.phase}
+                                    className={`${styles.roadmapCard} ${styles[`road_${r.accent}`]}`}
+                                >
                                     <div className={styles.roadmapPhase}>{r.phase}</div>
                                     <h3 className={styles.roadmapTitle}>{r.title}</h3>
-                                    <ul className={styles.roadmapList} aria-label={`${r.title} features`}>
+                                    <ul
+                                        className={styles.roadmapList}
+                                        aria-label={`${r.title} features`}
+                                    >
                                         {r.items.map((item) => (
                                             <li key={item} className={styles.roadmapItem}>
                                                 <span aria-hidden="true">✦</span> {item}
@@ -487,24 +562,49 @@ export default function MissionPage() {
                 </section>
 
                 {/* ── SUBJECTS SEO SECTION ──────────────────────────── */}
-                <section className={styles.subjectsSection} aria-labelledby="subjects-heading">
+                <section
+                    className={styles.subjectsSection}
+                    aria-labelledby="subjects-heading"
+                >
                     <div className={styles.sectionInner}>
                         <div className={styles.sectionEyebrow}>Subjects We Cover</div>
                         <h2 id="subjects-heading" className={styles.sectionTitle}>
                             AI tutoring for every subject, every level
                         </h2>
                         <p className={styles.sectionSub}>
-                            Whether you're preparing for JEE, NEET, UPSC, SAT, A-Levels, or your next class test —
-                            StudeQ has you covered with AI-generated quizzes and explanations for every topic.
+                            Whether you're preparing for JEE, NEET, UPSC, SAT, A-Levels, or
+                            your next class test — StudeQ has you covered with AI-generated
+                            quizzes and explanations for every topic.
                         </p>
-                        <div className={styles.subjectsPills} aria-label="Subjects covered by StudeQ">
+                        <div
+                            className={styles.subjectsPills}
+                            aria-label="Subjects covered by StudeQ"
+                        >
                             {[
-                                'Mathematics', 'Physics', 'Chemistry', 'Biology', 'English Literature',
-                                'History', 'Geography', 'Computer Science', 'Economics', 'Political Science',
-                                'Accountancy', 'Business Studies', 'Psychology', 'Statistics', 'Environmental Science',
-                                'Hindi', 'Sanskrit', 'Sociology', 'Philosophy', 'Physical Education',
+                                'Mathematics',
+                                'Physics',
+                                'Chemistry',
+                                'Biology',
+                                'English Literature',
+                                'History',
+                                'Geography',
+                                'Computer Science',
+                                'Economics',
+                                'Political Science',
+                                'Accountancy',
+                                'Business Studies',
+                                'Psychology',
+                                'Statistics',
+                                'Environmental Science',
+                                'Hindi',
+                                'Sanskrit',
+                                'Sociology',
+                                'Philosophy',
+                                'Physical Education',
                             ].map((s) => (
-                                <span key={s} className={styles.subjectPill}>{s}</span>
+                                <span key={s} className={styles.subjectPill}>
+                                    {s}
+                                </span>
                             ))}
                         </div>
                     </div>
@@ -514,7 +614,9 @@ export default function MissionPage() {
                 <section className={styles.faqSection} aria-labelledby="faq-heading">
                     <div className={styles.sectionInner}>
                         <div className={styles.sectionEyebrow}>FAQ</div>
-                        <h2 id="faq-heading" className={styles.sectionTitle}>Questions students ask us</h2>
+                        <h2 id="faq-heading" className={styles.sectionTitle}>
+                            Questions students ask us
+                        </h2>
                         <dl className={styles.faqList}>
                             {FAQS.map(({ q, a }) => (
                                 <div key={q} className={styles.faqItem}>
@@ -534,16 +636,20 @@ export default function MissionPage() {
                             Start studying smarter today
                         </h2>
                         <p className={styles.ctaBody}>
-                            Join students already using StudeQ to prepare for exams, understand difficult topics,
-                            and build habits that last. Free forever. No credit card needed.
+                            Join students already using StudeQ to prepare for exams,
+                            understand difficult topics, and build habits that last. Free
+                            forever. No credit card needed.
                         </p>
                         <div className={styles.ctaBtns}>
-                            <a href="/signup" className={styles.btnPrimary}>Create free account</a>
-                            <a href="/pricing" className={styles.btnGhost}>View pricing</a>
+                            <a href="/signup" className={styles.btnPrimary}>
+                                Create free account
+                            </a>
+                            <a href="/pricing" className={styles.btnGhost}>
+                                View pricing
+                            </a>
                         </div>
                     </div>
                 </section>
-
             </main>
         </>
     );
