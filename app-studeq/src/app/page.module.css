@@ -3,6 +3,7 @@
   CSS Modules — all class names scoped, no bare element selectors outside :root
   Fusion: turbo.ai dark starfield base + penseum.com timeline/comparison cards
   Updated: all hardcoded colors → global.css vars; light-mode overrides added
+  Fully Responsive: optimized for mobile, tablet, and desktop devices
 */
 
 /* ── GLOBAL PAGE ─────────────────────────────────────────────────────────── */
@@ -63,7 +64,6 @@
   right: 0;
   height: 30px;
   background: transparent;
-  /* border-bottom: 1px solid var(--theme-purple-dim); */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -120,9 +120,7 @@
 .ctaWrapper {
   display: flex;
   align-items: center;
-  /* Vertical alignment */
   gap: 16px;
-  /* Space between toggle and button */
 }
 
 .navbarScrolled {
@@ -158,7 +156,6 @@
   font-size: 1.15rem;
   font-weight: 900;
   letter-spacing: 0.1em;
-  /* text-transform: uppercase; */
   color: var(--theme-text);
   text-decoration: none;
   white-space: nowrap;
@@ -279,7 +276,6 @@
   pointer-events: none;
 }
 
-/* beam vars — light mode tones them down */
 :global([data-theme="light"]) .beam1 {
   --beam-purple-strong: rgba(124, 95, 245, 0.12);
 }
@@ -594,113 +590,6 @@
 }
 
 /* ── FEATURE TABS ────────────────────────────────────────────────────────── */
-/* .tabsWrap {
-  margin-top: 40px;
-}
-
-.tabNav {
-  display: flex;
-  gap: 0;
-  border-bottom: 1px solid var(--theme-border);
-  margin-bottom: 0;
-  list-style: none;
-  padding: 0;
-}
-
-.tabBtn {
-  position: relative;
-  padding: 12px 28px;
-  font-family: var(--font-display);
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--theme-text-muted);
-  background: none;
-  border: none;
-  cursor: pointer;
-  transition: color var(--t-fast);
-}
-
-.tabBtn::after {
-  content: "";
-  position: absolute;
-  bottom: -1px;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: var(--theme-accent);
-  width: 0;
-  transition: width 0.25s ease-out;
-}
-
-.tabBtnActive {
-  color: var(--theme-text);
-}
-
-.tabBtnActive::after {
-  width: 100%;
-}
-
-.tabPanel {
-  background: var(--theme-surface);
-  border: 1px solid var(--theme-border);
-  border-top: none;
-  border-radius: 0 0 var(--r-lg) var(--r-lg);
-  padding: 36px;
-  opacity: 0;
-  transform: translateY(8px);
-  transition:
-    opacity 0.25s ease,
-    transform 0.25s ease;
-  pointer-events: none;
-  position: absolute;
-  width: 100%;
-}
-
-.tabPanelActive {
-  opacity: 1;
-  transform: translateY(0);
-  pointer-events: all;
-  position: relative;
-}
-
-.tabPanelContainer {
-  position: relative;
-}
-
-.tabPanelText {
-  font-size: 16px;
-  color: var(--theme-text-muted);
-  line-height: 1.8;
-  max-width: 640px;
-  margin: 0;
-}
-
-.tabFeatureList {
-  list-style: none;
-  padding: 0;
-  margin: 20px 0 0;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.tabFeatureItem {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  font-size: 15px;
-  color: var(--theme-text-muted);
-}
-
-.tabCheckIcon {
-  color: var(--theme-green);
-  font-size: 16px;
-  margin-top: 2px;
-  flex-shrink: 0;
-} */
-
-
-/* ── FEATURE TABS ────────────────────────────────────────────────────────── */
 .tabsWrap {
   margin-top: 40px;
   position: relative;
@@ -718,6 +607,7 @@
   position: relative;
   z-index: 11;
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .tabBtn {
@@ -960,7 +850,6 @@
   font-weight: 600;
 }
 
-/* light mode green badge values */
 :global([data-theme="light"]) .phoneSyncBadge {
   --theme-green-dim: rgba(22, 163, 74, 0.1);
   --theme-green-border: rgba(22, 163, 74, 0.25);
@@ -976,8 +865,6 @@
 /* ── COMPARISON ──────────────────────────────────────────────────────────── */
 .comparisonSection {
   background: transparent;
-  /* border-top: 1px solid var(--theme-border); */
-  /* border-bottom: 1px solid var(--theme-border); */
 }
 
 .comparisonGrid {
@@ -999,7 +886,6 @@
   box-shadow:
     0 0 0 1px var(--theme-purple-dim),
     0 4px 32px var(--theme-purple-dim);
-  /* background: linear-gradient(160deg, #ff0000 0%, var(--theme-bg) 50%); */
 }
 
 .compHeader {
@@ -1007,6 +893,7 @@
   align-items: center;
   gap: 10px;
   margin-bottom: 24px;
+  flex-wrap: wrap;
 }
 
 .compLogo {
@@ -1294,6 +1181,8 @@
   align-items: center;
   justify-content: space-between;
   margin-bottom: 14px;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .testimonialName {
@@ -1531,6 +1420,7 @@
   display: flex;
   gap: 10px;
   margin-top: 4px;
+  flex-wrap: wrap;
 }
 
 .socialBtn {
@@ -1641,112 +1531,7 @@
   color: var(--theme-text-secondary);
 }
 
-/* ── FADE ANIMATIONS ─────────────────────────────────────────────────────── */
-@keyframes fadeDown {
-  from {
-    opacity: 0;
-    transform: translateY(-12px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* ── RESPONSIVE ──────────────────────────────────────────────────────────── */
-@media (max-width: 900px) {
-  .comparisonGrid {
-    grid-template-columns: 1fr;
-  }
-
-  .testimonialsGrid {
-    grid-template-columns: 1fr;
-  }
-
-  .footerTop {
-    grid-template-columns: 1fr;
-    gap: 32px;
-  }
-
-  .footerLinks {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .laptopScreen {
-    width: 300px;
-    height: 190px;
-  }
-
-  .laptopBase {
-    width: 330px;
-  }
-}
-
-@media (max-width: 680px) {
-  .navLinks {
-    display: none;
-  }
-
-  .navPill {
-    gap: 16px;
-    padding: 0 16px;
-  }
-
-  .statsBar {
-    flex-direction: column;
-  }
-
-  .statItem {
-    border-right: none;
-    border-bottom: 1px solid var(--theme-border);
-    padding: 28px 24px;
-  }
-
-  .statItem:last-child {
-    border-bottom: none;
-  }
-
-  .devicesWrap {
-    flex-direction: column;
-    gap: 24px;
-  }
-
-  .footerLinks {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .tabBtn {
-    padding: 10px 16px;
-    font-size: 13px;
-  }
-
-  .timelineNum {
-    width: 44px;
-    height: 44px;
-    font-size: 13px;
-  }
-
-  .timelineLine {
-    left: 34px;
-  }
-}
-
-@media (max-width: 480px) {
-  .heroH1 {
-    font-size: 2.2rem;
-  }
-
-  .footerLinks {
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-  }
-
-  .section {
-    padding: 56px 16px;
-  }
-}
-
+/* ── DROPDOWN NAVIGATION ─────────────────────────────────────────────────── */
 .navItem {
   position: relative;
   list-style: none;
@@ -1774,31 +1559,24 @@
   transform: rotate(180deg);
 }
 
-/* ── DROPDOWN PANEL ──────────────────────────────────────────────────────── */
 .navDropdown {
   position: absolute;
   top: calc(100% + 20px);
   left: 50%;
   transform: translateX(-50%) translateY(-10px);
-
   background: var(--theme-surface);
   border: 1px solid var(--theme-border-hover);
   border-radius: 16px;
   padding: 14px;
   min-width: 580px;
   z-index: 300;
-
   opacity: 0;
   pointer-events: none;
   visibility: hidden;
-
-  /* Show fast, hide slow — gives cursor time to travel */
   transition:
     opacity 0.18s cubic-bezier(0.4, 0, 0.2, 1),
     transform 0.18s cubic-bezier(0.4, 0, 0.2, 1),
     visibility 0s linear 0.18s;
-  /* delay visibility on hide only */
-
   box-shadow:
     0 8px 24px rgba(0, 0, 0, 0.35),
     0 2px 8px rgba(0, 0, 0, 0.2),
@@ -1811,8 +1589,6 @@
   pointer-events: all;
   visibility: visible;
   transform: translateX(-50%) translateY(0);
-
-  /* On show: no delay */
   transition:
     opacity 0.18s cubic-bezier(0.4, 0, 0.2, 1),
     transform 0.18s cubic-bezier(0.4, 0, 0.2, 1),
@@ -1825,24 +1601,16 @@
     0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
-/* ── HOVER BRIDGE ────────────────────────────────────────────────────────────
-   Invisible pseudo-element fills the gap between trigger and dropdown panel.
-   Without this, moving the mouse from trigger → dropdown crosses empty space
-   and fires mouseleave, collapsing the menu before you reach it.
-   ──────────────────────────────────────────────────────────────────────────── */
 .hasDropdown::after {
   content: "";
   position: absolute;
   top: 100%;
-  /* starts right below the trigger */
   left: -20px;
   right: -20px;
   height: 24px;
-  /* covers the gap (must be >= top offset on .navDropdown) */
   background: transparent;
 }
 
-/* ── ARROW CARET ─────────────────────────────────────────────────────────── */
 .navDropdownArrow {
   position: absolute;
   top: -6px;
@@ -1856,7 +1624,6 @@
   border-radius: 2px 0 0 0;
 }
 
-/* ── GRID OF ITEMS ───────────────────────────────────────────────────────── */
 .navDropdownGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -1922,7 +1689,6 @@
   line-height: 1.4;
 }
 
-/* ── FOOTER CTA ──────────────────────────────────────────────────────────── */
 .navDropdownFooter {
   margin-top: 8px;
   padding-top: 8px;
@@ -1951,13 +1717,6 @@
   box-shadow: 0 0 0 1px var(--theme-accent-glow);
 }
 
-/* ── RESPONSIVE ──────────────────────────────────────────────────────────── */
-@media (max-width: 680px) {
-  .hasDropdown .navDropdown {
-    display: none;
-  }
-}
-
 .navLoginBtn {
   font-size: 14px;
   font-weight: 600;
@@ -1970,4 +1729,803 @@
 
 .navLoginBtn:hover {
   color: var(--theme-text);
+}
+
+/* ── FADE ANIMATIONS ─────────────────────────────────────────────────────── */
+@keyframes fadeDown {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   RESPONSIVE BREAKPOINTS
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── TABLET (≤900px) ─────────────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .navbar {
+    left: 24px;
+    right: 24px;
+    top: 16px;
+  }
+
+  .navInner {
+    padding: 0 16px;
+  }
+
+  .navPill {
+    gap: 20px;
+    padding: 0 18px;
+  }
+
+  .navLinks {
+    gap: 18px;
+  }
+
+  .navDropdown {
+    min-width: 460px;
+    left: 0;
+    transform: translateX(-20%) translateY(-10px);
+  }
+
+  .hasDropdown:hover .navDropdown,
+  .hasDropdown:focus-within .navDropdown {
+    transform: translateX(-20%) translateY(0);
+  }
+
+  .hero {
+    padding: calc(var(--navbar-h) + 60px) 20px 60px;
+  }
+
+  .comparisonGrid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .testimonialsGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
+
+  .footerTop {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+
+  .footerLinks {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+
+  .devicesWrap {
+    gap: 32px;
+  }
+
+  .laptopScreen {
+    width: 320px;
+    height: 200px;
+  }
+
+  .laptopBase {
+    width: 350px;
+  }
+
+  .laptopFoot {
+    width: 160px;
+  }
+
+  .section {
+    padding: 60px 20px;
+  }
+
+  .tabPanel {
+    padding: 24px;
+  }
+}
+
+/* ── MOBILE LANDSCAPE / SMALL TABLET (≤768px) ────────────────────────────── */
+@media (max-width: 768px) {
+  .navbar {
+    left: 16px;
+    right: 16px;
+    top: 12px;
+  }
+
+  .navInner {
+    gap: 16px;
+  }
+
+  .navPill {
+    gap: 12px;
+    padding: 0 14px;
+    height: 44px;
+  }
+
+  .navLinks {
+    display: none;
+  }
+
+  .navLogo {
+    font-size: 1rem;
+  }
+
+  .navCta {
+    font-size: 13px;
+    padding: 8px 18px;
+  }
+
+  .navDropdown {
+    display: none;
+  }
+
+  .heroH1 {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+  }
+
+  .heroSub {
+    font-size: clamp(0.9rem, 1.8vw, 1.1rem);
+  }
+
+  .heroSubjectRow {
+    gap: 6px;
+  }
+
+  .subjectChip {
+    font-size: 12px;
+    padding: 4px 12px;
+  }
+
+  .dropZone {
+    max-width: 100%;
+    padding: 22px 18px;
+  }
+
+  .marqueeList {
+    gap: 40px;
+    padding: 0 20px;
+  }
+
+  .marqueeItem {
+    font-size: 13px;
+  }
+
+  .sectionH2 {
+    font-size: clamp(1.5rem, 3.5vw, 2.5rem);
+  }
+
+  .sectionSub {
+    font-size: 15px;
+  }
+
+  .tabNav {
+    gap: 4px;
+  }
+
+  .tabBtn {
+    padding: 10px 16px;
+    font-size: 13px;
+  }
+
+  .tabPanelContainer {
+    min-height: 250px;
+  }
+
+  .tabPanel {
+    padding: 20px;
+  }
+
+  .tabPanelText {
+    font-size: 14px;
+  }
+
+  .tabFeatureItem {
+    font-size: 13px;
+  }
+
+  .devicesWrap {
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .laptopScreen {
+    width: 280px;
+    height: 175px;
+  }
+
+  .laptopBase {
+    width: 310px;
+  }
+
+  .laptopFoot {
+    width: 140px;
+  }
+
+  .phoneFrame {
+    width: 100px;
+    height: 180px;
+  }
+
+  .compCol {
+    padding: 22px 20px;
+  }
+
+  .compItem {
+    font-size: 13px;
+    padding: 12px 0;
+  }
+
+  .timelineWrap {
+    max-width: 100%;
+  }
+
+  .timelineNum {
+    width: 44px;
+    height: 44px;
+    font-size: 14px;
+  }
+
+  .timelineLine {
+    left: 34px;
+  }
+
+  .timelineItem {
+    gap: 16px;
+  }
+
+  .timelineTitle {
+    font-size: 1.1rem;
+  }
+
+  .timelineDesc {
+    font-size: 14px;
+  }
+
+  .statsBar {
+    flex-direction: column;
+  }
+
+  .statItem {
+    border-right: none;
+    border-bottom: 1px solid var(--theme-border);
+    padding: 28px 24px;
+    width: 100%;
+  }
+
+  .statItem:last-child {
+    border-bottom: none;
+  }
+
+  .statNum {
+    font-size: clamp(1.6rem, 3vw, 2.5rem);
+  }
+
+  .testimonialsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .faqQ {
+    padding: 16px 18px;
+    font-size: 14px;
+  }
+
+  .faqAnswerText {
+    font-size: 13px;
+  }
+
+  .ctaBanner {
+    padding: 60px 20px;
+  }
+
+  .ctaBannerBeam {
+    width: 400px;
+    height: 200px;
+  }
+
+  .footerLinks {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+
+  .footerWordmarkText {
+    font-size: clamp(3rem, 10vw, 6rem);
+  }
+}
+
+/* ── MOBILE PORTRAIT (≤480px) ────────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .ticker {
+    font-size: 11px;
+    height: 26px;
+    gap: 6px;
+  }
+
+  .navbar {
+    left: 10px;
+    right: 10px;
+    top: 32px;
+    border-radius: 12px;
+  }
+
+  .navInner {
+    padding: 0 10px;
+    gap: 10px;
+  }
+
+  .navPill {
+    gap: 8px;
+    padding: 0 10px;
+    height: 40px;
+  }
+
+  .navLogo {
+    font-size: 0.9rem;
+  }
+
+  .navCta {
+    font-size: 12px;
+    padding: 6px 14px;
+  }
+
+  .ctaWrapper {
+    gap: 8px;
+  }
+
+  .hero {
+    padding: calc(var(--navbar-h) + 80px) 16px 48px;
+    min-height: auto;
+  }
+
+  .heroBadge {
+    font-size: 11px;
+    padding: 6px 14px;
+  }
+
+  .heroH1 {
+    font-size: 1.8rem;
+  }
+
+  .heroSub {
+    font-size: 0.85rem;
+  }
+
+  .heroCta {
+    font-size: 14px;
+    padding: 12px 24px;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .heroActions {
+    width: 100%;
+  }
+
+  .heroSubjectRow {
+    gap: 4px;
+  }
+
+  .subjectChip {
+    font-size: 11px;
+    padding: 4px 10px;
+  }
+
+  .dropZone {
+    padding: 18px 14px;
+    margin-top: 24px;
+  }
+
+  .dropIcon {
+    font-size: 1.5rem;
+  }
+
+  .dropText {
+    font-size: 13px;
+  }
+
+  .dropSub {
+    font-size: 11px;
+  }
+
+  .sparkMeter {
+    bottom: 12px;
+    right: 12px;
+    font-size: 10px;
+    padding: 4px 10px;
+  }
+
+  .marqueeSection {
+    padding: 16px 0 32px;
+  }
+
+  .marqueeLabel {
+    font-size: 11px;
+    margin-bottom: 14px;
+  }
+
+  .marqueeList {
+    gap: 28px;
+    padding: 0 14px;
+  }
+
+  .marqueeItem {
+    font-size: 12px;
+  }
+
+  .section {
+    padding: 48px 16px;
+  }
+
+  .sectionBadge {
+    font-size: 11px;
+    padding: 4px 10px;
+  }
+
+  .sectionH2 {
+    font-size: 1.4rem;
+    margin-bottom: 10px;
+  }
+
+  .sectionSub {
+    font-size: 14px;
+  }
+
+  .tabsWrap {
+    margin-top: 28px;
+  }
+
+  .tabBtn {
+    padding: 8px 14px;
+    font-size: 12px;
+  }
+
+  .tabPanel {
+    padding: 16px;
+  }
+
+  .tabFeatureItem {
+    font-size: 12px;
+    gap: 8px;
+  }
+
+  .tabCheckIcon {
+    font-size: 14px;
+  }
+
+  .devicesWrap {
+    margin-top: 32px;
+    gap: 20px;
+  }
+
+  .laptopScreen {
+    width: 240px;
+    height: 150px;
+  }
+
+  .laptopBase {
+    width: 260px;
+  }
+
+  .laptopFoot {
+    width: 120px;
+  }
+
+  .phoneFrame {
+    width: 90px;
+    height: 160px;
+    padding-top: 12px;
+    gap: 4px;
+  }
+
+  .phoneNotch {
+    width: 32px;
+    height: 6px;
+  }
+
+  .phoneLine {
+    height: 4px;
+  }
+
+  .phoneSyncBadge {
+    font-size: 8px;
+    padding: 2px 6px;
+    bottom: 8px;
+  }
+
+  .devicesCaption {
+    font-size: 13px;
+    margin-top: 20px;
+  }
+
+  .comparisonGrid {
+    margin-top: 28px;
+    gap: 16px;
+  }
+
+  .compCol {
+    padding: 18px 16px;
+    border-radius: var(--r-lg);
+  }
+
+  .compHeader {
+    margin-bottom: 18px;
+  }
+
+  .compLogo {
+    font-size: 0.85rem;
+  }
+
+  .compLogoMuted {
+    font-size: 0.8rem;
+  }
+
+  .compItem {
+    font-size: 12px;
+    padding: 10px 0;
+    gap: 10px;
+  }
+
+  .compFeatureLabel {
+    font-size: 10px;
+  }
+
+  .timelineH2 {
+    font-size: 1.4rem;
+  }
+
+  .timelineSub {
+    font-size: 14px;
+    margin-bottom: 40px;
+  }
+
+  .timelineNum {
+    width: 38px;
+    height: 38px;
+    font-size: 12px;
+  }
+
+  .timelineLine {
+    left: 30px;
+  }
+
+  .timelineItem {
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+
+  .timelineRight {
+    padding-top: 6px;
+  }
+
+  .timelinePill {
+    font-size: 10px;
+    padding: 2px 10px;
+  }
+
+  .timelineTitle {
+    font-size: 1rem;
+  }
+
+  .timelineDesc {
+    font-size: 13px;
+  }
+
+  .statItem {
+    padding: 22px 18px;
+  }
+
+  .statNum {
+    font-size: 1.4rem;
+  }
+
+  .statLabel {
+    font-size: 12px;
+  }
+
+  .testimonialsGrid {
+    margin-top: 28px;
+    gap: 12px;
+  }
+
+  .testimonialCard {
+    padding: 18px;
+  }
+
+  .testimonialQuote {
+    font-size: 13px;
+  }
+
+  .faqList {
+    margin-top: 28px;
+    gap: 6px;
+  }
+
+  .faqQ {
+    padding: 14px 16px;
+    font-size: 13px;
+    gap: 12px;
+  }
+
+  .faqIcon {
+    font-size: 18px;
+  }
+
+  .faqAnswerOpen {
+    padding: 0 16px 14px;
+  }
+
+  .faqAnswerText {
+    font-size: 12px;
+    padding-top: 12px;
+  }
+
+  .ctaBanner {
+    padding: 48px 16px;
+  }
+
+  .ctaBannerH2 {
+    font-size: 1.4rem;
+  }
+
+  .ctaBannerSub {
+    font-size: 14px;
+    margin-bottom: 22px;
+  }
+
+  .ctaBannerBtn {
+    font-size: 14px;
+    padding: 12px 28px;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .footerTop {
+    padding: 40px 16px 32px;
+    gap: 28px;
+  }
+
+  .footerLinks {
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .footerLinkCol {
+    gap: 8px;
+  }
+
+  .footerLinkHeading {
+    font-size: 11px;
+  }
+
+  .footerLink {
+    font-size: 13px;
+  }
+
+  .footerSocials {
+    gap: 8px;
+  }
+
+  .socialBtn {
+    width: 30px;
+    height: 30px;
+    font-size: 12px;
+  }
+
+  .footerWordmark {
+    padding: 0 16px;
+  }
+
+  .footerWordmarkText {
+    font-size: 2.5rem;
+  }
+
+  .footerBottom {
+    padding: 12px 16px;
+  }
+
+  .footerBottomText {
+    font-size: 11px;
+  }
+}
+
+/* ── VERY SMALL DEVICES (≤360px) ─────────────────────────────────────────── */
+@media (max-width: 360px) {
+  .navbar {
+    left: 6px;
+    right: 6px;
+    top: 30px;
+    border-radius: 10px;
+  }
+
+  .navPill {
+    height: 38px;
+    padding: 0 8px;
+    gap: 6px;
+  }
+
+  .navLogo {
+    font-size: 0.8rem;
+  }
+
+  .navCta {
+    font-size: 11px;
+    padding: 5px 12px;
+  }
+
+  .heroH1 {
+    font-size: 1.5rem;
+  }
+
+  .heroSub {
+    font-size: 0.8rem;
+  }
+
+  .laptopScreen {
+    width: 200px;
+    height: 125px;
+  }
+
+  .laptopBase {
+    width: 220px;
+  }
+
+  .laptopFoot {
+    width: 100px;
+  }
+
+  .footerLinks {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .footerWordmarkText {
+    font-size: 2rem;
+  }
+}
+
+/* ── LARGE DESKTOP (≥1400px) ─────────────────────────────────────────────── */
+@media (min-width: 1400px) {
+  .heroContent {
+    max-width: 900px;
+  }
+
+  .sectionInner {
+    max-width: 1200px;
+  }
+
+  .footerTop {
+    max-width: 1200px;
+  }
+}
+
+/* ── REDUCED MOTION ──────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .marqueeTrack {
+    animation: none;
+  }
+
+  .star {
+    animation: none;
+  }
+
+  .tickerDot {
+    animation: none;
+  }
+
+  .reveal {
+    opacity: 1;
+    transform: translateY(0);
+    transition: none;
+  }
+
+  .timelineItem {
+    opacity: 1;
+    transform: translateY(0);
+    transition: none;
+  }
 }
