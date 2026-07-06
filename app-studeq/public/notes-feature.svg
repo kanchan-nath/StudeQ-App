@@ -1,0 +1,200 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0F0B1F"/>
+      <stop offset="50%" style="stop-color:#1A1235"/>
+      <stop offset="100%" style="stop-color:#0D0A1E"/>
+    </linearGradient>
+    <linearGradient id="noteGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#06B6D4"/>
+      <stop offset="100%" style="stop-color:#0891B2"/>
+    </linearGradient>
+    <linearGradient id="noteGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#8B5CF6"/>
+      <stop offset="100%" style="stop-color:#7C3AED"/>
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#7C3AED"/>
+      <stop offset="100%" style="stop-color:#5B21B6"/>
+    </linearGradient>
+    <linearGradient id="badgeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#67E8F9"/>
+      <stop offset="100%" style="stop-color:#06B6D4"/>
+    </linearGradient>
+    <linearGradient id="lineGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#06B6D4;stop-opacity:0"/>
+      <stop offset="50%" style="stop-color:#67E8F9;stop-opacity:0.6"/>
+      <stop offset="100%" style="stop-color:#06B6D4;stop-opacity:0"/>
+    </linearGradient>
+    <linearGradient id="highlightGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FCD34D"/>
+      <stop offset="100%" style="stop-color:#F59E0B"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="softGlow">
+      <feGaussianBlur stdDeviation="10" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="cardShadow">
+      <feDropShadow dx="3" dy="6" stdDeviation="10" flood-color="#06B6D4" flood-opacity="0.12"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bgGrad)"/>
+
+  <!-- Top glow line -->
+  <line x1="0" y1="0" x2="1200" y2="0" stroke="url(#lineGrad)" stroke-width="2"/>
+
+  <!-- Subtle background orbs -->
+  <circle cx="200" cy="500" r="220" fill="#06B6D4" opacity="0.04"/>
+  <circle cx="1000" cy="100" r="200" fill="#67E8F9" opacity="0.04"/>
+  <circle cx="600" cy="315" r="350" fill="#06B6D4" opacity="0.02"/>
+
+  <!-- LEFT SIDE: Notes Visual (dominant ~45% canvas) -->
+  <g transform="translate(170, 315)">
+    
+    <!-- Floating notes stack -->
+    <!-- Back note -->
+    <g transform="rotate(-6) translate(-30, -20)" filter="url(#cardShadow)">
+      <rect x="-95" y="-115" width="190" height="230" rx="12" fill="#1A1235" stroke="#06B6D4" stroke-width="1.5" opacity="0.3"/>
+      <!-- Lines -->
+      <line x1="-75" y1="-90" x2="55" y2="-90" stroke="#06B6D4" stroke-width="1" opacity="0.08"/>
+      <line x1="-75" y1="-70" x2="65" y2="-70" stroke="#06B6D4" stroke-width="1" opacity="0.06"/>
+      <line x1="-75" y1="-50" x2="45" y2="-50" stroke="#06B6D4" stroke-width="1" opacity="0.06"/>
+      <line x1="-75" y1="-30" x2="70" y2="-30" stroke="#06B6D4" stroke-width="1" opacity="0.05"/>
+      <line x1="-75" y1="-10" x2="50" y2="-10" stroke="#06B6D4" stroke-width="1" opacity="0.05"/>
+    </g>
+
+    <!-- Middle note -->
+    <g transform="rotate(-3) translate(-15, -10)" filter="url(#cardShadow)">
+      <rect x="-95" y="-115" width="190" height="230" rx="12" fill="#1A1235" stroke="#67E8F9" stroke-width="1.5" opacity="0.5"/>
+      <!-- Lines -->
+      <line x1="-75" y1="-90" x2="55" y2="-90" stroke="#67E8F9" stroke-width="1" opacity="0.12"/>
+      <line x1="-75" y1="-70" x2="65" y2="-70" stroke="#67E8F9" stroke-width="1" opacity="0.1"/>
+      <line x1="-75" y1="-50" x2="45" y2="-50" stroke="#67E8F9" stroke-width="1" opacity="0.1"/>
+      <line x1="-75" y1="-30" x2="70" y2="-30" stroke="#67E8F9" stroke-width="1" opacity="0.08"/>
+      <line x1="-75" y1="-10" x2="50" y2="-10" stroke="#67E8F9" stroke-width="1" opacity="0.08"/>
+    </g>
+
+    <!-- Front note - Main focus -->
+    <g filter="url(#cardShadow)">
+      <rect x="-105" y="-125" width="210" height="250" rx="14" fill="#1A1235" stroke="url(#noteGrad1)" stroke-width="2.5"/>
+      <rect x="-105" y="-125" width="210" height="250" rx="14" fill="url(#noteGrad1)" opacity="0.06"/>
+      
+      <!-- Header bar -->
+      <rect x="-90" y="-110" width="180" height="30" rx="6" fill="#06B6D4" opacity="0.12"/>
+      <text x="-70" y="-91" font-family="'Segoe UI', Arial, sans-serif" font-size="13" fill="#67E8F9" font-weight="700">📝 Lecture Notes: AI 101</text>
+      
+      <!-- Key concepts section -->
+      <text x="-75" y="-58" font-family="'Segoe UI', Arial, sans-serif" font-size="12" fill="#FCD34D" font-weight="700">🔑 Key Concepts</text>
+      
+      <!-- Highlighted content -->
+      <rect x="-75" y="-48" width="160" height="20" rx="4" fill="#FCD34D" opacity="0.08"/>
+      <text x="-65" y="-34" font-family="'Segoe UI', Arial, sans-serif" font-size="12" fill="#FFFFFF" font-weight="500">• Neural networks learn from data</text>
+      
+      <rect x="-75" y="-24" width="160" height="20" rx="4" fill="#FCD34D" opacity="0.06"/>
+      <text x="-65" y="-10" font-family="'Segoe UI', Arial, sans-serif" font-size="12" fill="#FFFFFF" font-weight="500">• Training requires labeled datasets</text>
+      
+      <rect x="-75" y="0" width="160" height="20" rx="4" fill="#FCD34D" opacity="0.08"/>
+      <text x="-65" y="14" font-family="'Segoe UI', Arial, sans-serif" font-size="12" fill="#FFFFFF" font-weight="500">• Backpropagation optimizes weights</text>
+      
+      <!-- Highlighted summary -->
+      <text x="-75" y="48" font-family="'Segoe UI', Arial, sans-serif" font-size="12" fill="#FCD34D" font-weight="700">📌 Summary</text>
+      
+      <text x="-75" y="68" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#C4B5FD" font-weight="400">
+        AI learns by finding patterns in
+      </text>
+      <text x="-75" y="84" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#C4B5FD" font-weight="400">
+        data. More data = better results.
+      </text>
+      
+      <!-- Bottom conversion actions -->
+      <rect x="-75" y="105" width="70" height="24" rx="12" fill="#7C3AED" opacity="0.15"/>
+      <text x="-40" y="121" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#A78BFA" text-anchor="middle" font-weight="600">→ Quiz</text>
+      
+      <rect x="5" y="105" width="70" height="24" rx="12" fill="#F59E0B" opacity="0.15"/>
+      <text x="40" y="121" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#FBBF24" text-anchor="middle" font-weight="600">→ Flashcards</text>
+    </g>
+
+    <!-- AI processing indicator -->
+    <g transform="translate(-120, -145)">
+      <circle cx="0" cy="0" r="16" fill="#06B6D4" opacity="0.15"/>
+      <circle cx="0" cy="0" r="16" fill="none" stroke="#06B6D4" stroke-width="1.5" stroke-dasharray="4 4"/>
+      <text x="0" y="5" font-family="'Segoe UI', Arial, sans-serif" font-size="12" text-anchor="middle">✨</text>
+    </g>
+    
+    <!-- Sparkle accents -->
+    <circle cx="130" cy="-135" r="2.5" fill="#67E8F9" opacity="0.3"/>
+    <circle cx="-140" cy="120" r="2" fill="#67E8F9" opacity="0.25"/>
+    <circle cx="135" cy="130" r="3" fill="#67E8F9" opacity="0.2"/>
+  </g>
+
+  <!-- RIGHT SIDE: Text Content (F-pattern, clear negative space) -->
+  <g transform="translate(530, 50)">
+    
+    <!-- Badge -->
+    <rect x="0" y="0" width="140" height="30" rx="15" fill="url(#badgeGrad)" opacity="0.12"/>
+    <rect x="0" y="0" width="140" height="30" rx="15" fill="none" stroke="#67E8F9" stroke-width="1"/>
+    <text x="70" y="20" font-family="'Segoe UI', Arial, sans-serif" font-size="12" fill="#67E8F9" text-anchor="middle" font-weight="700" letter-spacing="1">✨ AI NOTE TAKING</text>
+
+    <!-- Main bold headline - dominant -->
+    <text x="0" y="75" font-family="'Segoe UI', Arial, sans-serif" font-size="64" fill="#FFFFFF" font-weight="900" letter-spacing="-1">
+      Smart Notes
+    </text>
+    <text x="0" y="145" font-family="'Segoe UI', Arial, sans-serif" font-size="64" fill="url(#noteGrad1)" font-weight="900" letter-spacing="-1">
+      From Any Lecture
+    </text>
+
+    <!-- Decorative underline -->
+    <rect x="0" y="163" width="220" height="4" rx="2" fill="url(#noteGrad1)" opacity="0.6"/>
+    <rect x="0" y="163" width="90" height="4" rx="2" fill="url(#noteGrad2)" opacity="0.9"/>
+
+    <!-- Description -->
+    <text x="0" y="205" font-family="'Segoe UI', Arial, sans-serif" font-size="18" fill="#C4B5FD" font-weight="400" opacity="0.9">
+      Paste any lecture, get a structured
+    </text>
+    <text x="0" y="233" font-family="'Segoe UI', Arial, sans-serif" font-size="18" fill="#C4B5FD" font-weight="400" opacity="0.9">
+      AI summary with key concepts,
+    </text>
+    <text x="0" y="261" font-family="'Segoe UI', Arial, sans-serif" font-size="18" fill="#C4B5FD" font-weight="400" opacity="0.9">
+      and convert to quizzes instantly. 🎯
+    </text>
+
+    <!-- Feature chips -->
+    <g transform="translate(0, 300)">
+      <rect x="0" y="0" width="145" height="32" rx="16" fill="#1A1235" stroke="#06B6D4" stroke-width="1" opacity="0.8"/>
+      <text x="72" y="21" font-family="'Segoe UI', Arial, sans-serif" font-size="13" fill="#67E8F9" text-anchor="middle" font-weight="600">AI Summarization</text>
+
+      <rect x="160" y="0" width="155" height="32" rx="16" fill="#1A1235" stroke="#8B5CF6" stroke-width="1" opacity="0.8"/>
+      <text x="237" y="21" font-family="'Segoe UI', Arial, sans-serif" font-size="13" fill="#A78BFA" text-anchor="middle" font-weight="600">Key Concept Extraction</text>
+
+      <rect x="0" y="45" width="170" height="32" rx="16" fill="#1A1235" stroke="#FCD34D" stroke-width="1" opacity="0.8"/>
+      <text x="85" y="66" font-family="'Segoe UI', Arial, sans-serif" font-size="13" fill="#FCD34D" text-anchor="middle" font-weight="600">Instant Quiz/Flashcards</text>
+    </g>
+
+    <!-- CTA Button -->
+    <g transform="translate(0, 395)">
+      <rect x="0" y="0" width="250" height="52" rx="26" fill="url(#accentGrad)" filter="url(#glow)"/>
+      <text x="125" y="32" font-family="'Segoe UI', Arial, sans-serif" font-size="17" fill="#FFFFFF" text-anchor="middle" font-weight="700">Start Smart Note Taking →</text>
+    </g>
+  </g>
+
+  <!-- Bottom right brand -->
+  <text x="1140" y="615" font-family="'Segoe UI', Arial, sans-serif" font-size="13" fill="#5B21B6" text-anchor="end" font-weight="600" letter-spacing="3" opacity="0.5">STUDEQ</text>
+
+  <!-- Corner decorations -->
+  <rect x="20" y="20" width="40" height="3" rx="1.5" fill="#06B6D4" opacity="0.3"/>
+  <rect x="20" y="20" width="3" height="40" rx="1.5" fill="#06B6D4" opacity="0.3"/>
+  <rect x="1140" y="20" width="40" height="3" rx="1.5" fill="#06B6D4" opacity="0.3"/>
+  <rect x="1177" y="20" width="3" height="40" rx="1.5" fill="#06B6D4" opacity="0.3"/>
+</svg>

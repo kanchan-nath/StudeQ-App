@@ -1,0 +1,188 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0F0B1F"/>
+      <stop offset="50%" style="stop-color:#1A1235"/>
+      <stop offset="100%" style="stop-color:#0D0A1E"/>
+    </linearGradient>
+    
+    <!-- 10% - Algorithms -->
+    <linearGradient id="seg10Grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#7C3AED"/>
+      <stop offset="100%" style="stop-color:#6D28D9"/>
+    </linearGradient>
+    
+    <!-- 20% - Data -->
+    <linearGradient id="seg20Grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#06B6D4"/>
+      <stop offset="100%" style="stop-color:#0891B2"/>
+    </linearGradient>
+    
+    <!-- 70% - Change Management -->
+    <linearGradient id="seg70Grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#F59E0B"/>
+      <stop offset="100%" style="stop-color:#D97706"/>
+    </linearGradient>
+    
+    <linearGradient id="lineGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#7C3AED;stop-opacity:0"/>
+      <stop offset="50%" style="stop-color:#A78BFA;stop-opacity:0.6"/>
+      <stop offset="100%" style="stop-color:#7C3AED;stop-opacity:0"/>
+    </linearGradient>
+    
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    
+    <filter id="softGlow">
+      <feGaussianBlur stdDeviation="15" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    
+    <filter id="cardShadow">
+      <feDropShadow dx="4" dy="8" stdDeviation="12" flood-color="#000000" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bgGrad)"/>
+
+  <!-- Top glow line -->
+  <line x1="0" y1="0" x2="1200" y2="0" stroke="url(#lineGrad)" stroke-width="2"/>
+
+  <!-- Subtle background orbs -->
+  <circle cx="200" cy="500" r="250" fill="#7C3AED" opacity="0.03"/>
+  <circle cx="1000" cy="100" r="200" fill="#A78BFA" opacity="0.03"/>
+  <circle cx="600" cy="315" r="350" fill="#8B5CF6" opacity="0.02"/>
+
+  <!-- LEFT SIDE: 10/20/70 Visual (dominant ~50% canvas) -->
+  <g transform="translate(240, 315)">
+    
+    <!-- Main container -->
+    <rect x="-160" y="-170" width="320" height="340" rx="24" fill="#1A1235" stroke="#5B21B6" stroke-width="1" opacity="0.9" filter="url(#cardShadow)"/>
+    <rect x="-160" y="-170" width="320" height="340" rx="24" fill="url(#bgGrad)" opacity="0.5"/>
+    
+    <!-- Title inside visual -->
+    <text x="0" y="-135" font-family="'Segoe UI', Arial, sans-serif" font-size="16" fill="#C4B5FD" text-anchor="middle" font-weight="600" letter-spacing="2">THE RULE</text>
+    
+    <!-- Three segmented circles representation -->
+    
+    <!-- Circle 1: 10% Algorithms - Left -->
+    <g transform="translate(-95, -40)">
+      <circle cx="0" cy="0" r="65" fill="none" stroke="#7C3AED" stroke-width="2" opacity="0.3"/>
+      <circle cx="0" cy="0" r="45" fill="none" stroke="#7C3AED" stroke-width="4"/>
+      <text x="0" y="-15" font-family="'Segoe UI', Arial, sans-serif" font-size="24" fill="#A78BFA" text-anchor="middle" font-weight="900">10%</text>
+      <text x="0" y="12" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#A78BFA" text-anchor="middle" font-weight="600">Algorithms</text>
+      
+      <!-- Connection line -->
+      <line x1="50" y1="0" x2="75" y2="0" stroke="#7C3AED" stroke-width="1.5" opacity="0.3"/>
+      <circle cx="78" cy="0" r="3" fill="#7C3AED" opacity="0.5"/>
+    </g>
+    
+    <!-- Circle 2: 20% Data - Center -->
+    <g transform="translate(0, -40)">
+      <circle cx="0" cy="0" r="75" fill="none" stroke="#06B6D4" stroke-width="2" opacity="0.3"/>
+      <circle cx="0" cy="0" r="55" fill="none" stroke="#06B6D4" stroke-width="4"/>
+      <text x="0" y="-15" font-family="'Segoe UI', Arial, sans-serif" font-size="28" fill="#67E8F9" text-anchor="middle" font-weight="900">20%</text>
+      <text x="0" y="12" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#67E8F9" text-anchor="middle" font-weight="600">Data</text>
+      
+      <!-- Connection lines -->
+      <line x1="-60" y1="0" x2="-80" y2="0" stroke="#06B6D4" stroke-width="1.5" opacity="0.3"/>
+      <circle cx="-83" cy="0" r="3" fill="#06B6D4" opacity="0.5"/>
+      
+      <line x1="60" y1="0" x2="80" y2="0" stroke="#06B6D4" stroke-width="1.5" opacity="0.3"/>
+      <circle cx="83" cy="0" r="3" fill="#06B6D4" opacity="0.5"/>
+    </g>
+    
+    <!-- Circle 3: 70% Change Management - Right -->
+    <g transform="translate(95, -40)">
+      <circle cx="0" cy="0" r="90" fill="none" stroke="#F59E0B" stroke-width="2" opacity="0.3"/>
+      <circle cx="0" cy="0" r="70" fill="none" stroke="#F59E0B" stroke-width="4"/>
+      <text x="0" y="-18" font-family="'Segoe UI', Arial, sans-serif" font-size="32" fill="#FBBF24" text-anchor="middle" font-weight="900">70%</text>
+      <text x="0" y="14" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#FBBF24" text-anchor="middle" font-weight="600">Change Management</text>
+      
+      <!-- Connection line -->
+      <line x1="-75" y1="0" x2="-55" y2="0" stroke="#F59E0B" stroke-width="1.5" opacity="0.3"/>
+      <circle cx="-52" cy="0" r="3" fill="#F59E0B" opacity="0.5"/>
+    </g>
+    
+    <!-- Examples section -->
+    <g transform="translate(0, 80)">
+      <text x="0" y="0" font-family="'Segoe UI', Arial, sans-serif" font-size="12" fill="#C4B5FD" text-anchor="middle" font-weight="600" opacity="0.6">REAL EXAMPLE</text>
+      
+      <rect x="-120" y="12" width="240" height="60" rx="10" fill="#1A1235" stroke="#5B21B6" stroke-width="1" opacity="0.8"/>
+      
+      <text x="-105" y="30" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#A78BFA" font-weight="500">📊 Model: 10%</text>
+      <text x="-105" y="44" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#67E8F9" font-weight="500">📁 Data Prep: 20%</text>
+      <text x="-105" y="58" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#FBBF24" font-weight="500">👥 Adoption &amp; Training: 70%</text>
+      
+      <text x="40" y="58" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#F472B6" font-weight="400">✓ StudeQ Demo</text>
+    </g>
+  </g>
+
+  <!-- RIGHT SIDE: Text Content (F-pattern, clear negative space) -->
+  <g transform="translate(560, 50)">
+    
+    <!-- Blog badge -->
+    <rect x="0" y="0" width="120" height="28" rx="14" fill="#7C3AED" opacity="0.12"/>
+    <rect x="0" y="0" width="120" height="28" rx="14" fill="none" stroke="#A78BFA" stroke-width="1"/>
+    <text x="60" y="19" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#A78BFA" text-anchor="middle" font-weight="700" letter-spacing="1">📖 BLOG</text>
+
+    <!-- Main bold headline - dominant -->
+    <text x="0" y="70" font-family="'Segoe UI', Arial, sans-serif" font-size="54" fill="#FFFFFF" font-weight="900" letter-spacing="-1.5">
+      What Is the
+    </text>
+    <text x="0" y="130" font-family="'Segoe UI', Arial, sans-serif" font-size="54" fill="#FBBF24" font-weight="900" letter-spacing="-1.5">
+      10/20/70 Rule
+    </text>
+    <text x="0" y="190" font-family="'Segoe UI', Arial, sans-serif" font-size="54" fill="#FFFFFF" font-weight="900" letter-spacing="-1.5">
+      of AI?
+    </text>
+
+    <!-- Decorative underline with three colors -->
+    <rect x="0" y="210" width="120" height="4" rx="2" fill="#7C3AED" opacity="0.8"/>
+    <rect x="125" y="210" width="60" height="4" rx="2" fill="#06B6D4" opacity="0.8"/>
+    <rect x="190" y="210" width="180" height="4" rx="2" fill="#F59E0B" opacity="0.8"/>
+
+    <!-- Description -->
+    <text x="0" y="252" font-family="'Segoe UI', Arial, sans-serif" font-size="17" fill="#C4B5FD" font-weight="400" opacity="0.9">
+      A practical framework for AI success:
+    </text>
+    <text x="0" y="280" font-family="'Segoe UI', Arial, sans-serif" font-size="17" fill="#C4B5FD" font-weight="400" opacity="0.9">
+      <tspan fill="#A78BFA">10% algorithms</tspan> · <tspan fill="#67E8F9">20% data</tspan> · <tspan fill="#FBBF24">70% change management</tspan>
+    </text>
+    <text x="0" y="315" font-family="'Segoe UI', Arial, sans-serif" font-size="17" fill="#C4B5FD" font-weight="400" opacity="0.9">
+      Real examples + StudeQ demo inside.
+    </text>
+
+    <!-- Key insight -->
+    <g transform="translate(0, 350)">
+      <rect x="0" y="0" width="260" height="48" rx="10" fill="#F59E0B" opacity="0.05"/>
+      <rect x="0" y="0" width="260" height="48" rx="10" stroke="#F59E0B" stroke-width="1" opacity="0.3"/>
+      <text x="15" y="20" font-family="'Segoe UI', Arial, sans-serif" font-size="13" fill="#FBBF24" font-weight="700">💡 Key Insight</text>
+      <text x="15" y="38" font-family="'Segoe UI', Arial, sans-serif" font-size="12" fill="#C4B5FD" font-weight="400">People, not tech, drive AI success.</text>
+    </g>
+
+    <!-- CTA Button -->
+    <g transform="translate(0, 425)">
+      <rect x="0" y="0" width="210" height="48" rx="24" fill="url(#seg70Grad)" filter="url(#glow)"/>
+      <text x="105" y="30" font-family="'Segoe UI', Arial, sans-serif" font-size="16" fill="#FFFFFF" text-anchor="middle" font-weight="700">Read the Article →</text>
+    </g>
+  </g>
+
+  <!-- Bottom right brand -->
+  <text x="1140" y="615" font-family="'Segoe UI', Arial, sans-serif" font-size="13" fill="#5B21B6" text-anchor="end" font-weight="600" letter-spacing="3" opacity="0.5">STUDEQ</text>
+
+  <!-- Corner decorations -->
+  <rect x="20" y="20" width="40" height="3" rx="1.5" fill="#7C3AED" opacity="0.3"/>
+  <rect x="20" y="20" width="3" height="40" rx="1.5" fill="#7C3AED" opacity="0.3"/>
+  <rect x="1140" y="20" width="40" height="3" rx="1.5" fill="#F59E0B" opacity="0.3"/>
+  <rect x="1177" y="20" width="3" height="40" rx="1.5" fill="#F59E0B" opacity="0.3"/>
+</svg>
