@@ -1,0 +1,164 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0F0B1F"/>
+      <stop offset="50%" style="stop-color:#1A1235"/>
+      <stop offset="100%" style="stop-color:#0D0A1E"/>
+    </linearGradient>
+    <linearGradient id="freeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#10B981"/>
+      <stop offset="100%" style="stop-color:#059669"/>
+    </linearGradient>
+    <linearGradient id="proGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#7C3AED"/>
+      <stop offset="100%" style="stop-color:#5B21B6"/>
+    </linearGradient>
+    <linearGradient id="premiumGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#F59E0B"/>
+      <stop offset="100%" style="stop-color:#D97706"/>
+    </linearGradient>
+    <linearGradient id="lineGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#7C3AED;stop-opacity:0"/>
+      <stop offset="50%" style="stop-color:#A78BFA;stop-opacity:0.6"/>
+      <stop offset="100%" style="stop-color:#7C3AED;stop-opacity:0"/>
+    </linearGradient>
+    <linearGradient id="ctaGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#8B5CF6"/>
+      <stop offset="100%" style="stop-color:#7C3AED"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="cardGlow">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bgGrad)"/>
+
+  <!-- Top glow line -->
+  <line x1="0" y1="0" x2="1200" y2="0" stroke="url(#lineGrad)" stroke-width="2"/>
+
+  <!-- Subtle background orbs -->
+  <circle cx="200" cy="500" r="200" fill="#7C3AED" opacity="0.04"/>
+  <circle cx="1000" cy="100" r="180" fill="#8B5CF6" opacity="0.04"/>
+  <circle cx="600" cy="315" r="300" fill="#A78BFA" opacity="0.02"/>
+
+  <!-- Header Section -->
+  <g transform="translate(600, 70)">
+    <text x="0" y="0" font-family="'Segoe UI', Arial, sans-serif" font-size="14" fill="#8B5CF6" text-anchor="middle" font-weight="700" letter-spacing="4">PRICING</text>
+    <text x="0" y="45" font-family="'Segoe UI', Arial, sans-serif" font-size="52" fill="#FFFFFF" text-anchor="middle" font-weight="900" letter-spacing="-0.5">Choose Your Plan</text>
+    <text x="0" y="80" font-family="'Segoe UI', Arial, sans-serif" font-size="18" fill="#C4B5FD" text-anchor="middle" font-weight="400" opacity="0.8">AI study tools for every learner. Start free, upgrade anytime.</text>
+  </g>
+
+  <!-- Pricing Cards Container -->
+  <g transform="translate(0, 175)">
+    
+    <!-- CARD 1: FREE -->
+    <g transform="translate(95, 0)">
+      <!-- Card background -->
+      <rect x="0" y="0" width="300" height="340" rx="16" fill="#1A1235" stroke="#10B981" stroke-width="1.5" opacity="0.9"/>
+      <rect x="0" y="0" width="300" height="340" rx="16" fill="url(#freeGrad)" opacity="0.05"/>
+      
+      <!-- Plan name -->
+      <text x="150" y="40" font-family="'Segoe UI', Arial, sans-serif" font-size="20" fill="#FFFFFF" text-anchor="middle" font-weight="700">Free</text>
+      
+      <!-- Price -->
+      <text x="150" y="100" font-family="'Segoe UI', Arial, sans-serif" font-size="52" fill="#10B981" text-anchor="middle" font-weight="900">$0</text>
+      <text x="150" y="118" font-family="'Segoe UI', Arial, sans-serif" font-size="14" fill="#C4B5FD" text-anchor="middle" font-weight="400">per month</text>
+      
+      <!-- Divider -->
+      <line x1="40" y1="140" x2="260" y2="140" stroke="#10B981" stroke-width="0.5" opacity="0.2"/>
+      
+      <!-- Features -->
+      <text x="150" y="170" font-family="'Segoe UI', Arial, sans-serif" font-size="14" fill="#C4B5FD" text-anchor="middle" font-weight="400">✓ 5 AI quizzes per month</text>
+      <text x="150" y="198" font-family="'Segoe UI', Arial, sans-serif" font-size="14" fill="#C4B5FD" text-anchor="middle" font-weight="400">✓ Basic flashcards</text>
+      <text x="150" y="226" font-family="'Segoe UI', Arial, sans-serif" font-size="14" fill="#C4B5FD" text-anchor="middle" font-weight="400">✓ Community support</text>
+      
+      <!-- CTA -->
+      <rect x="50" y="260" width="200" height="44" rx="22" fill="#10B981" opacity="0.15"/>
+      <rect x="50" y="260" width="200" height="44" rx="22" fill="none" stroke="#10B981" stroke-width="1.5"/>
+      <text x="150" y="287" font-family="'Segoe UI', Arial, sans-serif" font-size="15" fill="#10B981" text-anchor="middle" font-weight="700">Get Started</text>
+      
+      <!-- Popular badge (hidden for free) -->
+    </g>
+
+    <!-- CARD 2: PRO - HIGHLIGHTED -->
+    <g transform="translate(430, -15)">
+      <!-- Glow behind card -->
+      <rect x="5" y="5" width="310" height="370" rx="18" fill="#7C3AED" opacity="0.15" filter="url(#cardGlow)"/>
+      
+      <!-- Card background -->
+      <rect x="0" y="0" width="310" height="370" rx="16" fill="#1A1235" stroke="#7C3AED" stroke-width="2"/>
+      <rect x="0" y="0" width="310" height="370" rx="16" fill="url(#proGrad)" opacity="0.08"/>
+      
+      <!-- Popular badge -->
+      <rect x="95" y="-10" width="120" height="26" rx="13" fill="url(#proGrad)"/>
+      <text x="155" y="7" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#FFFFFF" text-anchor="middle" font-weight="700" letter-spacing="1">⭐ MOST POPULAR</text>
+      
+      <!-- Plan name -->
+      <text x="155" y="48" font-family="'Segoe UI', Arial, sans-serif" font-size="22" fill="#FFFFFF" text-anchor="middle" font-weight="700">Pro</text>
+      
+      <!-- Price -->
+      <text x="155" y="110" font-family="'Segoe UI', Arial, sans-serif" font-size="56" fill="#A78BFA" text-anchor="middle" font-weight="900">$12</text>
+      <text x="155" y="130" font-family="'Segoe UI', Arial, sans-serif" font-size="14" fill="#C4B5FD" text-anchor="middle" font-weight="400">per month</text>
+      
+      <!-- Divider -->
+      <line x1="40" y1="152" x2="270" y2="152" stroke="#7C3AED" stroke-width="0.5" opacity="0.3"/>
+      
+      <!-- Features -->
+      <text x="155" y="182" font-family="'Segoe UI', Arial, sans-serif" font-size="14" fill="#E0D7FF" text-anchor="middle" font-weight="400">✓ Unlimited AI quizzes</text>
+      <text x="155" y="212" font-family="'Segoe UI', Arial, sans-serif" font-size="14" fill="#E0D7FF" text-anchor="middle" font-weight="400">✓ Smart flashcards + spaced repetition</text>
+      <text x="155" y="242" font-family="'Segoe UI', Arial, sans-serif" font-size="14" fill="#E0D7FF" text-anchor="middle" font-weight="400">✓ AI tutoring &amp; explanations</text>
+      
+      <!-- CTA -->
+      <rect x="55" y="280" width="200" height="48" rx="24" fill="url(#ctaGrad)" filter="url(#glow)"/>
+      <text x="155" y="309" font-family="'Segoe UI', Arial, sans-serif" font-size="16" fill="#FFFFFF" text-anchor="middle" font-weight="700">Start Free Trial →</text>
+    </g>
+
+    <!-- CARD 3: PREMIUM -->
+    <g transform="translate(795, 0)">
+      <!-- Card background -->
+      <rect x="0" y="0" width="300" height="340" rx="16" fill="#1A1235" stroke="#F59E0B" stroke-width="1.5" opacity="0.9"/>
+      <rect x="0" y="0" width="300" height="340" rx="16" fill="url(#premiumGrad)" opacity="0.05"/>
+      
+      <!-- Plan name -->
+      <text x="150" y="40" font-family="'Segoe UI', Arial, sans-serif" font-size="20" fill="#FFFFFF" text-anchor="middle" font-weight="700">Premium</text>
+      
+      <!-- Price -->
+      <text x="150" y="100" font-family="'Segoe UI', Arial, sans-serif" font-size="52" fill="#FBBF24" text-anchor="middle" font-weight="900">$24</text>
+      <text x="150" y="118" font-family="'Segoe UI', Arial, sans-serif" font-size="14" fill="#C4B5FD" text-anchor="middle" font-weight="400">per month</text>
+      
+      <!-- Divider -->
+      <line x1="40" y1="140" x2="260" y2="140" stroke="#F59E0B" stroke-width="0.5" opacity="0.2"/>
+      
+      <!-- Features -->
+      <text x="150" y="170" font-family="'Segoe UI', Arial, sans-serif" font-size="14" fill="#C4B5FD" text-anchor="middle" font-weight="400">✓ Everything in Pro</text>
+      <text x="150" y="198" font-family="'Segoe UI', Arial, sans-serif" font-size="14" fill="#C4B5FD" text-anchor="middle" font-weight="400">✓ 1:1 AI mentor sessions</text>
+      <text x="150" y="226" font-family="'Segoe UI', Arial, sans-serif" font-size="14" fill="#C4B5FD" text-anchor="middle" font-weight="400">✓ Custom study plans</text>
+      
+      <!-- CTA -->
+      <rect x="50" y="260" width="200" height="44" rx="22" fill="#F59E0B" opacity="0.15"/>
+      <rect x="50" y="260" width="200" height="44" rx="22" fill="none" stroke="#F59E0B" stroke-width="1.5"/>
+      <text x="150" y="287" font-family="'Segoe UI', Arial, sans-serif" font-size="15" fill="#FBBF24" text-anchor="middle" font-weight="700">Contact Sales</text>
+    </g>
+  </g>
+
+  <!-- Bottom right brand -->
+  <text x="1140" y="615" font-family="'Segoe UI', Arial, sans-serif" font-size="13" fill="#5B21B6" text-anchor="end" font-weight="600" letter-spacing="3" opacity="0.5">STUDYAI</text>
+
+  <!-- Corner decorations -->
+  <rect x="20" y="20" width="40" height="3" rx="1.5" fill="#7C3AED" opacity="0.3"/>
+  <rect x="20" y="20" width="3" height="40" rx="1.5" fill="#7C3AED" opacity="0.3"/>
+  <rect x="1140" y="20" width="40" height="3" rx="1.5" fill="#7C3AED" opacity="0.3"/>
+  <rect x="1177" y="20" width="3" height="40" rx="1.5" fill="#7C3AED" opacity="0.3"/>
+</svg>
