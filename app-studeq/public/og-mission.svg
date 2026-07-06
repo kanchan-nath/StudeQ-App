@@ -1,0 +1,140 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0F0B1F"/>
+      <stop offset="50%" style="stop-color:#1A1235"/>
+      <stop offset="100%" style="stop-color:#0D0A1E"/>
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#7C3AED"/>
+      <stop offset="50%" style="stop-color:#6D28D9"/>
+      <stop offset="100%" style="stop-color:#5B21B6"/>
+    </linearGradient>
+    <linearGradient id="accentGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#8B5CF6"/>
+      <stop offset="100%" style="stop-color:#A78BFA"/>
+    </linearGradient>
+    <linearGradient id="glowGrad" x1="50%" y1="0%" x2="50%" y2="100%">
+      <stop offset="0%" style="stop-color:#7C3AED;stop-opacity:0.3"/>
+      <stop offset="100%" style="stop-color:#7C3AED;stop-opacity:0"/>
+    </linearGradient>
+    <linearGradient id="lineGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#7C3AED;stop-opacity:0"/>
+      <stop offset="50%" style="stop-color:#A78BFA;stop-opacity:0.6"/>
+      <stop offset="100%" style="stop-color:#7C3AED;stop-opacity:0"/>
+    </linearGradient>
+    <radialGradient id="orbGrad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#A78BFA;stop-opacity:0.15"/>
+      <stop offset="100%" style="stop-color:#7C3AED;stop-opacity:0"/>
+    </radialGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="softGlow">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bgGrad)"/>
+
+  <!-- Subtle background orbs -->
+  <circle cx="900" cy="100" r="250" fill="url(#orbGrad)"/>
+  <circle cx="200" cy="500" r="180" fill="url(#orbGrad)"/>
+
+  <!-- Glow line top -->
+  <line x1="0" y1="0" x2="1200" y2="0" stroke="url(#lineGrad)" stroke-width="2"/>
+
+  <!-- Hero Icon Area - Left side, dominant 45% canvas -->
+  <g transform="translate(180, 315)">
+    <!-- Outer glow ring -->
+    <circle cx="0" cy="0" r="160" fill="none" stroke="#7C3AED" stroke-width="1" opacity="0.15"/>
+    <circle cx="0" cy="0" r="140" fill="none" stroke="#7C3AED" stroke-width="0.5" opacity="0.08"/>
+
+    <!-- Main icon - AI/study brain + book fusion -->
+    <g filter="url(#softGlow)">
+      <!-- Central hexagon/tech shape -->
+      <polygon points="0,-85 73,-42 73,42 0,85 -73,42 -73,-42" fill="url(#accentGrad)" opacity="0.15"/>
+      <polygon points="0,-65 56,-32 56,32 0,65 -56,32 -56,-32" fill="url(#accentGrad)" opacity="0.25"/>
+      <polygon points="0,-45 39,-22 39,22 0,45 -39,22 -39,-22" fill="url(#accentGrad)" opacity="0.4"/>
+
+      <!-- Book/open pages -->
+      <path d="M-30,-20 L0,-35 L30,-20 L30,20 L0,35 L-30,20 Z" fill="none" stroke="#A78BFA" stroke-width="2.5" stroke-linejoin="round"/>
+      <path d="M0,-35 L0,35" stroke="#A78BFA" stroke-width="2" opacity="0.6"/>
+
+      <!-- Brain/neural overlay -->
+      <circle cx="-8" cy="-5" r="5" fill="#7C3AED" opacity="0.6"/>
+      <circle cx="8" cy="-5" r="5" fill="#7C3AED" opacity="0.6"/>
+      <circle cx="0" cy="8" r="5" fill="#7C3AED" opacity="0.6"/>
+      <line x1="-3" y1="-2" x2="3" y2="-2" stroke="#A78BFA" stroke-width="1.5" opacity="0.4"/>
+      <line x1="-8" y1="8" x2="8" y2="8" stroke="#A78BFA" stroke-width="1.5" opacity="0.4"/>
+      <line x1="-5" y1="2" x2="0" y2="8" stroke="#A78BFA" stroke-width="1.5" opacity="0.3"/>
+      <line x1="5" y1="2" x2="0" y2="8" stroke="#A78BFA" stroke-width="1.5" opacity="0.3"/>
+
+      <!-- AI sparkle dots -->
+      <circle cx="-50" cy="-55" r="3" fill="#A78BFA" opacity="0.5"/>
+      <circle cx="55" cy="-45" r="2" fill="#A78BFA" opacity="0.4"/>
+      <circle cx="-60" cy="40" r="2.5" fill="#A78BFA" opacity="0.3"/>
+      <circle cx="50" cy="50" r="3" fill="#A78BFA" opacity="0.4"/>
+      <circle cx="0" cy="-80" r="2" fill="#A78BFA" opacity="0.3"/>
+
+      <!-- Small orbit paths -->
+      <ellipse cx="0" cy="0" rx="100" ry="30" fill="none" stroke="#7C3AED" stroke-width="0.5" opacity="0.15" transform="rotate(-20)"/>
+      <ellipse cx="0" cy="0" rx="100" ry="30" fill="none" stroke="#7C3AED" stroke-width="0.5" opacity="0.15" transform="rotate(20)"/>
+    </g>
+
+    <!-- Small tag label under icon -->
+    <rect x="-50" y="100" width="100" height="24" rx="12" fill="none" stroke="#7C3AED" stroke-width="1" opacity="0.4"/>
+    <text x="0" y="116" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#A78BFA" text-anchor="middle" font-weight="600" letter-spacing="2" opacity="0.7">AI · ADAPTIVE · SMART</text>
+  </g>
+
+  <!-- Right side text zone - clear negative space -->
+  <g transform="translate(520, 50)">
+    <!-- Small eyebrow -->
+    <text x="0" y="20" font-family="'Segoe UI', Arial, sans-serif" font-size="16" fill="#8B5CF6" font-weight="700" letter-spacing="4" opacity="0.8">OUR MISSION</text>
+
+    <!-- Main bold keyword - largest element, high contrast -->
+    <text x="0" y="100" font-family="'Segoe UI', Arial, sans-serif" font-size="76" fill="#FFFFFF" font-weight="900" letter-spacing="-1.5">
+      AI-Powered
+    </text>
+    <text x="0" y="190" font-family="'Segoe UI', Arial, sans-serif" font-size="76" fill="#A78BFA" font-weight="900" letter-spacing="-1.5">
+      Study
+    </text>
+    <text x="0" y="280" font-family="'Segoe UI', Arial, sans-serif" font-size="76" fill="#FFFFFF" font-weight="900" letter-spacing="-1.5">
+      Revolution
+    </text>
+
+    <!-- Decorative underline -->
+    <rect x="0" y="295" width="480" height="4" rx="2" fill="url(#accentGrad2)" opacity="0.4"/>
+    <rect x="0" y="295" width="180" height="4" rx="2" fill="url(#accentGrad2)" opacity="0.8"/>
+
+    <!-- Description -->
+    <text x="0" y="340" font-family="'Segoe UI', Arial, sans-serif" font-size="18" fill="#C4B5FD" font-weight="400" opacity="0.8">
+      Adaptive quizzes · AI tutoring · Smart flashcards
+    </text>
+    <text x="0" y="370" font-family="'Segoe UI', Arial, sans-serif" font-size="18" fill="#C4B5FD" font-weight="400" opacity="0.8">
+      Personalized learning for every student
+    </text>
+
+    <!-- CTA pill -->
+    <rect x="0" y="400" width="200" height="48" rx="24" fill="url(#accentGrad)" filter="url(#glow)"/>
+    <text x="100" y="430" font-family="'Segoe UI', Arial, sans-serif" font-size="16" fill="#FFFFFF" text-anchor="middle" font-weight="700" letter-spacing="1">Start Learning Free →</text>
+  </g>
+
+  <!-- Bottom right brand -->
+  <text x="1140" y="615" font-family="'Segoe UI', Arial, sans-serif" font-size="13" fill="#5B21B6" text-anchor="end" font-weight="600" letter-spacing="3" opacity="0.5">STUDEQ</text>
+
+  <!-- Corner accent decorations -->
+  <rect x="20" y="20" width="40" height="3" rx="1.5" fill="#7C3AED" opacity="0.3"/>
+  <rect x="20" y="20" width="3" height="40" rx="1.5" fill="#7C3AED" opacity="0.3"/>
+  <rect x="1140" y="20" width="40" height="3" rx="1.5" fill="#7C3AED" opacity="0.3"/>
+  <rect x="1177" y="20" width="3" height="40" rx="1.5" fill="#7C3AED" opacity="0.3"/>
+</svg>

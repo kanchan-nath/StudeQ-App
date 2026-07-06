@@ -650,3 +650,23 @@
         transform: none !important;
     }
 }
+
+/* ── INLINE LINKS ───────────────────────────────────────────── */
+.inlineLink {
+    color: var(--theme-purple-light);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    text-decoration-thickness: 1.5px;
+    transition: opacity var(--t-fast), text-decoration-color var(--t-fast);
+}
+
+.inlineLink:hover {
+    opacity: 0.8;
+    text-decoration-color: var(--theme-purple);
+}
+
+.inlineLink:focus-visible {
+    outline: 2px solid var(--theme-purple);
+    outline-offset: 2px;
+    border-radius: var(--r-sm);
+}

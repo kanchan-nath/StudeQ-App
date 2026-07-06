@@ -1,0 +1,43 @@
+<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+
+  <!-- ============================================================
+       StudeQ Mark
+       Concept: Letter "Q" as a book-loop with its tail doubling as
+       a checkmark / upward-progress arrow, capped with a single
+       AI "spark" node.
+       Grid: ring outer/inner radii follow a golden ratio (52:32 ≈ φ)
+       Colors: bg #0a0c14, primary #ffd166 (gold), accent #7c5ff5 (purple)
+       Monochrome-safe: set -accent to #ffd166 for single-color use.
+     ============================================================ -->
+
+  <g id="background">
+    <rect x="0" y="0" width="200" height="200" rx="28" fill="#0a0c14"/>
+  </g>
+
+  <g id="primary-shape" fill="#ffd166" stroke="#ffd166">
+    <!-- Q bowl: donut ring, golden-ratio thickness (r=52 / r=32) -->
+    <path
+      fill-rule="evenodd"
+      stroke="none"
+      d="M 87,39
+         a 52,52 0 1,1 -0.1,0 Z
+         M 87,59
+         a 32,32 0 1,0 0.1,0 Z"
+    />
+    <!-- Q tail: thick diagonal stroke that reads as a checkmark / rising arrow -->
+    <path
+      fill="none"
+      stroke="#ffd166"
+      stroke-width="20"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      d="M 92,131 L 110,151 L 154,101"
+    />
+  </g>
+
+  <g id="accent-node">
+    <!-- AI spark: single purple node at the tip of the tail -->
+    <circle cx="154" cy="101" r="10" fill="#7c5ff5"/>
+  </g>
+
+</svg>
