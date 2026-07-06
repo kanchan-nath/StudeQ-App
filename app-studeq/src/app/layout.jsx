@@ -1,5 +1,11 @@
+import "./globals.css"; 
+import Script from "next/script"; 
+import { ThemeScript } from "@/components/ThemeScript"; 
+import ThemeProvider from "@/components/ThemeProvider";
+
+
 export const metadata = {
-  metadataBase: new URL("https://studeq.onrender.com"),
+  // metadataBase: new URL("https://studeq.onrender.com"),
 
   title: "StudeQ — AI Powered Study Platform",
 
@@ -87,3 +93,39 @@ export const metadata = {
     apple: "/apple-touch-icon.png",
   },
 };
+
+export default function RootLayout({ children }) {
+  return (
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <ThemeScript />
+
+        {/* Google Analytics */}
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-EPFWDB8HYE"
+          strategy="afterInteractive"
+        />
+
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-EPFWDB8HYE');
+          `}
+        </Script>
+
+        {/* Ahrefs */}
+        <Script
+          src="https://analytics.ahrefs.com/analytics.js"
+          data-key="BzueQFYBTleU4WENyLbgRw"
+          strategy="afterInteractive"
+        />
+      </head>
+
+      <body>
+        <ThemeProvider>{children}</ThemeProvider>
+      </body>
+    </html>
+  );
+}
