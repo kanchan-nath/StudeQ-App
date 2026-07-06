@@ -5,7 +5,7 @@ import ThemeProvider from "@/components/ThemeProvider";
 
 
 export const metadata = {
-  // metadataBase: new URL("https://studeq.onrender.com"),
+  metadataBase: new URL("https://studeq.onrender.com"),
 
   title: "StudeQ — AI Powered Study Platform",
 

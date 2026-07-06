@@ -1,7 +1,8 @@
 // components/ThemeScript.jsx
+import Script from "next/script";
 export const ThemeScript = () => {
     return (
-        <script
+        <Script
             dangerouslySetInnerHTML={{
                 __html: `
           (function() {

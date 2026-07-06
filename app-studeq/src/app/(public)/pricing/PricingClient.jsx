@@ -75,8 +75,8 @@ const ALL_FEATURES = [
 const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'WebPage',
-    name: 'Pricing — StudyAI',
-    description: 'Compare Free, Pro, and Premium plans for StudyAI. AI-powered quizzes, flashcards, and tutor access from $0/month.',
+    name: 'Pricing — studeq',
+    description: 'Compare Free, Pro, and Premium plans for studeq. AI-powered quizzes, flashcards, and tutor access from $0/month.',
     url: 'https://studeq.onrender.com/pricing',
     mainEntity: {
         '@type': 'ItemList',
@@ -105,23 +105,18 @@ export default function PricingClientPage() {
         [billing]
     );
 
-    const billingLabel = useCallback(
-        (plan) => plan.billingLabel[billing],
-        [billing]
-    );
-
     const handleButtonClick = useCallback(() => {
         router.push("/login");
     }, [router]);
 
     return (
         <>
-            {/* Structured data */}
             <script
                 type="application/ld+json"
-                dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+                dangerouslySetInnerHTML={{
+                    __html: JSON.stringify(jsonLd),
+                }}
             />
-
             <a href="#main-content" className={styles.skipLink}>Skip to main content</a>
 
             <main id="main-content" className={styles.main}>
@@ -227,9 +222,9 @@ export default function PricingClientPage() {
                         <h2 id="seo-heading" className={styles.seoTitle}>AI-Powered Study Tools for Every Learner</h2>
                         <div className={styles.seoCols}>
                             <div className={styles.seoBlock}>
-                                <h3 className={styles.seoBlockTitle}>Why StudyAI?</h3>
+                                <h3 className={styles.seoBlockTitle}>Why studeq?</h3>
                                 <p className={styles.seoText}>
-                                    StudyAI combines adaptive flashcards, unlimited AI-generated quizzes, and a real-time AI tutor
+                                    studeq combines adaptive flashcards, unlimited AI-generated quizzes, and a real-time AI tutor
                                     into one platform. Whether you're cramming for finals or building long-term knowledge, our plans
                                     scale with your ambition — from free basics to premium AI models.
                                 </p>
