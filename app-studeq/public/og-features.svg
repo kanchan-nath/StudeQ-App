@@ -1,0 +1,184 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0F0B1F"/>
+      <stop offset="50%" style="stop-color:#1A1235"/>
+      <stop offset="100%" style="stop-color:#0D0A1E"/>
+    </linearGradient>
+    <linearGradient id="feature1Grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#7C3AED"/>
+      <stop offset="100%" style="stop-color:#5B21B6"/>
+    </linearGradient>
+    <linearGradient id="feature2Grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#06B6D4"/>
+      <stop offset="100%" style="stop-color:#0891B2"/>
+    </linearGradient>
+    <linearGradient id="feature3Grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#F59E0B"/>
+      <stop offset="100%" style="stop-color:#D97706"/>
+    </linearGradient>
+    <linearGradient id="feature4Grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#EC4899"/>
+      <stop offset="100%" style="stop-color:#DB2777"/>
+    </linearGradient>
+    <linearGradient id="feature5Grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#10B981"/>
+      <stop offset="100%" style="stop-color:#059669"/>
+    </linearGradient>
+    <linearGradient id="feature6Grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#F43F5E"/>
+      <stop offset="100%" style="stop-color:#E11D48"/>
+    </linearGradient>
+    <linearGradient id="lineGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#7C3AED;stop-opacity:0"/>
+      <stop offset="50%" style="stop-color:#A78BFA;stop-opacity:0.6"/>
+      <stop offset="100%" style="stop-color:#7C3AED;stop-opacity:0"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="cardGlow">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bgGrad)"/>
+
+  <!-- Top glow line -->
+  <line x1="0" y1="0" x2="1200" y2="0" stroke="url(#lineGrad)" stroke-width="2"/>
+
+  <!-- Subtle background orbs -->
+  <circle cx="150" cy="500" r="220" fill="#7C3AED" opacity="0.04"/>
+  <circle cx="1050" cy="100" r="200" fill="#8B5CF6" opacity="0.04"/>
+  <circle cx="600" cy="315" r="350" fill="#A78BFA" opacity="0.02"/>
+
+  <!-- Header Section - Center aligned, Z-pattern start -->
+  <g transform="translate(600, 55)">
+    <text x="0" y="0" font-family="'Segoe UI', Arial, sans-serif" font-size="14" fill="#8B5CF6" text-anchor="middle" font-weight="700" letter-spacing="4">FEATURES</text>
+    <text x="0" y="45" font-family="'Segoe UI', Arial, sans-serif" font-size="54" fill="#FFFFFF" text-anchor="middle" font-weight="900" letter-spacing="-0.5">Everything You Need</text>
+    <text x="0" y="80" font-family="'Segoe UI', Arial, sans-serif" font-size="18" fill="#C4B5FD" text-anchor="middle" font-weight="400" opacity="0.8">AI-powered tools designed to help you study smarter, not harder</text>
+  </g>
+
+  <!-- Feature Grid - 3x2 layout, F-pattern -->
+  <g transform="translate(0, 160)">
+    
+    <!-- Row 1 -->
+    
+    <!-- Feature 1: Quiz Generator -->
+    <g transform="translate(65, 0)">
+      <rect x="0" y="0" width="340" height="115" rx="12" fill="#1A1235" stroke="#7C3AED" stroke-width="1" opacity="0.9"/>
+      <rect x="0" y="0" width="340" height="115" rx="12" fill="url(#feature1Grad)" opacity="0.06"/>
+      
+      <!-- Icon circle -->
+      <circle cx="45" cy="57" r="28" fill="#7C3AED" opacity="0.15"/>
+      <text x="45" y="65" font-family="'Segoe UI', Arial, sans-serif" font-size="24" text-anchor="middle">🧠</text>
+      
+      <!-- Text content -->
+      <text x="85" y="42" font-family="'Segoe UI', Arial, sans-serif" font-size="18" fill="#FFFFFF" font-weight="700">Quiz Generator</text>
+      <text x="85" y="68" font-family="'Segoe UI', Arial, sans-serif" font-size="14" fill="#C4B5FD" font-weight="400">AI-powered quizzes from any topic</text>
+      <text x="85" y="90" font-family="'Segoe UI', Arial, sans-serif" font-size="13" fill="#8B5CF6" font-weight="500">Adaptive difficulty</text>
+    </g>
+
+    <!-- Feature 2: Document Chat -->
+    <g transform="translate(430, 0)">
+      <rect x="0" y="0" width="340" height="115" rx="12" fill="#1A1235" stroke="#06B6D4" stroke-width="1" opacity="0.9"/>
+      <rect x="0" y="0" width="340" height="115" rx="12" fill="url(#feature2Grad)" opacity="0.06"/>
+      
+      <!-- Icon circle -->
+      <circle cx="45" cy="57" r="28" fill="#06B6D4" opacity="0.15"/>
+      <text x="45" y="65" font-family="'Segoe UI', Arial, sans-serif" font-size="24" text-anchor="middle">💬</text>
+      
+      <!-- Text content -->
+      <text x="85" y="42" font-family="'Segoe UI', Arial, sans-serif" font-size="18" fill="#FFFFFF" font-weight="700">Document Chat</text>
+      <text x="85" y="68" font-family="'Segoe UI', Arial, sans-serif" font-size="14" fill="#C4B5FD" font-weight="400">Chat with your PDFs &amp; notes</text>
+      <text x="85" y="90" font-family="'Segoe UI', Arial, sans-serif" font-size="13" fill="#67E8F9" font-weight="500">Instant answers</text>
+    </g>
+
+    <!-- Feature 3: AI Flashcards -->
+    <g transform="translate(795, 0)">
+      <rect x="0" y="0" width="340" height="115" rx="12" fill="#1A1235" stroke="#F59E0B" stroke-width="1" opacity="0.9"/>
+      <rect x="0" y="0" width="340" height="115" rx="12" fill="url(#feature3Grad)" opacity="0.06"/>
+      
+      <!-- Icon circle -->
+      <circle cx="45" cy="57" r="28" fill="#F59E0B" opacity="0.15"/>
+      <text x="45" y="65" font-family="'Segoe UI', Arial, sans-serif" font-size="24" text-anchor="middle">🃏</text>
+      
+      <!-- Text content -->
+      <text x="85" y="42" font-family="'Segoe UI', Arial, sans-serif" font-size="18" fill="#FFFFFF" font-weight="700">Smart Flashcards</text>
+      <text x="85" y="68" font-family="'Segoe UI', Arial, sans-serif" font-size="14" fill="#C4B5FD" font-weight="400">Spaced repetition &amp; AI-generated</text>
+      <text x="85" y="90" font-family="'Segoe UI', Arial, sans-serif" font-size="13" fill="#FCD34D" font-weight="500">Memorize faster</text>
+    </g>
+
+    <!-- Row 2 -->
+    
+    <!-- Feature 4: Timetable -->
+    <g transform="translate(65, 135)">
+      <rect x="0" y="0" width="340" height="115" rx="12" fill="#1A1235" stroke="#EC4899" stroke-width="1" opacity="0.9"/>
+      <rect x="0" y="0" width="340" height="115" rx="12" fill="url(#feature4Grad)" opacity="0.06"/>
+      
+      <!-- Icon circle -->
+      <circle cx="45" cy="57" r="28" fill="#EC4899" opacity="0.15"/>
+      <text x="45" y="65" font-family="'Segoe UI', Arial, sans-serif" font-size="24" text-anchor="middle">📅</text>
+      
+      <!-- Text content -->
+      <text x="85" y="42" font-family="'Segoe UI', Arial, sans-serif" font-size="18" fill="#FFFFFF" font-weight="700">Smart Timetable</text>
+      <text x="85" y="68" font-family="'Segoe UI', Arial, sans-serif" font-size="14" fill="#C4B5FD" font-weight="400">AI-optimized study schedule</text>
+      <text x="85" y="90" font-family="'Segoe UI', Arial, sans-serif" font-size="13" fill="#F472B6" font-weight="500">Stay on track</text>
+    </g>
+
+    <!-- Feature 5: AI Tutoring -->
+    <g transform="translate(430, 135)">
+      <rect x="0" y="0" width="340" height="115" rx="12" fill="#1A1235" stroke="#10B981" stroke-width="1" opacity="0.9"/>
+      <rect x="0" y="0" width="340" height="115" rx="12" fill="url(#feature5Grad)" opacity="0.06"/>
+      
+      <!-- Icon circle -->
+      <circle cx="45" cy="57" r="28" fill="#10B981" opacity="0.15"/>
+      <text x="45" y="65" font-family="'Segoe UI', Arial, sans-serif" font-size="24" text-anchor="middle">🎓</text>
+      
+      <!-- Text content -->
+      <text x="85" y="42" font-family="'Segoe UI', Arial, sans-serif" font-size="18" fill="#FFFFFF" font-weight="700">AI Tutoring</text>
+      <text x="85" y="68" font-family="'Segoe UI', Arial, sans-serif" font-size="14" fill="#C4B5FD" font-weight="400">Personalized 1:1 guidance</text>
+      <text x="85" y="90" font-family="'Segoe UI', Arial, sans-serif" font-size="13" fill="#34D399" font-weight="500">Learn at your pace</text>
+    </g>
+
+    <!-- Feature 6: Progress Analytics -->
+    <g transform="translate(795, 135)">
+      <rect x="0" y="0" width="340" height="115" rx="12" fill="#1A1235" stroke="#F43F5E" stroke-width="1" opacity="0.9"/>
+      <rect x="0" y="0" width="340" height="115" rx="12" fill="url(#feature6Grad)" opacity="0.06"/>
+      
+      <!-- Icon circle -->
+      <circle cx="45" cy="57" r="28" fill="#F43F5E" opacity="0.15"/>
+      <text x="45" y="65" font-family="'Segoe UI', Arial, sans-serif" font-size="24" text-anchor="middle">📊</text>
+      
+      <!-- Text content -->
+      <text x="85" y="42" font-family="'Segoe UI', Arial, sans-serif" font-size="18" fill="#FFFFFF" font-weight="700">Progress Analytics</text>
+      <text x="85" y="68" font-family="'Segoe UI', Arial, sans-serif" font-size="14" fill="#C4B5FD" font-weight="400">Track your growth &amp; mastery</text>
+      <text x="85" y="90" font-family="'Segoe UI', Arial, sans-serif" font-size="13" fill="#FB7185" font-weight="500">Data-driven insights</text>
+    </g>
+  </g>
+
+  <!-- Bottom CTA Bar -->
+  <g transform="translate(600, 590)">
+    <rect x="-160" y="0" width="320" height="36" rx="18" fill="#7C3AED" opacity="0.12"/>
+    <rect x="-160" y="0" width="320" height="36" rx="18" fill="none" stroke="#7C3AED" stroke-width="1.5"/>
+    <text x="0" y="23" font-family="'Segoe UI', Arial, sans-serif" font-size="14" fill="#A78BFA" text-anchor="middle" font-weight="600">✨ All features included in every plan</text>
+  </g>
+
+  <!-- Bottom right brand -->
+  <text x="1140" y="615" font-family="'Segoe UI', Arial, sans-serif" font-size="13" fill="#5B21B6" text-anchor="end" font-weight="600" letter-spacing="3" opacity="0.5">STUDEQ</text>
+
+  <!-- Corner decorations -->
+  <rect x="20" y="20" width="40" height="3" rx="1.5" fill="#7C3AED" opacity="0.3"/>
+  <rect x="20" y="20" width="3" height="40" rx="1.5" fill="#7C3AED" opacity="0.3"/>
+  <rect x="1140" y="20" width="40" height="3" rx="1.5" fill="#7C3AED" opacity="0.3"/>
+  <rect x="1177" y="20" width="3" height="40" rx="1.5" fill="#7C3AED" opacity="0.3"/>
+</svg>
