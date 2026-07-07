@@ -1,7 +1,2 @@
 User-agent: *
-
-# Block auth pages (no value for crawlers)
-Disallow: /login
-Disallow: /register
-
 Sitemap: https://studeq.onrender.com/sitemap.xml
