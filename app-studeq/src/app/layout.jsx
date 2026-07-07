@@ -1,8 +1,7 @@
 import "./globals.css"; 
-import Script from "next/script"; 
 import { ThemeScript } from "@/components/ThemeScript"; 
 import ThemeProvider from "@/components/ThemeProvider";
-
+import { GoogleAnalytics } from "@next/third-parties/google";
 
 export const metadata = {
   metadataBase: new URL("https://studeq.onrender.com"),
@@ -98,33 +97,12 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <ThemeScript />
-
-        {/* Google Analytics */}
-        <Script
-          src="https://www.googletagmanager.com/gtag/js?id=G-EPFWDB8HYE"
-          strategy="afterInteractive"
-        />
-
-        <Script id="google-analytics" strategy="afterInteractive">
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', 'G-EPFWDB8HYE');
-          `}
-        </Script>
-
-        {/* Ahrefs */}
-        {/* <Script
-          src="https://analytics.ahrefs.com/analytics.js"
-          data-key="BzueQFYBTleU4WENyLbgRw"
-          strategy="afterInteractive"
-        /> */}
+        <ThemeScript />        
       </head>
 
       <body>
         <ThemeProvider>{children}</ThemeProvider>
+         <GoogleAnalytics gaId="G-EPFWDB8HYE" />
       </body>
     </html>
   );
