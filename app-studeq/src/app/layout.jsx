@@ -116,11 +116,11 @@ export default function RootLayout({ children }) {
         </Script>
 
         {/* Ahrefs */}
-        <Script
+        {/* <Script
           src="https://analytics.ahrefs.com/analytics.js"
           data-key="BzueQFYBTleU4WENyLbgRw"
           strategy="afterInteractive"
-        />
+        /> */}
       </head>
 
       <body>
