@@ -118,12 +118,12 @@ const Register = () => {
         {/* ── LEFT PANEL ── */}
         <div className={styles["auth-left"]}>
           <header className={styles["auth-header"]}>
-            <Link
-              to="/"
+            <a
+              href="https://studeq.onrender.com"
               className={styles.navLogo}
             >
-              SPARK<span>.E</span>
-            </Link>
+              Stude<span>Q</span>
+            </a>
           </header>
 
           <main className={styles["auth-form-wrapper"]}>
