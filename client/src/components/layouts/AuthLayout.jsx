@@ -7,7 +7,7 @@ const AuthLayout = () => {
         <div className={styles.layout}>
             <header className={styles.header}>
                 <Link to="/" className={styles.logo}>
-                    SPARK<span>.E</span>
+                    Stude<span>Q</span>
                 </Link>
                 <Link to="/" className={styles.backLink}>
                     ← Back to home
