@@ -76,10 +76,13 @@ const Login = () => {
         {/* ── LEFT PANEL ── */}
         <div className={styles["auth-left"]}>
           <header className={styles["auth-header"]}>
+<<<<<<< HEAD
             <div className={styles["auth-logo"]}>
               <span className={styles["auth-logo-icon"]}>✦</span>
               <span className={styles["auth-logo-text"]}>StudeQ</span>
             </div>
+=======
+>>>>>>> origin/devmode
           </header>
 
           <main className={styles["auth-form-wrapper"]}>

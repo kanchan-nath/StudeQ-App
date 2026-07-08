@@ -240,6 +240,25 @@ html.theme-transitioning *::after {
   --toggle-track-border: rgba(255, 255, 255, 0.15);
   --toggle-thumb-bg: #1c1c2e;
   --toggle-accent: #7c5ff5;
+
+  --auth-glass-bg: rgba(255, 255, 255, 0.06);
+--auth-glass-border: rgba(255, 255, 255, 0.12);
+--auth-input-bg: rgba(255, 255, 255, 0.07);
+--auth-input-bg-hover: rgba(255, 255, 255, 0.1);
+--auth-input-bg-focus: rgba(255, 255, 255, 0.1);
+--auth-input-border: rgba(255, 255, 255, 0.12);
+--auth-input-text: rgba(255, 255, 255, 0.85);
+--auth-input-placeholder: rgba(255, 255, 255, 0.35);
+--auth-left-bg: transparent;
+--auth-right-bg: linear-gradient(135deg, #1e3a8a, #312e81, #581c87);
+--auth-tip-bg: rgba(37, 99, 235, 0.12);
+--auth-tip-border: rgba(37, 99, 235, 0.25);
+--auth-tip-text: #93c5fd;
+--auth-stat-bg: rgba(37, 99, 235, 0.5);
+--auth-blob-purple: #6366f1;
+--auth-blob-pink: #ec4899;
+--auth-blob-blue: #0ea5e9;
+
 }
 
 /* ── LIGHT ────────────────────────────────────────────────── */
@@ -273,4 +292,21 @@ html.theme-transitioning *::after {
   --toggle-track-border: #c8cadc;
   --toggle-thumb-bg: #ffffff;
   --toggle-accent: #5b3fd4;
+  --auth-glass-bg: rgba(255, 255, 255, 0.55);
+--auth-glass-border: rgba(15, 23, 42, 0.08);
+--auth-input-bg: rgba(255, 255, 255, 0.6);
+--auth-input-bg-hover: rgba(255, 255, 255, 0.8);
+--auth-input-bg-focus: #ffffff;
+--auth-input-border: rgba(15, 23, 42, 0.12);
+--auth-input-text: #0f172a;
+--auth-input-placeholder: rgba(15, 23, 42, 0.35);
+--auth-left-bg: linear-gradient(160deg, #eef2ff 0%, #f7f8fc 60%);
+--auth-right-bg: linear-gradient(135deg, #4338ca, #6d28d9, #a21caf);
+--auth-tip-bg: rgba(37, 99, 235, 0.08);
+--auth-tip-border: rgba(37, 99, 235, 0.2);
+--auth-tip-text: #1d4ed8;
+--auth-stat-bg: rgba(37, 99, 235, 0.85);
+--auth-blob-purple: #818cf8;
+--auth-blob-pink: #f472b6;
+--auth-blob-blue: #38bdf8;
 }

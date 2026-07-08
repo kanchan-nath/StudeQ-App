@@ -6,12 +6,12 @@ const AuthLayout = () => {
     return (
         <div className={styles.layout}>
             <header className={styles.header}>
-                <Link to="/" className={styles.logo}>
+                <a href="https://studeq.onrender.com" className={styles.logo}>
                     Stude<span>Q</span>
-                </Link>
-                <Link to="/" className={styles.backLink}>
+                </a>
+                <a href="https://studeq.onrender.com/" className={styles.backLink}>
                     ← Back to home
-                </Link>
+                </a>
             </header>
 
             <main className={styles.main}>
