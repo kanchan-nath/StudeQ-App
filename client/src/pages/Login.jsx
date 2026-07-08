@@ -76,10 +76,6 @@ const Login = () => {
         {/* ── LEFT PANEL ── */}
         <div className={styles["auth-left"]}>
           <header className={styles["auth-header"]}>
-            <div className={styles["auth-logo"]}>
-              <span className={styles["auth-logo-icon"]}>✦</span>
-              <span className={styles["auth-logo-text"]}>StudyFlow</span>
-            </div>
           </header>
 
           <main className={styles["auth-form-wrapper"]}>
