@@ -194,9 +194,9 @@ const Login = () => {
               <footer className={styles["auth-form-footer"]}>
                 <p className={`${styles["auth-footer-text"]} ${styles["auth-footer-terms"]}`}>
                   By logging in, you agree to our{" "}
-                  <a className={styles["auth-link"]} href="/terms">Terms of Service</a>{" "}
+                  <a className={styles["auth-link"]} href="https://studeq.onrender.com/terms-of-service">Terms of Service</a>{" "}
                   and{" "}
-                  <a className={styles["auth-link"]} href="/privacy">Privacy Policy</a>
+                  <a className={styles["auth-link"]} href="https://studeq.onrender.com/privacy-policy">Privacy Policy</a>
                 </p>
                 <p className={styles["auth-footer-text"]}>
                   Don't have an account?{" "}
