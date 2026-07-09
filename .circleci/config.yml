@@ -9,10 +9,12 @@ jobs:
       - checkout
 
       - run:
-          name: Build all projects
+          name: Build and test all projects
           command: |
             for dir in server client app-studeq; do
-              echo "=== $dir ==="
+              echo "========================"
+              echo "Processing $dir"
+              echo "========================"
 
               if [ ! -f "$dir/package.json" ]; then
                 echo "Skipping $dir (no package.json)"
@@ -21,14 +23,26 @@ jobs:
 
               cd "$dir"
 
-              npm ci
+              echo "Installing dependencies..."
 
-              if npm run | grep -q " build"; then
-                npm run build
+              if [ "$dir" = "server" ]; then
+                npm ci --legacy-peer-deps
+              else
+                npm ci
               fi
 
+              echo "Checking for build script..."
+              if npm run | grep -q " build"; then
+                npm run build
+              else
+                echo "No build script."
+              fi
+
+              echo "Checking for test script..."
               if npm run | grep -q " test"; then
                 npm test
+              else
+                echo "No test script."
               fi
 
               cd ..
