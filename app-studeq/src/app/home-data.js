@@ -30,6 +30,7 @@ export const BLOG_POSTS = [
   { to: "/blog/best-ai-tools-for-teachers", Icon: Users, label: "Best AI Tools for Teachers", desc: "Best AI Tools for Teachers in 2026: Free & Paid Options" },
   { to: "/blog/how-to-memorize-10x-faster", Icon: Image, label: "How to Memorize Faster", desc: "How to Memorize Faster: 5 Science-Backed Techniques for Students" },
   { to: "/blog/quiz-from-notes", Icon: CalendarClock, label: "How to Generate a Quiz from Notes with AI ", desc: "Stop rereading your notes and hoping something sticks" },
+    { to: "/blog/how-ai-is-changing-the-way-students-learn-in-2026", Icon: CalendarClock, label: "How AI Is Changing the Way Students Learn in 2026", desc: "Discover how AI transforms student learning in 2026 with personalized tutoring, instant feedback, and adaptive study tools. Real examples from 2024-2025." },
 ];
 
 export const SUBJECTS = [

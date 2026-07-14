@@ -1,0 +1,634 @@
+/* app/(public)/how-ai-is-changing-the-way-students-learn-in-2026/page.module.css */
+
+/* ── Skip Link ────────────────────────────────────────────────── */
+.skipLink {
+  position: fixed;
+  top: -100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--theme-surface);
+  color: var(--theme-text);
+  padding: var(--sp-3) var(--sp-6);
+  border-radius: var(--r-md);
+  border: 1px solid var(--theme-border);
+  z-index: 9999;
+  font-weight: 600;
+  transition: top 0.2s ease;
+}
+
+.skipLink:focus {
+  top: var(--sp-4);
+}
+
+/* ── Main Container ──────────────────────────────────────────── */
+.main {
+  min-height: 100vh;
+  background: var(--theme-bg);
+  padding-top: var(--navbar-h);
+}
+
+.container {
+  max-width: var(--max-w);
+  margin: 0 auto;
+  padding: var(--sp-6) var(--sp-4);
+}
+
+/* ── Hero Section ────────────────────────────────────────────── */
+.hero {
+  margin-bottom: var(--sp-12);
+}
+
+.heroContent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-6);
+}
+
+.heroBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  background: var(--theme-accent-dim);
+  color: var(--theme-accent);
+  padding: var(--sp-2) var(--sp-4);
+  border-radius: var(--r-full);
+  font-size: 0.875rem;
+  font-weight: 600;
+  width: fit-content;
+  border: 1px solid var(--theme-border);
+}
+
+.heroBadge svg {
+  color: var(--theme-accent);
+}
+
+.heroTitle {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--theme-text);
+  letter-spacing: -0.02em;
+}
+
+.heroDescription {
+  font-size: 1.125rem;
+  line-height: 1.7;
+  color: var(--theme-text-secondary);
+  max-width: 42rem;
+}
+
+.heroStats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--sp-4);
+  background: var(--theme-surface);
+  border: 1px solid var(--theme-border);
+  border-radius: var(--r-md);
+  padding: var(--sp-6);
+  margin-top: var(--sp-4);
+}
+
+.stat {
+  text-align: center;
+}
+
+.statNumber {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--theme-accent);
+}
+
+.statLabel {
+  display: block;
+  font-size: 0.875rem;
+  color: var(--theme-text-secondary);
+  margin-top: var(--sp-1);
+}
+
+.heroImageWrapper {
+  width: 100%;
+  border-radius: var(--r-md);
+  overflow: hidden;
+  margin-top: var(--sp-4);
+  background: var(--theme-surface);
+}
+
+.heroImage {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1200/630;
+  object-fit: cover;
+  display: block;
+}
+
+/* ── Sections ────────────────────────────────────────────────── */
+.section {
+  margin-bottom: var(--sp-12);
+}
+
+.sectionContent {
+  max-width: 42rem;
+}
+
+.sectionTitle {
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 3vw, 2.25rem);
+  font-weight: 700;
+  color: var(--theme-text);
+  margin-bottom: var(--sp-6);
+  line-height: 1.2;
+}
+
+.textLarge {
+  font-size: 1.125rem;
+  line-height: 1.7;
+  color: var(--theme-text-secondary);
+  margin-bottom: var(--sp-4);
+}
+
+.textRegular {
+  font-size: 1rem;
+  line-height: 1.7;
+  color: var(--theme-text-secondary);
+  margin-bottom: var(--sp-4);
+}
+
+/* ── Grid Layouts ────────────────────────────────────────────── */
+.grid3 {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--sp-6);
+}
+
+@media (min-width: 768px) {
+  .grid3 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .grid3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* ── Cards ────────────────────────────────────────────────────── */
+.card {
+  background: var(--theme-surface);
+  border: 1px solid var(--theme-border);
+  border-radius: var(--r-md);
+  padding: var(--sp-6);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--theme-card-shadow);
+}
+
+.cardIconWrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--theme-accent-dim);
+  border-radius: var(--r-sm);
+  padding: var(--sp-2);
+  margin-bottom: var(--sp-4);
+}
+
+.cardIcon {
+  color: var(--theme-accent);
+}
+
+.cardTitle {
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--theme-text);
+  margin-bottom: var(--sp-2);
+}
+
+.cardDescription {
+  font-size: 0.9375rem;
+  color: var(--theme-text-secondary);
+  line-height: 1.6;
+  margin-bottom: var(--sp-3);
+}
+
+.cardPeriod {
+  display: inline-block;
+  background: var(--theme-border);
+  color: var(--theme-text-secondary);
+  font-size: 0.75rem;
+  padding: var(--sp-1) var(--sp-3);
+  border-radius: var(--r-full);
+  font-weight: 600;
+}
+
+/* ── Tools Grid ───────────────────────────────────────────────── */
+.toolsGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--sp-6);
+  margin-top: var(--sp-6);
+}
+
+@media (min-width: 768px) {
+  .toolsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.toolCard {
+  background: var(--theme-surface);
+  border: 1px solid var(--theme-border);
+  border-radius: var(--r-md);
+  padding: var(--sp-6);
+}
+
+.toolHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+  margin-bottom: var(--sp-3);
+}
+
+.toolIconWrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--theme-accent-dim);
+  border-radius: var(--r-sm);
+  padding: var(--sp-2);
+}
+
+.toolIcon {
+  color: var(--theme-accent);
+}
+
+.toolTitle {
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--theme-text);
+}
+
+.toolDescription {
+  font-size: 0.9375rem;
+  color: var(--theme-text-secondary);
+  line-height: 1.6;
+  margin-bottom: var(--sp-4);
+}
+
+.toolFeatures {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.toolFeature {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-size: 0.875rem;
+  color: var(--theme-text-secondary);
+}
+
+.toolFeature svg {
+  color: var(--theme-accent);
+  flex-shrink: 0;
+}
+
+/* ── Live Example ────────────────────────────────────────────── */
+.liveExampleContainer {
+  background: var(--theme-surface);
+  border: 1px solid var(--theme-border);
+  border-radius: var(--r-md);
+  padding: var(--sp-6);
+}
+
+.liveExampleBadge {
+  display: inline-block;
+  background: var(--theme-accent);
+  color: var(--theme-bg);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: var(--sp-1) var(--sp-3);
+  border-radius: var(--r-full);
+  margin-bottom: var(--sp-4);
+  letter-spacing: 0.05em;
+}
+
+.timelineWrapper {
+  margin-top: var(--sp-6);
+}
+
+.timeline {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-6);
+}
+
+.timelineItem {
+  display: flex;
+  gap: var(--sp-4);
+  position: relative;
+}
+
+.timelineDot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--theme-accent);
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+
+.timelineContent {
+  flex: 1;
+}
+
+.timelineYear {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--theme-accent);
+  margin-bottom: var(--sp-1);
+}
+
+.timelineTitle {
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--theme-text);
+  margin-bottom: var(--sp-2);
+}
+
+.timelineResult {
+  margin-top: var(--sp-3);
+  background: var(--theme-accent-dim);
+  padding: var(--sp-2) var(--sp-4);
+  border-radius: var(--r-sm);
+  border-left: 3px solid var(--theme-accent);
+}
+
+.timelineResult span {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--theme-text);
+}
+
+.timelineArrow {
+  width: 2px;
+  height: 24px;
+  background: var(--theme-border);
+  margin-left: 5px;
+}
+
+/* ── Benefits Grid ───────────────────────────────────────────── */
+.benefitsGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--sp-6);
+}
+
+@media (min-width: 768px) {
+  .benefitsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.benefitCard {
+  background: var(--theme-surface);
+  border: 1px solid var(--theme-border);
+  border-radius: var(--r-md);
+  padding: var(--sp-6);
+  text-align: center;
+}
+
+.benefitIconWrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--theme-accent-dim);
+  border-radius: var(--r-full);
+  padding: var(--sp-3);
+  margin-bottom: var(--sp-4);
+}
+
+.benefitIcon {
+  color: var(--theme-accent);
+}
+
+.benefitTitle {
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--theme-text);
+  margin-bottom: var(--sp-2);
+}
+
+.benefitDescription {
+  font-size: 0.9375rem;
+  color: var(--theme-text-secondary);
+  line-height: 1.6;
+}
+
+/* ── Stats ────────────────────────────────────────────────────── */
+.statsContainer {
+  background: var(--theme-surface);
+  border: 1px solid var(--theme-border);
+  border-radius: var(--r-md);
+  padding: var(--sp-8);
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--sp-6);
+  margin-top: var(--sp-6);
+}
+
+@media (min-width: 768px) {
+  .statsGrid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.statCard {
+  text-align: center;
+}
+
+.statCard .statNumber {
+  font-family: var(--font-display);
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--theme-accent);
+  display: block;
+}
+
+.statCard .statLabel {
+  font-size: 0.875rem;
+  color: var(--theme-text-secondary);
+  margin-top: var(--sp-1);
+}
+
+/* ── CTA ──────────────────────────────────────────────────────── */
+.ctaContainer {
+  background: linear-gradient(
+    135deg,
+    var(--theme-accent-dim),
+    var(--theme-surface)
+  );
+  border: 1px solid var(--theme-border);
+  border-radius: var(--r-md);
+  padding: var(--sp-8);
+  text-align: center;
+}
+
+.ctaTitle {
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-weight: 700;
+  color: var(--theme-text);
+  margin-bottom: var(--sp-4);
+}
+
+.ctaDescription {
+  font-size: 1.125rem;
+  color: var(--theme-text-secondary);
+  margin-bottom: var(--sp-6);
+}
+
+.ctaButton {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  background: var(--theme-accent);
+  color: var(--theme-bg);
+  padding: var(--sp-3) var(--sp-6);
+  border-radius: var(--r-full);
+  font-weight: 600;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.ctaButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px var(--theme-accent-glow);
+}
+
+/* ── Related Articles ────────────────────────────────────────── */
+.relatedGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--sp-6);
+}
+
+@media (min-width: 768px) {
+  .relatedGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.relatedCard {
+  background: var(--theme-surface);
+  border: 1px solid var(--theme-border);
+  border-radius: var(--r-md);
+  padding: var(--sp-6);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.relatedCard:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--theme-card-shadow);
+}
+
+.relatedTitle {
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--theme-text);
+  margin-bottom: var(--sp-1);
+}
+
+.relatedDescription {
+  font-size: 0.9375rem;
+  color: var(--theme-text-secondary);
+  line-height: 1.6;
+  flex: 1;
+}
+
+.relatedLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-1);
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--theme-accent);
+  margin-top: var(--sp-2);
+}
+
+/* ── Breadcrumb ──────────────────────────────────────────────── */
+.breadcrumb {
+  margin-top: var(--sp-8);
+  padding-top: var(--sp-4);
+  border-top: 1px solid var(--theme-border);
+}
+
+.breadcrumbList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  align-items: center;
+}
+
+.breadcrumbItem {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.breadcrumbLink {
+  font-size: 0.875rem;
+  color: var(--theme-text-secondary);
+  transition: color 0.2s ease;
+}
+
+.breadcrumbLink:hover {
+  color: var(--theme-accent);
+}
+
+.breadcrumbSeparator {
+  font-size: 0.875rem;
+  color: var(--theme-text-muted);
+}
+
+.breadcrumbCurrent {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--theme-text);
+}
+
+/* ── Reduced Motion ──────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .card:hover,
+  .relatedCard:hover,
+  .benefitCard:hover,
+  .ctaButton:hover {
+    transform: none !important;
+    transition: none !important;
+  }
+
+  .skipLink {
+    transition: none !important;
+  }
+}

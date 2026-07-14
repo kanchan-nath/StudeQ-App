@@ -15,7 +15,7 @@ import {
   FAQS,
   TICKER_MESSAGES,
   MARQUEE_LOGOS,
-} from "./home-data";
+} from "./home-data.js";
 
 /* ─── HOOKS ─────────────────────────────────────────────────────────────── */
 
