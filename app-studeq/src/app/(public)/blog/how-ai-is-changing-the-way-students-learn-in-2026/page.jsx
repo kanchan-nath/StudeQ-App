@@ -139,7 +139,28 @@ export default function HowAIIsChangingStudentLearning() {
               </div>
             </div>
           </section>
-
+ {/* Breadcrumb Navigation */}
+          <nav className={styles.breadcrumb} aria-label="Breadcrumb">
+            <ol className={styles.breadcrumbList}>
+              <li className={styles.breadcrumbItem}>
+                <a href="/" className={styles.breadcrumbLink}>
+                  Home
+                </a>
+              </li>
+              <li className={styles.breadcrumbItem}>
+                <span className={styles.breadcrumbSeparator}>/</span>
+                <a href="/blog" className={styles.breadcrumbLink}>
+                  Blog
+                </a>
+              </li>
+              <li className={styles.breadcrumbItem}>
+                <span className={styles.breadcrumbSeparator}>/</span>
+                <span className={styles.breadcrumbCurrent}>
+                  How AI Is Changing the Way Students Learn in 2026
+                </span>
+              </li>
+            </ol>
+          </nav>
           {/* Introduction */}
           <section className={styles.section}>
             <div className={styles.sectionContent}>
@@ -525,28 +546,7 @@ export default function HowAIIsChangingStudentLearning() {
             </div>
           </section>
 
-          {/* Breadcrumb Navigation */}
-          <nav className={styles.breadcrumb} aria-label="Breadcrumb">
-            <ol className={styles.breadcrumbList}>
-              <li className={styles.breadcrumbItem}>
-                <a href="/" className={styles.breadcrumbLink}>
-                  Home
-                </a>
-              </li>
-              <li className={styles.breadcrumbItem}>
-                <span className={styles.breadcrumbSeparator}>/</span>
-                <a href="/blog" className={styles.breadcrumbLink}>
-                  Blog
-                </a>
-              </li>
-              <li className={styles.breadcrumbItem}>
-                <span className={styles.breadcrumbSeparator}>/</span>
-                <span className={styles.breadcrumbCurrent}>
-                  How AI Is Changing the Way Students Learn in 2026
-                </span>
-              </li>
-            </ol>
-          </nav>
+         
         </article>
       </main>
     </>
