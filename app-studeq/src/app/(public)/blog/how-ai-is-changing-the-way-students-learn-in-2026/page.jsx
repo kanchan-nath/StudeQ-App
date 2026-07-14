@@ -128,10 +128,10 @@ export default function HowAIIsChangingStudentLearning() {
               </div>
               <div className={styles.heroImageWrapper}>
                 <img
-                  src="/images/hero-ai-learning-2026.jpg"
+                  src="/images/hero-ai-learning-2026.svg"
                   alt="Students using AI-powered learning tools and interactive study applications in a modern classroom environment"
                   loading="eager"
-                  fetchpriority="high"
+                  fetchPriority="high"
                   width="1200"
                   height="630"
                   className={styles.heroImage}
