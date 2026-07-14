@@ -31,20 +31,20 @@ export const metadata = {
     "Discover how AI transforms student learning in 2026 with personalized tutoring, instant feedback, and adaptive study tools. Real examples from 2024-2025.",
   robots: "index, follow",
   alternates: {
-    canonical: "https://yourdomain.com/how-ai-is-changing-the-way-students-learn-in-2026",
+    canonical: "https://studeq.onrender.com/how-ai-is-changing-the-way-students-learn-in-2026",
   },
   openGraph: {
     title: "How AI Is Changing the Way Students Learn in 2026",
     description:
       "From AI tutors to personalized learning paths, see how students are learning smarter in 2026. Includes real examples from 2024-2025.",
-    url: "https://yourdomain.com/how-ai-is-changing-the-way-students-learn-in-2026",
+    url: "https://studeq.onrender.com/how-ai-is-changing-the-way-students-learn-in-2026",
     type: "article",
     images: [
       {
-        url: "https://yourdomain.com/images/ai-learning-2026-og.jpg",
+        url: "https://studeq.onrender.com/images/ai-learning-2026-og.svg",
         width: 1200,
         height: 630,
-        alt: "AI-powered learning transformation in 2026",
+        alt: "AI powered learning transformation in 2026",
       },
     ],
   },
@@ -53,7 +53,7 @@ export const metadata = {
     title: "How AI Is Changing the Way Students Learn in 2026",
     description:
       "AI is revolutionizing education. Learn how students are using AI tools to study smarter, not harder.",
-    images: ["https://yourdomain.com/images/ai-learning-2026-twitter.jpg"],
+    images: ["https://studeq.onrender.com/images/ai-learning-2026-twitter.svg"],
   },
 };
 
@@ -65,7 +65,7 @@ export default function HowAIIsChangingStudentLearning() {
     description:
       "AI is revolutionizing education with personalized learning, instant feedback, and adaptive tools. Explore real examples from 2024-2025.",
     image:
-      "https://yourdomain.com/images/ai-learning-2026-structured.jpg",
+      "https://studeq.onrender.com/images/ai-learning-2026-structured.svg",
     author: {
       "@type": "Organization",
       name: "Your Study Platform",
@@ -78,7 +78,7 @@ export default function HowAIIsChangingStudentLearning() {
     dateModified: "2026-01-15",
     mainEntityOfPage: {
       "@type": "WebPage",
-      "@id": "https://yourdomain.com/how-ai-is-changing-the-way-students-learn-in-2026",
+      "@id": "https://studeq.onrender.com/how-ai-is-changing-the-way-students-learn-in-2026",
     },
   };
 
@@ -490,22 +490,22 @@ export default function HowAIIsChangingStudentLearning() {
             <div className={styles.relatedGrid}>
               {[
                 {
-                  title: "Best AI Study Apps for Students in 2026",
+                  title: "What Is the 10/20/70 Rule of AI? A Practical Framework",
                   description:
-                    "Discover the top AI-powered study tools that are helping students excel.",
-                  link: "/best-ai-study-apps-students-2026",
+                    "Learn how the 10/20/70 rule breaks down AI project success into algorithms, data, and change management. Real examples and a StudeQ demo inside.",
+                  link: "/blog/10-20-70-rule-of-ai",
                 },
                 {
-                  title: "How to Create the Perfect Study Schedule with AI",
+                  title: "AI Quiz for Teachers: Best Free Generators & How to Use Them",
                   description:
-                    "Learn how AI can help you build a study schedule that works for you.",
-                  link: "/ai-study-schedule-strategies",
+                    "Find the best free AI quiz generators for teachers — from text, PDFs, or topics. Compare features, see a classroom demo, and learn how to save hours every week.",
+                  link: "/blog/ai-quiz-for-teachers",
                 },
                 {
-                  title: "AI vs Traditional Learning: The Future of Education",
+                  title: "AI Quiz Generator: Create Tests from PDF & Text in Seconds",
                   description:
-                    "Compare the effectiveness of AI-powered learning with traditional methods.",
-                  link: "/ai-vs-traditional-learning-future",
+                    "Discover the best AI quiz generator for students. Generate free quizzes from PDF, text, and study materials with StudeQ and Jotform alternatives.",
+                  link: "/blog/ai-quiz-generator",
                 },
               ].map((article, index) => (
                 <a
