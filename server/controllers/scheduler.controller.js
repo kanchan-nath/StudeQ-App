@@ -12,8 +12,7 @@ import {
 import { generateStudyPlan } from "../lib/groq/generateStudyPlan.js"
 import { StudyPlan } from "../models/studyPlan.model.js"
 import pdfToImages from "../services/pdfToImages.js"
-// import PDFParse from "pdf-parse/lib/pdf-parse.js";
-const PDFParse = true
+import PDFParse from "pdf-parse";
 import fs, { rmSync } from "fs"
 import createSchedule from "../lib/groq/createSchedule.js"
 import recurringTasks from "../lib/cronJobs/cron.js"
