@@ -11,8 +11,7 @@ const pdfAnalyze = asyncHandler(async (req, res) => {
 
         const dataBuffer = fs.readFileSync(pdfLocalFilePath)
         const uint8Array = new Uint8Array(dataBuffer)
-        const parser = new PDFParse(uint8Array)
-        const result = await parser.getText();
+        const result = await pdfParse(uint8Array)
 
         const data = await analyzePDF(result.text)
 

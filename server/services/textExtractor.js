@@ -64,15 +64,17 @@ const textExtractor = async (file) => {
             }
 
             const uint8Array = new Uint8Array(fileDataBuffer)
-            const parser = await new PDFParse(uint8Array)
+            const pdfData = await pdfParse(uint8Array)
 
-            const rawText = ((await parser.getText()).text.replace(/--\s*\d+\s*of\s*\d+\s*--/g, '').trim())
+            const rawText = (pdfData.text || "")
+                .replace(/--\s*\d+\s*of\s*\d+\s*--/g, '')
+                .trim()
 
             const extractedText = cleanExtractedText(rawText)
 
             const charCount = extractedText.length
             const wordCount = extractedText.split(/\s+/).filter(Boolean).length
-            const pageCount = parser.numPages
+            const pageCount = pdfData?.numpages || pdfData?.numPages || 1
 
             const isSparse = charCount < (THERESOLD_CHAR * pageCount) ||
                 wordCount < (THERESOLD_WORD * pageCount)
