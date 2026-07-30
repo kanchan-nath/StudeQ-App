@@ -1,7 +1,7 @@
 import { asyncHandler } from "../utils/asyncHandler.js"
 import { ApiError, ApiResponse } from "../utils/Async.js"
 import fs from "fs"
-import pdfParse from "pdf-parse"
+import PDFParse from "pdf-parse";
 import { analyzePDF } from "../lib/groq/pdfAnalyze.js"
 
 const pdfAnalyze = asyncHandler(async (req, res) => {

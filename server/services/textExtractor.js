@@ -1,6 +1,5 @@
 import { ApiError } from "../utils/Async.js"
-import path from "path"
-import pdfParse from "pdf-parse"
+import PDFParse from "pdf-parse";
 import fs from "fs"
 import XLSX from "xlsx"
 import Tesseract from "tesseract.js"
