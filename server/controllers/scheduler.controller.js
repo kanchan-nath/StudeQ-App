@@ -12,7 +12,7 @@ import {
 import { generateStudyPlan } from "../lib/groq/generateStudyPlan.js"
 import { StudyPlan } from "../models/studyPlan.model.js"
 import pdfToImages from "../services/pdfToImages.js"
-import { PDFParse } from "pdf-parse"
+import pdfParse from "pdf-parse"
 import fs, { rmSync } from "fs"
 import createSchedule from "../lib/groq/createSchedule.js"
 import recurringTasks from "../lib/cronJobs/cron.js"
@@ -683,11 +683,9 @@ const uploadFile = asyncHandler(async (req, res) => {
 
     const dataBuffer = fs.readFileSync(filePath)
     const uint8array = new Uint8Array(dataBuffer)
-    const parser = new PDFParse(uint8array)
+    const pdfData = await pdfParse(uint8array)
 
-    await parser.getText()
-
-    const totalPages = parser?.doc?._pdfInfo?.numPages
+    const totalPages = pdfData?.numpages || pdfData?.numPages || 1
     console.log("Started", totalPages);
 
     await pdfToImages(filePath, totalPages, outputDir)
