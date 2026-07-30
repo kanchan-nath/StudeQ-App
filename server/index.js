@@ -2,6 +2,7 @@ import "./configs/env.js"
 import { app } from "./app.js"
 import { connectDB } from "./lib/mongoClient.js"
 import http from "http"
+import net from "net"
 import jwt from "jsonwebtoken"
 import { ApiError } from "./utils/Async.js"
 import { initSocket } from "./lib/socket.js"
@@ -91,8 +92,34 @@ io.on("connection", (socket) => {
 
 })
 
-const PORT = process.env.PORT || 3000
-if (!PORT) {
+const getAvailablePort = (preferredPort) => {
+    return new Promise((resolve, reject) => {
+        const tryPort = (port) => {
+            const tester = net.createServer()
+
+            tester.once("error", (error) => {
+                if (error.code === "EADDRINUSE") {
+                    tryPort(port + 1)
+                    return
+                }
+
+                tester.close(() => reject(error))
+            })
+
+            tester.once("listening", () => {
+                const address = tester.address()
+                tester.close(() => resolve(address.port))
+            })
+
+            tester.listen(port, "0.0.0.0")
+        }
+
+        tryPort(preferredPort)
+    })
+}
+
+const preferredPort = Number(process.env.PORT || 3000)
+if (!preferredPort) {
     logger.error("FATAL: PORT env var not set")
     process.exit(1)
 }
@@ -101,9 +128,14 @@ let httpServer
 connectDB()
     .then(async () => {
         await seedPlansData()
-        httpServer = server.listen(PORT, '0.0.0.0', () => {
-            logger.info(`Server is running at ${PORT}`);
+        const availablePort = await getAvailablePort(preferredPort)
+        httpServer = server.listen(availablePort, '0.0.0.0', () => {
+            logger.info(`Server is running at ${availablePort}`)
+        })
 
+        httpServer.on("error", (error) => {
+            logger.error("HTTP server failed to start", error)
+            process.exit(1)
         })
     })
     .catch((error) => {
