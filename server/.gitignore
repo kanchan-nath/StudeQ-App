@@ -1,8 +1,9 @@
 node_modules
-.env
+*.env
 .env.development
 .env.production
 .env.local
+.env.production.studeq
 
 /generated/prisma
 

@@ -140,6 +140,7 @@ connectDB()
     })
     .catch((error) => {
           console.error("MONGO db connection failed !!! ", error)
+          process.exit(1) 
     })
 
 const shutdown = async (signal) => {
