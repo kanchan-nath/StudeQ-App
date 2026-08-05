@@ -15,17 +15,17 @@ try {
     })
 
     mongoose.connection.on("disconnected", () =>
-        logger.warn("MongoDB disconnected — attempting reconnect...")
+        console.warn("MongoDB disconnected — attempting reconnect...")
     )
     mongoose.connection.on("reconnected", () =>
         logger.info("MongoDB reconnected")
     )
     mongoose.connection.on("error", (err) =>
-        logger.error("MongoDB runtime error:", err.message)
+        console.error("MongoDB runtime error:", err.message)
     )
     
 } catch (error) {
-    logger.error("MONGODB connection FAILED ", error.message);
+    console.error("MONGODB connection FAILED ", error.message);
     process.exit(1)
 }
 }
