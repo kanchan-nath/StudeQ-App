@@ -118,7 +118,7 @@ const getAvailablePort = (preferredPort) => {
     })
 }
 
-const preferredPort = Number(process.env.PORT || 3000)
+const preferredPort = Number(process.env.PORT || 2000)
 if (!preferredPort) {
     console.error("FATAL: PORT env var not set")
     process.exit(1)
@@ -129,8 +129,8 @@ connectDB()
     .then(async () => {
         await seedPlansData()
         const availablePort = await getAvailablePort(preferredPort)
-        httpServer = server.listen(availablePort, '0.0.0.0', () => {
-            console.log(`Server is running at ${availablePort}`)
+        httpServer = server.listen(preferredPort, '0.0.0.0', () => {
+            console.log(`Server is running at ${preferredPort}`)
         })
 
         httpServer.on("error", (error) => {
