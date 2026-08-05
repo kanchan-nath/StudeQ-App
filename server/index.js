@@ -120,7 +120,7 @@ const getAvailablePort = (preferredPort) => {
 
 const preferredPort = Number(process.env.PORT || 3000)
 if (!preferredPort) {
-    logger.error("FATAL: PORT env var not set")
+    console.error("FATAL: PORT env var not set")
     process.exit(1)
 }
 
