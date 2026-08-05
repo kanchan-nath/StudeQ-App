@@ -127,8 +127,10 @@ if (!preferredPort) {
 let httpServer
 connectDB()
     .then(async () => {
+        console.log("[BOOT] DB ok, seeding...")
         await seedPlansData()
-        const availablePort = await getAvailablePort(preferredPort)
+        console.log("[BOOT] Seed ok, binding", preferredPort)
+
         httpServer = server.listen(preferredPort, '0.0.0.0', () => {
             console.log(`Server is running at ${preferredPort}`)
         })
@@ -139,8 +141,8 @@ connectDB()
         })
     })
     .catch((error) => {
-          console.error("MONGO db connection failed !!! ", error)
-          process.exit(1) 
+        console.error("MONGO db connection failed !!! ", error)
+        process.exit(1)
     })
 
 const shutdown = async (signal) => {
