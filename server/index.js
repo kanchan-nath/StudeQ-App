@@ -118,7 +118,7 @@ const getAvailablePort = (preferredPort) => {
     })
 }
 
-const preferredPort = Number(process.env.PORT || 3000)
+const preferredPort = Number(process.env.PORT || 2000)
 if (!preferredPort) {
     console.error("FATAL: PORT env var not set")
     process.exit(1)
@@ -127,10 +127,12 @@ if (!preferredPort) {
 let httpServer
 connectDB()
     .then(async () => {
+        console.log("[BOOT] DB ok, seeding...")
         await seedPlansData()
-        const availablePort = await getAvailablePort(preferredPort)
-        httpServer = server.listen(availablePort, '0.0.0.0', () => {
-            console.log(`Server is running at ${availablePort}`)
+        console.log("[BOOT] Seed ok, binding", preferredPort)
+
+        httpServer = server.listen(preferredPort, '0.0.0.0', () => {
+            console.log(`Server is running at ${preferredPort}`)
         })
 
         httpServer.on("error", (error) => {
@@ -139,8 +141,8 @@ connectDB()
         })
     })
     .catch((error) => {
-          console.error("MONGO db connection failed !!! ", error)
-          process.exit(1) 
+        console.error("MONGO db connection failed !!! ", error)
+        process.exit(1)
     })
 
 const shutdown = async (signal) => {
