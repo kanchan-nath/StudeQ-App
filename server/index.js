@@ -22,27 +22,25 @@ const userSocketMap = new Map() //Need to improve more using redis
 const io = initSocket(server)
 aiQueueEvents(userSocketMap, io)
 
-io.use((socket, next) => {
+export const createSocketAuthMiddleware = ({
+    cookieParse = cookie.parse,
+    jwtVerify = jwt.verify,
+    accessTokenSecret = process.env.ACCESS_TOKEN_SECRET,
+} = {}) => (socket, next) => {
     try {
         const rawCookie = socket.handshake.headers.cookie || ""
-        const token = cookie.parse(rawCookie).accessToken
-
-        if (!token) {
-            return next(new Error("Unauthorized: no token"))
-        }
-
-        const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET)
-
-        if (!decodedToken?.userId) {
-            return next(new Error("Unauthorized: invalid token payload"))
-        }
-
+        const token = cookieParse(rawCookie).accessToken
+        if (!token) return next(new Error("Unauthorized: no token"))
+        const decodedToken = jwtVerify(token, accessTokenSecret)
+        if (!decodedToken?.userId) return next(new Error("Unauthorized: invalid token payload"))
         socket.data.userId = decodedToken.userId
         next()
     } catch (error) {
         next(new Error(`Unauthorized: ${error.message}`))
     }
-})
+}
+
+io.use(createSocketAuthMiddleware())
 
 io.on("connection", (socket) => {
     const { userId } = socket.data

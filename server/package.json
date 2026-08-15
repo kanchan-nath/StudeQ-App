@@ -9,9 +9,7 @@
     "start": "NODE_ENV=production node index.js",
     "debug": "node index.js 2>&1",
     "debug:full": "node --inspect index.js 2>&1 | tee logs/debug.log",
-    "test": "NODE_OPTIONS='--experimental-vm-modules' jest --config tests/jest.config.js",
-    "test:watch": "NODE_OPTIONS='--experimental-vm-modules' jest --config tests/jest.config.js --watch",
-    "test:coverage": "NODE_OPTIONS='--experimental-vm-modules' jest --config tests/jest.config.js --coverage"
+    "test": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js"
   },
   "keywords": [],
   "author": "KANCHAN NATH",
