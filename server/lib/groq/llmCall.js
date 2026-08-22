@@ -3,7 +3,7 @@ import groq from "./groq.js"
 import { promptOptimizer } from "../../services/promptOptimizer.js"
 import {logAIResponse} from "../../utils/logAIResponse.utils.js"
 
-const MODEL = process.env.GROQ_RAG_MODEL || "llama-3.3-70b-versatile"
+const MODEL = process.env.GROQ_RAG_MODEL || "openai/gpt-oss-120b"
 
 const llmCall = async (query, topChunks, userId) => {
     if (!query || !userId) throw new Error("llmCall: query and userId required")
@@ -19,6 +19,8 @@ const llmCall = async (query, topChunks, userId) => {
     const chunksText = Array.isArray(topChunks) && topChunks.length
         ? topChunks.map((chunk, i) => `[Source ${i + 1}]\n${chunk}`).join("\n\n")
         : "No relevant context found."
+
+    if (!optimizedPrompt) throw new Error("optimizedPrompt missing");
 
     const prompt = optimizedPrompt
         .replace("{{QUERY}}", query)
