@@ -3,7 +3,7 @@ import { AIResponse } from "../../models/aiResponse.model.js"
 import logger from "../../logger/index.js";
 import { extractJSON } from "../../utils/llm.utils.js";
 
-const MODEL = process.env.GROQ_QUIZ_MODEL || "llama-3.3-70b-versatile"
+const MODEL = process.env.GROQ_QUIZ_MODEL || "openai/gpt-oss-120b"
 
 const logAIResponse = async (userId, prompt, rawResult, response) => {
     const { prompt_tokens, completion_tokens, total_tokens, total_time } = response.usage
