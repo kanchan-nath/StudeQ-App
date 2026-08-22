@@ -2,15 +2,21 @@ import OpenAi from "openai"
 import dotenv from "dotenv"
 import { prompt_PromptOptimizer } from "../lib/prompt.js"
 
-const openai = new OpenAi({
-    apiKey: process.env.NVIDIA_DEEPSEEK_API_KEY,
-    baseURL: 'https://integrate.api.nvidia.com/v1'
-})
+let openai = null
+const getClient = () => {
+    if (!openai) {
+        openai = new OpenAi({
+            apiKey: process.env.NVIDIA_DEEPSEEK_API_KEY,
+            baseURL: 'https://integrate.api.nvidia.com/v1'
+        })
+    }
+    return openai
+}
 
 const promptOptimizer = async (userQuery) => {
 
     try {        
-        const response = await openai.chat.completions.create({
+        const response = await getClient().chat.completions.create({
             model: "meta/llama-3.2-3b-instruct",
             messages: [
                 {
@@ -31,7 +37,7 @@ const promptOptimizer = async (userQuery) => {
         return data
     } catch (error) {
         console.error("ERROR:", error.message);
-
+        throw error
     }
 
 
