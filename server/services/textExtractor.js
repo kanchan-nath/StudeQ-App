@@ -1,5 +1,5 @@
 import { ApiError } from "../utils/Async.js"
-import PDFParse from "pdf-parse";
+import { extractPdfText } from "./pdfTextExtractor.js"
 import fs from "fs"
 import XLSX from "xlsx"
 import Tesseract from "tesseract.js"
@@ -64,7 +64,7 @@ const textExtractor = async (file) => {
             }
 
             const uint8Array = new Uint8Array(fileDataBuffer)
-            const pdfData = await pdfParse(uint8Array)
+            const pdfData = await extractPdfText(uint8Array)
 
             const rawText = (pdfData.text || "")
                 .replace(/--\s*\d+\s*of\s*\d+\s*--/g, '')
@@ -74,7 +74,7 @@ const textExtractor = async (file) => {
 
             const charCount = extractedText.length
             const wordCount = extractedText.split(/\s+/).filter(Boolean).length
-            const pageCount = pdfData?.numpages || pdfData?.numPages || 1
+            const pageCount = pdfData.numpages
 
             const isSparse = charCount < (THERESOLD_CHAR * pageCount) ||
                 wordCount < (THERESOLD_WORD * pageCount)

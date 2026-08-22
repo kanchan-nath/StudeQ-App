@@ -28,11 +28,14 @@ import userRoute from "./routes/auth.route.js"
 import noteRoute from "./routes/note.route.js"
 import tutorRouter from "./routes/tutor.route.js"
 import quizRouter from "./routes/quiz.route.js"
-import studyRoomRouter from "./routes/studyRoom.route.js"
-import imageAnalysisRouter from "./routes/imageAnalysis.route.js"
-import pdfAnalysisRouter from "./routes/pdfAnalysis.route.js"
+
+// import studyRoomRouter from "./routes/studyRoom.route.js"
+// import imageAnalysisRouter from "./routes/imageAnalysis.route.js"
+// import pdfAnalysisRouter from "./routes/pdfAnalysis.route.js"
+
 import schedulerRouter from "./routes/scheduler.route.js"
 import filesRagRouter from "./routes/filesRag.route.js"
+
 import searchAPIRouter from "./routes/searchAPI.route.js"
 import healthRouter from "./routes/health.route.js"
 import statsRouter from "./routes/stats.route.js"
@@ -45,9 +48,11 @@ app.use("/api/user", userRoute)
 app.use("/api", noteRoute)
 app.use("/api/tutor", tutorRouter)
 app.use("/api/quiz", quizRouter)
-app.use("/api", studyRoomRouter)
-app.use("/api/image", imageAnalysisRouter)
-app.use("/api/pdf", pdfAnalysisRouter)
+// app.use("/api", studyRoomRouter)
+
+// app.use("/api/image", imageAnalysisRouter)
+// app.use("/api/pdf", pdfAnalysisRouter)
+
 app.use("/api", schedulerRouter)
 app.use("/api/documents", filesRagRouter)
 app.use("/api", searchAPIRouter)

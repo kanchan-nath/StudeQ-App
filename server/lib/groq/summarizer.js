@@ -68,7 +68,7 @@ const summarizeText = async (text, userId) => {
     let response
     try {
          response = await groq.chat.completions.create({
-            model: process.env.GROQ_SUMMARIZE_MODEL || "llama-3.3-70b-versatile",
+            model: process.env.GROQ_SUMMARIZE_MODEL || "openai/gpt-oss-120b",
             messages: [
                 {
                     role: "system",
