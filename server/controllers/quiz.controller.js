@@ -2,8 +2,6 @@ import { asyncHandler } from "../utils/asyncHandler.js"
 import { ApiError, ApiResponse } from "../utils/Async.js"
 import { quiz, flashcards, quizFromFile } from "../lib/groq/quiz.js"
 import { Quiz } from "../models/quiz.model.js"
-import PDFParse from "pdf-parse";
-import fs from "fs"
 import { pdfToFlashcard } from "../lib/groq/pdfToFlashcard.js"
 import { v4 as uuidv4 } from "uuid" // ✅ ADDED: need this to generate unique quizId on server
 import { Flascards } from "../models/flashcard.model.js"
@@ -13,10 +11,8 @@ import { answersValidator, quizValidator, generateQuizFromFilesValidator } from 
 import { flashcardValidator } from "../validators/flashcard.validator.js"
 import { idParamValidator } from "../validators/params.validator.js"
 import { grantXP } from "../services/xpService.js"
-
-const generateQuiz = asyncHandler(async (req, res) => {
-    console.log(req.body);
-    
+import logger from "../logger/index.js"
+const generateQuiz = asyncHandler(async (req, res) => {    
     const { data, error } = quizValidator.safeParse(req.body)
 
     if (error) {
